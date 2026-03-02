@@ -1,5 +1,5 @@
 /// Represents an error during a request to the Auth0 My Account API.
-public struct MyAccountError: Auth0APIError, @unchecked Sendable {
+public struct MyAccountError: Auth0APIError {
 
     /// A server-side validation error.
     public struct ValidationError: Sendable, Equatable {
@@ -16,7 +16,7 @@ public struct MyAccountError: Auth0APIError, @unchecked Sendable {
     }
 
     /// Raw error values.
-    public let info: [String: Any]
+    public let info: [String: any Sendable]
 
     /// HTTP status code of the response.
     public let statusCode: Int
@@ -40,15 +40,16 @@ public struct MyAccountError: Auth0APIError, @unchecked Sendable {
     ///   - statusCode: HTTP status code of the response.
     ///
     /// - Returns: A new `NyAccountError`.
-    public init(info: [String: Any], statusCode: Int) {
+    public init(info: [String: any Sendable], statusCode: Int) {
         self.info = info
         self.statusCode = statusCode
         self.code = info["type"] as? String ?? info[apiErrorCode] as? String ?? unknownError
         self.title = info["title"] as? String ?? info[apiErrorDescription] as? String ?? ""
         self.detail = info["detail"] as? String ?? ""
 
-        if let validationErrors = info["validation_errors"] as? [[String: Any]] {
-            self.validationErrors = validationErrors.map(ValidationError.init(from:))
+        if let rawErrors = info["validation_errors"] as? [any Sendable] {
+            let dicts = rawErrors.compactMap { $0 as? [String: any Sendable] }
+            self.validationErrors = dicts.isEmpty ? nil : dicts.map(ValidationError.init(from:))
         } else {
             self.validationErrors = nil
         }
@@ -96,7 +97,7 @@ extension MyAccountError: Equatable {
 
 extension MyAccountError.ValidationError {
 
-    init(from dict: [String: Any]) {
+    init(from dict: [String: any Sendable]) {
         let pointer = dict["pointer"] as? String ?? ""
 
         self.detail = dict["detail"] as? String ?? ""

@@ -1,10 +1,10 @@
 import Foundation
 
 /// Represents an error during a request to the Auth0 Management API v2.
-public struct ManagementError: Auth0APIError, @unchecked Sendable {
+public struct ManagementError: Auth0APIError {
 
     /// Raw error values.
-    public let info: [String: Any]
+    public let info: [String: any Sendable]
 
     /// Creates an error from a JSON response.
     ///
@@ -13,7 +13,7 @@ public struct ManagementError: Auth0APIError, @unchecked Sendable {
     ///   - statusCode: HTTP status code of the response.
     ///
     /// - Returns: A new `ManagementError`.
-    public init(info: [String: Any], statusCode: Int) {
+    public init(info: [String: any Sendable], statusCode: Int) {
         var values = info
         values["statusCode"] = statusCode
         self.info = values

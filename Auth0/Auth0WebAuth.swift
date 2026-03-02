@@ -2,7 +2,7 @@
 import Foundation
 import Combine
 
-final class Auth0WebAuth: WebAuth {
+struct Auth0WebAuth: WebAuth, Sendable {
 
     let clientId: String
     let url: URL
@@ -34,14 +34,18 @@ final class Auth0WebAuth: WebAuth {
     private(set) var organization: String?
     private(set) var invitationURL: URL?
     private(set) var overrideAuthorizeURL: URL?
-    private(set) var provider: WebAuthProvider?
-    private(set) var onCloseCallback: (() -> Void)?
+    private(set) var onCloseCallback: (@Sendable () -> Void)?
 
-    var state: String {
-        return self.parameters["state"] ?? self.generateDefaultState()
+    private var _redirectURL: URL?
+    private var _provider: SendableProvider?
+
+    // Wraps the non-@Sendable WebAuthProvider closure so the struct can be Sendable
+    private struct SendableProvider: @unchecked Sendable {
+        let body: WebAuthProvider
     }
 
-    lazy var redirectURL: URL? = {
+    var redirectURL: URL? {
+        if let url = _redirectURL { return url }
         guard let bundleID = Bundle.main.bundleIdentifier, let domain = self.url.host else { return nil }
         let scheme: String
 
@@ -59,7 +63,13 @@ final class Auth0WebAuth: WebAuth {
             .appendingPathComponent(self.platform)
             .appendingPathComponent(bundleID)
             .appendingPathComponent("callback")
-    }()
+    }
+
+    var provider: WebAuthProvider? { _provider?.body }
+
+    var state: String {
+        return self.parameters["state"] ?? self.generateDefaultState()
+    }
 
     init(clientId: String,
          url: URL,
@@ -77,102 +87,122 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func connection(_ connection: String) -> Self {
-        self.parameters["connection"] = connection
-        return self
+        var copy = self
+        copy.parameters["connection"] = connection
+        return copy
     }
 
     func scope(_ scope: String) -> Self {
-        self.parameters["scope"] = scope
-        return self
+        var copy = self
+        copy.parameters["scope"] = scope
+        return copy
     }
 
     func connectionScope(_ connectionScope: String) -> Self {
-        self.parameters["connection_scope"] = connectionScope
-        return self
+        var copy = self
+        copy.parameters["connection_scope"] = connectionScope
+        return copy
     }
 
     func state(_ state: String) -> Self {
-        self.parameters["state"] = state
-        return self
+        var copy = self
+        copy.parameters["state"] = state
+        return copy
     }
 
     func parameters(_ parameters: [String: String]) -> Self {
-        parameters.forEach { self.parameters[$0] = $1 }
-        return self
+        var copy = self
+        parameters.forEach { copy.parameters[$0] = $1 }
+        return copy
     }
 
     @available(iOS 17.4, macOS 14.4, visionOS 1.2, *)
     func headers(_ headers: [String: String]) -> Self {
-        headers.forEach { self.headers[$0] = $1 }
-        return self
+        var copy = self
+        headers.forEach { copy.headers[$0] = $1 }
+        return copy
     }
 
     func redirectURL(_ redirectURL: URL) -> Self {
-        self.redirectURL = redirectURL
-        return self
+        var copy = self
+        copy._redirectURL = redirectURL
+        return copy
     }
 
     func authorizeURL(_ authorizeURL: URL) -> Self {
-        self.overrideAuthorizeURL = authorizeURL
-        return self
+        var copy = self
+        copy.overrideAuthorizeURL = authorizeURL
+        return copy
     }
 
     func nonce(_ nonce: String) -> Self {
-        self.nonce = nonce
-        return self
+        var copy = self
+        copy.nonce = nonce
+        return copy
     }
 
     func audience(_ audience: String) -> Self {
-        self.parameters["audience"] = audience
-        return self
+        var copy = self
+        copy.parameters["audience"] = audience
+        return copy
     }
 
     func issuer(_ issuer: String) -> Self {
-        self.issuer = issuer
-        return self
+        var copy = self
+        copy.issuer = issuer
+        return copy
     }
 
     func leeway(_ leeway: Int) -> Self {
-        self.leeway = leeway
-        return self
+        var copy = self
+        copy.leeway = leeway
+        return copy
     }
 
     func maxAge(_ maxAge: Int) -> Self {
-        self.maxAge = maxAge
-        return self
+        var copy = self
+        copy.maxAge = maxAge
+        return copy
     }
 
     func useHTTPS() -> Self {
-        self.https = true
-        return self
+        var copy = self
+        copy.https = true
+        return copy
     }
 
     func useEphemeralSession() -> Self {
-        self.ephemeralSession = true
-        return self
+        var copy = self
+        copy.ephemeralSession = true
+        return copy
     }
 
     func invitationURL(_ invitationURL: URL) -> Self {
-        self.invitationURL = invitationURL
-        return self
+        var copy = self
+        copy.invitationURL = invitationURL
+        return copy
     }
 
     func organization(_ organization: String) -> Self {
-        self.organization = organization
-        return self
+        var copy = self
+        copy.organization = organization
+        return copy
     }
 
     func provider(_ provider: @escaping WebAuthProvider) -> Self {
-        self.provider = provider
-        return self
+        var copy = self
+        copy._provider = SendableProvider(body: provider)
+        return copy
     }
 
-    func onClose(_ callback: (() -> Void)?) -> Self {
-        self.onCloseCallback = callback
-        return self
+    func onClose(_ callback: (@Sendable () -> Void)?) -> Self {
+        var copy = self
+        copy.onCloseCallback = callback
+        return copy
     }
 
-    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    @MainActor
+    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
         let mainThreadOnCloseCallback = onCloseCallback.map { dispatchOnMain($0) }
 
@@ -221,7 +251,8 @@ final class Auth0WebAuth: WebAuth {
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
-    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    @MainActor
+    func clearSession(federated: Bool, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
         guard barrier.raise() else {
@@ -249,7 +280,10 @@ final class Auth0WebAuth: WebAuth {
         }
         let transaction = ClearSessionTransaction(userAgent: userAgent)
         self.storage.store(transaction)
-        userAgent.start()
+        Task {
+            await userAgent.start()
+        }
+   
     }
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,
@@ -339,14 +373,22 @@ final class Auth0WebAuth: WebAuth {
 extension Auth0WebAuth {
 
     public func start() -> AnyPublisher<Credentials, WebAuthError> {
-        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+        return Deferred {
+            Future { promise in
+                let box = SendableBox(value: promise)
+                Task { @MainActor in
+                    self.start { result in box.value(result) }
+                }
+            }
+        }.eraseToAnyPublisher()
     }
 
     public func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
         return Deferred {
-            Future { callback in
-                self.clearSession(federated: federated) { result in
-                    callback(result)
+            Future { promise in
+                let box = SendableBox(value: promise)
+                Task { @MainActor in
+                    self.clearSession(federated: federated) { result in box.value(result) }
                 }
             }
         }.eraseToAnyPublisher()
@@ -360,12 +402,9 @@ extension Auth0WebAuth {
 extension Auth0WebAuth {
 
     func start() async throws -> Credentials {
-        var alreadyResumed = false
         return try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
                 self.start { result in
-                    guard !alreadyResumed else { return }
-                    alreadyResumed = true
                     continuation.resume(with: result)
                 }
             }

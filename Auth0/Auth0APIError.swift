@@ -9,7 +9,7 @@ let apiErrorDPoPNonce = "dpop_nonce"
 public protocol Auth0APIError: Auth0Error {
 
     /// Raw error values.
-    var info: [String: Any] { get }
+    var info: [String: any Sendable] { get }
 
     /// Error code.
     var code: String { get }
@@ -24,7 +24,7 @@ public protocol Auth0APIError: Auth0Error {
     ///   - statusCode: HTTP status code of the response.
     ///
     /// - Returns: A new `Auth0APIError`.
-    init(info: [String: Any], statusCode: Int)
+    init(info: [String: any Sendable], statusCode: Int)
 
 }
 
@@ -62,7 +62,7 @@ public extension Auth0APIError {
 extension Auth0APIError {
 
     init(cause error: Error, statusCode: Int = 0) {
-        let info: [String: Any] = [
+        let info: [String: any Sendable] = [
             apiErrorCode: nonJSONError,
             apiErrorDescription: "Unable to complete the operation.",
             apiErrorCause: error
@@ -71,7 +71,7 @@ extension Auth0APIError {
     }
 
     init(description: String?, statusCode: Int = 0) {
-        let info: [String: Any] = [
+        let info: [String: any Sendable] = [
             apiErrorCode: description != nil ? nonJSONError : emptyBodyError,
             apiErrorDescription: description ?? "Empty response body."
         ]
@@ -80,12 +80,13 @@ extension Auth0APIError {
 
     init(from response: ResponseValue) {
         if let dpopChallenge = DPoP.challenge(from: response.value) {
-            var info: [String: Any] = [apiErrorCode: dpopChallenge.errorCode]
-            info[apiErrorDescription] = dpopChallenge.errorDescription
-            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.value)
+            var info: [String: any Sendable] = [apiErrorCode: dpopChallenge.errorCode]
+            if let desc = dpopChallenge.errorDescription { info[apiErrorDescription] = desc }
+            if let nonce = DPoP.extractNonce(from: response.value) { info[apiErrorDPoPNonce] = nonce }
             self.init(info: info, statusCode: response.value.statusCode)
-        } else if var info = json(response.data) as? [String: Any] {
-            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.value)
+        } else if let jsonDict = json(response.data) as? [String: Any] {
+            var info = jsonDict.toSendable()
+            if let nonce = DPoP.extractNonce(from: response.value) { info[apiErrorDPoPNonce] = nonce }
             self.init(info: info, statusCode: response.value.statusCode)
         } else {
             self.init(description: string(response.data), statusCode: response.value.statusCode)
@@ -135,4 +136,20 @@ func json(_ data: Data?) -> Any? {
 func string(_ data: Data?) -> String? {
     guard let data = data else { return nil }
     return String(data: data, encoding: .utf8)
+}
+
+private func makeInfoSendable(_ value: Any) -> (any Sendable)? {
+    if let v = value as? String { return v }
+    if let v = value as? Bool { return v }
+    if let v = value as? Int { return v }
+    if let v = value as? Double { return v }
+    if let v = value as? [String: Any] { return v.toSendable() }
+    if let v = value as? [Any] { return v.compactMap { makeInfoSendable($0) } }
+    return nil
+}
+
+extension Dictionary where Key == String, Value == Any {
+    func toSendable() -> [String: any Sendable] {
+        compactMapValues { makeInfoSendable($0) }
+    }
 }

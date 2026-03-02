@@ -5,10 +5,10 @@ import Foundation
 /// ## See Also
 ///
 /// - [Authentication API Errors](https://auth0.com/docs/api/authentication#errors)
-public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
+public struct AuthenticationError: Auth0APIError {
 
     /// Raw error values.
-    public let info: [String: Any]
+    public let info: [String: any Sendable]
 
     /// Creates an error from a JSON response.
     ///
@@ -17,7 +17,7 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
     ///   - statusCode: HTTP status code of the response.
     ///
     /// - Returns: A new `AuthenticationError`.
-    public init(info: [String: Any], statusCode: Int) {
+    public init(info: [String: any Sendable], statusCode: Int) {
         var values = info
         values["statusCode"] = statusCode
         self.info = values

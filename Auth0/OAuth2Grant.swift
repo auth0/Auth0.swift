@@ -3,7 +3,7 @@ import Foundation
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
-    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void)
+    func credentials(from values: [String: String], callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void)
     func values(fromComponents components: URLComponents) -> [String: String]
 }
 
@@ -63,7 +63,7 @@ struct PKCE: OAuth2Grant {
         self.defaults = newDefaults
     }
 
-    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    func credentials(from values: [String: String], callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) {
         guard let code = values["code"] else {
             return callback(.failure(WebAuthError(code: .noAuthorizationCode(values))))
         }

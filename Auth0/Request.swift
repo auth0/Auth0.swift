@@ -18,7 +18,7 @@ let parameterPropertyKey = "com.auth0.parameter"
  }
  ```
  */
-public struct Request<T, E: Auth0APIError>: Requestable {
+public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
     /**
      The callback closure type for the request.
      */
@@ -88,7 +88,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
-    public func start(_ callback: @escaping Callback) {
+    public func start(_ callback: @escaping @Sendable (Result<T, E>) -> Void) {
         self.startDataTask(retryCount: 0, request: self.request, callback: dispatchOnMain(callback))
     }
 
@@ -205,7 +205,12 @@ public extension Request {
      - Returns: A type-erased publisher.
      */
     func start() -> AnyPublisher<T, E> {
-        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+        return Deferred {
+            Future { promise in
+                let box = SendableBox(value: promise)
+                self.start { box.value($0) }
+            }
+        }.eraseToAnyPublisher()
     }
 
 }
@@ -220,7 +225,7 @@ public extension Request {
 
      - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
      */
-    func start() async throws -> T {
+    func start() async throws -> T where T: Sendable {
         return try await withCheckedThrowingContinuation { continuation in
             self.start { result in
                 continuation.resume(with: result)

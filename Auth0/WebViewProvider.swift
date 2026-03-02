@@ -50,9 +50,8 @@
 public extension WebAuthentication {
 
     static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
-        return { url, callback  in
+        return { url, callback in
             let redirectURL = extractRedirectURL(from: url)!
-
             return WebViewUserAgent(authorizeURL: url,
                                     redirectURL: redirectURL,
                                     modalPresentationStyle: style,
@@ -62,7 +61,7 @@ public extension WebAuthentication {
 
 }
 
-class WebViewUserAgent: NSObject, WebAuthUserAgent {
+class WebViewUserAgent: NSObject, WebAuthUserAgent, @unchecked Sendable {
 
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
     static let customSchemeRedirectionFailureMessage = "com.auth0.webview.redirection_failure"
@@ -74,6 +73,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     let redirectURL: URL
     let callback: WebAuthProviderCallback
 
+    @MainActor
     init(authorizeURL: URL, redirectURL: URL, viewController: UIViewController = UIViewController(), modalPresentationStyle: UIModalPresentationStyle = .fullScreen, callback: @escaping WebAuthProviderCallback) {
         self.request = URLRequest(url: authorizeURL)
         self.redirectURL = redirectURL
@@ -89,6 +89,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         }
     }
 
+    @MainActor
     private func setupWebViewWithCustomScheme() {
         let configuration = WKWebViewConfiguration()
         configuration.setURLSchemeHandler(self, forURLScheme: redirectURL.scheme!)
@@ -97,12 +98,13 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         webview.navigationDelegate = self
     }
 
+    @MainActor
     private func setupWebViewWithHTTPS() {
         self.webview = WKWebView(frame: .zero)
         self.viewController.view = webview
         webview.navigationDelegate = self
     }
-
+    
     func start() {
         self.webview.load(self.request)
         UIWindow.topViewController?.present(self.viewController, animated: true)

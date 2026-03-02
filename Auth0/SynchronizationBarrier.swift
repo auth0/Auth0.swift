@@ -7,7 +7,7 @@ import Foundation
 /// The barrier uses a serial queue to maintain operation ordering and a queue-based system
 /// to ensure each operation completes before the next one begins, without using dispatch groups
 /// or semaphores that would block threads.
-final class SynchronizationBarrier {
+final class SynchronizationBarrier: @unchecked Sendable {
 
     /// Shared singleton instance used by both CredentialsManager and Auth0Authentication
     static let shared = SynchronizationBarrier()
@@ -16,12 +16,10 @@ final class SynchronizationBarrier {
     private let queue = DispatchQueue(label: "com.auth0.synchronization.serial")
     
     /// Queue of pending operations waiting to be executed
-    private var pendingOperations: [(@escaping () -> Void) -> Void] = []
+    private var pendingOperations: [@Sendable (@escaping @Sendable () -> Void) -> Void] = []
     
     /// Flag indicating whether an operation is currently executing
     private var isExecuting = false
-
-
 
     /// Executes an operation in a thread-safe manner.
     /// Only one operation will be executed at a time across all instances.
@@ -33,7 +31,7 @@ final class SynchronizationBarrier {
     /// - Parameter operation: The operation to execute. The operation will receive a completion
     ///   handler that it **must** call when finished. The completion handler can be called from
     ///   any thread. Operations are executed one at a time in the order they were submitted.
-    func execute(_ operation: @escaping (@escaping () -> Void) -> Void) {
+    func execute(_ operation: @escaping @Sendable (@escaping @Sendable () -> Void) -> Void) {
 
         queue.async { [weak self] in
             guard let self = self else { return }

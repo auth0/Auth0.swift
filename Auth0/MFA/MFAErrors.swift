@@ -26,14 +26,14 @@ public struct MfaListAuthenticatorsError: Auth0APIError {
        - info: Additional error information from the API response.
        - statusCode: HTTP status code from the response.
      */
-    public init(info: [String: Any], statusCode: Int = 0) {
+    public init(info: [String: any Sendable], statusCode: Int = 0) {
         self.info = info
         self.statusCode = statusCode
         code = (info["error"] as? String) ?? "mfa_list_authenticators_error"
     }
 
     /// Additional error information from the API response.
-    public var info: [String: Any]
+    public var info: [String: any Sendable]
 
     /// The error code identifying the type of failure.
     public var code: String
@@ -91,14 +91,14 @@ public struct MfaEnrollmentError: Auth0APIError {
        - info: Additional error information from the API response.
        - statusCode: HTTP status code from the response.
      */
-    public init(info: [String: Any], statusCode: Int = 0) {
+    public init(info: [String: any Sendable], statusCode: Int = 0) {
         self.info = info
         self.statusCode = statusCode
         code = (info["error"] as? String) ?? "mfa_enrollment_error"
     }
 
     /// Additional error information from the API response.
-    public var info: [String: Any]
+    public var info: [String: any Sendable]
 
     /// The error code identifying the type of failure.
     public var code: String
@@ -153,14 +153,14 @@ public struct MfaChallengeError: Auth0APIError {
        - info: Additional error information from the API response.
        - statusCode: HTTP status code from the response.
      */
-    public init(info: [String: Any], statusCode: Int = 0) {
+    public init(info: [String: any Sendable], statusCode: Int = 0) {
         self.info = info
         self.statusCode = statusCode
         code = (info["error"] as? String) ?? "mfa_challenge_error"
     }
 
     /// Additional error information from the API response.
-    public var info: [String: Any]
+    public var info: [String: any Sendable]
 
     /// The error code identifying the type of failure.
     public var code: String
@@ -217,14 +217,14 @@ public struct MFAVerifyError: Auth0APIError {
        - info: Additional error information from the API response.
        - statusCode: HTTP status code from the response.
      */
-    public init(info: [String: Any], statusCode: Int = 0) {
+    public init(info: [String: any Sendable], statusCode: Int = 0) {
         code = (info["error"] as? String) ?? "mfa_verify_error"
         self.info = info
         self.statusCode = statusCode
     }
 
     /// Additional error information from the API response.
-    public var info: [String: Any]
+    public var info: [String: any Sendable]
 
     /// The error code identifying the type of failure.
     public var code: String

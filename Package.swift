@@ -4,6 +4,14 @@ import PackageDescription
 
 let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst, .visionOS]
 let swiftSettings: [SwiftSetting] = [
+    .swiftLanguageMode(.v6),
+    .define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms)),
+    .define("PASSKEYS_PLATFORM", .when(platforms: webAuthPlatforms))
+]
+// Tests use Swift 5 mode: Quick's `waitUntil` `done` closure is not @Sendable,
+// which causes thousands of errors under Swift 6 strict concurrency.
+// The SDK itself is fully Swift 6 compliant; test infrastructure can be migrated separately.
+let testSwiftSettings: [SwiftSetting] = [
     .swiftLanguageMode(.v5),
     .define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms)),
     .define("PASSKEYS_PLATFORM", .when(platforms: webAuthPlatforms))
@@ -15,7 +23,7 @@ let package = Package(
     products: [.library(name: "Auth0", targets: ["Auth0"])],
     dependencies: [
         .package(url: "https://github.com/auth0/SimpleKeychain.git", exact:"1.3.0"),
-        .package(url: "https://github.com/auth0/JWTDecode.swift.git", exact:"3.3.0"),
+        .package(url: "https://github.com/auth0/JWTDecode.swift.git", exact:"4.0.0-beta.0"),
         .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "7.0.0")),
         .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "13.0.0"))
     ],
@@ -39,6 +47,6 @@ let package = Package(
             ],
             path: "Auth0Tests",
             exclude: ["Info.plist", "Auth0.plist"],
-            swiftSettings: swiftSettings)
+            swiftSettings: testSwiftSettings)
     ]
 )

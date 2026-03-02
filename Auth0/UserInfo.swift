@@ -7,7 +7,7 @@ import Foundation
 /// ## See Also
 ///
 /// - [Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims)
-public struct UserInfo: JSONObjectPayload, @unchecked Sendable {
+public struct UserInfo: JSONObjectPayload {
 
     /// The list of public claims.
     public static let publicClaims = [
@@ -134,7 +134,7 @@ public struct UserInfo: JSONObjectPayload, @unchecked Sendable {
     public let updatedAt: Date?
 
     /// Any custom claims.
-    public let customClaims: [String: Any]?
+    public let customClaims: [String: any Sendable]?
 
 }
 
@@ -183,8 +183,8 @@ public extension UserInfo {
             updatedAt = date(from: dateString)
         }
 
-        var customClaims = json
-        UserInfo.publicClaims.forEach { customClaims.removeValue(forKey: $0) }
+        var customClaimsDict = json
+        UserInfo.publicClaims.forEach { customClaimsDict.removeValue(forKey: $0) }
 
         self.init(sub: sub,
                   name: name,
@@ -206,7 +206,7 @@ public extension UserInfo {
                   phoneNumberVerified: phoneNumberVerified,
                   address: address,
                   updatedAt: updatedAt,
-                  customClaims: customClaims)
+                  customClaims: customClaimsDict.toSendable())
     }
 
 }
