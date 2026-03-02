@@ -20,7 +20,6 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)
   + [Authentication API Client](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)
   + [MFA API Client](https://auth0.github.io/Auth0.swift/documentation/auth0/mfaclient)
-  + [Management API Client (Users)](https://auth0.github.io/Auth0.swift/documentation/auth0/users)
 - [**FAQ**](FAQ.md) - answers some common questions about Auth0.swift.
 - [**Auth0 Documentation**](https://auth0.com/docs) - explore our docs site and learn more about Auth0.
 
@@ -115,16 +114,6 @@ Auth0
 ```swift
 Auth0
     .authentication(clientId: "YOUR_AUTH0_CLIENT_ID", domain: "YOUR_AUTH0_DOMAIN")
-    // ...
-```
-</details>
-
-<details>
-  <summary>For the Management API client (Users)</summary>
-
-```swift
-Auth0
-    .users(token: credentials.accessToken, domain: "YOUR_AUTH0_DOMAIN")
     // ...
 ```
 </details>

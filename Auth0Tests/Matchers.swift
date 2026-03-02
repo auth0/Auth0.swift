@@ -32,36 +32,6 @@ func haveAuthenticationError<T>(code: String, description: String) -> Nimble.Mat
 }
 #endif
 
-func haveManagementError<T>(_ errorString: String, description: String, code: String, statusCode: Int) -> Nimble.Matcher<ManagementResult<T>> {
-    return Matcher<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> MatcherResult in
-        return try beUnsuccessful(expression, failureMessage) { (error: ManagementError) -> Bool in
-            return errorString == error.info["error"] as? String
-            && code == error.code
-            && description == error.localizedDescription
-            && statusCode == error.statusCode
-        }
-    }
-}
-
-func haveManagementError<T>(description: String, code: String, statusCode: Int = 0, cause: Error? = nil) -> Nimble.Matcher<ManagementResult<T>> {
-    return Matcher<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> MatcherResult in
-        return try beUnsuccessful(expression, failureMessage) { (error: ManagementError) -> Bool in
-            return code == error.code
-            && description == error.localizedDescription
-            && statusCode == error.statusCode
-            && (cause == nil || error.cause?.localizedDescription == cause?.localizedDescription)
-        }
-    }
-}
-
-func haveManagementError<T>(description: String, statusCode: Int) -> Nimble.Matcher<ManagementResult<T>> {
-    return Matcher<ManagementResult<T>>.define("be an error result") { expression, failureMessage -> MatcherResult in
-        return try beUnsuccessful(expression, failureMessage) { (error: ManagementError) -> Bool in
-            return error.localizedDescription == description && error.statusCode == statusCode
-        }
-    }
-}
-
 #if WEB_AUTH_PLATFORM
 func haveWebAuthError<T>(_ expected: WebAuthError) -> Nimble.Matcher<WebAuthResult<T>> {
     return Matcher<WebAuthResult<T>>.define("be an error result") { expression, failureMessage -> MatcherResult in
@@ -375,12 +345,6 @@ func beSuccessful<T>() -> Nimble.Matcher<AuthenticationResult<T>> {
     }
 }
 
-func beSuccessful<T>() -> Nimble.Matcher<ManagementResult<T>> {
-    return Matcher<ManagementResult<T>>.define("be a successful result") { expression, failureMessage -> MatcherResult in
-        return try beSuccessful(expression, failureMessage)
-    }
-}
-
 #if WEB_AUTH_PLATFORM
 func beSuccessful<T>() -> Nimble.Matcher<WebAuthResult<T>> {
     return Matcher<WebAuthResult<T>>.define("be a successful result") { expression, failureMessage -> MatcherResult in
@@ -447,16 +411,6 @@ func beUnsuccessful<T>() -> Nimble.Matcher<CredentialsManagerResult<T>> {
 func haveProfile(_ sub: String) -> Nimble.Matcher<AuthenticationResult<UserInfo>> {
     return Matcher<AuthenticationResult<UserInfo>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (userInfo: UserInfo) -> Bool in userInfo.sub == sub }
-    }
-}
-
-func haveObjectWithAttributes(_ attributes: [String]) -> Nimble.Matcher<ManagementResult<[String: Any]>> {
-    return Matcher<ManagementResult<[String: Any]>>.define("have attributes \(attributes)") { expression, failureMessage -> MatcherResult in
-        return try beSuccessful(expression, failureMessage) { (value: [String: Any]) -> Bool in
-            return Array(value.keys).reduce(true, { (initial, value) -> Bool in
-                return initial && attributes.contains(value)
-            })
-        }
     }
 }
 

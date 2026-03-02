@@ -30,6 +30,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Sendable protocol conformances](#sendable-protocol-conformances)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
+- [**Removed APIs**](#removed-apis)
+  + [Management API client (Users)](#management-api-client-users)
 
 ---
 
@@ -184,7 +186,7 @@ In v2, completion callbacks would sometimes execute on the main thread and somet
 
 **Affected APIs:**
 
-- All Authentication and Management API methods using callbacks
+- All Authentication API methods using callbacks
 - All Credentials Manager methods using callbacks
 - All Web Auth methods using callbacks
 
@@ -314,6 +316,29 @@ final class MyLogger: Logger, @unchecked Sendable {
 **Impact:** Error handling code needs to be updated to use the new error cases. The removed cases will now throw `.unknown` errors with descriptive messages.
 
 **Reason:** The removed error cases represent configuration issues that should be caught during development, not handled in production code. This will result in a more useful and meaningful set of WebAuthError cases.
+
+---
+
+## Removed APIs
+
+### Management API client (Users)
+
+> [!NOTE]
+> This section only impacts you if your app used the Management API client (`Auth0.users(...)`). Removing it makes the SDK **leaner** — all consumers benefit from a smaller binary without carrying code they don't use.
+
+**Change:** The Management API client has been removed. This includes the `Auth0.users()` factory functions, the `Users` protocol, `ManagementError`, `ManagementResult`, and `UserPatchAttributes`.
+
+**Impact:** Any code that calls `Auth0.users(...)` or references the removed types will no longer compile.
+
+**Migration:** Instead of calling the [Management API](https://auth0.com/docs/api/management/v2) directly from your mobile app, expose dedicated endpoints in your own backend that perform the required operations, and call those from the app using the access token you already have.
+
+For example, if you were reading or updating user metadata:
+
+1. **Create a backend endpoint** (e.g. `PATCH /me/metadata`) that accepts the operation your app needs.
+2. **Call that endpoint from your app**, passing the user's access token as a `Bearer` token in the `Authorization` header.
+3. **On your backend**, obtain a machine-to-machine token via the [Client Credentials flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow) and use it to call the [Management API](https://auth0.com/docs/api/management/v2) with the precise scopes required.
+
+**Reason:** The Management API is not designed for direct use from mobile apps — it requires its own audience (`https://YOUR_AUTH0_DOMAIN/api/v2/`), but Auth0 access tokens support only a single audience. If your app also needs to call your own backend API, you must set that API's identifier as the audience at login, which means the same token cannot be used for the Management API. You would have to choose one or the other. It is also heavily restricted for public clients (only a small subset of operations are permitted, and sensitive actions such as managing roles, rules, or other users are not available), and was used by fewer than 0.1% of Auth0.swift users.
 
 ---
 [Go up ⤴](#table-of-contents)
