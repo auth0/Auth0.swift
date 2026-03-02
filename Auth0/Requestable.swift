@@ -13,7 +13,17 @@ public protocol Requestable<ResultType, ErrorType> {
 }
 
 extension Requestable {
-    var dpop: DPoP? { (self as? Request<ResultType, ErrorType>)?.dpop }
+    func parameters(_ extraParameters: [String: Any]) -> any Requestable<ResultType, ErrorType> {
+        self
+    }
+
+    func headers(_ extraHeaders: [String: String]) -> any Requestable<ResultType, ErrorType> {
+        self
+    }
+
+    func requestValidators(_ extraValidators: [RequestValidator]) -> any Requestable<ResultType, ErrorType> {
+        self
+    }
 }
 
 // MARK: - Combine

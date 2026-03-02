@@ -4,10 +4,42 @@ import Combine
 
 @MainActor
 final class ContentViewModel: ObservableObject {
+    @Published var email: String = ""
+    @Published var password: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var isAuthenticated: Bool = false
-    private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+    private let credentialsManager: CredentialsManager
+
+    private let authenticationClient: Authentication
+    init(email: String = "",
+         password: String = "",
+         isLoading: Bool = false,
+         errorMessage: String? = nil,
+         isAuthenticated: Bool = false,
+         authenticationClient: Authentication,
+         credentialsManager: CredentialsManager? = nil) {
+        self.email = email
+        self.password = password
+        self.isLoading = isLoading
+        self.errorMessage = errorMessage
+        self.isAuthenticated = isAuthenticated
+        self.authenticationClient = authenticationClient
+        self.credentialsManager = credentialsManager ?? CredentialsManager(authentication: Auth0.authentication())
+    }
+
+    func login() async {
+        isLoading = true
+        do {
+            let credentials = try await authenticationClient
+                .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication", audience: nil, scope: "openid profile offline_access")
+                .start()
+            isAuthenticated = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
 
     #if WEB_AUTH_PLATFORM
     func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {

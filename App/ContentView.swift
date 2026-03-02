@@ -10,7 +10,7 @@ import Auth0
 
 
 struct ContentView: View {
-    @StateObject private var viewModel = ContentViewModel()
+    @StateObject private var viewModel = ContentViewModel(authenticationClient: Auth0.authentication())
 
     #if os(macOS)
     @State private var currentWindow: Auth0WindowRepresentable?

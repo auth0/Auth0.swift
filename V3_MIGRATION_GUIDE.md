@@ -31,6 +31,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
+  + [Request to Requestable](#requestable)
 
 ---
 
@@ -369,5 +370,69 @@ let user: UserProfile = ...
 ```
 </details>
 
+## Request to Requestable 
+
+**Change:** API Clients Authentication, MFAClient, MyAccountAuthenticationMethods have been refactored to return Requestable instead of Request 
+
+**Impact:** With returning Requestable protocol instead of Request, developers can now mock Request in the api clients thus mocking Auth0 layer making writing tests supper easy
+
+**Reason:** With existing Request object it was hard to mock Auth0 SDK layer. Only way to mock was using URLProtocol. With Requestable, developers can mock requests and write tests without heavy lifting of mocking url session layer
+
+**example code**
+
+```swift
+public protocol Authentication {  
+    func login(email: String, code: String, audience: String?, scope: String) -> Requestable  
+}  
+  
+class MockRequestable: Requestable {  
+    typealias ResultType = Credentials  
+    typealias ErrorType = AuthenticationError  
+      
+    let mockResult: Result<Credentials, AuthenticationError>  
+      
+    init(mockResult: Result<Credentials, AuthenticationError>) {  
+        self.mockResult = mockResult  
+    }  
+      
+    func start(_ callback: @escaping (Result<Credentials, AuthenticationError>) -> Void) {  
+        callback(mockResult)  
+    }  
+}  
+  
+class MockAuthentication: Authentication {  
+    let mockRequest: MockRequestable  
+      
+    init(mockResult: Result<Credentials, AuthenticationError>) {  
+        self.mockRequest = MockRequestable(mockResult: mockResult)  
+    }  
+      
+    func login(email: String, code: String, audience: String?, scope: String) -> Requestable {  
+        return mockRequest  
+    }  
+}  
+  
+class ClientAppOrSDK {  
+    private let auth: Authentication  
+      
+    func login(email: String, code: String, completion: @escaping (Result<Credentials, Error>) -> Void) {  
+        let requestable = auth.login(email: email, code: code, audience: nil, scope: "openid profile email")  
+        requestable.start { result in  
+            // Handle result  
+        }  
+    }  
+}  
+  
+func testLoginSuccess() {  
+    let mockCredentials = Credentials(accessToken: "token", tokenType: "Bearer", expiresIn: Date(), idToken: "id_token")  
+    let mockAuth = MockAuthentication(mockResult: .success(mockCredentials))  
+    let apporsdk = ClientAppOrSDK(auth: mockAuth)  
+      
+    apporsdk.login(email: "test@example.com", code: "123456") { result in  
+        // Assert success without network calls  
+        XCTAssertEqual(try? result.get().accessToken, "token")  
+    }  
+}
+```
 ---
 [Go up ⤴](#table-of-contents)
