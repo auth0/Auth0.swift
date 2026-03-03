@@ -479,7 +479,7 @@ switch error {
 
 ### `UserInfo` struct
 
-`UserInfo` is now a struct, so its properties are no longer marked with the `@objc` attribute.
+It is now a struct, so its properties are no longer marked with the `@objc` attribute.
 
 ### `Credentials` class
 

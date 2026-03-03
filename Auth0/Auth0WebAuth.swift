@@ -261,7 +261,7 @@ final class Auth0WebAuth: WebAuth {
             barrier.lower()
             mainThreadCallback(result)
         }
-        let transaction = ClearSessionTransaction(userAgent: userAgent)
+        let transaction = LogoutTransaction(userAgent: userAgent)
         self.storage.store(transaction)
         userAgent.start()
     }

@@ -30,8 +30,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Sendable protocol conformances](#sendable-protocol-conformances)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
-  + [`clearSession()` renamed to `logout()`](#clearsession-renamed-to-logout)
-  + [`UserInfo` renamed to `UserProfile`](#userinfo-renamed-to-userprofile)
+  + [Renamed APIs](#renamed-apis)
 
 ---
 
@@ -317,13 +316,18 @@ final class MyLogger: Logger, @unchecked Sendable {
 
 **Reason:** The removed error cases represent configuration issues that should be caught during development, not handled in production code. This will result in a more useful and meaningful set of WebAuthError cases.
 
-### `clearSession()` renamed to `logout()`
+### Renamed APIs
 
-**Change:** The `clearSession(federated:)` method on the Web Auth client has been renamed to `logout(federated:)`.
+The following APIs have been renamed to align with the Android, Flutter, and React Native Auth0 SDKs:
 
-This affects all three API flavors: callback-based, Combine, and async/await.
+| v2 | v3 |
+| --- | --- |
+| `clearSession(federated:)` | `logout(federated:)` |
+| `UserInfo` | `UserProfile` |
 
-**Impact:** Update all call sites from `clearSession()` to `logout()`.
+**`clearSession()` → `logout()`**
+
+The `clearSession(federated:)` method on the Web Auth client has been renamed to `logout(federated:)`. This affects all three API flavors: callback-based, Combine, and async/await.
 
 <details>
   <summary>Migration example</summary>
@@ -349,13 +353,9 @@ try await Auth0.webAuth().logout()
 ```
 </details>
 
-**Reason:** Aligns with the Android, Flutter, and React Native Auth0 SDKs, which all use `logout()` for this operation.
+**`UserInfo` → `UserProfile`**
 
-### `UserInfo` renamed to `UserProfile`
-
-**Change:** The `UserInfo` struct has been renamed to `UserProfile`.
-
-**Impact:** Update all references to the `UserInfo` type in your code. The `userInfo(withAccessToken:)` method name on the Authentication client is unchanged, as it maps to the OIDC `/userinfo` endpoint.
+The `UserInfo` struct has been renamed to `UserProfile`. The `userInfo(withAccessToken:)` method name on the Authentication client is unchanged, as it maps to the OIDC `/userinfo` endpoint.
 
 <details>
   <summary>Migration example</summary>
@@ -368,8 +368,6 @@ let user: UserInfo = ...
 let user: UserProfile = ...
 ```
 </details>
-
-**Reason:** Aligns with the Android, Flutter, and React Native Auth0 SDKs, which all use `UserProfile` for this type.
 
 ---
 [Go up ⤴](#table-of-contents)
