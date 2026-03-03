@@ -30,6 +30,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Sendable protocol conformances](#sendable-protocol-conformances)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
+  + [`clearSession()` renamed to `logout()`](#clearsession-renamed-to-logout)
+  + [`UserInfo` renamed to `UserProfile`](#userinfo-renamed-to-userprofile)
 
 ---
 
@@ -314,6 +316,60 @@ final class MyLogger: Logger, @unchecked Sendable {
 **Impact:** Error handling code needs to be updated to use the new error cases. The removed cases will now throw `.unknown` errors with descriptive messages.
 
 **Reason:** The removed error cases represent configuration issues that should be caught during development, not handled in production code. This will result in a more useful and meaningful set of WebAuthError cases.
+
+### `clearSession()` renamed to `logout()`
+
+**Change:** The `clearSession(federated:)` method on the Web Auth client has been renamed to `logout(federated:)`.
+
+This affects all three API flavors: callback-based, Combine, and async/await.
+
+**Impact:** Update all call sites from `clearSession()` to `logout()`.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2
+Auth0
+    .webAuth()
+    .clearSession { result in
+        // ...
+    }
+
+try await Auth0.webAuth().clearSession()
+
+// v3
+Auth0
+    .webAuth()
+    .logout { result in
+        // ...
+    }
+
+try await Auth0.webAuth().logout()
+```
+</details>
+
+**Reason:** Aligns with the Android, Flutter, and React Native Auth0 SDKs, which all use `logout()` for this operation.
+
+### `UserInfo` renamed to `UserProfile`
+
+**Change:** The `UserInfo` struct has been renamed to `UserProfile`.
+
+**Impact:** Update all references to the `UserInfo` type in your code. The `userInfo(withAccessToken:)` method name on the Authentication client is unchanged, as it maps to the OIDC `/userinfo` endpoint.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2
+let user: UserInfo = ...
+
+// v3
+let user: UserProfile = ...
+```
+</details>
+
+**Reason:** Aligns with the Android, Flutter, and React Native Auth0 SDKs, which all use `UserProfile` for this type.
 
 ---
 [Go up ⤴](#table-of-contents)
