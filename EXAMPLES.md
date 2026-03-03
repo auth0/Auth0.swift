@@ -416,7 +416,7 @@ SomeView()
 
 ![Screenshot of SFSafariViewController's documentation](https://github.com/user-attachments/assets/98de5937-3ca4-4779-9e3c-725d8b628870)
 
-This is the case for login, but not for logout. Instead of calling `clearSession()`, you can delete the stored credentials –using the Credentials Manager's `clear()` method– and use `"prompt": "login"` to force the login page even if the session cookie is still present. Since the cookies stored by `SFSafariViewController` are scoped to your app, this should not pose an issue.
+This is the case for login, but not for logout. Instead of calling `logout()`, you can delete the stored credentials –using the Credentials Manager's `clear()` method– and use `"prompt": "login"` to force the login page even if the session cookie is still present. Since the cookies stored by `SFSafariViewController` are scoped to your app, this should not pose an issue.
 
 ```swift
 Auth0
@@ -508,7 +508,7 @@ On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair f
 ```swift
 Auth0.webAuth()
     .useHTTPS()
-    .clearSession { result in 
+    .logout { result in
     // ...
 }
 
@@ -1737,7 +1737,7 @@ Auth0
 
 Fetch the latest user information from the `/userinfo` endpoint.
 
-This method will yield a `UserInfo` instance. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/userinfo) to learn more about its available properties.
+This method will yield a `UserProfile` instance. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/userprofile) to learn more about its available properties.
 
 ```swift
 Auth0
@@ -4244,7 +4244,7 @@ Auth0
 
 ### Retrieve user metadata
 
-To call this method, you must request the `read:current_user` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you must request the `read:current_user` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserProfile` instance.
 
 ```swift
 Auth0
@@ -4300,7 +4300,7 @@ Auth0
 
 ### Update user metadata
 
-To call this method, you must request the `update:current_user_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you must request the `update:current_user_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserProfile` instance.
 
 ```swift
 Auth0
@@ -4358,7 +4358,7 @@ Auth0
 
 Your users may want to link their other accounts to the account they are logged in to. To achieve this, you need the user ID for the primary account and the idToken for the secondary account. You also need to request the `update:current_user_identities` scope when logging in.
 
-You can get the primary user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the primary user's ID token, or from the `sub` property of a `UserInfo` instance.
+You can get the primary user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the primary user's ID token, or from the `sub` property of a `UserProfile` instance.
 
 ```swift
 Auth0

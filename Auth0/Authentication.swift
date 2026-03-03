@@ -915,7 +915,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/user-profile/get-user-info)
      */
-    func userInfo(withAccessToken accessToken: String, tokenType: String) -> Request<UserInfo, AuthenticationError>
+    func userInfo(withAccessToken accessToken: String, tokenType: String) -> Request<UserProfile, AuthenticationError>
 
     /**
      Performs the last step of Proof Key for Code Exchange (PKCE).
@@ -1289,7 +1289,7 @@ public extension Authentication {
     }
 
     func userInfo(withAccessToken accessToken: String,
-                  tokenType: String = "Bearer") -> Request<UserInfo, AuthenticationError> {
+                  tokenType: String = "Bearer") -> Request<UserProfile, AuthenticationError> {
         self.userInfo(withAccessToken: accessToken, tokenType: tokenType)
     }
 

@@ -444,9 +444,9 @@ func beUnsuccessful<T>() -> Nimble.Matcher<CredentialsManagerResult<T>> {
     }
 }
 
-func haveProfile(_ sub: String) -> Nimble.Matcher<AuthenticationResult<UserInfo>> {
-    return Matcher<AuthenticationResult<UserInfo>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> MatcherResult in
-        return try beSuccessful(expression, failureMessage) { (userInfo: UserInfo) -> Bool in userInfo.sub == sub }
+func haveProfile(_ sub: String) -> Nimble.Matcher<AuthenticationResult<UserProfile>> {
+    return Matcher<AuthenticationResult<UserProfile>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage) { (userInfo: UserProfile) -> Bool in userInfo.sub == sub }
     }
 }
 

@@ -421,7 +421,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func userInfo(withAccessToken accessToken: String, tokenType: String) -> Request<UserInfo, AuthenticationError> {
+    func userInfo(withAccessToken accessToken: String, tokenType: String) -> Request<UserProfile, AuthenticationError> {
         let userInfo = URL(string: "userinfo", relativeTo: self.url)!
         let method = "GET"
         let headers = self.baseHeaders(accessToken: accessToken, tokenType: tokenType)
