@@ -79,11 +79,11 @@ public struct CredentialsManager: Sendable {
     /// ```
     ///
     /// - Important: Access to this property will not be protected by biometric authentication.
-    public var user: UserInfo? {
+    public var user: UserProfile? {
         guard let credentials = self.retrieveCredentials(),
               let jwt = try? decode(jwt: credentials.idToken) else { return nil }
 
-        return UserInfo(json: jwt.body)
+        return UserProfile(json: jwt.body)
     }
 
     #if WEB_AUTH_PLATFORM

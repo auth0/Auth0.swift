@@ -49,7 +49,7 @@ final class ContentViewModel: ObservableObject {
                 webAuth = webAuth.presentationWindow(window)
             }
 
-            try await webAuth.clearSession()
+            try await webAuth.logout()
 
             let cleared = credentialsManager.clear()
             if cleared {

@@ -41,7 +41,7 @@ As expected with a major release, Auth0.swift v2 contains breaking changes. Plea
   + [`ManagementError` struct](#managementerror-struct)
   + [`WebAuthError` struct](#webautherror-struct)
   + [`CredentialsManagerError` struct](#credentialsmanagererror-struct)
-  + [`UserInfo` struct](#userinfo-struct)
+  + [`UserProfile` struct](#userprofile-struct)
   + [`Credentials` class](#credentials-class)
   + [`NSError` extension](#nserror-extension)
 - [**Method Signatures Changed**](#method-signatures-changed)
@@ -122,7 +122,7 @@ The following classes were also removed, as they were no longer being used:
 - `Profile`
 - `Identity`
 
-You should use `UserInfo` from `userInfo(withAccessToken:)` instead.
+You should use `UserProfile` from `userInfo(withAccessToken:)` instead.
 
 ## Methods Removed
 
@@ -362,7 +362,7 @@ The `a0_url(_:)` method is no longer public.
 - `Auth0Error` was renamed to `Auth0APIError`, and `Auth0Error` is now a different protocol.
 - `Credentials` is now a `final` class that conforms to `Codable` instead of `JSONObjectPayload`.
 - `UserPatchAttributes` is now a `final` class.
-- `UserInfo` was changed from class to struct.
+- `UserProfile` (previously `UserInfo`) was changed from class to struct.
 - `AuthenticationError` was changed from class to struct, and it no longer conforms to `CustomNSError`.
 - `ManagementError` was changed from class to struct, and it no longer conforms to `CustomNSError`.
 - `WebAuthError` was changed from enum to struct.
@@ -477,9 +477,9 @@ switch error {
 
 `.largeMinTTL`, for when the requested `minTTL` is greater than the lifetime of the renewed access token.
 
-### `UserInfo` struct
+### `UserProfile` struct
 
-It is now a struct, so its properties are no longer marked with the `@objc` attribute.
+`UserProfile` (previously `UserInfo`) is now a struct, so its properties are no longer marked with the `@objc` attribute.
 
 ### `Credentials` class
 
@@ -629,9 +629,9 @@ case .failure(let error): // handle WebAuthError
 ```
 </details>
 
-#### `clearSession(federated:)`
+#### `logout(federated:)`
 
-This method now yields a `Result<Void, WebAuthError>`, which is aliased to `WebAuthResult<Void>`. This means you can now check the type of error, for example if the user cancelled the operation.
+This method (previously `clearSession(federated:)`) now yields a `Result<Void, WebAuthError>`, which is aliased to `WebAuthResult<Void>`. This means you can now check the type of error, for example if the user cancelled the operation.
 
 <details>
   <summary>Before / After</summary>
@@ -650,7 +650,7 @@ Auth0
 // After
 Auth0
     .webAuth()
-    .clearSession() { result in // federated is now false by default
+    .logout() { result in // federated is now false by default
         switch result {
         case .success: // ...
         case .failure(let error): // ...

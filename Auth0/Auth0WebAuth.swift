@@ -233,7 +233,7 @@ final class Auth0WebAuth: WebAuth {
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
-    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    func logout(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
         guard barrier.raise() else {
@@ -356,10 +356,10 @@ extension Auth0WebAuth {
         return Deferred { Future(self.start) }.eraseToAnyPublisher()
     }
 
-    public func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
+    public func logout(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
         return Deferred {
             Future { callback in
-                self.clearSession(federated: federated) { result in
+                self.logout(federated: federated) { result in
                     callback(result)
                 }
             }
@@ -386,10 +386,10 @@ extension Auth0WebAuth {
         }
     }
 
-    func clearSession(federated: Bool) async throws {
+    func logout(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
-                self.clearSession(federated: federated) { result in
+                self.logout(federated: federated) { result in
                     continuation.resume(with: result)
                 }
             }

@@ -171,7 +171,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
     /// Using this method will disable single sign-on (SSO).
     ///
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    /// - Important: You don't need to call ``WebAuth/clearSession(federated:callback:)-9yv61`` if you are using this
+    /// - Important: You don't need to call ``WebAuth/logout(federated:callback:)-9yv61`` if you are using this
     /// method on login, because there will be no shared cookie to remove.
     /// - Note: Don't use this method along with ``provider(_:)``. Use either one or the other, because this
     /// method will only work with the default `ASWebAuthenticationSession` implementation.
@@ -330,7 +330,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      ```swift
      Auth0
          .webAuth()
-         .clearSession { result in
+         .logout { result in
              switch result {
              case .success:
                  print("Session cookie cleared")
@@ -344,7 +344,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      ```swift
      Auth0
          .webAuth()
-         .clearSession(federated: true) { print($0) }
+         .logout(federated: true) { print($0) }
      ```
 
      - Parameters:
@@ -359,7 +359,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
-    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
+    func logout(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
 
     /**
      Removes the Auth0 session and optionally removes the identity provider (IdP) session.
@@ -369,7 +369,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      ```swift
      Auth0
          .webAuth()
-         .clearSession()
+         .logout()
          .sink(receiveCompletion: { completion in
              switch completion {
              case .finished:
@@ -386,7 +386,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      ```swift
      Auth0
          .webAuth()
-         .clearSession(federated: true)
+         .logout(federated: true)
          .sink(receiveCompletion: { print($0) },
                receiveValue: {})
          .store(in: &cancellables)
@@ -403,7 +403,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
-    func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError>
+    func logout(federated: Bool) -> AnyPublisher<Void, WebAuthError>
 
     #if canImport(_Concurrency)
     /**
@@ -413,7 +413,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
      ```swift
      do {
-         try await Auth0.webAuth().clearSession()
+         try await Auth0.webAuth().logout()
          print("Session cookie cleared")
      } catch {
          print("Failed with: \(error)")
@@ -423,7 +423,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      Remove both the Auth0 session and the identity provider session:
 
      ```swift
-     try await Auth0.webAuth().clearSession(federated: true)
+     try await Auth0.webAuth().logout(federated: true)
      ```
 
      - Parameter federated: If the identity provider session should be removed. Defaults to `false`.
@@ -436,24 +436,24 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
-    func clearSession(federated: Bool) async throws
+    func logout(federated: Bool) async throws
     #endif
 
 }
 
 public extension WebAuth {
 
-    func clearSession(federated: Bool = false, callback: @escaping (WebAuthResult<Void>) -> Void) {
-        self.clearSession(federated: federated, callback: callback)
+    func logout(federated: Bool = false, callback: @escaping (WebAuthResult<Void>) -> Void) {
+        self.logout(federated: federated, callback: callback)
     }
 
-    func clearSession(federated: Bool = false) -> AnyPublisher<Void, WebAuthError> {
-        return self.clearSession(federated: federated)
+    func logout(federated: Bool = false) -> AnyPublisher<Void, WebAuthError> {
+        return self.logout(federated: federated)
     }
 
     #if canImport(_Concurrency)
-    func clearSession(federated: Bool = false) async throws {
-        return try await self.clearSession(federated: federated)
+    func logout(federated: Bool = false) async throws {
+        return try await self.logout(federated: federated)
     }
     #endif
 
