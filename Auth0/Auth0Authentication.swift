@@ -575,7 +575,7 @@ private extension Auth0Authentication {
                        dpop: dpop)
     }
 
-    func token<T: Codable>() -> any Requestable<T, AuthenticationError> {
+    func token<T: Codable>() -> Request<T, AuthenticationError> {
         let token = URL(string: "oauth/token", relativeTo: self.url)!
         let payload: [String: Any] = ["client_id": self.clientId]
 

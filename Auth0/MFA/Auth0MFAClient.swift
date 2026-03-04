@@ -141,7 +141,7 @@ struct Auth0MFAClient: MFAClient {
 }
 
 private extension Auth0MFAClient {
-    func token<T: Codable>() -> any Requestable<T, MFAVerifyError> {
+    func token<T: Codable>() -> Request<T, MFAVerifyError> {
         let token = URL(string: "oauth/token", relativeTo: self.url)!
         let payload: [String: Any] = ["client_id": self.clientId]
 
