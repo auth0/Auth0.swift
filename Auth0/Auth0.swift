@@ -7,7 +7,10 @@ public typealias AuthenticationResult<T> = Result<T, AuthenticationError>
 
 /**
  `Result` wrapper for Management API operations.
+
+ - Warning: Deprecated. The Management API client is deprecated and will be removed in the next major version.
  */
+@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
 public typealias ManagementResult<T> = Result<T, ManagementError>
 
 /**
@@ -198,6 +201,7 @@ public func mfa(session: URLSession = .shared,
  - Returns: Management API v2 client.
  - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
+@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
 public func users(token: String, session: URLSession = .shared, bundle: Bundle = .main) -> Users {
     let values = plistValues(bundle: bundle)!
     return users(token: token, domain: values.domain, session: session)
@@ -224,7 +228,9 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
    - domain:  Domain of your Auth0 account, for example `samples.us.auth0.com`.
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
  - Returns: Management API v2 client.
+ - Warning: The Management API client is deprecated and will be removed in the next major version.
  */
+@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
 public func users(token: String, domain: String, session: URLSession = .shared) -> Users {
     return Management(token: token, url: .httpsURL(from: domain), session: session)
 }
