@@ -1,6 +1,9 @@
 import Foundation
 
 /// Represents an error during a request to the Auth0 Management API v2.
+///
+/// - Warning: Deprecated. The Management API client is deprecated and will be removed in the next major version.
+@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
 public struct ManagementError: Auth0APIError, @unchecked Sendable {
 
     /// Raw error values.
