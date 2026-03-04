@@ -1014,7 +1014,7 @@ See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh
 > [!CAUTION]
 > To ensure that no concurrent exchange requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
 
-#### SSO credentials [EA]
+#### SSO credentials
 
 > [!NOTE]  
 > This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
@@ -1115,7 +1115,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 - [Passwordless login](#passwordless-login)
 - [Retrieve user information](#retrieve-user-information)
 - [Renew credentials](#renew-credentials)
-- [Get SSO credentials [EA]](#get-sso-credentials-ea)
+- [Get SSO credentials](#get-sso-credentials)
 - [DPoP [EA]](#dpop-ea-1)
 - [Authentication API client configuration](#authentication-api-client-configuration)
 - [Authentication API client errors](#authentication-api-client-errors)
@@ -1843,10 +1843,7 @@ Auth0
 ```
 </details>
 
-### Get SSO credentials [EA]
-
-> [!NOTE]  
-> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+### Get SSO credentials
 
 To implement single sign-on (SSO) with Universal Login, you can use either `ASWebAuthenticationSession` or `SFSafariViewController` as the in-app browser. Each [has its own advantages and disadvantages](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents), and suit different use cases.
 

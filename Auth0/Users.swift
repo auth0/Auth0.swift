@@ -2,16 +2,22 @@ import Foundation
 
 /**
  A dictionary containing a user profile.
+
+ - Warning: Deprecated. The Management API client is deprecated and will be removed in the next major version.
  */
+@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
 public typealias ManagementObject = [String: Any]
 
 /**
  Client for the Users endpoints of the Auth0 [Management API v2](https://auth0.com/docs/api/management/v2).
 
+ - Warning: Deprecated. The Management API client is deprecated and will be removed in the next major version.
+
  ## See Also
 
  - ``ManagementError``
  */
+@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
 public protocol Users: Trackable, Loggable {
 
     /// The Management API token.
