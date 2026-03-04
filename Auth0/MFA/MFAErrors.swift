@@ -18,7 +18,7 @@ import Foundation
  - ``Authenticator``
  - [MFA API Documentation](https://auth0.com/docs/api/authentication#multi-factor-authentication)
  */
-public struct MfaListAuthenticatorsError: Auth0APIError {
+public struct MfaListAuthenticatorsError: Auth0APIError, @unchecked Sendable {
     /**
      Creates an MFA list authenticators error from the API response.
      

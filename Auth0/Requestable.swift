@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public protocol Requestable<ResultType, ErrorType> {
+public protocol Requestable<ResultType, ErrorType>: Sendable {
     associatedtype ResultType
     associatedtype ErrorType: Auth0APIError
     func start(_ callback: @escaping (Result<ResultType, ErrorType>) -> Void)
