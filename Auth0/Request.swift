@@ -18,7 +18,7 @@ let parameterPropertyKey = "com.auth0.parameter"
  }
  ```
  */
-public struct Request<T, E: Auth0APIError>: Requestable {
+public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
     /**
      The callback closure type for the request.
      */
