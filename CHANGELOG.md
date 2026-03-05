@@ -1,5 +1,21 @@
 # Change Log
 
+## [2.18.0](https://github.com/auth0/Auth0.swift/tree/2.18.0) (2026-03-05)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.17.1...2.18.0)
+
+**Added**
+- feat: make Auth0APIError.isRetryable public for better Error Handling DX [\#1110](https://github.com/auth0/Auth0.swift/pull/1110) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+- docs: Update Native to Web feature docs for GA release [\#1099](https://github.com/auth0/Auth0.swift/pull/1099) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
+**Deprecated**
+- chore: deprecate Management API client ahead of next major removal [\#1107](https://github.com/auth0/Auth0.swift/pull/1107) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
+**Fixed**
+- fix: correct rl-wrapper flag from --suppress_output to --suppress-output [\#1103](https://github.com/auth0/Auth0.swift/pull/1103) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
+**Security**
+- chore:  updated the RL wrapper installation path [\#1093](https://github.com/auth0/Auth0.swift/pull/1093) ([pmathew92](https://github.com/pmathew92))
+
 ## [2.17.1](https://github.com/auth0/Auth0.swift/tree/2.17.1) (2026-02-13)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.17.0...2.17.1)
 
