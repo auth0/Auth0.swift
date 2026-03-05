@@ -1,6 +1,9 @@
 import Foundation
 
 /// User attributes that can be updated using the ``Users/patch(_:attributes:)`` method of ``Users``.
+///
+/// - Warning: Deprecated. The Management API client is deprecated and will be removed in the next major version.
+@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
 final public class UserPatchAttributes {
 
     private(set) var dictionary: [String: Any]
