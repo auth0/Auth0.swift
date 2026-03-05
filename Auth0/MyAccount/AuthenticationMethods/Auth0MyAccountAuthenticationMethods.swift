@@ -25,7 +25,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
-                                    connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
+                                    connection: String?) -> any Requestable<PasskeyEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = ["type": "passkey"]
         payload["identity_user_id"] = userIdentityId
         payload["connection"] = connection
@@ -42,7 +42,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func enroll(passkey: NewPasskey,
-                challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+                challenge: PasskeyEnrollmentChallenge) -> any Requestable<PasskeyAuthenticationMethod, MyAccountError> {
         let resourceId = challenge.authenticationMethodId.removingPercentEncoding!
         let path = "\(resourceId)/verify"
         let credentialId = passkey.credentialID.encodeBase64URLSafe()
@@ -75,7 +75,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
     #endif
 
-    func enrollRecoveryCode() -> Request<RecoveryCodeEnrollmentChallenge, MyAccountError> {
+    func enrollRecoveryCode() -> any Requestable<RecoveryCodeEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "recovery-code"
         return Request(session: session,
@@ -88,7 +88,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func enrollTOTP() -> Request<TOTPEnrollmentChallenge, MyAccountError> {
+    func enrollTOTP() -> any Requestable<TOTPEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "totp"
         return Request(session: session,
@@ -101,7 +101,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func enrollPushNotification() -> Request<PushEnrollmentChallenge, MyAccountError> {
+    func enrollPushNotification() -> any Requestable<PushEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "push-notification"
         return Request(session: session,
@@ -114,7 +114,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func enrollEmail(emailAddress: String) -> Request<EmailEnrollmentChallenge, MyAccountError> {
+    func enrollEmail(emailAddress: String) -> any Requestable<EmailEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "email"
         payload["email"] = emailAddress
@@ -129,7 +129,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
 
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
+                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> any Requestable<PhoneEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "phone"
         payload["phone_number"] = phoneNumber
@@ -146,7 +146,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
     func confirmTOTPEnrollment(id: String,
                                authSession: String,
-                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+                               otpCode: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         payload["otp_code"] = otpCode
@@ -162,7 +162,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
     func confirmEmailEnrollment(id: String,
                                 authSession: String,
-                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+                                otpCode: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         payload["otp_code"] = otpCode
@@ -177,7 +177,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
 
     func confirmPushNotificationEnrollment(id: String,
-                                           authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
+                                           authSession: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
 
@@ -193,7 +193,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
     func confirmPhoneEnrollment(id: String,
                                 authSession: String,
-                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+                                otpCode: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         payload["otp_code"] = otpCode
@@ -208,7 +208,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
 
     func confirmRecoveryCodeEnrollment(id: String,
-                                       authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
+                                       authSession: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         return Request(session: session,
@@ -221,7 +221,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func deleteAuthenticationMethod(by id: String) -> Request<Void, MyAccountError> {
+    func deleteAuthenticationMethod(by id: String) -> any Requestable<Void, MyAccountError> {
         return Request(session: session,
                        url: self.url.appending("authentication-methods").appending(id),
                        method: "DELETE",
@@ -231,7 +231,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError> {
+    func getAuthenticationMethods() -> any Requestable<[AuthenticationMethod], MyAccountError> {
         return Request(session: session,
                        url: url.appending("authentication-methods"),
                        method: "GET",
@@ -241,7 +241,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getFactors() -> Request<[Factor], MyAccountError> {
+    func getFactors() -> any Requestable<[Factor], MyAccountError> {
         return Request(session: session,
                        url: url.appending("factors"),
                        method: "GET",
@@ -251,7 +251,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getAuthenticationMethod(by id: String) -> Request<AuthenticationMethod, MyAccountError> {
+    func getAuthenticationMethod(by id: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         return Request(session: session,
                        url: url.appending("authentication-methods").appending(id),
                        method: "GET",

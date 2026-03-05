@@ -21,7 +21,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Auth0", 
+            name: "Auth0",
             dependencies: [
                 .product(name: "SimpleKeychain", package: "SimpleKeychain"),
                 .product(name: "JWTDecode", package: "JWTDecode.swift")

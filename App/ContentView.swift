@@ -10,7 +10,7 @@ import Auth0
 
 
 struct ContentView: View {
-    @StateObject private var viewModel = ContentViewModel()
+    @StateObject private var viewModel = ContentViewModel(authenticationClient: Auth0.authentication())
 
     #if os(macOS)
     @State private var currentWindow: Auth0WindowRepresentable?
@@ -23,6 +23,7 @@ struct ContentView: View {
 
             Button {
                 Task {
+                    
                     #if WEB_AUTH_PLATFORM
                     #if os(macOS)
                     await viewModel.webLogin(presentationWindow: currentWindow)
@@ -45,7 +46,6 @@ struct ContentView: View {
             Button {
                 Task {
                     #if WEB_AUTH_PLATFORM
-
                     #if os(macOS)
                     await viewModel.logout(presentationWindow: currentWindow)
                     #else
