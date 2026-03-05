@@ -394,6 +394,28 @@ class AuthenticationErrorSpec: QuickSpec {
                 }
             }
 
+            it("should be retryable for network errors") {
+                for errorCode in AuthenticationError.networkErrorCodes {
+                    expect(AuthenticationError(cause: URLError.init(errorCode)).isRetryable) == true
+                }
+            }
+
+            it("should be retryable for rate limiting") {
+                expect(AuthenticationError(info: [:], statusCode: 429).isRetryable) == true
+            }
+
+            it("should be retryable for server errors") {
+                for statusCode in [500, 503, 599] {
+                    expect(AuthenticationError(info: [:], statusCode: statusCode).isRetryable) == true
+                }
+            }
+
+            it("should not be retryable for client errors") {
+                for statusCode in [400, 401, 403, 404] {
+                    expect(AuthenticationError(info: [:], statusCode: statusCode).isRetryable) == false
+                }
+            }
+
         }
 
         describe("error message") {
