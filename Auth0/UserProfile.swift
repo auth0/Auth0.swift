@@ -7,7 +7,7 @@ import Foundation
 /// ## See Also
 ///
 /// - [Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims)
-public struct UserInfo: JSONObjectPayload, @unchecked Sendable {
+public struct UserProfile: JSONObjectPayload, @unchecked Sendable {
 
     /// The list of public claims.
     public static let publicClaims = [
@@ -140,9 +140,9 @@ public struct UserInfo: JSONObjectPayload, @unchecked Sendable {
 
 // MARK: - Initializer
 
-public extension UserInfo {
+public extension UserProfile {
 
-    /// Creates a new `UserInfo` from a JSON dictionary.
+    /// Creates a new `UserProfile` from a JSON dictionary.
     init?(json: [String: Any]) {
         guard let sub = json["sub"] as? String else { return nil }
 
@@ -184,7 +184,7 @@ public extension UserInfo {
         }
 
         var customClaims = json
-        UserInfo.publicClaims.forEach { customClaims.removeValue(forKey: $0) }
+        UserProfile.publicClaims.forEach { customClaims.removeValue(forKey: $0) }
 
         self.init(sub: sub,
                   name: name,

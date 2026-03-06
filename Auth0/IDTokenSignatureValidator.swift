@@ -5,7 +5,7 @@ import JWTDecode
 protocol IDTokenSignatureValidatorContext: Sendable {
     var issuer: String { get }
     var audience: String { get }
-    var jwksRequest: Request<JWKS, AuthenticationError> { get }
+    var jwksRequest: any Requestable<JWKS, AuthenticationError> { get }
 }
 
 struct IDTokenSignatureValidator: JWTAsyncValidator {

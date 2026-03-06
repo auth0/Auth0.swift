@@ -264,13 +264,13 @@ Auth0
 
 Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your app.
 
-Call the `clearSession()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](EXAMPLES.md#clear-stored-credentials).
+Call the `logout()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](EXAMPLES.md#clear-stored-credentials).
 
 ```swift
 Auth0
     .webAuth()
     .useHTTPS() // Use a Universal Link logout URL on iOS 17.4+ / macOS 14.4+
-    .clearSession { result in
+    .logout { result in
         switch result {
         case .success:
             print("Session cookie cleared")
@@ -286,7 +286,7 @@ Auth0
 
 ```swift
 do {
-    try await Auth0.webAuth().useHTTPS().clearSession()
+    try await Auth0.webAuth().useHTTPS().logout()
     print("Session cookie cleared")
     // Delete credentials
 } catch {
@@ -302,7 +302,7 @@ do {
 Auth0
     .webAuth()
     .useHTTPS() // Use a Universal Link logout URL on iOS 17.4+ / macOS 14.4+
-    .clearSession()
+    .logout()
     .sink(receiveCompletion: { completion in
         switch completion {
         case .finished:

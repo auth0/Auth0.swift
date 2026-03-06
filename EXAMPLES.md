@@ -415,7 +415,7 @@ SomeView()
 
 ![Screenshot of SFSafariViewController's documentation](https://github.com/user-attachments/assets/98de5937-3ca4-4779-9e3c-725d8b628870)
 
-This is the case for login, but not for logout. Instead of calling `clearSession()`, you can delete the stored credentials –using the Credentials Manager's `clear()` method– and use `"prompt": "login"` to force the login page even if the session cookie is still present. Since the cookies stored by `SFSafariViewController` are scoped to your app, this should not pose an issue.
+This is the case for login, but not for logout. Instead of calling `logout()`, you can delete the stored credentials –using the Credentials Manager's `clear()` method– and use `"prompt": "login"` to force the login page even if the session cookie is still present. Since the cookies stored by `SFSafariViewController` are scoped to your app, this should not pose an issue.
 
 ```swift
 Auth0
@@ -507,7 +507,7 @@ On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair f
 ```swift
 Auth0.webAuth()
     .useHTTPS()
-    .clearSession { result in 
+    .logout { result in
     // ...
 }
 
@@ -1013,7 +1013,7 @@ See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh
 > [!CAUTION]
 > To ensure that no concurrent exchange requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
 
-#### SSO credentials [EA]
+#### SSO credentials
 
 > [!NOTE]  
 > This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
@@ -1114,7 +1114,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 - [Passwordless login](#passwordless-login)
 - [Retrieve user information](#retrieve-user-information)
 - [Renew credentials](#renew-credentials)
-- [Get SSO credentials [EA]](#get-sso-credentials-ea)
+- [Get SSO credentials](#get-sso-credentials)
 - [DPoP [EA]](#dpop-ea-1)
 - [Authentication API client configuration](#authentication-api-client-configuration)
 - [Authentication API client errors](#authentication-api-client-errors)
@@ -1736,7 +1736,7 @@ Auth0
 
 Fetch the latest user information from the `/userinfo` endpoint.
 
-This method will yield a `UserInfo` instance. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/userinfo) to learn more about its available properties.
+This method will yield a `UserProfile` instance. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/userprofile) to learn more about its available properties.
 
 ```swift
 Auth0
@@ -1842,10 +1842,7 @@ Auth0
 ```
 </details>
 
-### Get SSO credentials [EA]
-
-> [!NOTE]  
-> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+### Get SSO credentials
 
 To implement single sign-on (SSO) with Universal Login, you can use either `ASWebAuthenticationSession` or `SFSafariViewController` as the in-app browser. Each [has its own advantages and disadvantages](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents), and suit different use cases.
 

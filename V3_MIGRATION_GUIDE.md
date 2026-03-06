@@ -30,6 +30,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Sendable protocol conformances](#sendable-protocol-conformances)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
+  + [Renamed APIs](#renamed-apis)
+  + [Request to Requestable](#requestable)
 - [**Removed APIs**](#removed-apis)
   + [Management API client (Users)](#management-api-client-users)
 
@@ -317,6 +319,123 @@ final class MyLogger: Logger, @unchecked Sendable {
 
 **Reason:** The removed error cases represent configuration issues that should be caught during development, not handled in production code. This will result in a more useful and meaningful set of WebAuthError cases.
 
+### Renamed APIs
+
+The following APIs have been renamed to align with the Android, Flutter, and React Native Auth0 SDKs:
+
+| v2 | v3 |
+| --- | --- |
+| `clearSession(federated:)` | `logout(federated:)` |
+| `UserInfo` | `UserProfile` |
+
+**`clearSession()` → `logout()`**
+
+The `clearSession(federated:)` method on the Web Auth client has been renamed to `logout(federated:)`. This affects all three API flavors: callback-based, Combine, and async/await.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2
+Auth0
+    .webAuth()
+    .clearSession { result in
+        // ...
+    }
+
+try await Auth0.webAuth().clearSession()
+
+// v3
+Auth0
+    .webAuth()
+    .logout { result in
+        // ...
+    }
+
+try await Auth0.webAuth().logout()
+```
+</details>
+
+**`UserInfo` → `UserProfile`**
+
+The `UserInfo` struct has been renamed to `UserProfile`. The `userInfo(withAccessToken:)` method name on the Authentication client is unchanged, as it maps to the OIDC `/userinfo` endpoint.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2
+let user: UserInfo = ...
+
+// v3
+let user: UserProfile = ...
+```
+</details>
+
+## Request to Requestable 
+
+**Change:** API Clients Authentication, MFAClient, MyAccountAuthenticationMethods have been refactored to return Requestable instead of Request 
+
+**Impact:** With returning Requestable protocol instead of Request, developers can now mock Request in the api clients thus mocking Auth0 layer making writing tests supper easy
+
+**Reason:** With existing Request object it was hard to mock Auth0 SDK layer. Only way to mock was using URLProtocol. With Requestable, developers can mock requests and write tests without heavy lifting of mocking url session layer
+
+**example code**
+
+```swift
+public protocol Authentication {  
+    func login(email: String, code: String, audience: String?, scope: String) -> Requestable  
+}  
+  
+class MockRequestable: Requestable {  
+    typealias ResultType = Credentials  
+    typealias ErrorType = AuthenticationError  
+      
+    let mockResult: Result<Credentials, AuthenticationError>  
+      
+    init(mockResult: Result<Credentials, AuthenticationError>) {  
+        self.mockResult = mockResult  
+    }  
+      
+    func start(_ callback: @escaping (Result<Credentials, AuthenticationError>) -> Void) {  
+        callback(mockResult)  
+    }  
+}  
+  
+class MockAuthentication: Authentication {  
+    let mockRequest: MockRequestable  
+      
+    init(mockResult: Result<Credentials, AuthenticationError>) {  
+        self.mockRequest = MockRequestable(mockResult: mockResult)  
+    }  
+      
+    func login(email: String, code: String, audience: String?, scope: String) -> Requestable {  
+        return mockRequest  
+    }  
+}  
+  
+class ClientAppOrSDK {  
+    private let auth: Authentication  
+      
+    func login(email: String, code: String, completion: @escaping (Result<Credentials, Error>) -> Void) {  
+        let requestable = auth.login(email: email, code: code, audience: nil, scope: "openid profile email")  
+        requestable.start { result in  
+            // Handle result  
+        }  
+    }  
+}  
+  
+func testLoginSuccess() {  
+    let mockCredentials = Credentials(accessToken: "token", tokenType: "Bearer", expiresIn: Date(), idToken: "id_token")  
+    let mockAuth = MockAuthentication(mockResult: .success(mockCredentials))  
+    let apporsdk = ClientAppOrSDK(auth: mockAuth)  
+      
+    apporsdk.login(email: "test@example.com", code: "123456") { result in  
+        // Assert success without network calls  
+        XCTAssertEqual(try? result.get().accessToken, "token")  
+    }  
+}
+```
 ---
 
 ## Removed APIs

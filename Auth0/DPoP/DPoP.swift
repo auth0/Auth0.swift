@@ -91,7 +91,7 @@ public struct DPoP: Sendable {
     /// Clears the key pair stored in the Keychain.
     ///
     /// This method should be called as part of the logout process, along with ``CredentialsManager/clear()``, and
-    /// ``WebAuth/clearSession(federated:callback:)-9xcu3`` –when using web-based authentication.
+    /// ``WebAuth/logout(federated:callback:)-9xcu3`` –when using web-based authentication.
     ///
     /// ## Availability
     ///
