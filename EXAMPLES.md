@@ -270,7 +270,7 @@ Auth0.swift automatically [validates](https://auth0.com/docs/secure/tokens/id-to
 
 ### DPoP
 
-[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Posession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method.
+[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Possession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method.
 
 ```swift
 Auth0
@@ -1610,7 +1610,7 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 
 ### DPoP
 
-[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Posession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method. This ensures that DPoP proofs are generated for requests made through the Authentication API client.
+[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Possession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method. This ensures that DPoP proofs are generated for requests made through the Authentication API client.
 
 ```swift
 let authenticationClient = Auth0.authentication().useDPoP()
