@@ -12,14 +12,6 @@ import UIKit
 public typealias AuthenticationResult<T> = Result<T, AuthenticationError>
 
 /**
- `Result` wrapper for Management API operations.
-
- - Warning: Deprecated. The Management API client is deprecated and will be removed in the next major version.
- */
-@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
-public typealias ManagementResult<T> = Result<T, ManagementError>
-
-/**
  `Result` wrapper for My Account API operations.
  */
 public typealias MyAccountResult<T> = Result<T, MyAccountError>
@@ -175,78 +167,6 @@ public func mfa(session: URLSession = .shared,
     return mfa(clientId: values.clientId,
                domain: values.domain,
                session: session)
-}
-
-/**
- [Management API v2](https://auth0.com/docs/api/management/v2) client for performing operations with the Users endpoints.
-
- ## Usage
-
- ```swift
- Auth0.users(token: credentials.accessToken)
- ```
-
- You can only perform the following operations:
-
- * Get a user by ID
- * Update the user's `user_metadata`
- * Link users
- * Unlink users
-
- The Auth0 Domain is loaded from the `Auth0.plist` file in your main bundle. It should have the following content:
-
- ```xml
- <?xml version="1.0" encoding="UTF-8"?>
- <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
- <plist version="1.0">
- <dict>
-     <key>ClientId</key>
-     <string>YOUR_AUTH0_CLIENT_ID</string>
-     <key>Domain</key>
-     <string>YOUR_AUTH0_DOMAIN</string>
- </dict>
- </plist>
- ```
-
- - Parameters:
-   - token:   Access token for the Management API with the correct allowed scopes to perform the desired action.
-   - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
-   - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
- - Returns: Management API v2 client.
- - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
- */
-@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
-public func users(token: String, session: URLSession = .shared, bundle: Bundle = .main) -> Users {
-    let values = plistValues(bundle: bundle)!
-    return users(token: token, domain: values.domain, session: session)
-}
-
-/**
- [Management API v2](https://auth0.com/docs/api/management/v2) client for performing operations with the Users endpoints.
-
- ## Usage
-
- ```swift
- Auth0.users(token: credentials.accessToken, domain: "samples.us.auth0.com")
- ```
-
- You can only perform the following operations:
- 
- * Get a user by ID
- * Update the user's `user_metadata`
- * Link users
- * Unlink users
-
- - Parameters:
-   - token:   Access token for the Management API with the correct allowed scopes to perform the desired action.
-   - domain:  Domain of your Auth0 account, for example `samples.us.auth0.com`.
-   - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
- - Returns: Management API v2 client.
- - Warning: The Management API client is deprecated and will be removed in the next major version.
- */
-@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
-public func users(token: String, domain: String, session: URLSession = .shared) -> Users {
-    return Management(token: token, url: .httpsURL(from: domain), session: session)
 }
 
 #if WEB_AUTH_PLATFORM

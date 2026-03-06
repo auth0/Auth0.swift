@@ -8,7 +8,6 @@ This document provides context and guidelines for AI coding assistants working w
 
   - **WebAuth**: Universal Login via `ASWebAuthenticationSession` (iOS 12+ / macOS 10.15+).
   - **Authentication**: Direct API client (Login, Signup, User Info, Passwordless).
-  - **Management**: Management API client (Users, Patching).
   - **CredentialsManager**: Secure storage and automatic renewal of credentials.
   - **Support**: Async/Await, Combine, and legacy Callback patterns.
 
@@ -19,7 +18,6 @@ Auth0.swift/
 ├── Auth0/                          # Main SDK Source
 │   ├── WebAuth/                    # Web Authentication (Universal Login)
 │   ├── Authentication/             # Authentication API Client
-│   ├── Management/                 # Management API Client
 │   ├── CredentialsManager/         # Secure Storage & Refresh Logic
 │   ├── Networking/                 # Network Layer (Request/Response)
 │   ├── Utils/                      # Validators, Extensions
@@ -90,7 +88,6 @@ When adding or modifying APIs, you must support the **Tri-brid Concurrency Model
 - Specific domains:
   - `AuthenticationError`: API failures.
   - `WebAuthError`: User cancellation, browser issues.
-  - `ManagementError`: Management API failures.
 
 ### Testing Requirements
 

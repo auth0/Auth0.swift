@@ -218,7 +218,7 @@ public extension Request {
     /**
      Performs the request.
 
-     - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
+     - Throws: An error that conforms to ``Auth0APIError``.
      */
     func start() async throws -> T {
         return try await withCheckedThrowingContinuation { continuation in
