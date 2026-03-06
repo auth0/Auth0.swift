@@ -445,7 +445,7 @@ func testLoginSuccess() {
 > [!NOTE]
 > This section only impacts you if your app used the Management API client (`Auth0.users(...)`). Removing it makes the SDK **leaner** — all consumers benefit from a smaller binary without carrying code they don't use.
 
-**Change:** The Management API client has been removed. This includes the `Auth0.users()` factory functions, the `Users` protocol, `ManagementError`, `ManagementResult`, and `UserPatchAttributes`.
+**Change:** The Management API client has been removed. This includes the `Auth0.users(token:domain:)` and `Auth0.users(token:session:bundle:)` factory functions, the `Users` protocol, `ManagementError`, `ManagementResult`, and `UserPatchAttributes`.
 
 **Impact:** Any code that calls `Auth0.users(...)` or references the removed types will no longer compile.
 

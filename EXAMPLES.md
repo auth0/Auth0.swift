@@ -4215,7 +4215,7 @@ Auth0.swift provides comprehensive logging capabilities for debugging HTTP reque
 
 ### Enable Logging
 
-Enable logging by calling the `logging(enabled:)` method on `WebAuth` or `Authentication`:
+Enable logging by calling the `logging(enabled:)` method on any Auth0.swift client that conforms to `Loggable` (e.g. `Authentication`, `MFAClient`, `MyAccountClient`, or `WebAuth`):
 
 ```swift
 Auth0
