@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
 
@@ -65,4 +64,3 @@ struct IDTokenSignatureValidator: JWTAsyncValidator {
         return nil
     }
 }
-#endif

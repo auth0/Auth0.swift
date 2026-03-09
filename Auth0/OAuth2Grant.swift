@@ -73,8 +73,8 @@ struct PKCE: OAuth2Grant {
         authentication
             .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
             .validateClaims()
-            .withIdTokenVerificationIssuer(self.issuer)
-            .withIdTokenVerificationLeeway(self.leeway)
+            .withIssuer(self.issuer)
+            .withLeeway(self.leeway)
             .withNonce(self.defaults["nonce"])
             .withMaxAge(self.maxAge)
             .withOrganization(self.organization)

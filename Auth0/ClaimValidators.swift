@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
 
@@ -306,4 +305,3 @@ struct IDTokenOrgNameValidator: JWTValidator {
         return nil
     }
 }
-#endif

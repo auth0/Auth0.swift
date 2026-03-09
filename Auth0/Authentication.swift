@@ -945,10 +945,13 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - redirectURI:  Redirect URI sent in the request to `/oauth/authorize`.
      - Returns: A request that will yield Auth0 user's credentials.
 
+     > Note: Chain ``BaseAuthenticationRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/authorization-code-flow-with-pkce/get-token-pkce)
      - [RFC 7636](https://tools.ietf.org/html/rfc7636)
+     - <doc:IDTokenValidation>
      */
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError>
 
@@ -1007,10 +1010,13 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - Parameter refreshToken: The refresh token.
      - Returns: A request that will yield SSO credentials.
 
+     > Note: Chain ``BaseAuthenticationRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+     - <doc:IDTokenValidation>
      */
     func ssoExchange(withRefreshToken refreshToken: String) -> BaseAuthenticationRequest<SSOCredentials, AuthenticationError>
 
@@ -1053,11 +1059,14 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - scope:        Space-separated list of scope values to request. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
 
+     > Note: Chain ``BaseAuthenticationRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
      - <doc:RefreshTokens>
+     - <doc:IDTokenValidation>
      */
     func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> BaseAuthenticationRequest<Credentials, AuthenticationError>
 

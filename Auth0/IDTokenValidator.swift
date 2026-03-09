@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
 
@@ -101,4 +100,3 @@ func isIDTokenValidationError(_ error: Error) -> Bool {
         || error is IDTokenOrgNameValidator.ValidationError
         || error is IDTokenSignatureValidator.ValidationError
 }
-#endif

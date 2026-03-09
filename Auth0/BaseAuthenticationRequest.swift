@@ -35,8 +35,8 @@ import os
      .authentication()
      .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURI)
      .validateClaims()
-     .withIdTokenVerificationLeeway(120_000)   // 2-minute clock skew
-     .withIdTokenVerificationIssuer("https://example.auth0.com/")
+     .withLeeway(120_000)                      // 2-minute clock skew
+     .withIssuer("https://example.auth0.com/")
      .start { result in ... }
  ```
  */
@@ -46,16 +46,16 @@ public struct BaseAuthenticationRequest<T, E: Auth0APIError>: @unchecked Sendabl
     private let authentication: any Authentication
 
     private var validateClaimsEnabled: Bool = false
-    private var idTokenVerificationLeeway: Int?
-    private var idTokenVerificationIssuer: String
-    private var idTokenVerificationNonce: String?
-    private var idTokenVerificationMaxAge: Int?
-    private var idTokenVerificationOrganization: String?
+    private var leeway: Int?
+    private var issuer: String
+    private var nonce: String?
+    private var maxAge: Int?
+    private var organization: String?
 
     init(request: any Requestable<T, E>, authentication: any Authentication) {
         self.request = request
         self.authentication = authentication
-        self.idTokenVerificationIssuer = authentication.url.absoluteString
+        self.issuer = authentication.url.absoluteString
     }
 
     /// Forwards the DPoP instance from the underlying ``Request``, if present.
@@ -89,9 +89,9 @@ public extension BaseAuthenticationRequest {
      - Parameter leeway: Allowed clock skew in **milliseconds**. Defaults to 60,000 (60 s).
      - Returns: A copy of the request with the leeway applied.
      */
-    func withIdTokenVerificationLeeway(_ leeway: Int) -> BaseAuthenticationRequest<T, E> {
+    func withLeeway(_ leeway: Int) -> BaseAuthenticationRequest<T, E> {
         var copy = self
-        copy.idTokenVerificationLeeway = leeway
+        copy.leeway = leeway
         return copy
     }
 
@@ -103,9 +103,9 @@ public extension BaseAuthenticationRequest {
      - Parameter issuer: The expected issuer string.
      - Returns: A copy of the request with the issuer applied.
      */
-    func withIdTokenVerificationIssuer(_ issuer: String) -> BaseAuthenticationRequest<T, E> {
+    func withIssuer(_ issuer: String) -> BaseAuthenticationRequest<T, E> {
         var copy = self
-        copy.idTokenVerificationIssuer = issuer
+        copy.issuer = issuer
         return copy
     }
 
@@ -117,7 +117,7 @@ public extension BaseAuthenticationRequest {
      */
     func withNonce(_ nonce: String?) -> BaseAuthenticationRequest<T, E> {
         var copy = self
-        copy.idTokenVerificationNonce = nonce
+        copy.nonce = nonce
         return copy
     }
 
@@ -129,7 +129,7 @@ public extension BaseAuthenticationRequest {
      */
     func withMaxAge(_ maxAge: Int?) -> BaseAuthenticationRequest<T, E> {
         var copy = self
-        copy.idTokenVerificationMaxAge = maxAge
+        copy.maxAge = maxAge
         return copy
     }
 
@@ -141,7 +141,7 @@ public extension BaseAuthenticationRequest {
      */
     func withOrganization(_ organization: String?) -> BaseAuthenticationRequest<T, E> {
         var copy = self
-        copy.idTokenVerificationOrganization = organization
+        copy.organization = organization
         return copy
     }
 }
@@ -196,11 +196,11 @@ private extension BaseAuthenticationRequest {
     func verifyClaims(idToken: String, callback: @escaping (Error?) -> Void) {
         let context = IDTokenValidatorContext(
             authentication: authentication,
-            issuer: idTokenVerificationIssuer,
-            leeway: idTokenVerificationLeeway ?? 60 * 1000,
-            maxAge: idTokenVerificationMaxAge,
-            nonce: idTokenVerificationNonce,
-            organization: idTokenVerificationOrganization
+            issuer: issuer,
+            leeway: leeway ?? 60 * 1000,
+            maxAge: maxAge,
+            nonce: nonce,
+            organization: organization
         )
         validate(idToken: idToken, with: context, callback: callback)
     }
