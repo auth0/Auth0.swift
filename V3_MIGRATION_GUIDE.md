@@ -32,6 +32,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
   + [Request to Requestable](#requestable)
+  + [ID Token Validation](#id-token-validation)
 - [**Removed APIs**](#removed-apis)
   + [Management API client (Users)](#management-api-client-users)
 
@@ -474,6 +475,58 @@ func testLoginSuccess() {
     }  
 }
 ```
+### ID Token Validation
+
+**Change:** All credential-returning methods on `Authentication` and `MFAClient` now return `BaseAuthenticationRequest<T, E>` instead of `any Requestable<T, E>`.
+
+`BaseAuthenticationRequest` conforms to `Requestable`, so **existing call sites that use `any Requestable` or call `.start(_:)` directly are unaffected**. The concrete return type unlocks opt-in ID token claim validation via a chainable API.
+
+**New API:**
+
+```swift
+Auth0
+    .authentication()
+    .renew(withRefreshToken: credentials.refreshToken)
+    .validateClaims()           // opt in to ID token validation
+    .start { result in ... }
+```
+
+Chain any combination of the following modifiers after `validateClaims()` to customise validation:
+
+| Modifier | Default | Description |
+| --- | --- | --- |
+| `.withLeeway(_ leeway: Int)` | `60_000` ms | Clock-skew tolerance. |
+| `.withIssuer(_ issuer: String)` | Auth0 domain URL | Expected `iss` claim. |
+| `.withNonce(_ nonce: String?)` | `nil` (skip) | Expected `nonce` claim. |
+| `.withMaxAge(_ maxAge: Int?)` | `nil` (skip) | Maximum seconds since last authentication. |
+| `.withOrganization(_ organization: String?)` | `nil` (skip) | Expected `org_id` or `org_name` claim. |
+
+If `validateClaims()` is **not** called, a runtime warning is logged via `os_log` and the request proceeds without validation.
+
+> **Note:** When using Web Auth (PKCE flow), ID token validation is performed automatically. You do not need to call `validateClaims()` yourself.
+
+**Affected methods:**
+
+- `Authentication.login(email:code:audience:scope:)`
+- `Authentication.login(phoneNumber:code:audience:scope:)`
+- `Authentication.login(usernameOrEmail:password:realmOrConnection:audience:scope:)`
+- `Authentication.loginDefaultDirectory(withUsername:password:audience:scope:)`
+- `Authentication.login(withOTP:mfaToken:)`
+- `Authentication.login(withOOBCode:mfaToken:bindingCode:)`
+- `Authentication.login(withRecoveryCode:mfaToken:)`
+- `Authentication.login(appleAuthorizationCode:fullName:profile:audience:scope:)`
+- `Authentication.login(facebookSessionAccessToken:profile:audience:scope:)`
+- `Authentication.login(passkey:challenge:connection:audience:scope:)` (both variants)
+- `Authentication.codeExchange(withCode:codeVerifier:redirectURI:)`
+- `Authentication.ssoExchange(withRefreshToken:)`
+- `Authentication.renew(withRefreshToken:audience:scope:)`
+- `Authentication.customTokenExchange(subjectToken:subjectTokenType:audience:scope:organization:parameters:)`
+- `MFAClient.verify(oobCode:bindingCode:mfaToken:)`
+- `MFAClient.verify(otp:mfaToken:)`
+- `MFAClient.verify(recoveryCode:mfaToken:)`
+
+**Impact:** No migration required for existing code. To enable ID token validation on any of the above calls, chain `.validateClaims()` before `.start(_:)`.
+
 ---
 
 ## Removed APIs
