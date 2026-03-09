@@ -70,27 +70,24 @@ struct PKCE: OAuth2Grant {
         let authentication = self.authentication
         let verifier = self.verifier
         let redirectUrlString = self.redirectURL.absoluteString
-        let validatorContext = IDTokenValidatorContext(authentication: authentication,
-                                                       issuer: self.issuer,
-                                                       leeway: self.leeway,
-                                                       maxAge: self.maxAge,
-                                                       nonce: self.defaults["nonce"],
-                                                       organization: self.organization)
         authentication
             .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
+            .validateClaims()
+            .withIdTokenVerificationIssuer(self.issuer)
+            .withIdTokenVerificationLeeway(self.leeway)
+            .withNonce(self.defaults["nonce"])
+            .withMaxAge(self.maxAge)
+            .withOrganization(self.organization)
             .start { result in
                 switch result {
                 case .failure(let error) where error.localizedDescription == "Unauthorized":
                     return callback(.failure(WebAuthError(code: .unknown("PKCE not allowed - Application Type must be 'Native' and Token Endpoint Authentication Method must be 'None'"))))
+                case .failure(let error) where error.cause.map({ isIDTokenValidationError($0) }) == true:
+                    return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error.cause)))
                 case .failure(let error):
                     return callback(.failure(WebAuthError(code: .codeExchangeFailed, cause: error)))
                 case .success(let credentials):
-                    validate(idToken: credentials.idToken, with: validatorContext) { error in
-                        if let error = error {
-                            return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error)))
-                        }
-                        callback(.success(credentials))
-                    }
+                    callback(.success(credentials))
                 }
             }
     }

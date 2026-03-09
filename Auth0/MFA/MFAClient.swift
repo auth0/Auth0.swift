@@ -161,7 +161,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      */
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError>
+                mfaToken: String) -> BaseAuthenticationRequest<Credentials, MFAVerifyError>
 
     // MARK: - OTP Enrollment
 
@@ -233,7 +233,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-mfa-with-otp)
      */
     func verify(otp: String,
-                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError>
+                mfaToken: String) -> BaseAuthenticationRequest<Credentials, MFAVerifyError>
 
     // MARK: - Recovery Code Verification
 
@@ -270,7 +270,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-recovery-code)
      */
     func verify(recoveryCode: String,
-                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError>
+                mfaToken: String) -> BaseAuthenticationRequest<Credentials, MFAVerifyError>
 
     // MARK: - Push Notification Enrollment
 

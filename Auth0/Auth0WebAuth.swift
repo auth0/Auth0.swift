@@ -342,7 +342,7 @@ final class Auth0WebAuth: WebAuth {
                     issuer: self.issuer,
                     leeway: self.leeway,
                     maxAge: self.maxAge,
-                    nonce: self.nonce,
+                    nonce: self.nonce ?? self.parameters["nonce"],
                     organization: self.organization)
     }
 

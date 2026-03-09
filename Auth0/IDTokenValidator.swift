@@ -2,6 +2,14 @@
 import Foundation
 import JWTDecode
 
+/// A type that carries an ID token string. Conformed to by ``Credentials`` and ``SSOCredentials``.
+protocol IDTokenProtocol {
+    var idToken: String { get }
+}
+
+extension Credentials: IDTokenProtocol {}
+extension SSOCredentials: IDTokenProtocol {}
+
 protocol JWTValidator: Sendable {
     func validate(_ jwt: JWT) -> Auth0Error?
 }
@@ -77,5 +85,20 @@ func validate(idToken: String,
                                      claimsValidator: claimsValidator ?? IDTokenClaimsValidator(validators: claimValidators),
                                      context: context)
     validator.validate(jwt, callback: callback)
+}
+/// Returns true if the error is an ID token claim validation failure produced by any of the IDToken validators.
+func isIDTokenValidationError(_ error: Error) -> Bool {
+    return error is IDTokenDecodingError
+        || error is IDTokenIssValidator.ValidationError
+        || error is IDTokenSubValidator.ValidationError
+        || error is IDTokenAudValidator.ValidationError
+        || error is IDTokenExpValidator.ValidationError
+        || error is IDTokenIatValidator.ValidationError
+        || error is IDTokenNonceValidator.ValidationError
+        || error is IDTokenAzpValidator.ValidationError
+        || error is IDTokenAuthTimeValidator.ValidationError
+        || error is IDTokenOrgIDValidator.ValidationError
+        || error is IDTokenOrgNameValidator.ValidationError
+        || error is IDTokenSignatureValidator.ValidationError
 }
 #endif
