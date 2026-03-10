@@ -4,18 +4,18 @@ struct Auth0MFAClient: MFAClient {
     var dpop: DPoP?
     let clientId: String
     let url: URL
-    var telemetry: Telemetry
+    var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
     let session: URLSession
 
     init(clientId: String,
          url: URL,
          session: URLSession = URLSession.shared,
-         telemetry: Telemetry = Telemetry()) {
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo()) {
         self.clientId = clientId
         self.url = url
         self.session = session
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
     }
 
     func getAuthenticators(mfaToken: String, factorsAllowed: [String]) -> any Requestable<[Authenticator], MfaListAuthenticatorsError> {
@@ -27,7 +27,7 @@ struct Auth0MFAClient: MFAClient {
             listAuthenticatorsResponseMapper(factorsAllowed: factorsAllowed, result: result, callback: callback)
         }, headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
         .requestValidators([ListAuthenticatorsValidator(factorsAllowed: factorsAllowed)])
     }
 
@@ -44,7 +44,7 @@ struct Auth0MFAClient: MFAClient {
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func challenge(with authenticatorId: String, mfaToken: String) -> any Requestable<MFAChallenge, MfaChallengeError> {
@@ -60,7 +60,7 @@ struct Auth0MFAClient: MFAClient {
                        handle: mfaChallengeDecodable,
                        parameters: payload,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func verify(oobCode: String,
@@ -86,7 +86,7 @@ struct Auth0MFAClient: MFAClient {
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func verify(otp: String,
@@ -120,7 +120,7 @@ struct Auth0MFAClient: MFAClient {
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func enroll(mfaToken: String, email: String) -> any Requestable<MFAEnrollmentChallenge, MfaEnrollmentError> {
@@ -136,7 +136,7 @@ struct Auth0MFAClient: MFAClient {
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 }
 
@@ -151,7 +151,7 @@ private extension Auth0MFAClient {
                        handle: mfaVerifyDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 }

@@ -992,7 +992,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
          .path: "/",
          .name: "auth0_session_transfer_token",
          .value: ssoCredentials.sessionTransferToken,
-         .expires: ssoCredentials.expiresIn,
+         .expires: ssoCredentials.expiresAt,
          .secure: true
      ])!
 
