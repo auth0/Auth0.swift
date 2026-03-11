@@ -15,7 +15,7 @@ import os
  ``Authentication/ssoExchange(withRefreshToken:)``, and all `login` variants.
 
  Chain ``validateClaims()`` to opt in to ID token validation before calling ``start(_:)``.
- If the response contains an ID token (i.e. the result type conforms to ``IDTokenProtocol``),
+ If the response contains an ID token (i.e. the result type is either ``Credentials`` or ``SSOCrredentials``),
  it will be validated against the configured issuer and options.
 
  ## Usage

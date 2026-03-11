@@ -7,7 +7,6 @@ struct Auth0MFAClient: MFAClient {
     var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
     let session: URLSession
-    private let authentication: any Authentication
 
     init(clientId: String,
          url: URL,
@@ -17,7 +16,6 @@ struct Auth0MFAClient: MFAClient {
         self.url = url
         self.session = session
         self.auth0ClientInfo = auth0ClientInfo
-        self.authentication = Auth0Authentication(clientId: clientId, url: url, session: session, auth0ClientInfo: auth0ClientInfo)
     }
 
     func getAuthenticators(mfaToken: String, factorsAllowed: [String]) -> any Requestable<[Authenticator], MfaListAuthenticatorsError> {
@@ -73,7 +71,7 @@ struct Auth0MFAClient: MFAClient {
         parameters["binding_code"] = bindingCode
         parameters["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-oob"
         parameters["mfa_token"] = mfaToken
-        return BaseAuthenticationRequest(request: self.token().parameters(parameters), authentication: self.authentication)
+        return BaseAuthenticationRequest(request: self.token().parameters(parameters), authentication: Auth0Authentication(clientId: clientId, url: url, session: session, auth0ClientInfo: auth0ClientInfo))
     }
 
     func enroll(mfaToken: String) -> any Requestable<OTPMFAEnrollmentChallenge, MfaEnrollmentError> {
@@ -96,7 +94,7 @@ struct Auth0MFAClient: MFAClient {
         payload["otp"] = otp
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-otp"
         payload["mfa_token"] = mfaToken
-        return BaseAuthenticationRequest(request: self.token().parameters(payload), authentication: self.authentication)
+        return BaseAuthenticationRequest(request: self.token().parameters(payload), authentication: Auth0Authentication(clientId: clientId, url: url, session: session, auth0ClientInfo: auth0ClientInfo))
     }
 
     func verify(recoveryCode: String,
@@ -106,7 +104,7 @@ struct Auth0MFAClient: MFAClient {
         payload["mfa_token"] = mfaToken
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-recovery-code"
         payload["client_id"] = clientId
-        return BaseAuthenticationRequest(request: token().parameters(payload), authentication: self.authentication)
+        return BaseAuthenticationRequest(request: token().parameters(payload), authentication: Auth0Authentication(clientId: clientId, url: url, session: session, auth0ClientInfo: auth0ClientInfo))
     }
 
     func enroll(mfaToken: String) -> any Requestable<PushMFAEnrollmentChallenge, MfaEnrollmentError> {

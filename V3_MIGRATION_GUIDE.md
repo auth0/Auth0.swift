@@ -501,8 +501,6 @@ Chain any combination of the following modifiers after `validateClaims()` to cus
 | `.withMaxAge(_ maxAge: Int?)` | `nil` (skip) | Maximum seconds since last authentication. |
 | `.withOrganization(_ organization: String?)` | `nil` (skip) | Expected `org_id` or `org_name` claim. |
 
-If `validateClaims()` is **not** called, a runtime warning is logged via `os_log` and the request proceeds without validation.
-
 > **Note:** When using Web Auth (PKCE flow), ID token validation is performed automatically. You do not need to call `validateClaims()` yourself.
 
 **Affected methods:**

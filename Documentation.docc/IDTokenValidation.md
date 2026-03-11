@@ -6,8 +6,6 @@ Validate ID token claims on credential-returning Authentication API requests.
 
 Methods on ``Authentication`` that return credentials (`login`, `renew`, `codeExchange`, `ssoExchange`, and similar) return a ``BaseAuthenticationRequest`` instead of a plain `Requestable`. You can chain ``BaseAuthenticationRequest/validateClaims()`` on the returned request before calling `start(_:)` to verify the ID token's claims.
 
-When `validateClaims()` is not called, a warning is logged at runtime and the request proceeds without validation.
-
 > Note: ID token validation is only performed when the response contains a non-empty ID token (i.e. the result type conforms to `IDTokenProtocol`, which ``Credentials`` and ``SSOCredentials`` do).
 
 ## Basic usage
