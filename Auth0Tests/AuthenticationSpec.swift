@@ -62,12 +62,12 @@ class AuthenticationSpec: QuickSpec {
                 expect(authentication.session).to(be(session))
             }
             
-            it("should init with client id, url & telemetry") {
+            it("should init with client id, url & auth0ClientInfo") {
                 let telemetryInfo = "info"
-                var telemetry = Telemetry()
-                telemetry.info = telemetryInfo
-                let authentication = Auth0Authentication(clientId: ClientId, url: DomainURL, telemetry: telemetry)
-                expect(authentication.telemetry.info) == telemetryInfo
+                var auth0ClientInfo = Auth0ClientInfo()
+                auth0ClientInfo.info = telemetryInfo
+                let authentication = Auth0Authentication(clientId: ClientId, url: DomainURL, auth0ClientInfo: auth0ClientInfo)
+                expect(authentication.auth0ClientInfo.info) == telemetryInfo
             }
             
         }

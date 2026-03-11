@@ -89,12 +89,12 @@ class WebAuthSpec: QuickSpec {
                 expect(webAuth.storage).to(be(storage))
             }
 
-            it("should init with client id, url & telemetry") {
+            it("should init with client id, url & auth0ClientInfo") {
                 let telemetryInfo = "info"
-                var telemetry = Telemetry()
-                telemetry.info = telemetryInfo
-                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, telemetry: telemetry)
-                expect(webAuth.telemetry.info) == telemetryInfo
+                var auth0ClientInfo = Auth0ClientInfo()
+                auth0ClientInfo.info = telemetryInfo
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, auth0ClientInfo: auth0ClientInfo)
+                expect(webAuth.auth0ClientInfo.info) == telemetryInfo
             }
 
             it("should init with client id, url & barrier") {
@@ -708,7 +708,7 @@ class WebAuthSpec: QuickSpec {
             
             beforeEach {
                 let url = URL(string: "https://samples.auth0.com")!
-                auth = Auth0WebAuth(clientId: "client123", url: url, telemetry: Telemetry())
+                auth = Auth0WebAuth(clientId: "client123", url: url, auth0ClientInfo: Auth0ClientInfo())
                 QueueBarrier.shared.lower()
                 cancellables = []
             }
@@ -783,7 +783,7 @@ class WebAuthSpec: QuickSpec {
             beforeEach {
                 let url = URL(string: "https://samples.auth0.com")!
                 QueueBarrier.shared.lower()
-                auth = Auth0WebAuth(clientId: "client123", url: url, telemetry: Telemetry())
+                auth = Auth0WebAuth(clientId: "client123", url: url, auth0ClientInfo: Auth0ClientInfo())
             }
             it("start() async throws on failure") {
                 auth.provider { url, completion in
@@ -812,7 +812,7 @@ class WebAuthSpec: QuickSpec {
                     tokenType: "bearer",
                     idToken: "id",
                     refreshToken: "refresh",
-                    expiresIn: Date()
+                    expiresAt: Date()
                 )
 
                 var callbackRef: (WebAuthResult<Void>) -> Void = { _  in }

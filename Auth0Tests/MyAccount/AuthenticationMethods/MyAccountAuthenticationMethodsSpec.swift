@@ -51,14 +51,14 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 expect(authMethods.session).to(be(session))
             }
 
-            it("should init with token, url, and telemetry") {
+            it("should init with token, url, and auth0ClientInfo") {
                 let telemetryInfo = "info"
-                var telemetry = Telemetry()
-                telemetry.info = telemetryInfo
+                var auth0ClientInfo = Auth0ClientInfo()
+                auth0ClientInfo.info = telemetryInfo
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
                                                                       url: DomainURL,
-                                                                      telemetry: telemetry)
-                expect(authMethods.telemetry.info) == telemetryInfo
+                                                                      auth0ClientInfo: auth0ClientInfo)
+                expect(authMethods.auth0ClientInfo.info) == telemetryInfo
             }
         }
 

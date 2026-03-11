@@ -1081,7 +1081,7 @@ let cookie = HTTPCookie(properties: [
     .path: "/",
     .name: "auth0_session_transfer_token",
     .value: ssoCredentials.sessionTransferToken,
-    .expires: ssoCredentials.expiresIn,
+    .expires: ssoCredentials.expiresAt,
     .secure: true
 ])!
 
@@ -1917,7 +1917,7 @@ let cookie = HTTPCookie(properties: [
     .path: "/",
     .name: "auth0_session_transfer_token",
     .value: ssoCredentials.sessionTransferToken,
-    .expires: ssoCredentials.expiresIn,
+    .expires: ssoCredentials.expiresAt,
     .secure: true
 ])!
 

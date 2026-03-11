@@ -14,7 +14,7 @@ final class Auth0WebAuth: WebAuth {
     let session: URLSession
     let storage: TransactionStore
 
-    var telemetry: Telemetry
+    var auth0ClientInfo: Auth0ClientInfo
     var barrier: Barrier
     var logger: Logger?
     var dpop: DPoP?
@@ -71,13 +71,13 @@ final class Auth0WebAuth: WebAuth {
          url: URL,
          session: URLSession = URLSession.shared,
          storage: TransactionStore = TransactionStore.shared,
-         telemetry: Telemetry = Telemetry(),
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo(),
          barrier: Barrier = QueueBarrier.shared) {
         self.clientId = clientId
         self.url = url
         self.session = session
         self.storage = storage
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
         self.barrier = barrier
         self.issuer = url.absoluteString
     }
@@ -311,7 +311,7 @@ final class Auth0WebAuth: WebAuth {
 
         entries["scope"] = includeRequiredScope(in: entries["scope"])
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
-        components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
+        components.queryItems = self.auth0ClientInfo.queryItemsWithTelemetry(queryItems: items)
         components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
         return components.url!
     }
@@ -334,7 +334,7 @@ final class Auth0WebAuth: WebAuth {
         var authentication = Auth0Authentication(clientId: self.clientId,
                                                  url: self.url,
                                                  session: self.session,
-                                                 telemetry: self.telemetry)
+                                                 auth0ClientInfo: self.auth0ClientInfo)
         authentication.dpop = self.dpop
         authentication.logger = self.logger
         return PKCE(authentication: authentication,

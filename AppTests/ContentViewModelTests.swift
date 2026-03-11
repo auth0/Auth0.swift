@@ -37,7 +37,7 @@ struct MockAuthentication: Authentication {
     var clientId: String
     var url: URL
     var dpop: DPoP?
-    var telemetry: Telemetry
+    var auth0ClientInfo: Auth0ClientInfo
     var logger: (any Logger)?
 
     /// The request returned by `login(usernameOrEmail:password:realmOrConnection:audience:scope:)`.
@@ -50,7 +50,7 @@ struct MockAuthentication: Authentication {
         self.clientId = clientId
         self.url = url
         self.dpop = nil
-        self.telemetry = Telemetry()
+        self.auth0ClientInfo = Auth0ClientInfo()
         self.logger = nil
     }
 

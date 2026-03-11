@@ -32,7 +32,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
-    let telemetry: Telemetry
+    let auth0ClientInfo: Auth0ClientInfo
     let dpop: DPoP?
 
     init(session: URLSession,
@@ -43,7 +43,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
          logger: Logger?,
-         telemetry: Telemetry,
+         auth0ClientInfo: Auth0ClientInfo,
          dpop: DPoP? = nil) {
         self.session = session
         self.url = url
@@ -52,7 +52,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
         self.requestValidator = requestValidator
         self.parameters = parameters
         self.logger = logger
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
         self.headers = headers
         self.dpop = dpop
     }
@@ -77,7 +77,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
-        telemetry.addTelemetryHeader(request: request)
+        auth0ClientInfo.addTelemetryHeader(request: request)
         return request as URLRequest
     }
 
@@ -156,7 +156,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
                        parameters: parameters,
                        headers: self.headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -175,7 +175,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
                        parameters: self.parameters,
                        headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -190,7 +190,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
                        parameters: parameters,
                        headers: headers,
                        logger: logger,
-                       telemetry: telemetry,
+                       auth0ClientInfo: auth0ClientInfo,
                        dpop: dpop)
     }
 }
