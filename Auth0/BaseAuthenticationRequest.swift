@@ -52,7 +52,8 @@ public struct BaseAuthenticationRequest<T, E: Auth0APIError>: @unchecked Sendabl
     private var maxAge: Int?
     private var organization: String?
 
-    init(request: any Requestable<T, E>, authentication: any Authentication) {
+    init(request: any Requestable<T, E>,
+         authentication: any Authentication) {
         self.request = request
         self.authentication = authentication
         self.issuer = authentication.url.absoluteString

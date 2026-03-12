@@ -123,7 +123,8 @@ public func mfa(clientId: String,
                 session: URLSession = .shared) -> MFAClient {
     return Auth0MFAClient(clientId: clientId,
                           url: .httpsURL(from: domain),
-                          session: session)
+                          session: session,
+                          authentication: authentication(clientId: clientId, domain: domain, session: session))
 }
 
 /**
