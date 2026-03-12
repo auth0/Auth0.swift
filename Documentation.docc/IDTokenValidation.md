@@ -4,7 +4,7 @@ Validate ID token claims on credential-returning Authentication API requests.
 
 ## Overview
 
-Methods on ``Authentication`` that return credentials (`login`, `renew`, `codeExchange`, `ssoExchange`, and similar) return a ``BaseAuthenticationRequest`` instead of a plain `Requestable`. You can chain ``BaseAuthenticationRequest/validateClaims()`` on the returned request before calling `start(_:)` to verify the ID token's claims.
+Methods on ``Authentication`` that return credentials (`login`, `renew`, `codeExchange`, `ssoExchange`, and similar) return a ``TokenRequest`` instead of a plain `Requestable`. You can chain ``TokenRequest/validateClaims()`` on the returned request before calling `start(_:)` to verify the ID token's claims.
 
 > Note: ID token validation is only performed when the response contains a non-empty ID token (i.e. the result type conforms to `IDTokenProtocol`, which ``Credentials`` and ``SSOCredentials`` do).
 
@@ -66,6 +66,6 @@ When using ``WebAuth``, ID token validation is performed automatically — you d
 
 ## See Also
 
-- ``BaseAuthenticationRequest``
+- ``TokenRequest``
 - ``Authentication``
 - ``MFAClient``

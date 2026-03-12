@@ -477,9 +477,9 @@ func testLoginSuccess() {
 ```
 ### ID Token Validation
 
-**Change:** All credential-returning methods on `Authentication` and `MFAClient` now return `BaseAuthenticationRequest<T, E>` instead of `any Requestable<T, E>`.
+**Change:** All credential-returning methods on `Authentication` and `MFAClient` now return `TokenRequest<T, E>` instead of `any Requestable<T, E>`.
 
-`BaseAuthenticationRequest` conforms to `Requestable`, so **existing call sites that use `any Requestable` or call `.start(_:)` directly are unaffected**. The concrete return type unlocks opt-in ID token claim validation via a chainable API.
+`TokenRequest` conforms to `Requestable`, so **existing call sites that use `any Requestable` or call `.start(_:)` directly are unaffected**. The concrete return type unlocks opt-in ID token claim validation via a chainable API.
 
 **New API:**
 

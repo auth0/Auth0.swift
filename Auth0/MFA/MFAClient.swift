@@ -155,7 +155,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - Returns: A request that will yield Auth0 user's credentials.
      - Requires: MFA OOB Grant `http://auth0.com/oauth/grant-type/mfa-oob`.
 
-     > Note: Chain ``BaseAuthenticationRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
+     > Note: Chain ``TokenRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
 
      ## See Also
 
@@ -164,7 +164,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      */
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> BaseAuthenticationRequest<Credentials, MFAVerifyError>
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError>
 
     // MARK: - OTP Enrollment
 
@@ -231,7 +231,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - Returns: A request that will yield Auth0 user's credentials.
      - Requires: MFA OTP Grant `http://auth0.com/oauth/grant-type/mfa-otp`.
 
-     > Note: Chain ``BaseAuthenticationRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
+     > Note: Chain ``TokenRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
 
      ## See Also
 
@@ -239,7 +239,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - <doc:IDTokenValidation>
      */
     func verify(otp: String,
-                mfaToken: String) -> BaseAuthenticationRequest<Credentials, MFAVerifyError>
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError>
 
     // MARK: - Recovery Code Verification
 
@@ -271,7 +271,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - Returns: A request that will yield Auth0 user's credentials.
      - Requires: MFA Recovery Code Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`.
 
-     > Note: Chain ``BaseAuthenticationRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
+     > Note: Chain ``TokenRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
 
      ## See Also
 
@@ -279,7 +279,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - <doc:IDTokenValidation>
      */
     func verify(recoveryCode: String,
-                mfaToken: String) -> BaseAuthenticationRequest<Credentials, MFAVerifyError>
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError>
 
     // MARK: - Push Notification Enrollment
 

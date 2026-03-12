@@ -574,11 +574,11 @@
 		C1B3BA4F2C24BA37004A32A4 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		C1B3BA502C24BA37004A32A4 /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
 		C2A1F2DB6DB54F13B63CB723 /* Array+Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F551923C8FB8E00C89615 /* Array+Encode.swift */; };
-		D40B77242F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* BaseAuthenticationRequest.swift */; };
-		D40B77252F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* BaseAuthenticationRequest.swift */; };
-		D40B77262F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* BaseAuthenticationRequest.swift */; };
-		D40B77272F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* BaseAuthenticationRequest.swift */; };
-		D40B77282F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* BaseAuthenticationRequest.swift */; };
+		D40B77242F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
+		D40B77252F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
+		D40B77262F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
+		D40B77272F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
+		D40B77282F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
 		D41DED172DCA083800F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
 		D41DED182DCA083B00F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
 		D41DED192DCA084100F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
@@ -660,6 +660,11 @@
 		D46D58CE2F5E78DB001ECC7B /* IDTokenSignatureValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3D23D0BA2C00074024 /* IDTokenSignatureValidator.swift */; };
 		D46D58CF2F5E78E9001ECC7B /* JWTAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550423C8FADE00C89615 /* JWTAlgorithm.swift */; };
 		D46D58D02F5E78E9001ECC7B /* JWTAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550423C8FADE00C89615 /* JWTAlgorithm.swift */; };
+		D46D5E042F62B93F001ECC7B /* TokenRequestable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46D5E032F62B934001ECC7B /* TokenRequestable.swift */; };
+		D46D5E052F62B93F001ECC7B /* TokenRequestable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46D5E032F62B934001ECC7B /* TokenRequestable.swift */; };
+		D46D5E062F62B93F001ECC7B /* TokenRequestable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46D5E032F62B934001ECC7B /* TokenRequestable.swift */; };
+		D46D5E072F62B93F001ECC7B /* TokenRequestable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46D5E032F62B934001ECC7B /* TokenRequestable.swift */; };
+		D46D5E082F62B93F001ECC7B /* TokenRequestable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46D5E032F62B934001ECC7B /* TokenRequestable.swift */; };
 		D499DAEE2E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift */; };
 		D499DAEF2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift */; };
 		D499DAF02E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift */; };
@@ -1073,7 +1078,7 @@
 		C1B3B9A82C24B297004A32A4 /* OAuth2Vision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2Vision.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B3B9C02C24B39E004A32A4 /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B3B9C72C24B39E004A32A4 /* Auth0Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Auth0Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D40B77232F5AA7A6000F5F90 /* BaseAuthenticationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseAuthenticationRequest.swift; sourceTree = "<group>"; };
+		D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequest.swift; sourceTree = "<group>"; };
 		D424ED5C2F15FEFD00052186 /* Auth0MFAClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth0MFAClient.swift; sourceTree = "<group>"; };
 		D424ED5D2F15FEFD00052186 /* MFAClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAClient.swift; sourceTree = "<group>"; };
 		D424ED692F15FF4E00052186 /* Authenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
@@ -1085,6 +1090,7 @@
 		D46390902F18F28700FD84D7 /* RequestValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestValidator.swift; sourceTree = "<group>"; };
 		D46390962F18F59800FD84D7 /* ListAuthenticatorsValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListAuthenticatorsValidator.swift; sourceTree = "<group>"; };
 		D463909C2F19C32000FD84D7 /* MFAHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAHandlers.swift; sourceTree = "<group>"; };
+		D46D5E032F62B934001ECC7B /* TokenRequestable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestable.swift; sourceTree = "<group>"; };
 		D4919A752F55A3BD007EA4B0 /* AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D499DAE32E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth0MyAccountAuthenticationMethods.swift; sourceTree = "<group>"; };
 		D499DAE42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailEnrollmentChallenge.swift; sourceTree = "<group>"; };
@@ -1671,7 +1677,8 @@
 		5FDE87751D8A425300EA27DC /* Authentication */ = {
 			isa = PBXGroup;
 			children = (
-				D40B77232F5AA7A6000F5F90 /* BaseAuthenticationRequest.swift */,
+				D46D5E032F62B934001ECC7B /* TokenRequestable.swift */,
+				D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */,
 				D4ABFE6C2F10BEA3000C828C /* MFARequiredErrorPayload.swift */,
 				5FDE87491D8A424700EA27DC /* Auth0Authentication.swift */,
 				5FDE874A1D8A424700EA27DC /* Authentication.swift */,
@@ -2541,7 +2548,7 @@
 				D499DB242E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */,
 				5C505FD72E2168BD005D0757 /* KeychainKeyStore.swift in Sources */,
 				5C354C04276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
-				D40B77242F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */,
+				D40B77242F5AA7B2000F5F90 /* TokenRequest.swift in Sources */,
 				5FCAB1711D09005A00331C84 /* NSURLComponents+OAuth2.swift in Sources */,
 				5CFB82632D6D221F009FD237 /* Barrier.swift in Sources */,
 				5FDE876D1D8A424700EA27DC /* AuthenticationHandlers.swift in Sources */,
@@ -2566,6 +2573,7 @@
 				5F53F5CE1CFD157300476A46 /* AuthTransaction.swift in Sources */,
 				5C505FB92E216702005D0757 /* DPoPProofGenerator.swift in Sources */,
 				D463909A2F18F59F00FD84D7 /* ListAuthenticatorsValidator.swift in Sources */,
+				D46D5E062F62B93F001ECC7B /* TokenRequestable.swift in Sources */,
 				5CDF672A2DD395C700A9B513 /* NewPasskey.swift in Sources */,
 				D4ABFE712F10BEA9000C828C /* MFARequiredErrorPayload.swift in Sources */,
 				5CB41D6C23D0BBA600074024 /* JWT+Header.swift in Sources */,
@@ -2629,6 +2637,7 @@
 				5C41F6D1244F972000252548 /* JWT+Header.swift in Sources */,
 				5CDF67442DD3B52F00A9B513 /* Auth0MyAccount.swift in Sources */,
 				5FE2F8BC1CD0EAAD003628F4 /* Response.swift in Sources */,
+				D46D5E072F62B93F001ECC7B /* TokenRequestable.swift in Sources */,
 				5C505FD82E2168BD005D0757 /* KeychainKeyStore.swift in Sources */,
 				5B7EE47420FCA00A00367724 /* CredentialsManagerError.swift in Sources */,
 				6287D5CA2EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */,
@@ -2682,7 +2691,7 @@
 				D499DAF92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
 				D499DAFA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
 				D499DAFB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */,
-				D40B77282F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */,
+				D40B77282F5AA7B2000F5F90 /* TokenRequest.swift in Sources */,
 				D499DAFC2E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
 				D499DAFD2E6EB1FD000E7E2F /* Factor.swift in Sources */,
 				D499DAFE2E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */,
@@ -2888,6 +2897,7 @@
 				5C29743323FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */,
 				5CDF674E2DD3DB5400A9B513 /* MyAccountHandlers.swift in Sources */,
 				5F23E6DF1D4ACD7A00C3F2D9 /* Logger.swift in Sources */,
+				D46D5E082F62B93F001ECC7B /* TokenRequestable.swift in Sources */,
 				5C505FB82E216702005D0757 /* DPoPProofGenerator.swift in Sources */,
 				5FDE875B1D8A424700EA27DC /* Authentication.swift in Sources */,
 				5FDE876B1D8A424700EA27DC /* Credentials.swift in Sources */,
@@ -2922,7 +2932,7 @@
 				62BD27022EEA928F001FC67C /* SynchronizationBarrier.swift in Sources */,
 				5C505FC72E216784005D0757 /* ECPublicKey.swift in Sources */,
 				D46D58CC2F5E78D1001ECC7B /* IDTokenValidatorContext.swift in Sources */,
-				D40B77272F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */,
+				D40B77272F5AA7B2000F5F90 /* TokenRequest.swift in Sources */,
 				5F23E6DC1D4ACD6100C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				D463908D2F18C63400FD84D7 /* MFAErrors.swift in Sources */,
 				5F23E6E61D4ACD8500C3F2D9 /* Requestable.swift in Sources */,
@@ -2976,6 +2986,7 @@
 				5FDE875C1D8A424700EA27DC /* Authentication.swift in Sources */,
 				5CDF674F2DD3DB5400A9B513 /* MyAccountHandlers.swift in Sources */,
 				5F23E7081D4B88F000C3F2D9 /* Logger.swift in Sources */,
+				D46D5E052F62B93F001ECC7B /* TokenRequestable.swift in Sources */,
 				5C505FBA2E216702005D0757 /* DPoPProofGenerator.swift in Sources */,
 				5C29743223FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */,
 				5FDE876C1D8A424700EA27DC /* Credentials.swift in Sources */,
@@ -3010,7 +3021,7 @@
 				62BD27002EEA928F001FC67C /* SynchronizationBarrier.swift in Sources */,
 				5C505FC82E216784005D0757 /* ECPublicKey.swift in Sources */,
 				D46D58CB2F5E78D1001ECC7B /* IDTokenValidatorContext.swift in Sources */,
-				D40B77252F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */,
+				D40B77252F5AA7B2000F5F90 /* TokenRequest.swift in Sources */,
 				5F23E7061D4B88EA00C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				D463908E2F18C63400FD84D7 /* MFAErrors.swift in Sources */,
 				5F23E70F1D4B88FC00C3F2D9 /* Requestable.swift in Sources */,
@@ -3098,12 +3109,13 @@
 				C1B3B9F22C24B6D4004A32A4 /* MultifactorChallenge.swift in Sources */,
 				5C505FD12E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C3D87E42DB8276000AACC34 /* PublicKeyCredentialCreationOptions.swift in Sources */,
+				D46D5E042F62B93F001ECC7B /* TokenRequestable.swift in Sources */,
 				5C3D881D2DC148C600AACC34 /* PasskeyLoginChallenge.swift in Sources */,
 				62BD27042EEA928F001FC67C /* SynchronizationBarrier.swift in Sources */,
 				C1B3B9F32C24B6D4004A32A4 /* JWKS.swift in Sources */,
 				5CFB82522D5BF324009FD237 /* APICredentials.swift in Sources */,
 				C1B3B9F42C24B6D4004A32A4 /* UserProfile.swift in Sources */,
-				D40B77262F5AA7B2000F5F90 /* BaseAuthenticationRequest.swift in Sources */,
+				D40B77262F5AA7B2000F5F90 /* TokenRequest.swift in Sources */,
 				D4ABFE6F2F10BEA9000C828C /* MFARequiredErrorPayload.swift in Sources */,
 				D463908C2F18C63400FD84D7 /* MFAErrors.swift in Sources */,
 				D424ED7C2F15FF8B00052186 /* MFAEnrollmentChallenge.swift in Sources */,
@@ -3981,7 +3993,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = App/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4007,7 +4019,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = App/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

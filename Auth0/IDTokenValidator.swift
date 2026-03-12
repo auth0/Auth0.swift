@@ -2,12 +2,16 @@ import Foundation
 import JWTDecode
 
 /// A type that carries an ID token string. Conformed to by ``Credentials`` and ``SSOCredentials``.
-protocol IDTokenProtocol {
+protocol IDTokenCarrying {
     var idToken: String { get }
 }
 
-extension Credentials: IDTokenProtocol {}
-extension SSOCredentials: IDTokenProtocol {}
+/// Marker protocol adopted by every ID token validation error type.
+/// Used to identify validation failures without exhaustive type checking.
+protocol IDTokenValidationError: Auth0Error {}
+
+extension Credentials: IDTokenCarrying {}
+extension SSOCredentials: IDTokenCarrying {}
 
 protocol JWTValidator: Sendable {
     func validate(_ jwt: JWT) -> Auth0Error?
@@ -43,12 +47,14 @@ struct IDTokenValidator: JWTAsyncValidator {
     }
 }
 
-enum IDTokenDecodingError: Auth0Error {
+enum IDTokenDecodingError: IDTokenValidationError {
     case cannotDecode
+    case missingIDToken
 
     var debugDescription: String {
         switch self {
         case .cannotDecode: return "ID token could not be decoded"
+        case .missingIDToken: return "ID token validation was requested but the response did not include an ID token"
         }
     }
 }
@@ -85,18 +91,7 @@ func validate(idToken: String,
                                      context: context)
     validator.validate(jwt, callback: callback)
 }
-/// Returns true if the error is an ID token claim validation failure produced by any of the IDToken validators.
+/// Returns true if the error is an ID token validation failure produced by any of the IDToken validators.
 func isIDTokenValidationError(_ error: Error) -> Bool {
-    return error is IDTokenDecodingError
-        || error is IDTokenIssValidator.ValidationError
-        || error is IDTokenSubValidator.ValidationError
-        || error is IDTokenAudValidator.ValidationError
-        || error is IDTokenExpValidator.ValidationError
-        || error is IDTokenIatValidator.ValidationError
-        || error is IDTokenNonceValidator.ValidationError
-        || error is IDTokenAzpValidator.ValidationError
-        || error is IDTokenAuthTimeValidator.ValidationError
-        || error is IDTokenOrgIDValidator.ValidationError
-        || error is IDTokenOrgNameValidator.ValidationError
-        || error is IDTokenSignatureValidator.ValidationError
+    return error is any IDTokenValidationError
 }

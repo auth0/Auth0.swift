@@ -8,7 +8,7 @@ protocol IDTokenSignatureValidatorContext: Sendable {
 }
 
 struct IDTokenSignatureValidator: JWTAsyncValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case invalidAlgorithm(actual: String, expected: String)
         case missingPublicKey(kid: String)
         case invalidSignature

@@ -82,13 +82,13 @@ struct Auth0MFAClient: MFAClient {
 
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> BaseAuthenticationRequest<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError> {
         var parameters: [String: Any] = [:]
         parameters["oob_code"] = oobCode
         parameters["binding_code"] = bindingCode
         parameters["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-oob"
         parameters["mfa_token"] = mfaToken
-        return BaseAuthenticationRequest(request: self.token().parameters(parameters), authentication: authentication)
+        return TokenRequest(request: self.token().parameters(parameters), authentication: authentication)
     }
 
     func enroll(mfaToken: String) -> any Requestable<OTPMFAEnrollmentChallenge, MfaEnrollmentError> {
@@ -106,22 +106,22 @@ struct Auth0MFAClient: MFAClient {
     }
 
     func verify(otp: String,
-                mfaToken: String) -> BaseAuthenticationRequest<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["otp"] = otp
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-otp"
         payload["mfa_token"] = mfaToken
-        return BaseAuthenticationRequest(request: self.token().parameters(payload), authentication: authentication)
+        return TokenRequest(request: self.token().parameters(payload), authentication: authentication)
     }
 
     func verify(recoveryCode: String,
-                mfaToken: String) -> BaseAuthenticationRequest<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["recovery_code"] = recoveryCode
         payload["mfa_token"] = mfaToken
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-recovery-code"
         payload["client_id"] = clientId
-        return BaseAuthenticationRequest(request: token().parameters(payload), authentication: authentication)
+        return TokenRequest(request: token().parameters(payload), authentication: authentication)
     }
 
     func enroll(mfaToken: String) -> any Requestable<PushMFAEnrollmentChallenge, MfaEnrollmentError> {

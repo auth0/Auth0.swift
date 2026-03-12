@@ -22,7 +22,7 @@ struct IDTokenClaimsValidator: JWTValidator {
 }
 
 struct IDTokenIssValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingIss
         case mismatchedIss(actual: String, expected: String)
 
@@ -51,7 +51,7 @@ struct IDTokenIssValidator: JWTValidator {
 }
 
 struct IDTokenSubValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingSub
 
         var debugDescription: String {
@@ -68,7 +68,7 @@ struct IDTokenSubValidator: JWTValidator {
 }
 
 struct IDTokenAudValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingAud
         case mismatchedAudString(actual: String, expected: String)
         case mismatchedAudArray(actual: [String], expected: String)
@@ -103,7 +103,7 @@ struct IDTokenAudValidator: JWTValidator {
 }
 
 struct IDTokenExpValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingExp
         case pastExp(baseTime: Double, expirationTime: Double)
 
@@ -136,7 +136,7 @@ struct IDTokenExpValidator: JWTValidator {
 }
 
 struct IDTokenIatValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingIat
 
         var debugDescription: String {
@@ -153,7 +153,7 @@ struct IDTokenIatValidator: JWTValidator {
 }
 
 struct IDTokenNonceValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingNonce
         case mismatchedNonce(actual: String, expected: String)
 
@@ -182,7 +182,7 @@ struct IDTokenNonceValidator: JWTValidator {
 }
 
 struct IDTokenAzpValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingAzp
         case mismatchedAzp(actual: String, expected: String)
 
@@ -212,7 +212,7 @@ struct IDTokenAzpValidator: JWTValidator {
 }
 
 struct IDTokenAuthTimeValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingAuthTime
         case pastLastAuth(baseTime: Double, lastAuthTime: Double)
 
@@ -249,7 +249,7 @@ struct IDTokenAuthTimeValidator: JWTValidator {
 }
 
 struct IDTokenOrgIDValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingOrgId
         case mismatchedOrgId(actual: String, expected: String)
 
@@ -278,7 +278,7 @@ struct IDTokenOrgIDValidator: JWTValidator {
 }
 
 struct IDTokenOrgNameValidator: JWTValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case missingOrgName
         case mismatchedOrgName(actual: String, expected: String)
 

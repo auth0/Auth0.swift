@@ -21,15 +21,15 @@ struct Auth0Authentication: Authentication {
         self.auth0ClientInfo = auth0ClientInfo
     }
 
-    func login(email: String, code: String, audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
-        return BaseAuthenticationRequest(request: login(username: email, otp: code, realm: "email", audience: audience, scope: scope), authentication: self)
+    func login(email: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        return TokenRequest(request: login(username: email, otp: code, realm: "email", audience: audience, scope: scope), authentication: self)
     }
 
-    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
-        return BaseAuthenticationRequest(request: login(username: phoneNumber, otp: code, realm: "sms", audience: audience, scope: scope), authentication: self)
+    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        return TokenRequest(request: login(username: phoneNumber, otp: code, realm: "sms", audience: audience, scope: scope), authentication: self)
     }
 
-    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -42,7 +42,7 @@ struct Auth0Authentication: Authentication {
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
 
-        return BaseAuthenticationRequest(request: Request(session: session,
+        return TokenRequest(request: Request(session: session,
                                                           url: url,
                                                           method: "POST",
                                                           handle: authenticationDecodable,
@@ -53,7 +53,7 @@ struct Auth0Authentication: Authentication {
                              authentication: self)
     }
 
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -65,7 +65,7 @@ struct Auth0Authentication: Authentication {
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
 
-        return BaseAuthenticationRequest(request: Request(session: session,
+        return TokenRequest(request: Request(session: session,
                                                           url: url,
                                                           method: "POST",
                                                           handle: authenticationDecodable,
@@ -76,7 +76,7 @@ struct Auth0Authentication: Authentication {
                              authentication: self)
     }
 
-    func login(withOTP otp: String, mfaToken: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+    func login(withOTP otp: String, mfaToken: String) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         let payload: [String: Any] = [
@@ -86,7 +86,7 @@ struct Auth0Authentication: Authentication {
             "client_id": self.clientId
         ]
 
-        return BaseAuthenticationRequest(request: Request(session: session,
+        return TokenRequest(request: Request(session: session,
                                                           url: url,
                                                           method: "POST",
                                                           handle: authenticationDecodable,
@@ -97,7 +97,7 @@ struct Auth0Authentication: Authentication {
                              authentication: self)
     }
 
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -111,7 +111,7 @@ struct Auth0Authentication: Authentication {
             payload["binding_code"] = bindingCode
         }
 
-        return BaseAuthenticationRequest(request: Request(session: session,
+        return TokenRequest(request: Request(session: session,
                                                           url: url,
                                                           method: "POST",
                                                           handle: authenticationDecodable,
@@ -122,7 +122,7 @@ struct Auth0Authentication: Authentication {
                              authentication: self)
     }
 
-    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         let payload: [String: Any] = [
@@ -132,7 +132,7 @@ struct Auth0Authentication: Authentication {
             "client_id": self.clientId
         ]
 
-        return BaseAuthenticationRequest(request: Request(session: session,
+        return TokenRequest(request: Request(session: session,
                                                           url: url,
                                                           method: "POST",
                                                           handle: authenticationDecodable,
@@ -171,7 +171,7 @@ struct Auth0Authentication: Authentication {
                fullName: PersonNameComponents?,
                profile: [String: Any]?,
                audience: String?,
-               scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+               scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
         var parameters: [String: Any] = [:]
         var profile: [String: Any] = profile ?? [:]
 
@@ -187,7 +187,7 @@ struct Auth0Authentication: Authentication {
             parameters["user_profile"] = json
         }
 
-        return BaseAuthenticationRequest(request: self.tokenExchange(subjectToken: authorizationCode,
+        return TokenRequest(request: self.tokenExchange(subjectToken: authorizationCode,
                                                                          subjectTokenType: "http://auth0.com/oauth/token-type/apple-authz-code",
                                                                          scope: scope,
                                                                          audience: audience,
@@ -198,13 +198,13 @@ struct Auth0Authentication: Authentication {
     func login(facebookSessionAccessToken sessionAccessToken: String,
                profile: [String: Any],
                audience: String?,
-               scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+               scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
         var parameters: [String: String] = [:]
         if let jsonData = try? JSONSerialization.data(withJSONObject: profile, options: []),
             let json = String(data: jsonData, encoding: .utf8) {
             parameters["user_profile"] = json
         }
-        return BaseAuthenticationRequest(request: self.tokenExchange(subjectToken: sessionAccessToken,
+        return TokenRequest(request: self.tokenExchange(subjectToken: sessionAccessToken,
                                                                          subjectTokenType: "http://auth0.com/oauth/token-type/facebook-info-session-access-token",
                                                                          scope: scope,
                                                                          audience: audience,
@@ -244,7 +244,7 @@ struct Auth0Authentication: Authentication {
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+               organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -273,7 +273,7 @@ struct Auth0Authentication: Authentication {
         payload["scope"] = includeRequiredScope(in: scope)
         payload["organization"] = organization
 
-        return BaseAuthenticationRequest(request: Request(session: session,
+        return TokenRequest(request: Request(session: session,
                                                           url: url,
                                                           method: "POST",
                                                           handle: authenticationDecodable,
@@ -308,7 +308,7 @@ struct Auth0Authentication: Authentication {
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+               organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -336,7 +336,7 @@ struct Auth0Authentication: Authentication {
         payload["scope"] = includeRequiredScope(in: scope)
         payload["organization"] = organization
 
-        return BaseAuthenticationRequest(request: Request(session: session,
+        return TokenRequest(request: Request(session: session,
                                                           url: url,
                                                           method: "POST",
                                                           handle: authenticationDecodable,
@@ -445,8 +445,8 @@ struct Auth0Authentication: Authentication {
                        dpop: dpop)
     }
 
-    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
-        return BaseAuthenticationRequest(request: self.token().parameters([
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        return TokenRequest(request: self.token().parameters([
             "code": code,
             "code_verifier": codeVerifier,
             "redirect_uri": redirectURI,
@@ -455,8 +455,8 @@ struct Auth0Authentication: Authentication {
                              authentication: self)
     }
 
-    func ssoExchange(withRefreshToken refreshToken: String) -> BaseAuthenticationRequest<SSOCredentials, AuthenticationError> {
-        return BaseAuthenticationRequest(request: self.token().parameters([
+    func ssoExchange(withRefreshToken refreshToken: String) -> any TokenRequestable<SSOCredentials, AuthenticationError> {
+        return TokenRequest(request: self.token().parameters([
             "refresh_token": refreshToken,
             "grant_type": "refresh_token",
             "audience": "urn:\(self.url.host!):session_transfer"
@@ -464,7 +464,7 @@ struct Auth0Authentication: Authentication {
                              authentication: self)
     }
 
-    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
+    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> any TokenRequestable<Credentials, AuthenticationError> {
         let oauthToken = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -482,7 +482,7 @@ struct Auth0Authentication: Authentication {
             payload["scope"] = scope
         }
 
-        return BaseAuthenticationRequest(request: Request(session: session,
+        return TokenRequest(request: Request(session: session,
                                                           url: oauthToken,
                                                           method: "POST",
                                                           handle: authenticationDecodable,
@@ -523,8 +523,8 @@ struct Auth0Authentication: Authentication {
                              audience: String?,
                              scope: String,
                              organization: String?,
-                             parameters: [String: Any]) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
-        return BaseAuthenticationRequest(request: self.tokenExchange(subjectToken: subjectToken,
+                             parameters: [String: Any]) -> any TokenRequestable<Credentials, AuthenticationError> {
+        return TokenRequest(request: self.tokenExchange(subjectToken: subjectToken,
                                                                          subjectTokenType: subjectTokenType,
                                                                          scope: scope,
                                                                          audience: audience,
