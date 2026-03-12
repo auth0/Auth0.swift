@@ -50,6 +50,18 @@ public struct TokenRequest<T, E: Auth0APIError>: @unchecked Sendable {
     private let maxAge: Int?
     private let organization: String?
 
+    init(request: any Requestable<T, E>, authentication: any Authentication) {
+        self.init(request: request,
+                  audience: authentication.clientId,
+                  jwksRequest: authentication.jwks(),
+                  validateClaimsEnabled: false,
+                  leeway: nil,
+                  issuer: authentication.url.absoluteString,
+                  nonce: nil,
+                  maxAge: nil,
+                  organization: nil)
+    }
+
     init(request: any Requestable<T, E>,
          audience: String,
          issuer: String,
