@@ -87,10 +87,9 @@ public struct TokenRequest<T, E: Auth0APIError>: @unchecked Sendable {
 
 // TokenRequestable inherits Requestable, so one extension covers both.
 extension TokenRequest: TokenRequestable {
-
     // MARK: TokenRequestable
 
-    public func validateClaims() -> TokenRequest<T, E> {
+    public func validateClaims() -> any TokenRequestable<T, E> {
         TokenRequest(request: request,
                      audience: audience,
                      jwksRequest: jwksRequest,
@@ -102,7 +101,7 @@ extension TokenRequest: TokenRequestable {
                      organization: organization)
     }
 
-    public func withLeeway(_ leeway: Int) -> TokenRequest<T, E> {
+    public func withLeeway(_ leeway: Int) -> any TokenRequestable<T, E> {
         TokenRequest(request: request,
                      audience: audience,
                      jwksRequest: jwksRequest,
@@ -114,7 +113,7 @@ extension TokenRequest: TokenRequestable {
                      organization: organization)
     }
 
-    public func withIssuer(_ issuer: String) -> TokenRequest<T, E> {
+    public func withIssuer(_ issuer: String) -> any TokenRequestable<T, E> {
         TokenRequest(request: request,
                      audience: audience,
                      jwksRequest: jwksRequest,
@@ -126,7 +125,7 @@ extension TokenRequest: TokenRequestable {
                      organization: organization)
     }
 
-    public func withNonce(_ nonce: String?) -> TokenRequest<T, E> {
+    public func withNonce(_ nonce: String?) -> any TokenRequestable<T, E> {
         TokenRequest(request: request,
                      audience: audience,
                      jwksRequest: jwksRequest,
@@ -138,7 +137,7 @@ extension TokenRequest: TokenRequestable {
                      organization: organization)
     }
 
-    public func withMaxAge(_ maxAge: Int?) -> TokenRequest<T, E> {
+    public func withMaxAge(_ maxAge: Int?) -> any TokenRequestable<T, E> {
         TokenRequest(request: request,
                      audience: audience,
                      jwksRequest: jwksRequest,
@@ -150,7 +149,7 @@ extension TokenRequest: TokenRequestable {
                      organization: organization)
     }
 
-    public func withOrganization(_ organization: String?) -> TokenRequest<T, E> {
+    public func withOrganization(_ organization: String?) -> any TokenRequestable<T, E> {
         TokenRequest(request: request,
                      audience: audience,
                      jwksRequest: jwksRequest,

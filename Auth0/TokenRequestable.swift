@@ -27,7 +27,7 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
 
      - Returns: A copy of the request with claim validation enabled.
      */
-    func validateClaims() -> Self
+    func validateClaims() -> any TokenRequestable<ResultType, ErrorType>
 
     /**
      Overrides the clock-skew tolerance used during ID token validation.
@@ -35,7 +35,7 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
      - Parameter leeway: Allowed clock skew in **seconds**. Defaults to 60.
      - Returns: A copy of the request with the leeway applied.
      */
-    func withLeeway(_ leeway: Int) -> Self
+    func withLeeway(_ leeway: Int) -> any TokenRequestable<ResultType, ErrorType>
 
     /**
      Overrides the expected `iss` claim used during ID token validation.
@@ -45,7 +45,7 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
      - Parameter issuer: The expected issuer string.
      - Returns: A copy of the request with the issuer applied.
      */
-    func withIssuer(_ issuer: String) -> Self
+    func withIssuer(_ issuer: String) -> any TokenRequestable<ResultType, ErrorType>
 
     /**
      Sets the expected `nonce` claim for ID token validation.
@@ -53,7 +53,7 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
      - Parameter nonce: The nonce value to expect. Pass `nil` to skip nonce validation.
      - Returns: A copy of the request with the nonce applied.
      */
-    func withNonce(_ nonce: String?) -> Self
+    func withNonce(_ nonce: String?) -> any TokenRequestable<ResultType, ErrorType>
 
     /**
      Sets the maximum authentication age for ID token validation.
@@ -61,7 +61,7 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
      - Parameter maxAge: Maximum elapsed seconds since last authentication. Validates the `auth_time` claim.
      - Returns: A copy of the request with the maxAge applied.
      */
-    func withMaxAge(_ maxAge: Int?) -> Self
+    func withMaxAge(_ maxAge: Int?) -> any TokenRequestable<ResultType, ErrorType>
 
     /**
      Sets the expected organization (`org_id` or `org_name`) claim for ID token validation.
@@ -69,7 +69,7 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
      - Parameter organization: The organization value to expect.
      - Returns: A copy of the request with the organization applied.
      */
-    func withOrganization(_ organization: String?) -> Self
+    func withOrganization(_ organization: String?) -> any TokenRequestable<ResultType, ErrorType>
 
     // MARK: - Requestable
 

@@ -58,47 +58,47 @@ struct MockAuthentication: Authentication {
 
     func login(usernameOrEmail username: String, password: String,
                realmOrConnection realm: String,
-               audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> {
-        BaseAuthenticationRequest(request: loginRequest, authentication: self)
+               audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        TokenRequest(request: loginRequest, authentication: self)
     }
 
     // MARK: Required stubs
 
-    func login(email: String, code: String, audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func login(withOTP otp: String, mfaToken: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> any Requestable<Challenge, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> any Requestable<DatabaseUser, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
+    func login(email: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(withOTP otp: String, mfaToken: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> any Requestable<Challenge, AuthenticationError> { StubRequestable() }
+    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> any Requestable<DatabaseUser, AuthenticationError> { StubRequestable() }
 
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(passkey: LoginPasskey, challenge: PasskeyLoginChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
+    func login(passkey: LoginPasskey, challenge: PasskeyLoginChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func passkeyLoginChallenge(connection: String?, organization: String?) -> any Requestable<PasskeyLoginChallenge, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
+    func passkeyLoginChallenge(connection: String?, organization: String?) -> any Requestable<PasskeyLoginChallenge, AuthenticationError> { StubRequestable() }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(passkey: SignupPasskey, challenge: PasskeySignupChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
+    func login(passkey: SignupPasskey, challenge: PasskeySignupChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func passkeySignupChallenge(email: String?, phoneNumber: String?, username: String?, name: String?, connection: String?, organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
+    func passkeySignupChallenge(email: String?, phoneNumber: String?, username: String?, name: String?, connection: String?, organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> { StubRequestable() }
     #endif
 
-    func resetPassword(email: String, connection: String) -> any Requestable<Void, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func startPasswordless(email: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func userInfo(withAccessToken accessToken: String, tokenType: String) -> any Requestable<UserProfile, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func ssoExchange(withRefreshToken refreshToken: String) -> BaseAuthenticationRequest<SSOCredentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func revoke(refreshToken: String) -> any Requestable<Void, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func jwks() -> any Requestable<JWKS, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
-    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String, organization: String?, parameters: [String: Any]) -> BaseAuthenticationRequest<Credentials, AuthenticationError> { BaseAuthenticationRequest(request: StubRequestable(), authentication: self) }
+    func resetPassword(email: String, connection: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
+    func startPasswordless(email: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
+    func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
+    func userInfo(withAccessToken accessToken: String, tokenType: String) -> any Requestable<UserProfile, AuthenticationError> { StubRequestable() }
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func ssoExchange(withRefreshToken refreshToken: String) -> any TokenRequestable<SSOCredentials, AuthenticationError> { TokenRequest(request: StubRequestable() as any Requestable<SSOCredentials, AuthenticationError>, authentication: self) }
+    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func revoke(refreshToken: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
+    func jwks() -> any Requestable<JWKS, AuthenticationError> { StubRequestable() }
+    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String, organization: String?, parameters: [String: Any]) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
 }
 
 // MARK: - Stubs
