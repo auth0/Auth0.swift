@@ -813,4 +813,55 @@ struct Auth0MFAClientTests {
             Issue.record("Unexpected error type: \(error)")
         }
     }
+
+    // MARK: - Property Propagation Tests
+
+    private func makeMFAClient() -> Auth0MFAClient {
+        let authentication = Auth0Authentication(clientId: "test_client",
+                                                url: URL(string: "https://test.auth0.com")!)
+        return Auth0MFAClient(clientId: "test_client",
+                              url: URL(string: "https://test.auth0.com")!,
+                              session: makeMockSession(),
+                              authentication: authentication)
+    }
+
+    @Test
+    func testDPoPPropagatedToAuthentication() {
+        var client = makeMFAClient()
+        let dpop = DPoP(keychainIdentifier: "test.identifier")
+        client.dpop = dpop
+        #expect(client.authentication.dpop?.keychainIdentifier == "test.identifier")
+    }
+
+    @Test
+    func testDPoPNilPropagatedToAuthentication() {
+        var client = makeMFAClient()
+        client.dpop = DPoP(keychainIdentifier: "test.identifier")
+        client.dpop = nil
+        #expect(client.authentication.dpop == nil)
+    }
+
+    @Test
+    func testAuth0ClientInfoPropagatedToAuthentication() {
+        var client = makeMFAClient()
+        var customInfo = Auth0ClientInfo()
+        customInfo.enabled = false
+        client.auth0ClientInfo = customInfo
+        #expect(client.authentication.auth0ClientInfo.enabled == false)
+    }
+
+    @Test
+    func testLoggerPropagatedToAuthentication() {
+        var client = makeMFAClient()
+        client.logger = DefaultLogger()
+        #expect(client.authentication.logger != nil)
+    }
+
+    @Test
+    func testLoggerNilPropagatedToAuthentication() {
+        var client = makeMFAClient()
+        client.logger = DefaultLogger()
+        client.logger = nil
+        #expect(client.authentication.logger == nil)
+    }
 }
