@@ -814,54 +814,51 @@ struct Auth0MFAClientTests {
         }
     }
 
-    // MARK: - Property Propagation Tests
+    // MARK: - Property Tests
 
     private func makeMFAClient() -> Auth0MFAClient {
-        let authentication = Auth0Authentication(clientId: "test_client",
-                                                url: URL(string: "https://test.auth0.com")!)
         return Auth0MFAClient(clientId: "test_client",
                               url: URL(string: "https://test.auth0.com")!,
-                              session: makeMockSession(),
-                              authentication: authentication)
+                              session: makeMockSession())
     }
 
     @Test
-    func testDPoPPropagatedToAuthentication() {
+    func testDPoPIsSet() {
         var client = makeMFAClient()
         let dpop = DPoP(keychainIdentifier: "test.identifier")
         client.dpop = dpop
-        #expect(client.authentication.dpop?.keychainIdentifier == "test.identifier")
+        #expect(client.dpop?.keychainIdentifier == "test.identifier")
     }
 
     @Test
-    func testDPoPNilPropagatedToAuthentication() {
+    func testDPoPClearedToNil() {
         var client = makeMFAClient()
         client.dpop = DPoP(keychainIdentifier: "test.identifier")
         client.dpop = nil
-        #expect(client.authentication.dpop == nil)
+        #expect(client.dpop == nil)
     }
 
     @Test
-    func testAuth0ClientInfoPropagatedToAuthentication() {
+    func testAuth0ClientInfoIsSet() {
         var client = makeMFAClient()
         var customInfo = Auth0ClientInfo()
         customInfo.enabled = false
         client.auth0ClientInfo = customInfo
-        #expect(client.authentication.auth0ClientInfo.enabled == false)
+        #expect(client.auth0ClientInfo.enabled == false)
     }
 
     @Test
-    func testLoggerPropagatedToAuthentication() {
+    func testLoggerIsSet() {
         var client = makeMFAClient()
         client.logger = DefaultLogger()
-        #expect(client.authentication.logger != nil)
+        #expect(client.logger != nil)
     }
 
     @Test
-    func testLoggerNilPropagatedToAuthentication() {
+    func testLoggerClearedToNil() {
         var client = makeMFAClient()
         client.logger = DefaultLogger()
         client.logger = nil
-        #expect(client.authentication.logger == nil)
+        #expect(client.logger == nil)
     }
 }
