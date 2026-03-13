@@ -50,6 +50,10 @@ public struct TokenRequest<T, E: Auth0APIError>: @unchecked Sendable {
     private let maxAge: Int?
     private let organization: String?
 
+    public var dpop: DPoP? {
+        return (request as? Request<T, E>)?.dpop
+    }
+
     init(request: any Requestable<T, E>, authentication: any Authentication) {
         self.init(request: request,
                   audience: authentication.clientId,

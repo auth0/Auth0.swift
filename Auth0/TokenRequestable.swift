@@ -71,6 +71,11 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
      */
     func withOrganization(_ organization: String?) -> any TokenRequestable<ResultType, ErrorType>
 
+    // MARK: - DPoP inspection (for test/debug use only)
+
+    /// The ``DPoP`` instance forwarded from the underlying request, if present.
+    var dpop: DPoP? { get }
+
     // MARK: - Requestable
 
     /**
