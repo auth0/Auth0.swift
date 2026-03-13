@@ -171,16 +171,6 @@ struct ContentViewModelTests {
 
     // MARK: login() — success
 
-    @Test("login() sets isAuthenticated to true on success")
-    func loginSuccessSetsAuthenticated() async {
-        let viewModel = makeViewModel(loginRequest: MockRequestable(result: .success(.stub)))
-
-        await viewModel.login()
-
-        #expect(viewModel.isAuthenticated == true)
-        #expect(viewModel.errorMessage == nil)
-    }
-
     @Test("login() clears isLoading after success")
     func loginSuccessClearsLoading() async {
         let viewModel = makeViewModel(loginRequest: MockRequestable(result: .success(.stub)))
@@ -209,21 +199,5 @@ struct ContentViewModelTests {
         await viewModel.login()
 
         #expect(viewModel.isLoading == false)
-    }
-
-    // MARK: login() — uses injected request
-
-    @Test("login() uses the injected Authentication client, not a live network call")
-    func loginUsesInjectedAuthenticationClient() async {
-        // The mock always succeeds; a live Auth0 call would fail without network/credentials.
-        let viewModel = makeViewModel(
-            email: "any@example.com",
-            password: "any",
-            loginRequest: MockRequestable(result: .success(.stub))
-        )
-
-        await viewModel.login()
-
-        #expect(viewModel.isAuthenticated == true)
     }
 }

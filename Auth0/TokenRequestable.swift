@@ -1,5 +1,5 @@
 import Foundation
-
+import Combine
 /**
  A request that supports opt-in ID token claim validation via a chainable builder API.
 
@@ -71,11 +71,6 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
      */
     func withOrganization(_ organization: String?) -> any TokenRequestable<ResultType, ErrorType>
 
-    // MARK: - DPoP inspection (for test/debug use only)
-
-    /// The ``DPoP`` instance forwarded from the underlying request, if present.
-    var dpop: DPoP? { get }
-
     // MARK: - Requestable
 
     /**
@@ -109,3 +104,39 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
      */
     func requestValidators(_ extraValidators: [RequestValidator]) -> any Requestable<ResultType, ErrorType>
 }
+
+// MARK: - Combine
+
+public extension TokenRequestable {
+
+    /**
+     Combine publisher for the request.
+
+     - Returns: A type-erased publisher.
+     */
+    func start() -> AnyPublisher<ResultType, ErrorType> {
+        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+    }
+
+}
+
+// MARK: - Async/Await
+
+#if canImport(_Concurrency)
+public extension TokenRequestable {
+
+    /**
+     Performs the request.
+
+     - Throws: An error that conforms to ``Auth0APIError``.
+     */
+    func start() async throws -> ResultType {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.start { result in
+                continuation.resume(with: result)
+            }
+        }
+    }
+
+}
+#endif
