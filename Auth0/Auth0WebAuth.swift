@@ -29,7 +29,6 @@ final class Auth0WebAuth: WebAuth {
     private(set) var ephemeralSession = false
     private(set) var issuer: String
     private(set) var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
-    private(set) var nonce: String?
     private(set) var maxAge: Int?
     private(set) var organization: String?
     private(set) var invitationURL: URL?
@@ -39,6 +38,10 @@ final class Auth0WebAuth: WebAuth {
 
     var state: String {
         return self.parameters["state"] ?? self.generateDefaultState()
+    }
+
+    var nonce: String {
+        return self.parameters["nonce"] ?? self.generateDefaultNonce()
     }
 
     lazy var redirectURL: URL? = {
@@ -91,6 +94,11 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
+    func nonce(_ nonce: String) -> Self {
+        self.parameters["nonce"] = nonce
+        return self
+    }
+
     func state(_ state: String) -> Self {
         self.parameters["state"] = state
         return self
@@ -114,11 +122,6 @@ final class Auth0WebAuth: WebAuth {
 
     func authorizeURL(_ authorizeURL: URL) -> Self {
         self.overrideAuthorizeURL = authorizeURL
-        return self
-    }
-
-    func nonce(_ nonce: String) -> Self {
-        self.nonce = nonce
         return self
     }
 
@@ -264,7 +267,7 @@ final class Auth0WebAuth: WebAuth {
         entries["response_type"] = self.responseType
         entries["redirect_uri"] = redirectURL.absoluteString
         entries["state"] = state
-        entries["nonce"] = self.nonce
+        entries["nonce"] = nonce
         entries["organization"] = self.organization
 
         if let invitationURL = self.invitationURL {
@@ -297,18 +300,22 @@ final class Auth0WebAuth: WebAuth {
         return components.url!
     }
 
-    func generateDefaultState() -> String {
+    func generateDefaultNonce() -> String {
         let data = Data(count: 32)
-        var tempData = data
-
-        let result = tempData.withUnsafeMutableBytes {
+        var randomData = data
+        _ = randomData.withUnsafeMutableBytes {
             SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
         }
+        return randomData.encodeBase64URLSafe()
+    }
 
-        guard result == 0, let state = tempData.a0_encodeBase64URLSafe()
-        else { return UUID().uuidString.replacingOccurrences(of: "-", with: "") }
-
-        return state
+    func generateDefaultState() -> String {
+        let data = Data(count: 32)
+        var randomData = data
+        _ = randomData.withUnsafeMutableBytes {
+            SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
+        }
+        return randomData.encodeBase64URLSafe()
     }
 
     private func handler(_ redirectURL: URL) -> OAuth2Grant {
