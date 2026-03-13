@@ -194,39 +194,3 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
                        dpop: dpop)
     }
 }
-
-// MARK: - Combine
-
-public extension Request {
-
-    /**
-     Combine publisher for the request.
-
-     - Returns: A type-erased publisher.
-     */
-    func start() -> AnyPublisher<T, E> {
-        return Deferred { Future(self.start) }.eraseToAnyPublisher()
-    }
-
-}
-
-// MARK: - Async/Await
-
-#if canImport(_Concurrency)
-public extension Request {
-
-    /**
-     Performs the request.
-
-     - Throws: An error that conforms to ``Auth0APIError``.
-     */
-    func start() async throws -> T {
-        return try await withCheckedThrowingContinuation { continuation in
-            self.start { result in
-                continuation.resume(with: result)
-            }
-        }
-    }
-
-}
-#endif

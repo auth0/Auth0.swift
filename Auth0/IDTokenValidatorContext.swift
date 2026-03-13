@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 
 struct IDTokenValidatorContext: IDTokenSignatureValidatorContext, IDTokenClaimsValidatorContext {
@@ -29,4 +28,3 @@ extension IDTokenValidatorContext {
     }
 
 }
-#endif
