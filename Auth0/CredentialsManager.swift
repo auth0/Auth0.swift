@@ -181,6 +181,25 @@ public struct CredentialsManager: Sendable {
         return self.storage.deleteEntry(forKey: key)
     }
 
+    /// Clears all credentials stored in the Keychain, including the main credentials and any API credentials
+    /// for all audiences.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// try credentialsManager.clearAll()
+    /// ```
+    ///
+    /// - Throws: An error when the delete operation fails.
+    public func clearAll() throws {
+        #if WEB_AUTH_PLATFORM
+        self.biometricSession.lock.lock()
+        self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
+        self.biometricSession.lock.unlock()
+        #endif
+        try self.storage.deleteAllEntries()
+    }
+
     #if WEB_AUTH_PLATFORM
     /// Checks if the current biometric session is valid based on the configured policy.
     ///

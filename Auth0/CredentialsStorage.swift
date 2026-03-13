@@ -24,6 +24,11 @@ public protocol CredentialsStorage {
     /// - Returns: If the entry was deleted.
     func deleteEntry(forKey key: String) -> Bool
 
+    /// Deletes all storage entries.
+    ///
+    /// - Throws: An error when the delete operation fails.
+    func deleteAllEntries() throws
+
 }
 
 /// Conformance to ``CredentialsStorage``.
@@ -63,6 +68,13 @@ extension SimpleKeychain: CredentialsStorage {
         } catch {
             return false
         }
+    }
+
+    /// Deletes all storage entries from the Keychain for the service and access group values.
+    ///
+    /// - Throws: A `SimpleKeychainError` when the operation fails.
+    public func deleteAllEntries() throws {
+        try self.deleteAll()
     }
 
 }
