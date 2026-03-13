@@ -26,6 +26,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Completion callbacks](#completion-callbacks)
 - [**Methods Added**](#methods-added)
   + [Web Auth](#web-auth)
+  + [Credentials Manager clearAll](#credentials-manager-clearall)
+  + [CredentialsStorage deleteAllEntries](#credentialsstorage-deleteallentries)
 - [**Swift 6 Concurrency**](#swift-6-concurrency)
   + [Sendable protocol conformances](#sendable-protocol-conformances)
 - [**API Changes**](#api-changes)
@@ -244,6 +246,64 @@ Auth0
     }
 ```
 </details>
+
+### Credentials Manager clearAll
+
+**New method:** `clearAll() throws` has been added to `CredentialsManager`.
+
+This method removes **all** credentials stored by the Credentials Manager from the Keychain, including the default credentials entry, any API credentials stored via `store(apiCredentials:)`, and any SSO credentials. It also resets the biometric authentication session (if biometric authentication was enabled).
+
+This is different from the existing `clear()` method, which only removes the default credentials entry.
+
+<details>
+  <summary>Code</summary>
+
+```swift
+// Clear only the default credentials entry (existing method)
+let cleared = credentialsManager.clear()
+
+// Clear ALL keychain entries managed by the Credentials Manager (new method)
+do {
+    try credentialsManager.clearAll()
+} catch {
+    print("Failed to clear all credentials: \(error)")
+}
+```
+</details>
+
+**Impact:** This is a new additive API. No migration is required. Use it when you need to completely wipe all stored credentials (e.g., on account deletion or full sign-out).
+
+### CredentialsStorage deleteAllEntries
+
+**New method:** `deleteAllEntries() throws` has been added to the `CredentialsStorage` protocol.
+
+If your application provides a custom `CredentialsStorage` implementation, you must add this method.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2 - CredentialsStorage protocol
+class MyCustomStorage: CredentialsStorage {
+    func getEntry(forKey key: String) -> Data? { ... }
+    func setEntry(_ data: Data, forKey key: String) -> Bool { ... }
+    func deleteEntry(forKey key: String) -> Bool { ... }
+}
+
+// v3 - Must also implement deleteAllEntries()
+class MyCustomStorage: CredentialsStorage {
+    func getEntry(forKey key: String) -> Data? { ... }
+    func setEntry(_ data: Data, forKey key: String) -> Bool { ... }
+    func deleteEntry(forKey key: String) -> Bool { ... }
+
+    func deleteAllEntries() throws {
+        // Delete all entries from your custom storage
+    }
+}
+```
+</details>
+
+**Impact:** If you have a custom `CredentialsStorage` implementation, you must add the `deleteAllEntries()` method. The default `SimpleKeychain`-based storage already provides this implementation.
 
 ---
 
