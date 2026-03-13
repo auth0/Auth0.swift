@@ -5,18 +5,18 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     let session: URLSession
     let token: String
 
-    var telemetry: Telemetry
+    var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
 
     init(token: String,
          url: URL,
          session: URLSession = .shared,
-         telemetry: Telemetry = Telemetry(),
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo(),
          logger: Logger? = nil) {
         self.token = token
         self.url = url
         self.session = session
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
         self.logger = logger
     }
 
@@ -37,7 +37,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -71,7 +71,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
     #endif
 
@@ -85,7 +85,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func enrollTOTP() -> any Requestable<TOTPEnrollmentChallenge, MyAccountError> {
@@ -98,7 +98,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func enrollPushNotification() -> any Requestable<PushEnrollmentChallenge, MyAccountError> {
@@ -111,7 +111,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func enrollEmail(emailAddress: String) -> any Requestable<EmailEnrollmentChallenge, MyAccountError> {
@@ -125,7 +125,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func enrollPhone(phoneNumber: String,
@@ -141,7 +141,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmTOTPEnrollment(id: String,
@@ -157,7 +157,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmEmailEnrollment(id: String,
@@ -173,7 +173,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmPushNotificationEnrollment(id: String,
@@ -188,7 +188,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmPhoneEnrollment(id: String,
@@ -204,7 +204,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmRecoveryCodeEnrollment(id: String,
@@ -218,7 +218,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func deleteAuthenticationMethod(by id: String) -> any Requestable<Void, MyAccountError> {
@@ -228,7 +228,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        handle: myAccountDecodableNoBody,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func getAuthenticationMethods() -> any Requestable<[AuthenticationMethod], MyAccountError> {
@@ -238,7 +238,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        handle: getAuthMethodsDecodable,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func getFactors() -> any Requestable<[Factor], MyAccountError> {
@@ -248,7 +248,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        handle: getFactorsDecodable,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func getAuthenticationMethod(by id: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
@@ -258,6 +258,6 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        handle: myAcccountDecodable,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 }

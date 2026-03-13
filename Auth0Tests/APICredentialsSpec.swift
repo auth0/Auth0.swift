@@ -29,7 +29,7 @@ class APICredentialsSpec: QuickSpec {
                 let credentials = try APICredentials(from: json)
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == Bearer
-                expect(credentials.expiresIn) == ExpiresInDate
+                expect(credentials.expiresAt) == ExpiresInDate
                 expect(credentials.scope) == Scope
             }
 
@@ -40,9 +40,9 @@ class APICredentialsSpec: QuickSpec {
             it("should have all unredacted properties") {
                 let credentials = APICredentials(accessToken: AccessToken,
                                                  tokenType: Bearer,
-                                                 expiresIn: ExpiresInDate,
+                                                 expiresAt: ExpiresInDate,
                                                  scope: Scope)
-                let description = "APICredentials(accessToken: \"<REDACTED>\", tokenType: \"\(Bearer)\", expiresIn:"
+                let description = "APICredentials(accessToken: \"<REDACTED>\", tokenType: \"\(Bearer)\", expiresAt:"
                     + " \(ExpiresInDate), scope: \"\(Scope)\")"
                 expect(credentials.description) == description
                 expect(credentials.description).toNot(contain(AccessToken))

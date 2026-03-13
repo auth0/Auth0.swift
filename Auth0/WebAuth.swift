@@ -34,8 +34,8 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
     /// The Auth0 Domain URL.
     var url: URL { get }
 
-    /// The ``Telemetry`` instance.
-    var telemetry: Telemetry { get set }
+    /// The ``Auth0ClientInfo`` instance.
+    var auth0ClientInfo: Auth0ClientInfo { get set }
 
     // MARK: - Builder
 

@@ -321,10 +321,10 @@ public struct CredentialsManager: Sendable {
     ///
     /// ## See Also
     ///
-    /// - ``Credentials/expiresIn``
+    /// - ``Credentials/expiresAt``
     public func hasValid(minTTL: Int = 0) -> Bool {
         guard let credentials = self.retrieveCredentials() else { return false }
-        return !self.hasExpired(credentials.expiresIn) && !self.willExpire(credentials.expiresIn, within: minTTL)
+        return !self.hasExpired(credentials.expiresAt) && !self.willExpire(credentials.expiresAt, within: minTTL)
     }
 
     /// Checks that there are credentials stored, and that the credentials contain a refresh token. If you are using
@@ -642,7 +642,7 @@ public struct CredentialsManager: Sendable {
     ///     .path: "/",
     ///     .name: "auth0_session_transfer_token",
     ///     .value: ssoCredentials.sessionTransferToken,
-    ///     .expires: ssoCredentials.expiresIn,
+    ///     .expires: ssoCredentials.expiresAt,
     ///     .secure: true
     /// ])!
     ///
@@ -787,8 +787,8 @@ public struct CredentialsManager: Sendable {
                 return callback(.failure(.noCredentials))
             }
             guard forceRenewal ||
-                  self.hasExpired(credentials.expiresIn) ||
-                  self.willExpire(credentials.expiresIn, within: minTTL) ||
+                  self.hasExpired(credentials.expiresAt) ||
+                  self.willExpire(credentials.expiresAt, within: minTTL) ||
                   self.hasScopeChanged(from: credentials.scope, to: scope) else {
                 complete()
                 return callback(.success(credentials))
@@ -807,8 +807,8 @@ public struct CredentialsManager: Sendable {
                     case .success(let credentials):
                         let newCredentials = Credentials(from: credentials,
                                                          refreshToken: credentials.refreshToken ?? refreshToken)
-                        if self.willExpire(newCredentials.expiresIn, within: minTTL) {
-                            let tokenTTL = Int(newCredentials.expiresIn.timeIntervalSinceNow)
+                        if self.willExpire(newCredentials.expiresAt, within: minTTL) {
+                            let tokenTTL = Int(newCredentials.expiresAt.timeIntervalSinceNow)
                             let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
                             complete()
                             callback(.failure(error))
@@ -894,8 +894,8 @@ public struct CredentialsManager: Sendable {
                                         callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             if let apiCredentials = self.retrieveAPICredentials(audience: audience, scope: scope),
-                  !self.hasExpired(apiCredentials.expiresIn),
-                  !self.willExpire(apiCredentials.expiresIn, within: minTTL),
+                  !self.hasExpired(apiCredentials.expiresAt),
+                  !self.willExpire(apiCredentials.expiresAt, within: minTTL),
                !self.hasScopeChanged(from: apiCredentials.scope, to: scope, ignoreOpenid: scope?.contains("openid") == false) {
                 complete()
                 return callback(.success(apiCredentials))
@@ -920,8 +920,8 @@ public struct CredentialsManager: Sendable {
                                                          idToken: credentials.idToken,
                                                          refreshToken: credentials.refreshToken ?? refreshToken)
                         let newAPICredentials = APICredentials(from: credentials)
-                        if self.willExpire(newAPICredentials.expiresIn, within: minTTL) {
-                            let tokenTTL = Int(newAPICredentials.expiresIn.timeIntervalSinceNow)
+                        if self.willExpire(newAPICredentials.expiresAt, within: minTTL) {
+                            let tokenTTL = Int(newAPICredentials.expiresAt.timeIntervalSinceNow)
                             let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
                             complete()
                             callback(.failure(error))
@@ -943,12 +943,12 @@ public struct CredentialsManager: Sendable {
         }
     }
 
-    func willExpire(_ expiresIn: Date, within ttl: Int) -> Bool {
-        return expiresIn < Date(timeIntervalSinceNow: TimeInterval(ttl))
+    func willExpire(_ expiresAt: Date, within ttl: Int) -> Bool {
+        return expiresAt < Date(timeIntervalSinceNow: TimeInterval(ttl))
     }
 
-    func hasExpired(_ expiresIn: Date) -> Bool {
-        return expiresIn < Date()
+    func hasExpired(_ expiresAt: Date) -> Bool {
+        return expiresAt < Date()
     }
 
     func hasScopeChanged(from lastScope: String?, to newScope: String?, ignoreOpenid: Bool = false) -> Bool {
@@ -1254,7 +1254,7 @@ public extension CredentialsManager {
     ///     .path: "/",
     ///     .name: "auth0_session_transfer_token",
     ///     .value: ssoCredentials.sessionTransferToken,
-    ///     .expires: ssoCredentials.expiresIn,
+    ///     .expires: ssoCredentials.expiresAt,
     ///     .secure: true
     /// ])!
     ///
@@ -1569,7 +1569,7 @@ public extension CredentialsManager {
     ///     .path: "/",
     ///     .name: "auth0_session_transfer_token",
     ///     .value: ssoCredentials.sessionTransferToken,
-    ///     .expires: ssoCredentials.expiresIn,
+    ///     .expires: ssoCredentials.expiresAt,
     ///     .secure: true
     /// ])!
     ///

@@ -6,7 +6,7 @@ struct Auth0MyAccount: MyAccount {
     let session: URLSession
     let token: String
 
-    var telemetry: Telemetry
+    var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
 
     static let apiVersion = "v1"
@@ -15,19 +15,19 @@ struct Auth0MyAccount: MyAccount {
         return Auth0MyAccountAuthenticationMethods(token: self.token,
                                                    url: self.url,
                                                    session: self.session,
-                                                   telemetry: self.telemetry,
+                                                   auth0ClientInfo: self.auth0ClientInfo,
                                                    logger: self.logger)
     }
 
     init(token: String,
          url: URL,
          session: URLSession = .shared,
-         telemetry: Telemetry = Telemetry(),
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo(),
          logger: Logger? = nil) {
         self.url = url.appending("me/\(Self.apiVersion)")
         self.session = session
         self.token = token
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
         self.logger = logger
     }
 

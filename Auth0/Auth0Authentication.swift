@@ -8,17 +8,17 @@ struct Auth0Authentication: Authentication {
 
     let clientId: String
     let url: URL
-    var telemetry: Telemetry
+    var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
     var dpop: DPoP?
 
     let session: URLSession
 
-    init(clientId: String, url: URL, session: URLSession = URLSession.shared, telemetry: Telemetry = Telemetry()) {
+    init(clientId: String, url: URL, session: URLSession = URLSession.shared, auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo()) {
         self.clientId = clientId
         self.url = url
         self.session = session
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
     }
 
     func login(email: String, code: String, audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError> {
@@ -48,7 +48,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -70,7 +70,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -90,7 +90,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -114,7 +114,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -134,7 +134,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -159,7 +159,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     func login(appleAuthorizationCode authorizationCode: String,
@@ -227,7 +227,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDatabaseUser,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     #if PASSKEYS_PLATFORM
@@ -272,7 +272,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -291,7 +291,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -334,7 +334,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -366,7 +366,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
     #endif
 
@@ -383,7 +383,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> {
@@ -401,7 +401,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> {
@@ -418,7 +418,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     func userInfo(withAccessToken accessToken: String, tokenType: String) -> any Requestable<UserProfile, AuthenticationError> {
@@ -432,7 +432,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationObject,
                        headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: dpop)
     }
 
@@ -477,7 +477,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -493,7 +493,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     func jwks() -> any Requestable<JWKS, AuthenticationError> {
@@ -503,7 +503,7 @@ struct Auth0Authentication: Authentication {
                        method: "GET",
                        handle: authenticationDecodable,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     func customTokenExchange(subjectToken: String,
@@ -545,7 +545,7 @@ private extension Auth0Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -571,7 +571,7 @@ private extension Auth0Authentication {
                        handle: authenticationDecodable,
                        parameters: parameters,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: dpop)
     }
 
@@ -585,7 +585,7 @@ private extension Auth0Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 

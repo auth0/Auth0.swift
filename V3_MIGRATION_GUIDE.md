@@ -387,6 +387,10 @@ The following APIs have been renamed to align with the Android, Flutter, and Rea
 | --- | --- |
 | `clearSession(federated:)` | `logout(federated:)` |
 | `UserInfo` | `UserProfile` |
+| `Credentials.expiresIn` | `Credentials.expiresAt` |
+| `APICredentials.expiresIn` | `APICredentials.expiresAt` |
+| `SSOCredentials.expiresIn` | `SSOCredentials.expiresAt` |
+| `Telemetry` | `Auth0ClientInfo` |
 
 **`clearSession()` → `logout()`**
 
@@ -429,6 +433,40 @@ let user: UserInfo = ...
 
 // v3
 let user: UserProfile = ...
+```
+</details>
+
+**`expiresIn` → `expiresAt`**
+
+The `expiresIn` property on `Credentials`, `APICredentials`, and `SSOCredentials` has been renamed to `expiresAt`. The JSON key (`expires_in`) and Keychain storage key are unchanged.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2
+let expiry = credentials.expiresIn
+
+// v3
+let expiry = credentials.expiresAt
+```
+</details>
+
+**`Telemetry` → `Auth0ClientInfo`**
+
+The `Telemetry` struct has been renamed to `Auth0ClientInfo`, and the `telemetry` property on `Trackable` conforming types has been renamed to `auth0ClientInfo`.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2
+var auth = Auth0.authentication()
+auth.telemetry.enabled = false
+
+// v3
+var auth = Auth0.authentication()
+auth.auth0ClientInfo.enabled = false
 ```
 </details>
 
@@ -486,7 +524,7 @@ class ClientAppOrSDK {
 }  
   
 func testLoginSuccess() {  
-    let mockCredentials = Credentials(accessToken: "token", tokenType: "Bearer", expiresIn: Date(), idToken: "id_token")  
+    let mockCredentials = Credentials(accessToken: "token", tokenType: "Bearer", expiresAt: Date(), idToken: "id_token")  
     let mockAuth = MockAuthentication(mockResult: .success(mockCredentials))  
     let apporsdk = ClientAppOrSDK(auth: mockAuth)  
       

@@ -30,7 +30,7 @@ class BiometricPolicySpec: QuickSpec {
                                     tokenType: TokenType,
                                     idToken: IdToken,
                                     refreshToken: RefreshToken,
-                                    expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
+                                    expiresAt: Date(timeIntervalSinceNow: ExpiresIn),
                                     scope: Scope)
         }
         

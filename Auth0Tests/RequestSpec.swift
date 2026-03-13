@@ -24,7 +24,7 @@ fileprivate extension Request where T == [String: Any], E == AuthenticationError
                   parameters: parameters,
                   headers: headers,
                   logger: nil,
-                  telemetry: Telemetry(),
+                  auth0ClientInfo: Auth0ClientInfo(),
                   dpop: dpop)
     }
 
