@@ -514,7 +514,7 @@ Chain any combination of the following modifiers after `validateClaims()`:
 
 > **Note:** If `validateClaims()` is enabled but the response does not contain an ID token, the request fails with `AuthenticationError` wrapping `IDTokenDecodingError.missingIDToken` rather than silently succeeding.
 
-**Affected methods** (now return `any TokenRequestable` instead of `any Requestable`):
+**Affected methods** (now return `any TokenRequestable` instead of `Request`):
 
 - `Authentication.login(email:code:audience:scope:)`
 - `Authentication.login(phoneNumber:code:audience:scope:)`
@@ -533,7 +533,7 @@ Chain any combination of the following modifiers after `validateClaims()`:
 - `MFAClient.verify(otp:mfaToken:)`
 - `MFAClient.verify(recoveryCode:mfaToken:)`
 
-**Impact:** No migration required for existing call sites. If you implement the `Authentication` protocol in your own mocks or test doubles, update the return type of the affected methods from `any Requestable<Credentials, AuthenticationError>` to `any TokenRequestable<Credentials, AuthenticationError>` (see the [mocking example](#request-to-requestable) above).
+**Impact:** No migration required for existing call sites. If you implement the `Authentication` protocol in your own mocks or test doubles, update the return type of the affected methods from `Request<Credentials, AuthenticationError>` to `any TokenRequestable<Credentials, AuthenticationError>` (see the [mocking example](#request-to-requestable) above).
 
 ---
 
