@@ -6,7 +6,7 @@ Validate ID token claims on credential-returning Authentication API requests.
 
 Methods on ``Authentication`` and ``MFAClient`` that return credentials (`login`, `renew`, `codeExchange`, `ssoExchange`, `verify`, and similar) return `any ``TokenRequestable``` instead of a plain `Requestable`. The concrete type returned is ``TokenRequest``, which conforms to ``TokenRequestable``. You can chain ``TokenRequestable/validateClaims()`` on the returned request before calling `start(_:)` to verify the ID token's claims.
 
-> Note: ID token validation is only performed when the response contains a non-empty ID token (i.e. the result type conforms to `IDTokenProtocol`, which ``Credentials`` and ``SSOCredentials`` do).
+> Note: ID token validation is only performed when the response contains a non-empty ID token (i.e. the result type is ``Credentials`` and ``SSOCredentials`` do). Embedded login is available for all the platforms. Hence IDTokenValidation would also be available for all platforms.
 
 ## Basic usage
 

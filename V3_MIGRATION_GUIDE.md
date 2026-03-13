@@ -31,7 +31,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
-  + [Request to Requestable](#requestable)
+  + [Request to Requestable](#request-to-requestable)
   + [ID Token Validation](#id-token-validation)
 - [**Removed APIs**](#removed-apis)
   + [Management API client (Users)](#management-api-client-users)
@@ -411,99 +411,110 @@ auth.auth0ClientInfo.enabled = false
 ```
 </details>
 
-## Request to Requestable 
+## Request to Requestable
 
-**Change:** API Clients Authentication, MFAClient, MyAccountAuthenticationMethods have been refactored to return Requestable instead of Request 
+**Change:** All `Authentication` and `MFAClient` methods now return protocol types instead of the concrete `Request` struct:
 
-**Impact:** With returning Requestable protocol instead of Request, developers can now mock Request in the api clients thus mocking Auth0 layer making writing tests supper easy
+- Credential-returning methods return `any TokenRequestable<T, E>` (extends `Requestable`, adds `.validateClaims()` and related modifiers — see [ID Token Validation](#id-token-validation) below).
+- All other methods (e.g. `signup`, `resetPassword`, `userInfo`, `jwks`) return `any Requestable<T, E>`.
 
-**Reason:** With existing Request object it was hard to mock Auth0 SDK layer. Only way to mock was using URLProtocol. With Requestable, developers can mock requests and write tests without heavy lifting of mocking url session layer
+**Impact:** Existing call sites that call `.start(_:)` directly are unaffected. The main benefit is that mocking the `Authentication` layer in tests no longer requires `URLProtocol` — you can implement the protocol directly.
 
-**example code**
+**Reason:** With the previous concrete `Request` return type, the only way to intercept Auth0 calls in tests was by stubbing at the URL session layer. Protocol return types let you supply a lightweight mock implementation directly.
+
+<details>
+  <summary>Mocking example</summary>
 
 ```swift
-public protocol Authentication {  
-    func login(email: String, code: String, audience: String?, scope: String) -> Requestable  
-}  
-  
-class MockRequestable: Requestable {  
-    typealias ResultType = Credentials  
-    typealias ErrorType = AuthenticationError  
-      
-    let mockResult: Result<Credentials, AuthenticationError>  
-      
-    init(mockResult: Result<Credentials, AuthenticationError>) {  
-        self.mockResult = mockResult  
-    }  
-      
-    func start(_ callback: @escaping (Result<Credentials, AuthenticationError>) -> Void) {  
-        callback(mockResult)  
-    }  
-}  
-  
-class MockAuthentication: Authentication {  
-    let mockRequest: MockRequestable  
-      
-    init(mockResult: Result<Credentials, AuthenticationError>) {  
-        self.mockRequest = MockRequestable(mockResult: mockResult)  
-    }  
-      
-    func login(email: String, code: String, audience: String?, scope: String) -> Requestable {  
-        return mockRequest  
-    }  
-}  
-  
-class ClientAppOrSDK {  
-    private let auth: Authentication  
-      
-    func login(email: String, code: String, completion: @escaping (Result<Credentials, Error>) -> Void) {  
-        let requestable = auth.login(email: email, code: code, audience: nil, scope: "openid profile email")  
-        requestable.start { result in  
-            // Handle result  
-        }  
-    }  
-}  
-  
-func testLoginSuccess() {  
-    let mockCredentials = Credentials(accessToken: "token", tokenType: "Bearer", expiresAt: Date(), idToken: "id_token")  
-    let mockAuth = MockAuthentication(mockResult: .success(mockCredentials))  
-    let apporsdk = ClientAppOrSDK(auth: mockAuth)  
-      
-    apporsdk.login(email: "test@example.com", code: "123456") { result in  
-        // Assert success without network calls  
-        XCTAssertEqual(try? result.get().accessToken, "token")  
-    }  
+// Conforming type for credential-returning methods (TokenRequestable)
+struct MockTokenRequest: TokenRequestable {
+    typealias ResultType = Credentials
+    typealias ErrorType = AuthenticationError
+
+    let mockResult: Result<Credentials, AuthenticationError>
+
+    func start(_ callback: @escaping (Result<Credentials, AuthenticationError>) -> Void) {
+        callback(mockResult)
+    }
+
+    func validateClaims() -> any TokenRequestable<Credentials, AuthenticationError> { self }
+    func withLeeway(_ leeway: Int) -> any TokenRequestable<Credentials, AuthenticationError> { self }
+    func withIssuer(_ issuer: String) -> any TokenRequestable<Credentials, AuthenticationError> { self }
+    func withNonce(_ nonce: String?) -> any TokenRequestable<Credentials, AuthenticationError> { self }
+    func withMaxAge(_ maxAge: Int?) -> any TokenRequestable<Credentials, AuthenticationError> { self }
+    func withOrganization(_ organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> { self }
+}
+
+class MockAuthentication: Authentication {
+    let mockResult: Result<Credentials, AuthenticationError>
+
+    init(mockResult: Result<Credentials, AuthenticationError>) {
+        self.mockResult = mockResult
+    }
+
+    func login(email: String, code: String, audience: String?, scope: String)
+        -> any TokenRequestable<Credentials, AuthenticationError> {
+        return MockTokenRequest(mockResult: mockResult)
+    }
+}
+
+// Test
+func testLoginSuccess() {
+    let mockCredentials = Credentials(accessToken: "token", tokenType: "Bearer",
+                                      expiresAt: Date(), idToken: "id_token")
+    let mockAuth = MockAuthentication(mockResult: .success(mockCredentials))
+
+    mockAuth.login(email: "test@example.com", code: "123456", audience: nil, scope: "openid")
+        .start { result in
+            XCTAssertEqual(try? result.get().accessToken, "token")
+        }
 }
 ```
+</details>
 ### ID Token Validation
 
-**Change:** All credential-returning methods on `Authentication` and `MFAClient` now return `any TokenRequestable<T, E>` instead of `any Requestable<T, E>`.
+**Change:** All credential-returning methods on `Authentication` and `MFAClient` now return `any TokenRequestable<T, E>`. `TokenRequestable` extends `Requestable` and adds opt-in ID token claim validation via a chainable builder API.
 
-`TokenRequestable` inherits `Requestable`, so **existing call sites that call `.start(_:)` directly are unaffected**. The concrete type returned is `TokenRequest<T, E>`, which conforms to `TokenRequestable` and unlocks opt-in ID token claim validation via a chainable builder API.
+**Existing call sites that call `.start(_:)` directly are unaffected.**
 
-**New API:**
+<details>
+  <summary>Usage example</summary>
 
 ```swift
+// Basic — validate with defaults
 Auth0
     .authentication()
     .renew(withRefreshToken: credentials.refreshToken)
-    .validateClaims()           // opt in to ID token validation
+    .validateClaims()
+    .start { result in ... }
+
+// Custom options
+Auth0
+    .authentication()
+    .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURI)
+    .validateClaims()
+    .withLeeway(120)                           // 2-minute clock skew
+    .withNonce("expected-nonce")
+    .withOrganization("org_abc123")
     .start { result in ... }
 ```
+</details>
 
-Chain any combination of the following modifiers after `validateClaims()` to customise validation:
+Chain any combination of the following modifiers after `validateClaims()`:
 
 | Modifier | Default | Description |
 | --- | --- | --- |
-| `.withLeeway(_ leeway: Int)` | `60_000` ms | Clock-skew tolerance. |
+| `.withLeeway(_ leeway: Int)` | `60` s | Clock-skew tolerance in **seconds**. |
 | `.withIssuer(_ issuer: String)` | Auth0 domain URL | Expected `iss` claim. |
 | `.withNonce(_ nonce: String?)` | `nil` (skip) | Expected `nonce` claim. |
-| `.withMaxAge(_ maxAge: Int?)` | `nil` (skip) | Maximum seconds since last authentication. |
+| `.withMaxAge(_ maxAge: Int?)` | `nil` (skip) | Maximum seconds since last authentication (`auth_time`). |
 | `.withOrganization(_ organization: String?)` | `nil` (skip) | Expected `org_id` or `org_name` claim. |
 
 > **Note:** When using Web Auth (PKCE flow), ID token validation is performed automatically. You do not need to call `validateClaims()` yourself.
 
-**Affected methods:**
+> **Note:** If `validateClaims()` is enabled but the response does not contain an ID token, the request fails with `AuthenticationError` wrapping `IDTokenDecodingError.missingIDToken` rather than silently succeeding.
+
+**Affected methods** (now return `any TokenRequestable` instead of `any Requestable`):
 
 - `Authentication.login(email:code:audience:scope:)`
 - `Authentication.login(phoneNumber:code:audience:scope:)`
@@ -514,16 +525,15 @@ Chain any combination of the following modifiers after `validateClaims()` to cus
 - `Authentication.login(withRecoveryCode:mfaToken:)`
 - `Authentication.login(appleAuthorizationCode:fullName:profile:audience:scope:)`
 - `Authentication.login(facebookSessionAccessToken:profile:audience:scope:)`
-- `Authentication.login(passkey:challenge:connection:audience:scope:)` (both variants)
+- `Authentication.login(passkey:challenge:connection:audience:scope:)` (both `LoginPasskey` and `SignupPasskey` variants)
 - `Authentication.codeExchange(withCode:codeVerifier:redirectURI:)`
 - `Authentication.ssoExchange(withRefreshToken:)`
 - `Authentication.renew(withRefreshToken:audience:scope:)`
-- `Authentication.customTokenExchange(subjectToken:subjectTokenType:audience:scope:organization:parameters:)`
 - `MFAClient.verify(oobCode:bindingCode:mfaToken:)`
 - `MFAClient.verify(otp:mfaToken:)`
 - `MFAClient.verify(recoveryCode:mfaToken:)`
 
-**Impact:** No migration required for existing code. To enable ID token validation on any of the above calls, chain `.validateClaims()` before `.start(_:)`.
+**Impact:** No migration required for existing call sites. If you implement the `Authentication` protocol in your own mocks or test doubles, update the return type of the affected methods from `any Requestable<Credentials, AuthenticationError>` to `any TokenRequestable<Credentials, AuthenticationError>` (see the [mocking example](#request-to-requestable) above).
 
 ---
 
