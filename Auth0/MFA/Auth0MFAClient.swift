@@ -1,9 +1,10 @@
 import Foundation
 
 struct Auth0MFAClient: MFAClient {
-    var dpop: DPoP?
     let clientId: String
     let url: URL
+
+    var dpop: DPoP?
     var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
     let session: URLSession
@@ -65,14 +66,16 @@ struct Auth0MFAClient: MFAClient {
 
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError> {
         var parameters: [String: Any] = [:]
         parameters["oob_code"] = oobCode
         parameters["binding_code"] = bindingCode
         parameters["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-oob"
         parameters["mfa_token"] = mfaToken
-        return self.token()
-            .parameters(parameters)
+        return TokenRequest(request: self.token().parameters(parameters),
+                            audience: clientId,
+                            issuer: url.absoluteString,
+                            jwksRequest: jwks())
     }
 
     func enroll(mfaToken: String) -> any Requestable<OTPMFAEnrollmentChallenge, MfaEnrollmentError> {
@@ -90,22 +93,28 @@ struct Auth0MFAClient: MFAClient {
     }
 
     func verify(otp: String,
-                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["otp"] = otp
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-otp"
         payload["mfa_token"] = mfaToken
-        return self.token().parameters(payload)
+        return TokenRequest(request: self.token().parameters(payload),
+                            audience: clientId,
+                            issuer: url.absoluteString,
+                            jwksRequest: jwks())
     }
 
     func verify(recoveryCode: String,
-                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["recovery_code"] = recoveryCode
         payload["mfa_token"] = mfaToken
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-recovery-code"
         payload["client_id"] = clientId
-        return token().parameters(payload)
+        return TokenRequest(request: token().parameters(payload),
+                            audience: clientId,
+                            issuer: url.absoluteString,
+                            jwksRequest: jwks())
     }
 
     func enroll(mfaToken: String) -> any Requestable<PushMFAEnrollmentChallenge, MfaEnrollmentError> {
@@ -141,6 +150,16 @@ struct Auth0MFAClient: MFAClient {
 }
 
 private extension Auth0MFAClient {
+    func jwks() -> any Requestable<JWKS, AuthenticationError> {
+        let jwksURL = URL(string: ".well-known/jwks.json", relativeTo: url)!
+        return Request(session: session,
+                       url: jwksURL,
+                       method: "GET",
+                       handle: authenticationDecodable,
+                       logger: logger,
+                       auth0ClientInfo: auth0ClientInfo)
+    }
+
     func token<T: Codable>() -> Request<T, MFAVerifyError> {
         let token = URL(string: "oauth/token", relativeTo: self.url)!
         let payload: [String: Any] = ["client_id": self.clientId]

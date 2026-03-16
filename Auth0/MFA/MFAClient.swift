@@ -155,13 +155,16 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - Returns: A request that will yield Auth0 user's credentials.
      - Requires: MFA OOB Grant `http://auth0.com/oauth/grant-type/mfa-oob`.
 
+     > Note: Chain ``TokenRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
+
      ## See Also
 
      - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-out-of-band)
+     - <doc:IDTokenValidation>
      */
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError>
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError>
 
     // MARK: - OTP Enrollment
 
@@ -228,12 +231,15 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - Returns: A request that will yield Auth0 user's credentials.
      - Requires: MFA OTP Grant `http://auth0.com/oauth/grant-type/mfa-otp`.
 
+     > Note: Chain ``TokenRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
+
      ## See Also
 
      - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-mfa-with-otp)
+     - <doc:IDTokenValidation>
      */
     func verify(otp: String,
-                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError>
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError>
 
     // MARK: - Recovery Code Verification
 
@@ -265,12 +271,15 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - Returns: A request that will yield Auth0 user's credentials.
      - Requires: MFA Recovery Code Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`.
 
+     > Note: Chain ``TokenRequest/validateClaims()`` before calling `start(_:)` to validate the ID token. See <doc:IDTokenValidation>.
+
      ## See Also
 
      - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-recovery-code)
+     - <doc:IDTokenValidation>
      */
     func verify(recoveryCode: String,
-                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError>
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError>
 
     // MARK: - Push Notification Enrollment
 

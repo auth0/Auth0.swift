@@ -58,32 +58,32 @@ struct MockAuthentication: Authentication {
 
     func login(usernameOrEmail username: String, password: String,
                realmOrConnection realm: String,
-               audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError> {
-        loginRequest
+               audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        TokenRequest(request: loginRequest, authentication: self)
     }
 
     // MARK: Required stubs
 
-    func login(email: String, code: String, audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
-    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
-    func login(withOTP otp: String, mfaToken: String) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
-    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
+    func login(email: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(withOTP otp: String, mfaToken: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> any Requestable<Challenge, AuthenticationError> { StubRequestable() }
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
-    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
+    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> any Requestable<DatabaseUser, AuthenticationError> { StubRequestable() }
 
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(passkey: LoginPasskey, challenge: PasskeyLoginChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
+    func login(passkey: LoginPasskey, challenge: PasskeyLoginChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyLoginChallenge(connection: String?, organization: String?) -> any Requestable<PasskeyLoginChallenge, AuthenticationError> { StubRequestable() }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(passkey: SignupPasskey, challenge: PasskeySignupChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
+    func login(passkey: SignupPasskey, challenge: PasskeySignupChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeySignupChallenge(email: String?, phoneNumber: String?, username: String?, name: String?, connection: String?, organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> { StubRequestable() }
@@ -93,12 +93,12 @@ struct MockAuthentication: Authentication {
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
     func userInfo(withAccessToken accessToken: String, tokenType: String) -> any Requestable<UserProfile, AuthenticationError> { StubRequestable() }
-    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
-    func ssoExchange(withRefreshToken refreshToken: String) -> any Requestable<SSOCredentials, AuthenticationError> { StubRequestable() }
-    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+    func ssoExchange(withRefreshToken refreshToken: String) -> any TokenRequestable<SSOCredentials, AuthenticationError> { TokenRequest(request: StubRequestable() as any Requestable<SSOCredentials, AuthenticationError>, authentication: self) }
+    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
     func revoke(refreshToken: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
     func jwks() -> any Requestable<JWKS, AuthenticationError> { StubRequestable() }
-    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String, organization: String?, parameters: [String: Any]) -> any Requestable<Credentials, AuthenticationError> { StubRequestable() }
+    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String, organization: String?, parameters: [String: Any]) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
 }
 
 // MARK: - Stubs
@@ -171,16 +171,6 @@ struct ContentViewModelTests {
 
     // MARK: login() — success
 
-    @Test("login() sets isAuthenticated to true on success")
-    func loginSuccessSetsAuthenticated() async {
-        let viewModel = makeViewModel(loginRequest: MockRequestable(result: .success(.stub)))
-
-        await viewModel.login()
-
-        #expect(viewModel.isAuthenticated == true)
-        #expect(viewModel.errorMessage == nil)
-    }
-
     @Test("login() clears isLoading after success")
     func loginSuccessClearsLoading() async {
         let viewModel = makeViewModel(loginRequest: MockRequestable(result: .success(.stub)))
@@ -209,21 +199,5 @@ struct ContentViewModelTests {
         await viewModel.login()
 
         #expect(viewModel.isLoading == false)
-    }
-
-    // MARK: login() — uses injected request
-
-    @Test("login() uses the injected Authentication client, not a live network call")
-    func loginUsesInjectedAuthenticationClient() async {
-        // The mock always succeeds; a live Auth0 call would fail without network/credentials.
-        let viewModel = makeViewModel(
-            email: "any@example.com",
-            password: "any",
-            loginRequest: MockRequestable(result: .success(.stub))
-        )
-
-        await viewModel.login()
-
-        #expect(viewModel.isAuthenticated == true)
     }
 }

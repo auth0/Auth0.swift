@@ -114,13 +114,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.login(withOTP: OTP, mfaToken: MFAToken)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.login(withOTP: OTP, mfaToken: MFAToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -178,13 +178,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.login(withOOBCode: OOB, mfaToken: MFAToken)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.login(withOOBCode: OOB, mfaToken: MFAToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -228,13 +228,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.login(withRecoveryCode: RecoveryCode, mfaToken: MFAToken)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.login(withRecoveryCode: RecoveryCode, mfaToken: MFAToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -317,7 +317,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.multifactorChallenge(mfaToken: MFAToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Challenge, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -441,7 +441,7 @@ class AuthenticationSpec: QuickSpec {
                                              audience: Audience,
                                              scope: Scope)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
@@ -451,7 +451,7 @@ class AuthenticationSpec: QuickSpec {
                                              audience: Audience,
                                              scope: Scope)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -497,7 +497,7 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.passkeyLoginChallenge(connection: ConnectionName)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? Request<PasskeyLoginChallenge, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -599,7 +599,7 @@ class AuthenticationSpec: QuickSpec {
                                              audience: Audience,
                                              scope: Scope)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
@@ -609,7 +609,7 @@ class AuthenticationSpec: QuickSpec {
                                              audience: Audience,
                                              scope: Scope)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -721,7 +721,7 @@ class AuthenticationSpec: QuickSpec {
                                                               name: Name,
                                                               connection: ConnectionName)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? Request<PasskeySignupChallenge, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -832,13 +832,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.renew(withRefreshToken: refreshToken)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.renew(withRefreshToken: refreshToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1048,13 +1048,13 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(appleAuthorizationCode: validCode)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.login(appleAuthorizationCode: validCode)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -1143,13 +1143,13 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -1186,7 +1186,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.revoke(refreshToken: refreshToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Void, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1269,13 +1269,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm")
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm")
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1348,13 +1348,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1454,7 +1454,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.signup(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<DatabaseUser, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1487,7 +1487,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Void, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1528,7 +1528,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.startPasswordless(email: SupportAtAuth0)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Void, AuthenticationError>)?.dpop).to(beNil())
             }
 
             context("passwordless login") {
@@ -1597,13 +1597,13 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(email: SupportAtAuth0, code: OTP)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.login(email: SupportAtAuth0, code: OTP)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -1645,7 +1645,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.startPasswordless(phoneNumber: Phone)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Void, AuthenticationError>)?.dpop).to(beNil())
             }
 
             context("passwordless login") {
@@ -1716,13 +1716,13 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(phoneNumber: Phone, code: OTP)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.login(phoneNumber: Phone, code: OTP)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -1754,13 +1754,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.userInfo(withAccessToken: AccessToken)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? Request<UserProfile, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.userInfo(withAccessToken: AccessToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<UserProfile, AuthenticationError>)?.dpop).to(beNil())
             }
 
             context("token type") {
@@ -1839,13 +1839,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1925,13 +1925,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.ssoExchange(withRefreshToken: RefreshToken)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<SSOCredentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.ssoExchange(withRefreshToken: RefreshToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<SSOCredentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -2090,7 +2090,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.jwks()
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<JWKS, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }

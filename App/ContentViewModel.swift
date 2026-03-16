@@ -32,7 +32,8 @@ final class ContentViewModel: ObservableObject {
         isLoading = true
         do {
             let credentials = try await authenticationClient
-                .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication", audience: nil, scope: "openid profile offline_access")
+                .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication", audience: nil, scope: "openid profile email offline_access")
+                .validateClaims()
                 .start()
             isAuthenticated = true
         } catch {
@@ -78,11 +79,9 @@ final class ContentViewModel: ObservableObject {
             let cleared = credentialsManager.clear()
             if cleared {
                 isAuthenticated = false
-                print("Logout successful")
             }
         } catch let error as Auth0Error {
             errorMessage = "Logout failed: \(error.localizedDescription)"
-            print("Logout failed with error: \(error)")
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
@@ -95,10 +94,8 @@ final class ContentViewModel: ObservableObject {
         do {
             let credentials = try await credentialsManager.credentials()
             isAuthenticated = true
-            print("Valid credentials found: \(credentials.accessToken)")
         } catch {
             isAuthenticated = false
-            print("No valid credentials found")
         }
     }
 }

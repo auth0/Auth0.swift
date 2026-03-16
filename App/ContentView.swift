@@ -21,6 +21,24 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 20) {
 
+            VStack {
+                TextField(text: $viewModel.email) {
+                    Text("email")
+                }
+                
+                SecureField(text: $viewModel.password) {
+                    Text("password")
+                }
+                
+                Button {
+                    Task {
+                        await viewModel.login()
+                    }
+                } label: {
+                    Text("Login")
+                }
+
+            }
             Button {
                 Task {
                     
