@@ -24,7 +24,7 @@ public protocol CredentialsStorage {
     /// - Returns: If the entry was deleted.
     func deleteEntry(forKey key: String) -> Bool
 
-    /// Deletes all storage entries.
+    /// Deletes all storage entries managed by this ``CredentialsStorage`` instance.
     ///
     /// - Throws: An error when the delete operation fails.
     func deleteAllEntries() throws

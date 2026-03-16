@@ -251,7 +251,7 @@ Auth0
 
 **New method:** `clearAll() throws` has been added to `CredentialsManager`.
 
-This method removes **all** credentials stored by the Credentials Manager from the Keychain, including the default credentials entry, any API credentials stored via `store(apiCredentials:)`, and any SSO credentials. It also resets the biometric authentication session (if biometric authentication was enabled).
+This method removes **all** entries managed by the Credentials Manager from the Keychain (its configured storage/service), including the default credentials entry and any API credentials stored via `store(apiCredentials:)`. It also resets the biometric authentication session (if biometric authentication was enabled).
 
 This is different from the existing `clear()` method, which only removes the default credentials entry.
 
@@ -284,14 +284,14 @@ If your application provides a custom `CredentialsStorage` implementation, you m
 
 ```swift
 // v2 - CredentialsStorage protocol
-class MyCustomStorage: CredentialsStorage {
+class MyCustomCredentialStorage: CredentialsStorage {
     func getEntry(forKey key: String) -> Data? { ... }
     func setEntry(_ data: Data, forKey key: String) -> Bool { ... }
     func deleteEntry(forKey key: String) -> Bool { ... }
 }
 
 // v3 - Must also implement deleteAllEntries()
-class MyCustomStorage: CredentialsStorage {
+class MyCustomCredentialStorage: CredentialsStorage {
     func getEntry(forKey key: String) -> Data? { ... }
     func setEntry(_ data: Data, forKey key: String) -> Bool { ... }
     func deleteEntry(forKey key: String) -> Bool { ... }

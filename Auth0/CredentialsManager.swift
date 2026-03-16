@@ -181,8 +181,16 @@ public struct CredentialsManager: Sendable {
         return self.storage.deleteEntry(forKey: key)
     }
 
-    /// Clears all credentials stored in the Keychain, including the main credentials and any API credentials
-    /// for all audiences.
+    /// Clears all credentials stored in the underlying storage, including the main credentials and any API
+    /// credentials for all audiences.
+    ///
+    /// This method delegates to the underlying storage to delete **all** of its entries (for example, all
+    /// Keychain items for the configured service/access group), not just those keys explicitly known to
+    /// ``CredentialsManager``. If the same storage instance or Keychain service/access group is shared with
+    /// other parts of your application, calling this method may delete non-Auth0 data as well.
+    ///
+    /// To avoid unintended data loss, ensure that the storage backing this ``CredentialsManager`` is dedicated
+    /// to Auth0 credentials when using ``clearAll()``.
     ///
     /// ## Usage
     ///
