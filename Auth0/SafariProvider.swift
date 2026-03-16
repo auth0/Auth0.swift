@@ -1,6 +1,6 @@
 #if os(iOS)
-import UIKit
-import SafariServices
+@preconcurrency import UIKit
+@preconcurrency import SafariServices
 
 public extension WebAuthentication {
 
@@ -52,6 +52,7 @@ public extension WebAuthentication {
 
 }
 
+@MainActor
 class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     let controller: SFSafariViewController
@@ -71,18 +72,14 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     func finish(with result: WebAuthResult<Void>) {
         if case .failure(let cause) = result, case .userCancelled = cause {
-            DispatchQueue.main.async { [callback] in
-                callback(result)
-            }
+            callback(result)
         } else {
-            DispatchQueue.main.async { [callback, weak controller] in
-                guard let presenting = controller?.presentingViewController else {
-                    let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
-                    return callback(.failure(error))
-                }
-                presenting.dismiss(animated: true) {
-                    callback(result)
-                }
+            guard let presenting = controller.presentingViewController else {
+                let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
+                return callback(.failure(error))
+            }
+            presenting.dismiss(animated: true) { [callback] in
+                Task { @MainActor in callback(result) }
             }
         }
     }
@@ -93,7 +90,7 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 
 }
 
-extension SafariUserAgent: SFSafariViewControllerDelegate {
+extension SafariUserAgent: @preconcurrency SFSafariViewControllerDelegate {
 
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead

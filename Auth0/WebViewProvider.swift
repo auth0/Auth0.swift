@@ -50,9 +50,8 @@
 public extension WebAuthentication {
 
     static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
-        return { url, callback  in
+        return { url, callback in
             let redirectURL = extractRedirectURL(from: url)!
-
             return WebViewUserAgent(authorizeURL: url,
                                     redirectURL: redirectURL,
                                     modalPresentationStyle: style,
@@ -62,6 +61,7 @@ public extension WebAuthentication {
 
 }
 
+@MainActor
 class WebViewUserAgent: NSObject, WebAuthUserAgent {
 
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
@@ -102,22 +102,20 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         self.viewController.view = webview
         webview.navigationDelegate = self
     }
-
+    
     func start() {
         self.webview.load(self.request)
         UIWindow.topViewController?.present(self.viewController, animated: true)
     }
 
     func finish(with result: WebAuthResult<Void>) {
-        DispatchQueue.main.async { [weak webview, weak viewController, callback] in
-            webview?.removeFromSuperview()
-            guard let presenting = viewController?.presentingViewController else {
-                let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
-                return callback(.failure(error))
-            }
-            presenting.dismiss(animated: true) {
-                callback(result)
-            }
+        webview?.removeFromSuperview()
+        guard let presenting = viewController.presentingViewController else {
+            let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
+            return callback(.failure(error))
+        }
+        presenting.dismiss(animated: true) { [callback] in
+            Task { @MainActor in callback(result) }
         }
     }
 

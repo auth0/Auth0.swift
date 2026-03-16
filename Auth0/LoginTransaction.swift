@@ -1,9 +1,10 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
+@MainActor
 class LoginTransaction: NSObject, AuthTransaction {
 
-    typealias FinishTransaction = (WebAuthResult<Credentials>) -> Void
+    typealias FinishTransaction = @MainActor (WebAuthResult<Credentials>) -> Void
 
     private(set) var userAgent: WebAuthUserAgent?
 

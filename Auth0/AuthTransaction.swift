@@ -16,15 +16,17 @@ protocol AuthTransaction {
     /**
      Resumes the transaction when the third party application notifies the application using a URL with a custom
      scheme.
-     
+
      - Parameter url: The URL sent by the third party application that contains the result of the auth.
      - Returns: If the URL was expected and properly formatted. Otherwise, it will return `false`.
     */
+    @MainActor
     func resume(_ url: URL) -> Bool
 
     /**
      Terminates the operation and reports back that it was cancelled.
     */
+    @MainActor
     func cancel()
 
 }

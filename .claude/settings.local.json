@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(auth0-pr-review-agent)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git -C /Users/sanchit.mehta/Documents/Repos/Auth0.swift log --oneline -5 -- Auth0/Auth0WebAuth.swift)",
+      "Bash(git -C /Users/sanchit.mehta/Documents/Repos/Auth0.swift show 8f5a1dfc:Auth0/Auth0WebAuth.swift)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(swift build:*)",
+      "Bash(swift test:*)",
+      "Bash(xcodebuild build:*)",
+      "Bash(gh api:*)"
+    ]
+  }
+}

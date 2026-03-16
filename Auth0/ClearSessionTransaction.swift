@@ -1,6 +1,7 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
+@MainActor
 class ClearSessionTransaction: NSObject, AuthTransaction {
 
     private(set) var userAgent: WebAuthUserAgent?

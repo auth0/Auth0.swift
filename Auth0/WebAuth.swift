@@ -5,7 +5,7 @@ import Foundation
 import Combine
 
 /// Callback invoked by the ``WebAuthUserAgent`` when the web-based operation concludes.
-public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
+public typealias WebAuthProviderCallback = @MainActor (WebAuthResult<Void>) -> Void
 
 /// Thunk that returns a function that creates and returns a ``WebAuthUserAgent`` to perform a web-based operation.
 /// The ``WebAuthUserAgent`` opens the URL in an external user agent and then invokes the callback when done.
@@ -13,7 +13,7 @@ public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
 /// ## See Also
 ///
 /// - [Example](https://github.com/auth0/Auth0.swift/blob/master/Auth0/SafariProvider.swift)
-public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent
+public typealias WebAuthProvider = @MainActor (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent
 
 /// Web-based authentication using Auth0.
 ///
@@ -207,7 +207,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
     ///
     /// - Parameter callback: A callback to be executed
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func onClose(_ callback: (() -> Void)?) -> Self
+    func onClose(_ callback: (@MainActor () -> Void)?) -> Self
 
     // MARK: - Methods
 
@@ -236,7 +236,8 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
      application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
-    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
+    @MainActor
+    func start(_ callback: @escaping @MainActor (WebAuthResult<Credentials>) -> Void)
 
     #if canImport(_Concurrency)
     /**
@@ -329,7 +330,8 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
-    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
+    @MainActor
+    func clearSession(federated: Bool, callback: @escaping @MainActor (WebAuthResult<Void>) -> Void)
 
     /**
      Removes the Auth0 session and optionally removes the identity provider (IdP) session.
@@ -413,7 +415,8 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
 public extension WebAuth {
 
-    func clearSession(federated: Bool = false, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    @MainActor
+    func clearSession(federated: Bool = false, callback: @escaping @MainActor (WebAuthResult<Void>) -> Void) {
         self.clearSession(federated: federated, callback: callback)
     }
 

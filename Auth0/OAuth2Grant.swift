@@ -3,7 +3,7 @@ import Foundation
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
-    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void)
+    func credentials(from values: [String: String], callback: @escaping @MainActor (WebAuthResult<Credentials>) -> Void)
     func values(fromComponents components: URLComponents) -> [String: String]
 }
 
@@ -63,9 +63,10 @@ struct PKCE: OAuth2Grant {
         self.defaults = newDefaults
     }
 
-    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    func credentials(from values: [String: String], callback: @escaping @MainActor (WebAuthResult<Credentials>) -> Void) {
         guard let code = values["code"] else {
-            return callback(.failure(WebAuthError(code: .noAuthorizationCode(values))))
+            Task { @MainActor in callback(.failure(WebAuthError(code: .noAuthorizationCode(values)))) }
+            return
         }
         let authentication = self.authentication
         let verifier = self.verifier
@@ -81,14 +82,16 @@ struct PKCE: OAuth2Grant {
             .start { result in
                 switch result {
                 case .failure(let error) where error.localizedDescription == "Unauthorized":
-                    return callback(.failure(WebAuthError(code: .pkceNotAllowed)))
-                case .failure(let error): return callback(.failure(WebAuthError(code: .other, cause: error)))
+                    Task { @MainActor in callback(.failure(WebAuthError(code: .pkceNotAllowed))) }
+                case .failure(let error):
+                    Task { @MainActor in callback(.failure(WebAuthError(code: .other, cause: error))) }
                 case .success(let credentials):
                     validate(idToken: credentials.idToken, with: validatorContext) { error in
                         if let error = error {
-                            return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error)))
+                            Task { @MainActor in callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error))) }
+                            return
                         }
-                        callback(.success(credentials))
+                        Task { @MainActor in callback(.success(credentials)) }
                     }
                 }
             }

@@ -49,7 +49,7 @@ class ValidAuthorizeURLBehavior: Behavior<[String:Any]> {
 }
 
 private func newWebAuth() -> Auth0WebAuth {
-    return Auth0WebAuth(clientId: ClientId, url: DomainURL, barrier: MockBarrier())
+    return Auth0WebAuth(clientId: ClientId, url: DomainURL)
 }
 
 private func defaultQuery(withParameters parameters: [String: String] = [:]) -> [String: String] {
@@ -65,6 +65,7 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
 
 private let defaults = ["response_type": "code"]
 
+@MainActor
 class WebAuthSpec: QuickSpec {
 
     override class func spec() {
@@ -95,12 +96,6 @@ class WebAuthSpec: QuickSpec {
                 telemetry.info = telemetryInfo
                 let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, telemetry: telemetry)
                 expect(webAuth.telemetry.info) == telemetryInfo
-            }
-
-            it("should init with client id, url & barrier") {
-                let barrier = QueueBarrier.shared
-                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, barrier: barrier)
-                expect(webAuth.barrier).to(be(barrier))
             }
 
         }
@@ -637,10 +632,11 @@ class WebAuthSpec: QuickSpec {
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
+                // Use a URL with no host so the computed redirectURL returns nil
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: URL(string: "custom:path")!)
                 let expectedError = WebAuthError(code: .noBundleIdentifier)
                 var result: WebAuthResult<Credentials>?
-                auth.redirectURL = nil
-                auth.start { result = $0 }
+                webAuth.start { result = $0 }
                 expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
@@ -668,14 +664,13 @@ class WebAuthSpec: QuickSpec {
 
             }
 
-            context("barrier") {
+            context("flow control") {
 
                 beforeEach {
-                    auth = Auth0WebAuth(clientId: ClientId, url: DomainURL, barrier: QueueBarrier.shared)
-                    QueueBarrier.shared.lower()
+                    auth = Auth0WebAuth(clientId: ClientId, url: DomainURL)
                 }
 
-                it("should raise the barrier") {
+                it("should block a second concurrent flow") {
                     let expectedError = WebAuthError(code: .transactionActiveAlready)
                     var result: WebAuthResult<Credentials>?
                     _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
@@ -684,7 +679,7 @@ class WebAuthSpec: QuickSpec {
                     expect(result).toEventually(haveWebAuthError(expectedError))
                 }
 
-                it("should lower the barrier") {
+                it("should allow a new flow after the previous one completes") {
                     var firstResult: WebAuthResult<Credentials>?
                     var secondResult: WebAuthResult<Credentials>?
                     _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
@@ -708,7 +703,6 @@ class WebAuthSpec: QuickSpec {
             beforeEach {
                 let url = URL(string: "https://samples.auth0.com")!
                 auth = Auth0WebAuth(clientId: "client123", url: url, telemetry: Telemetry())
-                QueueBarrier.shared.lower()
                 cancellables = []
             }
             
@@ -781,7 +775,6 @@ class WebAuthSpec: QuickSpec {
             
             beforeEach {
                 let url = URL(string: "https://samples.auth0.com")!
-                QueueBarrier.shared.lower()
                 auth = Auth0WebAuth(clientId: "client123", url: url, telemetry: Telemetry())
             }
             it("start() async throws on failure") {
@@ -920,9 +913,10 @@ class WebAuthSpec: QuickSpec {
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
+                // Use a URL with no host so the computed redirectURL returns nil
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: URL(string: "custom:path")!)
                 var result: WebAuthResult<Void>?
-                auth.redirectURL = nil
-                auth.clearSession() { result = $0 }
+                webAuth.clearSession() { result = $0 }
                 expect(result).to(haveWebAuthError(WebAuthError(code: .noBundleIdentifier)))
             }
 
@@ -959,14 +953,13 @@ class WebAuthSpec: QuickSpec {
 
             }
 
-            context("barrier") {
+            context("flow control") {
 
                 beforeEach {
-                    auth = Auth0WebAuth(clientId: ClientId, url: DomainURL, barrier: QueueBarrier.shared)
-                    QueueBarrier.shared.lower()
+                    auth = Auth0WebAuth(clientId: ClientId, url: DomainURL)
                 }
 
-                it("should raise the barrier") {
+                it("should block a second concurrent session") {
                     let expectedError = WebAuthError(code: .transactionActiveAlready)
                     var result: WebAuthResult<Void>?
                     _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
@@ -975,7 +968,7 @@ class WebAuthSpec: QuickSpec {
                     expect(result).toEventually(haveWebAuthError(expectedError))
                 }
 
-                it("should lower the barrier") {
+                it("should allow a new session after the previous one completes") {
                     var firstResult: WebAuthResult<Void>?
                     var secondResult: WebAuthResult<Void>?
                     _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
@@ -998,9 +991,7 @@ class WebAuthSpec: QuickSpec {
                     .redirectURL(RedirectURL)
                     .provider { url, callback in
                         let agent = MockUserAgent(callback: callback)
-                        DispatchQueue.global().async {
-                            callback(.failure(WebAuthError(code: .userCancelled)))
-                        }
+                        callback(.failure(WebAuthError(code: .userCancelled)))
                         return agent
                     }
 
@@ -1017,9 +1008,7 @@ class WebAuthSpec: QuickSpec {
                     .redirectURL(RedirectURL)
                     .provider { url, callback in
                         let agent = MockUserAgent(callback: callback)
-                        DispatchQueue.global().async {
-                            callback(.success(()))
-                        }
+                        callback(.success(()))
                         return agent
                     }
 
@@ -1038,16 +1027,6 @@ class WebAuthSpec: QuickSpec {
 }
 
 // - MARK: Mocks
-
-class MockBarrier: Barrier {
-
-    func raise() -> Bool {
-        return true
-    }
-
-    func lower() {}
-
-}
 
 class MockUserAgent: WebAuthUserAgent {
 

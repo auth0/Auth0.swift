@@ -8,7 +8,7 @@ class TransactionStore {
 
     private(set) var current: AuthTransaction?
 
-    func resume(_ url: URL) -> Bool {
+    @MainActor func resume(_ url: URL) -> Bool {
         let isResumed = self.current?.resume(url) ?? false
         self.clear()
         return isResumed
@@ -18,7 +18,7 @@ class TransactionStore {
         self.current = transaction
     }
 
-    func cancel() {
+    @MainActor func cancel() {
         self.current?.cancel()
         self.clear()
     }
