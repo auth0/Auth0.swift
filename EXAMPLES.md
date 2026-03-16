@@ -18,7 +18,7 @@
 - [Web Auth signup](#web-auth-signup)
 - [Web Auth configuration](#web-auth-configuration)
 - [ID token validation](#id-token-validation)
-- [DPoP [EA]](#dpop-ea)
+- [DPoP](#dpop)
 - [Web Auth errors](#web-auth-errors)
 
 ### Web Auth signup
@@ -268,12 +268,9 @@ Auth0
 
 Auth0.swift automatically [validates](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) the ID token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID token have not been tampered with and can be safely used.
 
-### DPoP [EA]
+### DPoP
 
-> [!NOTE]  
-> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
-
-[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Posession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method.
+[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Possession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method.
 
 ```swift
 Auth0
@@ -819,7 +816,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 - [Retrieve user information](#retrieve-user-information)
 - [Renew credentials](#renew-credentials)
 - [Get SSO credentials](#get-sso-credentials)
-- [DPoP [EA]](#dpop-ea-1)
+- [DPoP](#dpop-1)
 - [Authentication API client configuration](#authentication-api-client-configuration)
 - [Authentication API client errors](#authentication-api-client-errors)
 
@@ -1611,12 +1608,9 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 > [!IMPORTANT]
 > Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the default Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
 
-### DPoP [EA]
+### DPoP
 
-> [!NOTE]  
-> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
-
-[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Posession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method. This ensures that DPoP proofs are generated for requests made through the Authentication API client.
+[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Possession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method. This ensures that DPoP proofs are generated for requests made through the Authentication API client.
 
 ```swift
 let authenticationClient = Auth0.authentication().useDPoP()
@@ -1705,6 +1699,7 @@ The Authentication API client will only produce `AuthenticationError` error valu
 - The `info` property contains additional information about the error.
 - The `cause` property contains the underlying error value, if any.
 - Use the `isNetworkError` property to check if the request failed due to networking issues.
+- Use the `isRetryable` property to check if the error represents a transient failure that can be retried (network errors, rate limiting, or server errors).
 
 Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about the available `AuthenticationError` properties.
 
@@ -3888,6 +3883,7 @@ The My Account API client will only produce `MyAccountError` error values.
 - The `info` property contains additional information about the error.
 - The `cause` property contains the underlying error value, if any.
 - Use the `isNetworkError` property to check if the request failed due to networking issues.
+- Use the `isRetryable` property to check if the error represents a transient failure that can be retried (network errors, rate limiting, or server errors).
 
 See the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/myaccounterror) to learn more about the available `MyAccountError` properties.
 
@@ -4133,6 +4129,7 @@ The Management API client will only produce `ManagementError` error values.
 - The `info` property contains additional information about the error.
 - The `cause` property contains the underlying error value, if any.
 - Use the `isNetworkError` property to check if the request failed due to networking issues.
+- Use the `isRetryable` property to check if the error represents a transient failure that can be retried (network errors, rate limiting, or server errors).
 
 Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/managementerror) to learn more about the available `ManagementError` properties.
 
