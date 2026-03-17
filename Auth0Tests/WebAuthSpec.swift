@@ -454,13 +454,36 @@ class WebAuthSpec: QuickSpec {
 
             }
 
+            context("state") {
+
+                it("should generate a unique state on each access for the same auth object") {
+                    let auth = newWebAuth()
+                    expect(auth.state) != auth.state
+                }
+
+                it("should generate a unique state for different auth objects") {
+                    expect(newWebAuth().state) != newWebAuth().state
+                }
+
+                it("should use a custom state value") {
+                    let state = "foo"
+                    expect(newWebAuth().state(state).state).to(equal(state))
+                }
+
+            }
+
             context("nonce") {
 
                 it("should generate a default nonce") {
-                    expect(newWebAuth().nonce).toNot(beNil())
+                    expect(newWebAuth().nonce).toNot(beEmpty())
                 }
 
-                it("should generate unique nonces for different auth objects") {
+                it("should generate a unique nonce on each access for the same auth object") {
+                    let auth = newWebAuth()
+                    expect(auth.nonce) != auth.nonce
+                }
+
+                it("should generate a unique nonce for different auth objects") {
                     expect(newWebAuth().nonce) != newWebAuth().nonce
                 }
 
