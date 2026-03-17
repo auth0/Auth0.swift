@@ -192,16 +192,12 @@ final class Auth0WebAuth: WebAuth {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
-        let state = self.state
-        let nonce = self.nonce
         let handler = self.handler(redirectURL)
 
         let authorizeURL: URL
         do {
             authorizeURL = try self.buildAuthorizeURL(withRedirectURL: redirectURL,
-                                                      defaults: handler.defaults,
-                                                      state: state,
-                                                      nonce: nonce)
+                                                      defaults: handler.defaults)
         } catch {
             return callback(.failure(error))
         }
@@ -261,9 +257,7 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,
-                           defaults: [String: String],
-                           state: String?,
-                           nonce: String?) throws(WebAuthError) -> URL {
+                           defaults: [String: String]) throws(WebAuthError) -> URL {
         guard let authorize = self.overrideAuthorizeURL ?? URL(string: "authorize", relativeTo: self.url),
               var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true) else {
             let message = "Unable to build authorize URL with base URL: \(self.url.absoluteString)."
