@@ -36,20 +36,12 @@ final class Auth0WebAuth: WebAuth {
     private(set) var provider: WebAuthProvider?
     private(set) var onCloseCallback: (() -> Void)?
 
-    var state: String? {
-        if let state = parameters["state"], state.isEmpty == false {
-            return state
-        }
-        parameters["state"] = generateRandomString()
-        return parameters["state"]
+    var state: String {
+        return parameters["state"] ?? generateRandomString()
     }
 
-    var nonce: String? {
-        if let nonce = parameters["nonce"], nonce.isEmpty == false {
-            return nonce
-        }
-        parameters["nonce"] = generateRandomString()
-        return parameters["nonce"]
+    var nonce: String {
+        return parameters["nonce"] ?? generateRandomString()
     }
 
     lazy var redirectURL: URL? = {
@@ -192,12 +184,16 @@ final class Auth0WebAuth: WebAuth {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
-        let handler = self.handler(redirectURL)
+        let nonce = nonce
+        let state = state
+        let handler = self.handler(redirectURL, nonce: nonce)
 
         let authorizeURL: URL
         do {
             authorizeURL = try self.buildAuthorizeURL(withRedirectURL: redirectURL,
-                                                      defaults: handler.defaults)
+                                                      defaults: handler.defaults,
+                                                      nonce: nonce,
+                                                      state: state)
         } catch {
             return callback(.failure(error))
         }
@@ -257,7 +253,9 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,
-                           defaults: [String: String]) throws(WebAuthError) -> URL {
+                           defaults: [String: String],
+                           nonce: String,
+                           state: String) throws(WebAuthError) -> URL {
         guard let authorize = self.overrideAuthorizeURL ?? URL(string: "authorize", relativeTo: self.url),
               var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true) else {
             let message = "Unable to build authorize URL with base URL: \(self.url.absoluteString)."
@@ -316,7 +314,7 @@ final class Auth0WebAuth: WebAuth {
         return nonce
     }
 
-    private func handler(_ redirectURL: URL) -> OAuth2Grant {
+    private func handler(_ redirectURL: URL, nonce: String) -> OAuth2Grant {
         var authentication = Auth0Authentication(clientId: self.clientId,
                                                  url: self.url,
                                                  session: self.session,

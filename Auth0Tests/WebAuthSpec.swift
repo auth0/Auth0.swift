@@ -111,7 +111,7 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": try! newWebAuth()
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(),
                 ]
@@ -120,7 +120,7 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": try! newWebAuth()
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": "\(Domain)/foo",
                     "query": defaultQuery()
                 ]
@@ -129,7 +129,7 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": try! newWebAuth()
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": "\(Domain)/foo/",
                     "query": defaultQuery()
                 ]
@@ -138,7 +138,7 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": try! newWebAuth()
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": "\(Domain)/foo/bar",
                     "query": defaultQuery()
                 ]
@@ -147,7 +147,7 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": try! newWebAuth()
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": "\(Domain)/foo/bar/",
                     "query": defaultQuery()
                 ]
@@ -157,7 +157,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .connection("facebook")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection": "facebook"]),
                 ]
@@ -168,7 +168,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .state(state)
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["state": state]),
                 ]
@@ -179,7 +179,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .scope(scope)
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["scope": scope]),
                 ]
@@ -190,7 +190,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .scope(scope)
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["scope": "openid \(scope)"]),
                 ]
@@ -200,7 +200,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .maxAge(10000) // 1 second
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["max_age": "10000"]),
                 ]
@@ -210,7 +210,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .organization("abc1234")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["organization": "abc1234"]),
                 ]
@@ -221,7 +221,7 @@ class WebAuthSpec: QuickSpec {
                     "url": try! newWebAuth()
                         .organization("abc1234")
                         .invitationURL(URL(string: "https://example.com/invitations?organization=abc1234&invitation=xyz6789")!)
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["organization": "abc1234", "invitation": "xyz6789"]),
                 ]
@@ -232,7 +232,7 @@ class WebAuthSpec: QuickSpec {
                 newDefaults["audience"] = "https://wwww.google.com"
                 return [
                     "url": try! newWebAuth()
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["audience": "https://wwww.google.com"]),
                 ]
@@ -244,7 +244,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .audience("https://domain.auth0.com")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["audience": "https://domain.auth0.com"]),
                 ]
@@ -254,7 +254,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .audience("https://domain.auth0.com")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["audience": "https://domain.auth0.com"]),
                 ]
@@ -264,7 +264,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .connectionScope("user_friends,email")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection_scope": "user_friends,email"]),
                 ]
@@ -276,7 +276,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .connectionScope("user_friends")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection_scope": "user_friends"]),
                 ]
@@ -289,7 +289,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .invitationURL(url)
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["organization": organization, "invitation": invitation]),
                 ]
@@ -299,7 +299,7 @@ class WebAuthSpec: QuickSpec {
                 return [
                     "url": try! newWebAuth()
                         .authorizeURL(URL(string: "https://example.com/authorize")!)
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State),
                     "domain": "example.com",
                     "query": defaultQuery(),
                 ]
@@ -310,7 +310,7 @@ class WebAuthSpec: QuickSpec {
                 it("should encode + as %2B"){
                     let url = try! newWebAuth()
                             .parameters(["login_hint": "first+last@host.com"])
-                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce)
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State)
                     expect(url.absoluteString.contains("first%2Blast@host.com")).to(beTrue())
                 }
 
@@ -327,13 +327,13 @@ class WebAuthSpec: QuickSpec {
                 let webAuth = newWebAuth().invitationURL(invitationUrl) // Invalid invitation URL
 
                 expect({
-                    _ = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce)
+                    _ = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State)
                 }).to(throwError(expectedError))
             }
 
             it("should include dpop_jkt parameter when DPoP is enabled") {
                 let webAuth = newWebAuth().useDPoP()
-                let url = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce)
+                let url = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State)
                 let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
                 let dpopJktItem = components?.queryItems?.first { $0.name == "dpop_jkt" }
 
@@ -342,7 +342,7 @@ class WebAuthSpec: QuickSpec {
 
             it("should not include dpop_jkt parameter when DPoP is not enabled") {
                 let webAuth = newWebAuth()
-                let url = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, nonce: Nonce)
+                let url = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State)
                 let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
                 let dpopJktItem = components?.queryItems?.first { $0.name == "dpop_jkt" }
 
@@ -460,11 +460,6 @@ class WebAuthSpec: QuickSpec {
                     expect(newWebAuth().nonce).toNot(beNil())
                 }
 
-                it("should generate a consistent nonce for the same auth object") {
-                    let auth = newWebAuth()
-                    expect(auth.nonce) == auth.nonce
-                }
-
                 it("should generate unique nonces for different auth objects") {
                     expect(newWebAuth().nonce) != newWebAuth().nonce
                 }
@@ -575,14 +570,6 @@ class WebAuthSpec: QuickSpec {
                 _ = auth.provider({ url, _ in SpyUserAgent() })
                 auth.start { _ in }
                 expect(auth.state).toNot(beNil())
-            }
-
-            it("should generate a consistent state for the same auth object") {
-                _ = auth.provider({ url, _ in SpyUserAgent() })
-                auth.start { _ in }
-                let state = auth.state
-                auth.start { _ in }
-                expect(auth.state) == state
             }
 
             it("should generate unique states for different auth objects") {
