@@ -309,9 +309,9 @@ final class Auth0WebAuth: WebAuth {
         let result = tempData.withUnsafeMutableBytes {
             SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
         }
-        guard result == errSecSuccess, let nonce = tempData.a0_encodeBase64URLSafe()
+        guard result == errSecSuccess, let randomString = tempData.a0_encodeBase64URLSafe()
         else { return UUID().uuidString.replacingOccurrences(of: "-", with: "") }
-        return nonce
+        return randomString
     }
 
     private func handler(_ redirectURL: URL, nonce: String) -> OAuth2Grant {
