@@ -10,17 +10,20 @@ class LogoutTransaction: NSObject, AuthTransaction {
         super.init()
     }
 
+    @MainActor
     func cancel() {
         // The user agent can handle the error
         self.finishUserAgent(with: .failure(WebAuthError(code: .userCancelled)))
     }
 
+    @MainActor
     func resume(_ url: URL) -> Bool {
         // The user agent can close itself
         self.finishUserAgent(with: .success(()))
         return true
     }
 
+    @MainActor
     private func finishUserAgent(with result: WebAuthResult<Void>) {
         self.userAgent?.finish(with: result)
         self.userAgent = nil

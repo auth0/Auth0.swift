@@ -4,6 +4,7 @@ import AuthenticationServices
 typealias ASHandler = ASWebAuthenticationSession.CompletionHandler
 
 extension WebAuthentication {
+    @MainActor
     static func asProvider(redirectURL: URL,
                            ephemeralSession: Bool = false,
                            headers: [String: String]? = nil,
@@ -37,24 +38,26 @@ extension WebAuthentication {
     }
 
      static let completionHandler: (_ callback: @escaping WebAuthProviderCallback) -> ASHandler = { callback in
-        return {
-            guard let callbackURL = $0, $1 == nil else {
-                if let error = $1 as? NSError,
-                    error.userInfo.isEmpty,
-                    case ASWebAuthenticationSessionError.canceledLogin = error {
-                    return callback(.failure(WebAuthError(code: .userCancelled)))
-                } else if let error = $1 {
-                    return callback(.failure(WebAuthError(code: .other, cause: error)))
+        return { url, error in
+            Task { @MainActor in
+                guard let callbackURL = url, error == nil else {
+                    if let error = error as? NSError,
+                        error.userInfo.isEmpty,
+                        case ASWebAuthenticationSessionError.canceledLogin = error {
+                        return callback(.failure(WebAuthError(code: .userCancelled)))
+                    } else if let error {
+                        return callback(.failure(WebAuthError(code: .other, cause: error)))
+                    }
+
+                    return callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
                 }
-
-                return callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
+                _ = TransactionStore.shared.resume(callbackURL)
             }
-
-            _ = TransactionStore.shared.resume(callbackURL)
         }
     }
 }
 
+@MainActor
 class ASUserAgent: NSObject, WebAuthUserAgent {
 
     private(set) static var currentSession: ASWebAuthenticationSession?

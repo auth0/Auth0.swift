@@ -28,6 +28,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Web Auth](#web-auth)
 - [**Swift 6 Concurrency**](#swift-6-concurrency)
   + [Sendable protocol conformances](#sendable-protocol-conformances)
+  + [@MainActor isolation for Web Auth types](#mainactor-isolation-for-web-auth-types)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
@@ -294,6 +295,73 @@ struct MyAppError: Auth0Error { // implicitly Sendable - no changes needed
 final class MyLogger: Logger, @unchecked Sendable {
     private let lock = NSLock()
     // ... thread-safe implementation
+}
+```
+</details>
+
+### `@MainActor` isolation for Web Auth types
+
+**Change:** The following public types and typealiases are now `@MainActor`-isolated:
+
+| Symbol | Kind |
+|--------|------|
+| `WebAuthProviderCallback` | `typealias` |
+| `WebAuthProvider` | `typealias` |
+| `WebAuthUserAgent.start()` | protocol requirement |
+| `WebAuthUserAgent.finish(with:)` | protocol requirement |
+| `WebAuthentication.resume(with:)` | static method |
+| `WebAuthentication.cancel()` | static method |
+
+**Impact:** If your application implements a **custom `WebAuthUserAgent`**, both `start()` and `finish(with:)` must now be `@MainActor`. Similarly, if you store or call a `WebAuthProviderCallback` or `WebAuthProvider`, those interactions must happen on the main actor.
+
+<details>
+  <summary>Migration example — custom WebAuthUserAgent</summary>
+
+```swift
+// v2
+class MyUserAgent: WebAuthUserAgent {
+    func start() {
+        DispatchQueue.main.async {
+            // present UI
+        }
+    }
+
+    func finish(with result: WebAuthResult<Void>) {
+        DispatchQueue.main.async {
+            // dismiss UI
+        }
+    }
+}
+
+// v3 — mark the class (or the individual methods) @MainActor
+@MainActor
+class MyUserAgent: WebAuthUserAgent {
+    func start() {
+        // already on main actor, no DispatchQueue.main needed
+    }
+
+    func finish(with result: WebAuthResult<Void>) {
+        // already on main actor, no DispatchQueue.main needed
+    }
+}
+```
+</details>
+
+<details>
+  <summary>Migration example — calling WebAuthentication.resume / cancel</summary>
+
+```swift
+// v2 — could be called from any thread
+func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    guard let url = URLContexts.first?.url else { return }
+    WebAuthentication.resume(with: url)
+}
+
+// v3 — scene(_:openURLContexts:) is already called on the main thread,
+// so no change is needed in most cases. If you call these methods from a
+// background context, you must hop to the main actor first:
+Task { @MainActor in
+    WebAuthentication.resume(with: url)
 }
 ```
 </details>

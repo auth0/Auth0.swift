@@ -43,6 +43,7 @@ public extension WebAuthentication {
     /// ## See Also
     ///
     /// - <doc:UserAgents>
+    @MainActor
     static func safariProvider(style: UIModalPresentationStyle = .fullScreen,
                                presentationWindow: Auth0WindowRepresentable? = nil) -> WebAuthProvider {
         return { url, callback in
@@ -57,6 +58,7 @@ public extension WebAuthentication {
 
 }
 
+@MainActor
 class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     let controller: SFSafariViewController
@@ -91,18 +93,14 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     func finish(with result: WebAuthResult<Void>) {
         if case .failure(let cause) = result, case .userCancelled = cause {
-            DispatchQueue.main.async { [callback] in
-                callback(result)
-            }
+            callback(result)
         } else {
-            DispatchQueue.main.async { [callback, weak controller] in
-                guard let presenting = controller?.presentingViewController else {
-                    let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
-                    return callback(.failure(error))
-                }
-                presenting.dismiss(animated: true) {
-                    callback(result)
-                }
+            guard let presenting = controller.presentingViewController else {
+                let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
+                return callback(.failure(error))
+            }
+            presenting.dismiss(animated: true) {
+                self.callback(result)
             }
         }
     }

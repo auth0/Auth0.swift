@@ -1,6 +1,7 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
+@MainActor
 class LoginTransaction: NSObject, AuthTransaction {
 
     typealias FinishTransaction = (WebAuthResult<Credentials>) -> Void

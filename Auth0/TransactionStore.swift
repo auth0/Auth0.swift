@@ -8,6 +8,7 @@ class TransactionStore: @unchecked Sendable {
 
     private(set) var current: AuthTransaction?
 
+    @MainActor
     func resume(_ url: URL) -> Bool {
         let isResumed = self.current?.resume(url) ?? false
         self.clear()
@@ -18,6 +19,7 @@ class TransactionStore: @unchecked Sendable {
         self.current = transaction
     }
 
+    @MainActor
     func cancel() {
         self.current?.cancel()
         self.clear()

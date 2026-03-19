@@ -50,7 +50,7 @@
 ///
 /// - [OAuth 2.0 Best Practices for Native Apps](https://auth0.com/blog/oauth-2-best-practices-for-native-apps)
 public extension WebAuthentication {
-
+    @MainActor
     static func webViewProvider(style: UIModalPresentationStyle = .fullScreen,
                                 presentationWindow: Auth0WindowRepresentable? = nil) -> WebAuthProvider {
         return { url, callback  in
@@ -66,6 +66,7 @@ public extension WebAuthentication {
 
 }
 
+@MainActor
 class WebViewUserAgent: NSObject, WebAuthUserAgent {
 
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
@@ -132,15 +133,13 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func finish(with result: WebAuthResult<Void>) {
-        DispatchQueue.main.async { [weak webview, weak viewController, callback] in
-            webview?.removeFromSuperview()
-            guard let presenting = viewController?.presentingViewController else {
-                let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
-                return callback(.failure(error))
-            }
-            presenting.dismiss(animated: true) {
-                callback(result)
-            }
+        webview?.removeFromSuperview()
+        guard let presenting = viewController.presentingViewController else {
+            let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
+            return callback(.failure(error))
+        }
+        presenting.dismiss(animated: true) {
+            self.callback(result)
         }
     }
 

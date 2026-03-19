@@ -10,7 +10,7 @@ import AppKit
 #endif
 
 /// Callback invoked by the ``WebAuthUserAgent`` when the web-based operation concludes.
-public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
+public typealias WebAuthProviderCallback = @MainActor (WebAuthResult<Void>) -> Void
 
 /// Thunk that returns a function that creates and returns a ``WebAuthUserAgent`` to perform a web-based operation.
 /// The ``WebAuthUserAgent`` opens the URL in an external user agent and then invokes the callback when done.
@@ -18,7 +18,7 @@ public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
 /// ## See Also
 ///
 /// - [Example](https://github.com/auth0/Auth0.swift/blob/master/Auth0/SafariProvider.swift)
-public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent
+public typealias WebAuthProvider = @MainActor (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent
 
 /// Web-based authentication using Auth0.
 ///

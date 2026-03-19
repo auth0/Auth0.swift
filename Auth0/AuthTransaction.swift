@@ -11,6 +11,7 @@ OS can open it on success/failure.
 - Important: Only one ``AuthTransaction`` can be active at a given time for Auth0.swift, if you start a new one before
  finishing the current one it will be cancelled.
 */
+@MainActor
 protocol AuthTransaction {
 
     /**
