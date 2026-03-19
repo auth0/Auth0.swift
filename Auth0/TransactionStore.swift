@@ -15,6 +15,7 @@ class TransactionStore: @unchecked Sendable {
         return isResumed
     }
 
+    @MainActor
     func store(_ transaction: AuthTransaction) {
         self.current = transaction
     }
@@ -25,6 +26,7 @@ class TransactionStore: @unchecked Sendable {
         self.clear()
     }
 
+    @MainActor
     func clear() {
         self.current = nil
     }
