@@ -80,9 +80,8 @@ public struct CredentialsManager: Sendable {
     ///
     /// - Important: Access to this property will not be protected by biometric authentication.
     public var user: UserProfile? {
-        guard let credentials = self.retrieveCredentials(),
-              let jwt = try? decode(jwt: credentials.idToken) else { return nil }
-
+        let credentials = try self.retrieveCredentials()
+        let jwt = try decode(jwt: credentials.idToken)
         return UserProfile(json: jwt.body)
     }
 
@@ -137,13 +136,13 @@ public struct CredentialsManager: Sendable {
     ///
     /// - Parameter credentials: ``Credentials`` instance to store.
     /// - Returns: If the credentials were stored.
-    public func store(credentials: Credentials) -> Bool {
+    public func store(credentials: Credentials) throws {
         guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
                                                            requiringSecureCoding: true) else {
-            return false
+            throw CredentialsManagerError.storeFailed
         }
 
-        return self.storage.setEntry(data, forKey: self.storeKey)
+        try self.storage.setEntry(data, forKey: self.storeKey)
     }
 
     /// Clears credentials stored in the Keychain.
@@ -155,13 +154,13 @@ public struct CredentialsManager: Sendable {
     /// ```
     ///
     /// - Returns: If the credentials were removed.
-    public func clear() -> Bool {
+    public func clear() throws {
         #if WEB_AUTH_PLATFORM
         self.biometricSession.lock.lock()
         self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
         self.biometricSession.lock.unlock()
         #endif
-        return self.storage.deleteEntry(forKey: self.storeKey)
+        try self.storage.deleteEntry(forKey: self.storeKey)
     }
 
     /// Clears API credentials stored in the Keychain for a given audience value.
@@ -176,9 +175,9 @@ public struct CredentialsManager: Sendable {
     /// - Parameter scope: Optional scope for which the  API Credentials are stored. If the credentials were initially fetched/stored with scope,
     ///   it is recommended to pass scope also while clearing them.
     /// - Returns: If the API credentials were removed.
-    public func clear(forAudience audience: String, scope: String? = nil) -> Bool {
+    public func clear(forAudience audience: String, scope: String? = nil) throws {
         let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
-        return self.storage.deleteEntry(forKey: key)
+        try self.storage.deleteEntry(forKey: key)
     }
 
     /// Clears all credentials stored in the underlying storage, including the main credentials and any API
@@ -291,9 +290,12 @@ public struct CredentialsManager: Sendable {
 
         guard let credentials = self.retrieveCredentials(),
               let refreshToken = credentials.refreshToken else {
-                  _ = self.clear()
-
-                  return mainThreadCallback(.success(()))
+            do {
+                try self.clear()
+            } catch {
+                return mainThreadCallback(.failure(CredentialsManagerError(code: .clearFailed, cause: error)))
+            }
+            return mainThreadCallback(.success(()))
         }
 
         self.authentication
@@ -304,8 +306,11 @@ public struct CredentialsManager: Sendable {
                 case .failure(let error):
                     mainThreadCallback(.failure(CredentialsManagerError(code: .revokeFailed, cause: error)))
                 case .success:
-                    _ = self.clear()
-
+                    do {
+                        try self.clear()
+                    } catch {
+                        mainThreadCallback(.failure(CredentialsManagerError(code: .clearFailed, cause: error)))
+                    }
                     mainThreadCallback(.success(()))
                 }
             }
@@ -732,24 +737,26 @@ public struct CredentialsManager: Sendable {
                                  callback: dispatchOnMain(callback))
     }
 
-    public func store(apiCredentials: APICredentials, forAudience audience: String, forScope scope: String? = nil) -> Bool {
-        guard let data = try? apiCredentials.encode() else {
-            return false
+    public func store(apiCredentials: APICredentials, forAudience audience: String, forScope scope: String? = nil) throws {
+        let data = try apiCredentials.encode()
+
+        let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
+        do {
+            try self.storage.setEntry(data, forKey: key)
+        } catch {
+            
         }
-
-        let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
-        return self.storage.setEntry(data, forKey: key)
     }
 
-    private func retrieveCredentials() -> Credentials? {
-        guard let data = self.storage.getEntry(forKey: self.storeKey) else { return nil }
-        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
+    private func retrieveCredentials() throws -> Credentials? {
+        let data = try self.storage.getEntry(forKey: self.storeKey)
+        return try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
-    private func retrieveAPICredentials(audience: String, scope: String?) -> APICredentials? {
+    private func retrieveAPICredentials(audience: String, scope: String?) throws -> APICredentials? {
         let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
-        guard let data = self.storage.getEntry(forKey: key) else { return nil }
-        return try? APICredentials(from: data)
+        let data = try self.storage.getEntry(forKey: key)
+        return try APICredentials(from: data)
     }
 
     private func getAPICredentialsStorageKey(audience: String, scope: String?) -> String {

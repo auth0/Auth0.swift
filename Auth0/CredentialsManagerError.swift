@@ -10,6 +10,8 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
         case apiExchangeFailed
         case ssoExchangeFailed
         case storeFailed
+        case deleteFailed
+        case clearFailed
         case biometricsFailed
         case revokeFailed
         case largeMinTTL(minTTL: Int, lifetime: Int)
@@ -57,6 +59,10 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
     /// Storing the renewed credentials failed.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let storeFailed: CredentialsManagerError = .init(code: .storeFailed)
+    
+    public static let clearFailed: CredentialsManagerError = .init(code: .clearFailed)
+    
+    public static let deleteFailed: CredentialsManagerError = .init(code: .deleteFailed)
 
     /// The biometric authentication failed.
     /// The underlying `LAError` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
@@ -83,6 +89,10 @@ public extension CredentialsManagerError {
         case .apiExchangeFailed: return "The exchange of the refresh token for API credentials failed."
         case .ssoExchangeFailed: return "The exchange of the refresh token for SSO credentials failed."
         case .storeFailed: return "Storing the renewed credentials failed."
+        case .clearFailed:
+            return "Clearing the credentials failed"
+        case .deleteFailed:
+            return "Deletion of creating failed"
         case .biometricsFailed: return "The biometric authentication failed."
         case .revokeFailed: return "The revocation of the refresh token failed."
         case .largeMinTTL(let minTTL, let lifetime): return "The minTTL requested (\(minTTL)s) is greater than the"

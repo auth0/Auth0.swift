@@ -8,7 +8,7 @@ public protocol CredentialsStorage {
     ///
     /// - Parameter key: The key to get from the store.
     /// - Returns: The stored data.
-    func getEntry(forKey key: String) -> Data?
+    func getEntry(forKey key: String) throws -> Data
 
     /// Sets a storage entry.
     ///
@@ -16,13 +16,13 @@ public protocol CredentialsStorage {
     ///   - data: The data to be stored.
     ///   - key: The key to store it to.
     /// - Returns: If the data was stored.
-    func setEntry(_ data: Data, forKey key: String) -> Bool
+    func setEntry(_ data: Data, forKey key: String) throws
 
     /// Deletes a storage entry.
     ///
     /// - Parameter key: The key to delete from the store.
     /// - Returns: If the entry was deleted.
-    func deleteEntry(forKey key: String) -> Bool
+    func deleteEntry(forKey key: String) throws
 
     /// Deletes all storage entries managed by this ``CredentialsStorage`` instance.
     ///
@@ -47,8 +47,8 @@ extension SimpleKeychain: CredentialsStorage {
     ///
     /// - Parameter key: The key to get from the Keychain.
     /// - Returns: The stored data.
-    public func getEntry(forKey key: String) -> Data? {
-        return try? self.data(forKey: key)
+    public func getEntry(forKey key: String) throws -> Data {
+        try self.data(forKey: key)
     }
 
     /// Sets a storage entry.
@@ -57,26 +57,16 @@ extension SimpleKeychain: CredentialsStorage {
     ///   - data: The data to be stored.
     ///   - key: The key to store it to.
     /// - Returns: If the data was stored.
-    public func setEntry(_ data: Data, forKey key: String) -> Bool {
-        do {
-            try self.set(data, forKey: key)
-            return true
-        } catch {
-            return false
-        }
+    public func setEntry(_ data: Data, forKey key: String) throws {
+        try self.set(data, forKey: key)
     }
 
     /// Deletes a storage entry.
     ///
     /// - Parameter key: The key to delete from the Keychain.
     /// - Returns: If the data was deleted.
-    public func deleteEntry(forKey key: String) -> Bool {
-        do {
-            try self.deleteItem(forKey: key)
-            return true
-        } catch {
-            return false
-        }
+    public func deleteEntry(forKey key: String) throws {
+        try self.deleteItem(forKey: key)
     }
 
     /// Deletes all storage entries from the Keychain for the service and access group values.
