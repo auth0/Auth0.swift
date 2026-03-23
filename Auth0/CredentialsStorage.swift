@@ -31,6 +31,15 @@ public protocol CredentialsStorage {
 
 }
 
+extension CredentialsStorage {
+
+    /// Default implementation that triggers an assertion failure.
+    public func deleteAllEntries() throws {
+        assertionFailure("deleteAllEntries() is not implemented. Implement this method in your custom CredentialsStorage.")
+    }
+
+}
+
 /// Conformance to ``CredentialsStorage``.
 extension SimpleKeychain: CredentialsStorage {
 
