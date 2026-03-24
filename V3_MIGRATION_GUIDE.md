@@ -24,6 +24,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Signup connection](#signup-connection)
 - [**Behavior Changes**](#behavior-changes)
   + [Completion callbacks](#completion-callbacks)
+  + [Credentials Manager error handling](#credentials-manager-error-handling)
 - [**Methods Added**](#methods-added)
   + [Web Auth](#web-auth)
   + [Credentials Manager clearAll](#credentials-manager-clearall)
@@ -228,6 +229,159 @@ credentialsManager.credentials { result in
 </details>
 
 **Reason:** After performing operations with Auth0.swift, it's common to run presentation logic – for example, to show an error or navigate to the main flow of the app. Having callbacks execute on the main thread by default improves developer experience and reduces boilerplate.
+
+### Credentials Manager error handling
+
+**Change:** `CredentialsManager` storage methods now throw errors instead of returning `Bool` or optional `Data`.
+
+The following methods have been updated:
+
+| v2 | v3 |
+| --- | --- |
+| `store(credentials:) -> Bool` | `store(credentials:) throws` |
+| `clear() -> Bool` | `clear() throws` |
+| `clear(forAudience:scope:) -> Bool` | `clear(forAudience:scope:) throws` |
+| `store(apiCredentials:forAudience:forScope:)` (silent failure) | `store(apiCredentials:forAudience:forScope:) throws` |
+
+The `CredentialsStorage` protocol methods have also changed:
+
+| v2 | v3 |
+| --- | --- |
+| `getEntry(forKey:) -> Data?` | `getEntry(forKey:) throws -> Data` |
+| `setEntry(_:forKey:) -> Bool` | `setEntry(_:forKey:) throws` |
+| `deleteEntry(forKey:) -> Bool` | `deleteEntry(forKey:) throws` |
+
+**Impact:** Any code that checks the `Bool` return value of `store` or `clear` must be updated to use `do-try-catch`. Code that ignores the return value (e.g. `_ = credentialsManager.store(...)`) can be migrated to `try?` if you want to continue ignoring failures, or wrapped in `do-try-catch` to handle them. If you have a custom `CredentialsStorage` implementation, you must update your method signatures and throw an error instead of returning `false` or `nil`.
+
+<details>
+  <summary>Migration example — store and clear</summary>
+
+```swift
+// v2
+if credentialsManager.store(credentials: credentials) {
+    // stored successfully
+} else {
+    // handle failure
+}
+
+if credentialsManager.clear() {
+    // cleared successfully
+} else {
+    // handle failure
+}
+
+// v3
+do {
+    try credentialsManager.store(credentials: credentials)
+    // stored successfully
+} catch {
+    // handle error
+}
+
+do {
+    try credentialsManager.clear()
+    // cleared successfully
+} catch {
+    // handle error
+}
+
+// v3 — if you want to silently ignore failures (not recommended)
+try? credentialsManager.store(credentials: credentials)
+try? credentialsManager.clear()
+```
+</details>
+
+<details>
+  <summary>Migration example — custom CredentialsStorage</summary>
+
+```swift
+// v2
+class MyCustomStorage: CredentialsStorage {
+    func getEntry(forKey key: String) -> Data? {
+        return myStore[key]
+    }
+    func setEntry(_ data: Data, forKey key: String) -> Bool {
+        myStore[key] = data
+        return true
+    }
+    func deleteEntry(forKey key: String) -> Bool {
+        myStore.removeValue(forKey: key)
+        return true
+    }
+}
+
+// v3
+class MyCustomStorage: CredentialsStorage {
+    func getEntry(forKey key: String) throws -> Data {
+        guard let data = myStore[key] else {
+            throw MyStorageError.itemNotFound
+        }
+        return data
+    }
+    func setEntry(_ data: Data, forKey key: String) throws {
+        myStore[key] = data
+    }
+    func deleteEntry(forKey key: String) throws {
+        guard myStore[key] != nil else {
+            throw MyStorageError.itemNotFound
+        }
+        myStore.removeValue(forKey: key)
+    }
+}
+```
+</details>
+
+**Downstream impact on async methods:** Because `clear()` and `store(credentials:)` now surface errors, several callback-based methods gain new failure paths that were previously silent:
+
+| Method | New error delivered to callback | Trigger |
+| --- | --- | --- |
+| `revoke(headers:callback:)` | `.clearFailed` | Keychain delete fails after a successful token revocation, or when no refresh token is present |
+| `credentials(withScope:minTTL:parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving renewed credentials |
+| `renew(parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving renewed credentials |
+| `apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving exchanged API credentials |
+| `ssoCredentials(parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving updated credentials after SSO exchange |
+
+In v2, a storage failure inside these methods was silently ignored — the callback was still called with a success result. In v3, the callback receives the appropriate `CredentialsManagerError` instead.
+
+<details>
+  <summary>Migration example — handling new revoke failure path</summary>
+
+```swift
+// v2 — a Keychain failure during clear() was silently ignored;
+//       result was always .success after a successful network revocation
+credentialsManager.revoke { result in
+    switch result {
+    case .success:
+        navigateToLogin()
+    case .failure(let error):
+        // only .revokeFailed was possible here
+        showError(error)
+    }
+}
+
+// v3 — a Keychain failure during clear() is surfaced as .clearFailed
+credentialsManager.revoke { result in
+    switch result {
+    case .success:
+        navigateToLogin()
+    case .failure(let error):
+        switch error.code {
+        case .revokeFailed:
+            // network revocation failed — refresh token may still be active
+            showError(error)
+        case .clearFailed:
+            // token was revoked but credentials could not be removed from storage
+            // treat as logged out since the token is no longer valid
+            navigateToLogin()
+        default:
+            showError(error)
+        }
+    }
+}
+```
+</details>
+
+**Reason:** Returning `Bool` or `nil` silently swallows the underlying Keychain error, making it impossible to distinguish a missing item from a permissions failure or a corrupted entry. Throwing the error directly gives callers full context to respond appropriately—for example, by prompting the user to re-authenticate or surfacing a meaningful error message.
 
 ## Methods Added
 

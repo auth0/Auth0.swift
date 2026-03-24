@@ -130,11 +130,11 @@ class CredentialsManagerSpec: QuickSpec {
         describe("storage with scoped keys") {
 
             afterEach {
-                _ = credentialsManager.clear(forAudience: Audience)
-                _ = credentialsManager.clear(forAudience: Audience, scope: Scope)
-                _ = credentialsManager.clear(forAudience: Audience, scope: NewScope)
-                _ = credentialsManager.clear(forAudience: Audience, scope: "read write")
-                _ = credentialsManager.clear(forAudience: Audience, scope: "read")
+                try? credentialsManager.clear(forAudience: Audience)
+                try? credentialsManager.clear(forAudience: Audience, scope: Scope)
+                try? credentialsManager.clear(forAudience: Audience, scope: NewScope)
+                try? credentialsManager.clear(forAudience: Audience, scope: "read write")
+                try? credentialsManager.clear(forAudience: Audience, scope: "read")
             }
 
             it("should store api credentials without scope using audience as key") {
@@ -176,9 +176,9 @@ class CredentialsManagerSpec: QuickSpec {
                 credentialsManager = CredentialsManager(authentication: authentication, storage: store)
 
                 try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
-                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read")
+                try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read")
 
-                _ = credentialsManager.clear(forAudience: Audience, scope: "read")
+                try? credentialsManager.clear(forAudience: Audience, scope: "read")
 
                 expect(fetchAPICredentials(forAudience: Audience, from: store)).toNot(beNil())
                 
@@ -190,9 +190,9 @@ class CredentialsManagerSpec: QuickSpec {
                 credentialsManager = CredentialsManager(authentication: authentication, storage: store)
 
                 try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
-                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read")
+                try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read")
 
-                _ = credentialsManager.clear(forAudience: Audience)
+                try? credentialsManager.clear(forAudience: Audience)
 
                 expect(fetchAPICredentials(forAudience: Audience, from: store)).to(beNil())
                 expect(fetchAPICredentials(forAudience: Audience, forScope: "read", from: store)).toNot(beNil())
@@ -296,6 +296,182 @@ class CredentialsManagerSpec: QuickSpec {
                 try? credentialsManager.clear()
                 expect { try storage.data(forKey: "credentials") }.to(throwError(SimpleKeychainError.itemNotFound))
             }
+        }
+
+        describe("storage error handling") {
+
+            it("should throw storeFailed when store(credentials:) encounters a write error") {
+                class FailingWriteStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {
+                        throw SimpleKeychainError.interactionNotAllowed
+                    }
+                    func deleteEntry(forKey key: String) throws {}
+                }
+
+                let failingManager = CredentialsManager(authentication: authentication, storage: FailingWriteStore())
+                expect { try failingManager.store(credentials: credentials) }.to(throwError(CredentialsManagerError.storeFailed))
+            }
+
+            it("should throw clearFailed when clear() fails in revoke when there are no credentials") {
+                class FailingDeleteStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {
+                        throw SimpleKeychainError.interactionNotAllowed
+                    }
+                }
+
+                let failingManager = CredentialsManager(authentication: authentication, storage: FailingDeleteStore())
+                waitUntil(timeout: Timeout) { done in
+                    failingManager.revoke { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .clearFailed)))
+                        done()
+                    }
+                }
+            }
+
+            it("should throw storeFailed when store(apiCredentials:) encounters a write error") {
+                class FailingWriteStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {
+                        throw SimpleKeychainError.interactionNotAllowed
+                    }
+                    func deleteEntry(forKey key: String) throws {}
+                }
+
+                let failingManager = CredentialsManager(authentication: authentication, storage: FailingWriteStore())
+                let apiCreds = APICredentials(accessToken: AccessToken,
+                                              tokenType: TokenType,
+                                              expiresAt: Date(timeIntervalSinceNow: ExpiresIn),
+                                              scope: Scope)
+                expect { try failingManager.store(apiCredentials: apiCreds, forAudience: Audience) }.to(throwError())
+            }
+
+            it("should return nil for user when storage throws") {
+                class FailingReadStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {}
+                }
+
+                let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
+                expect(failingManager.user).to(beNil())
+            }
+
+            it("should return false for hasValid when storage throws") {
+                class FailingReadStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {}
+                }
+
+                let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
+                expect(failingManager.hasValid()).to(beFalse())
+            }
+
+            it("should return false for canRenew when storage throws") {
+                class FailingReadStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {}
+                }
+
+                let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
+                expect(failingManager.canRenew()).to(beFalse())
+            }
+
+            it("should yield noCredentials error in credentials() when storage throws on read") {
+                class FailingReadStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {}
+                }
+
+                let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
+                waitUntil(timeout: Timeout) { done in
+                    failingManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        done()
+                    }
+                }
+            }
+
+            it("should yield clearFailed when clear() throws after a successful token revocation") {
+                class FailingDeleteAfterReadStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        return encodeCredentials(Credentials(accessToken: AccessToken,
+                                                             idToken: IdToken,
+                                                             refreshToken: RefreshToken))
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {
+                        throw SimpleKeychainError.interactionNotAllowed
+                    }
+                }
+
+                NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken]) },
+                                    response: revokeTokenResponse())
+                let failingManager = CredentialsManager(authentication: authentication,
+                                                        storage: FailingDeleteAfterReadStore())
+                waitUntil(timeout: Timeout) { done in
+                    failingManager.revoke { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .clearFailed)))
+                        done()
+                    }
+                }
+            }
+
+            it("should yield noCredentials error in ssoCredentials() when storage throws on read") {
+                class FailingReadStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {}
+                }
+
+                let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
+                waitUntil(timeout: Timeout) { done in
+                    failingManager.ssoCredentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        done()
+                    }
+                }
+            }
+
+            it("should yield noCredentials error in apiCredentials() when storage throws on read") {
+                class FailingReadStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {}
+                }
+
+                let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
+                waitUntil(timeout: Timeout) { done in
+                    failingManager.apiCredentials(forAudience: Audience) { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        done()
+                    }
+                }
+            }
+
         }
 
         describe("clearing and revoking refresh token") {
@@ -433,7 +609,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             afterEach {
                 try? credentialsManager.clear()
-                _ = secondaryCredentialsManager.clear()
+                try? secondaryCredentialsManager.clear()
             }
             
         }
@@ -740,7 +916,7 @@ class CredentialsManagerSpec: QuickSpec {
                             return encodeCredentials(Credentials(refreshToken: RefreshToken))
                         }
                         func setEntry(_ data: Data, forKey: String) throws {
-                            throw SimpleKeychainError.operationFailed
+                            throw SimpleKeychainError.interactionNotAllowed
                         }
                         func deleteAllEntries() throws {}
                         func deleteEntry(forKey: String) throws {}
@@ -1184,11 +1360,11 @@ class CredentialsManagerSpec: QuickSpec {
             beforeEach {
                 credentialsManagerWithRetry = CredentialsManager(authentication: authentication, maxRetries: 2)
                 credentials = Credentials(refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: -ExpiresIn))
-                _ = credentialsManagerWithRetry.store(credentials: credentials)
+                try? credentialsManagerWithRetry.store(credentials: credentials)
             }
             
             afterEach {
-                _ = credentialsManagerWithRetry.clear()
+                try? credentialsManagerWithRetry.clear()
             }
             
             context("network errors") {
@@ -1388,7 +1564,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should not retry when maxRetries is 0") {
                     var attemptCount = 0
                     let credentialsManagerNoRetry = CredentialsManager(authentication: authentication, maxRetries: 0)
-                    _ = credentialsManagerNoRetry.store(credentials: credentials)
+                    try? credentialsManagerNoRetry.store(credentials: credentials)
                     
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
                         attemptCount += 1
@@ -1399,7 +1575,7 @@ class CredentialsManagerSpec: QuickSpec {
                         credentialsManagerNoRetry.credentials { result in
                             expect(result).to(beUnsuccessful())
                             expect(attemptCount) == 1 // Should not retry
-                            _ = credentialsManagerNoRetry.clear()
+                            try? credentialsManagerNoRetry.clear()
                             done()
                         }
                     }
@@ -1519,7 +1695,7 @@ class CredentialsManagerSpec: QuickSpec {
             
             afterEach {
                 try? credentialsManager.clear()
-                _ = credentialsManager.clear(forAudience: Audience)
+                try? credentialsManager.clear(forAudience: Audience)
             }
             
             it("should error when there are no credentials stored") {
@@ -1686,7 +1862,7 @@ class CredentialsManagerSpec: QuickSpec {
                             return encodeCredentials(Credentials(refreshToken: RefreshToken))
                         }
                         func setEntry(_ data: Data, forKey: String) throws {
-                            throw SimpleKeychainError.operationFailed
+                            throw SimpleKeychainError.interactionNotAllowed
                         }
                         func deleteAllEntries() throws {}
                         func deleteEntry(forKey: String) throws {}
@@ -1770,7 +1946,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     expiresAt: Date(timeIntervalSinceNow: ExpiresIn),
                                                     scope: "openid phone")
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience,forScope: "openid phone")
+                    try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "openid phone")
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: "openid phone") { result in
                             expect(result).to(haveAPICredentials(AccessToken))
@@ -1788,7 +1964,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     expiresAt: Date(timeIntervalSinceNow: ExpiresIn),
                                                     scope: "openid phone")
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "openid phone")
+                    try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "openid phone")
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: "openid email") { result in
                             expect(result).to(haveAPICredentials(NewAccessToken))
@@ -1841,16 +2017,16 @@ class CredentialsManagerSpec: QuickSpec {
 
                 afterEach {
                     try? credentialsManager.clear()
-                    _ = credentialsManager.clear(forAudience: Audience)
-                    _ = credentialsManager.clear(forAudience: Audience, scope: Scope)
-                    _ = credentialsManager.clear(forAudience: Audience, scope: "openid phone")
-                    _ = credentialsManager.clear(forAudience: Audience, scope: "different")
-                    _ = credentialsManager.clear(forAudience: Audience, scope: "read write")
+                    try? credentialsManager.clear(forAudience: Audience)
+                    try? credentialsManager.clear(forAudience: Audience, scope: Scope)
+                    try? credentialsManager.clear(forAudience: Audience, scope: "openid phone")
+                    try? credentialsManager.clear(forAudience: Audience, scope: "different")
+                    try? credentialsManager.clear(forAudience: Audience, scope: "read write")
                 }
 
                 it("should retrieve api credentials stored with matching scope") {
                     apiCredentials = APICredentials(accessToken: AccessToken, tokenType: TokenType, expiresAt: Date(timeIntervalSinceNow: ExpiresIn), scope: Scope)
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: Scope)
+                    try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: Scope)
 
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
@@ -1867,7 +2043,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresAt: ExpiresIn, scope: "different"))
 
                     apiCredentials = APICredentials(accessToken: AccessToken, tokenType: TokenType, expiresAt: Date(timeIntervalSinceNow: ExpiresIn), scope: Scope)
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: Scope)
+                    try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: Scope)
 
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: "different") { result in
@@ -1879,7 +2055,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should retrieve api credentials with scopes in different order") {
                     apiCredentials = APICredentials(accessToken: AccessToken, tokenType: TokenType, expiresAt: Date(timeIntervalSinceNow: ExpiresIn), scope: "read write")
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read write")
+                    try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read write")
 
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: "write read") { result in
@@ -2132,7 +2308,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
 
                     func setEntry(_ data: Data, forKey: String) throws {
-                        throw SimpleKeychainError.operationFailed
+                        throw SimpleKeychainError.interactionNotAllowed
                     }
 
                     func deleteAllEntries() throws {}
@@ -2377,7 +2553,7 @@ class CredentialsManagerSpec: QuickSpec {
                         return encodeCredentials(Credentials(refreshToken: RefreshToken))
                     }
                     func setEntry(_ data: Data, forKey: String) throws {
-                        throw SimpleKeychainError.operationFailed
+                        throw SimpleKeychainError.interactionNotAllowed
                     }
                     func deleteAllEntries() throws {}
 
@@ -2860,7 +3036,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             afterEach {
                 try? credentialsManager.clear()
-                _ = credentialsManager.clear(forAudience: Audience)
+                try? credentialsManager.clear(forAudience: Audience)
             }
 
             context("credentials") {
@@ -3182,12 +3358,13 @@ class CredentialsManagerSpec: QuickSpec {
 
 // MARK: - Private Functions
 
-private func encodeCredentials(_ credentials: Credentials) -> Data? {
-    return try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true)
+private func encodeCredentials(_ credentials: Credentials) -> Data {
+    // Force-unwrap is intentional: archiving a valid Credentials object should never fail in tests
+    return try! NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true)
 }
 
 private func fetchCredentials(from store: CredentialsStorage) -> Credentials? {
-    guard let data = store.getEntry(forKey: "credentials") else { return nil }
+    guard let data = try? store.getEntry(forKey: "credentials") else { return nil }
     return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
 }
 
@@ -3199,6 +3376,6 @@ private func fetchAPICredentials(forAudience audience: String = Audience, forSco
     } else {
         key = audience
     }
-    guard let data = store.getEntry(forKey: key) else { return nil }
+    guard let data = try? store.getEntry(forKey: key) else { return nil }
     return try? APICredentials(from: data)
 }
