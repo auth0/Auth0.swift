@@ -326,7 +326,7 @@ class WebAuthSpec: QuickSpec {
                 let webAuth = newWebAuth().invitationURL(invitationUrl) // Invalid invitation URL
 
                 expect {
-                    try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State)
+                    try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State)
                 }.to(throwError { (error: WebAuthError) in
                     guard case .unknown(let message) = error.code else {
                         fail("Expected .unknown error, got \(error)")
