@@ -210,8 +210,8 @@ class CredentialsManagerSpec: QuickSpec {
                 let store = SimpleKeychain()
                 credentialsManager = CredentialsManager(authentication: authentication, storage: store)
 
-                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
-                expect(credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)).to(beTrue())
+                expect { try credentialsManager.store(credentials: credentials) }.toNot(throwError())
+                expect { try credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience) }.toNot(throwError())
 
                 expect { try credentialsManager.clearAll() }.toNot(throwError())
                 expect(credentialsManager.hasValid()).to(beFalse())
@@ -227,9 +227,9 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should throw when storage fails") {
                 class FailingStore: CredentialsStorage {
-                    func getEntry(forKey key: String) -> Data? { return nil }
-                    func setEntry(_ data: Data, forKey key: String) -> Bool { return true }
-                    func deleteEntry(forKey key: String) -> Bool { return true }
+                    func getEntry(forKey key: String) throws -> Data { throw SimpleKeychainError.itemNotFound }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {}
                     func deleteAllEntries() throws {
                         throw NSError(domain: "test", code: -1)
                     }
@@ -300,7 +300,7 @@ class CredentialsManagerSpec: QuickSpec {
 
         describe("storage error handling") {
 
-            it("should throw storeFailed when store(credentials:) encounters a write error") {
+            it("should throw when store(credentials:) encounters a write error") {
                 class FailingWriteStore: CredentialsStorage {
                     func getEntry(forKey key: String) throws -> Data {
                         throw SimpleKeychainError.itemNotFound
@@ -312,13 +312,33 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 let failingManager = CredentialsManager(authentication: authentication, storage: FailingWriteStore())
-                expect { try failingManager.store(credentials: credentials) }.to(throwError(CredentialsManagerError.storeFailed))
+                expect { try failingManager.store(credentials: credentials) }.to(throwError(SimpleKeychainError.interactionNotAllowed))
             }
 
-            it("should throw clearFailed when clear() fails in revoke when there are no credentials") {
-                class FailingDeleteStore: CredentialsStorage {
+            it("should succeed in revoke when there are no credentials stored") {
+                class EmptyStore: CredentialsStorage {
                     func getEntry(forKey key: String) throws -> Data {
                         throw SimpleKeychainError.itemNotFound
+                    }
+                    func setEntry(_ data: Data, forKey key: String) throws {}
+                    func deleteEntry(forKey key: String) throws {}
+                }
+
+                let emptyManager = CredentialsManager(authentication: authentication, storage: EmptyStore())
+                waitUntil(timeout: Timeout) { done in
+                    emptyManager.revoke { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should throw clearFailed when clear() fails in revoke with no refresh token") {
+                class FailingDeleteStore: CredentialsStorage {
+                    func getEntry(forKey key: String) throws -> Data {
+                        return encodeCredentials(Credentials(accessToken: AccessToken,
+                                                             idToken: IdToken,
+                                                             refreshToken: nil))
                     }
                     func setEntry(_ data: Data, forKey key: String) throws {}
                     func deleteEntry(forKey key: String) throws {
@@ -329,7 +349,7 @@ class CredentialsManagerSpec: QuickSpec {
                 let failingManager = CredentialsManager(authentication: authentication, storage: FailingDeleteStore())
                 waitUntil(timeout: Timeout) { done in
                     failingManager.revoke { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .clearFailed)))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .clearFailed, cause: SimpleKeychainError.interactionNotAllowed)))
                         done()
                     }
                 }
@@ -430,7 +450,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                         storage: FailingDeleteAfterReadStore())
                 waitUntil(timeout: Timeout) { done in
                     failingManager.revoke { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .clearFailed)))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .clearFailed, cause: SimpleKeychainError.interactionNotAllowed)))
                         done()
                     }
                 }

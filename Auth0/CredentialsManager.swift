@@ -288,8 +288,11 @@ public struct CredentialsManager: Sendable {
                        _ callback: @escaping @Sendable (CredentialsManagerResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
-        guard let credentials = try? self.retrieveCredentials(),
-              let refreshToken = credentials.refreshToken else {
+        guard let credentials = try? self.retrieveCredentials() else {
+            return mainThreadCallback(.success(()))
+        }
+
+        guard let refreshToken = credentials.refreshToken else {
             do {
                 try self.clear()
             } catch {
@@ -308,10 +311,10 @@ public struct CredentialsManager: Sendable {
                 case .success:
                     do {
                         try self.clear()
+                        mainThreadCallback(.success(()))
                     } catch {
                         mainThreadCallback(.failure(CredentialsManagerError(code: .clearFailed, cause: error)))
                     }
-                    mainThreadCallback(.success(()))
                 }
             }
     }
