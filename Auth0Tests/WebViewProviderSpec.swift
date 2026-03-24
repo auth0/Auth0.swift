@@ -66,33 +66,39 @@ class WebViewProviderSpec: QuickSpec {
             it("should initialize with correct parameters") {
                 let authorizeURL = URL(string: "https://auth0.com/authorize?redirect_uri=https://auth0.com/callback")!
                 let redirectURL = URL(string: "https://auth0.com/callback")!
-                webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
-                
-                expect(webViewUserAgent.request.url).to(equal(authorizeURL))
-                expect(webViewUserAgent.redirectURL).to(equal(redirectURL))
-                expect(webViewUserAgent.callback).toNot(beNil())
-                expect(webViewUserAgent.viewController).to(equal(mockViewController))
-                expect(webViewUserAgent.webview).toNot(beNil())
-                
-                expect(webViewUserAgent.viewController.view).to(equal(webViewUserAgent.webview))
-                expect(webViewUserAgent.webview.navigationDelegate).to(be(webViewUserAgent))
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
+                        expect(webViewUserAgent.request.url).to(equal(authorizeURL))
+                        expect(webViewUserAgent.redirectURL).to(equal(redirectURL))
+                        expect(webViewUserAgent.callback).toNot(beNil())
+                        expect(webViewUserAgent.viewController).to(equal(mockViewController))
+                        expect(webViewUserAgent.webview).toNot(beNil())
+                        expect(webViewUserAgent.viewController.view).to(equal(webViewUserAgent.webview))
+                        expect(webViewUserAgent.webview.navigationDelegate).to(be(webViewUserAgent))
+                        done()
+                    }
+                }
             }
             
             it("should initialize with custom scheme URLs and supply WKURLSchemeHandler") {
                 let authorizeURL = URL(string: "customscheme://auth0.com/authorize?redirect_uri=customscheme://auth0.com/callback")!
                 let redirectURL = URL(string: "customscheme://auth0.com/callback")!
-                webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
-                
-                expect(webViewUserAgent.request.url).to(equal(authorizeURL))
-                expect(webViewUserAgent.redirectURL).to(equal(redirectURL))
-                expect(webViewUserAgent.callback).toNot(beNil())
-                expect(webViewUserAgent.viewController).to(equal(mockViewController))
-                expect(webViewUserAgent.webview).toNot(beNil())
-                
-                let schemeHandler = webViewUserAgent.webview.configuration.urlSchemeHandler(forURLScheme: "customscheme")
-                expect(schemeHandler).toNot(beNil())
-                expect(webViewUserAgent.viewController.view).to(equal(webViewUserAgent.webview))
-                expect(webViewUserAgent.webview.navigationDelegate).to(be(webViewUserAgent))
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
+                        expect(webViewUserAgent.request.url).to(equal(authorizeURL))
+                        expect(webViewUserAgent.redirectURL).to(equal(redirectURL))
+                        expect(webViewUserAgent.callback).toNot(beNil())
+                        expect(webViewUserAgent.viewController).to(equal(mockViewController))
+                        expect(webViewUserAgent.webview).toNot(beNil())
+                        let schemeHandler = webViewUserAgent.webview.configuration.urlSchemeHandler(forURLScheme: "customscheme")
+                        expect(schemeHandler).toNot(beNil())
+                        expect(webViewUserAgent.viewController.view).to(equal(webViewUserAgent.webview))
+                        expect(webViewUserAgent.webview.navigationDelegate).to(be(webViewUserAgent))
+                        done()
+                    }
+                }
             }
         }
         
@@ -102,8 +108,13 @@ class WebViewProviderSpec: QuickSpec {
                 UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = root
                 webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
                 webViewUserAgent.start()
-                expect(webViewUserAgent.webview.url).to(equal(authorizeURL))
-                expect(root.presentedViewController).to(equal(webViewUserAgent.viewController))
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        expect(webViewUserAgent.webview.url).to(equal(authorizeURL))
+                        expect(root.presentedViewController).to(equal(webViewUserAgent.viewController))
+                        done()
+                    }
+                }
             }
             
             it("should present view controller and load request with custom scheme URLs") {
@@ -111,8 +122,13 @@ class WebViewProviderSpec: QuickSpec {
                 UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = root
                 webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: customSchemeRedirectURL, viewController: mockViewController, callback: callback)
                 webViewUserAgent.start()
-                expect(webViewUserAgent.webview.url).to(equal(authorizeURL))
-                expect(root.presentedViewController).to(equal(webViewUserAgent.viewController))
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        expect(webViewUserAgent.webview.url).to(equal(authorizeURL))
+                        expect(root.presentedViewController).to(equal(webViewUserAgent.viewController))
+                        done()
+                    }
+                }
             }
         }
         
@@ -124,8 +140,10 @@ class WebViewProviderSpec: QuickSpec {
                 
                 waitUntil(timeout: LongerTimeout) { done in
                     callback = { result in
-                        expect(root.presentedViewController).to(beNil())
-                        expect(mockViewController.view.subviews.contains(webViewUserAgent.webview)).to(beFalse())
+                        Task { @MainActor in
+                            expect(root.presentedViewController).to(beNil())
+                            expect(mockViewController.view.subviews.contains(webViewUserAgent.webview)).to(beFalse())
+                        }
                         expect(result).to(beSuccessful())
                         done()
                     }
@@ -142,8 +160,10 @@ class WebViewProviderSpec: QuickSpec {
                 
                 waitUntil(timeout: Timeout) { done in
                     callback = { result in
-                        expect(root.presentedViewController).to(beNil())
-                        expect(mockViewController.view.subviews.contains(webViewUserAgent.webview)).to(beFalse())
+                        Task { @MainActor in
+                            expect(root.presentedViewController).to(beNil())
+                            expect(mockViewController.view.subviews.contains(webViewUserAgent.webview)).to(beFalse())
+                        }
                         expect(result).to(haveWebAuthError(WebAuthError(code: .webViewFailure("An error occurred while starting to load data for the main frame of the WebView."))))
                         done()
                     }
@@ -157,7 +177,9 @@ class WebViewProviderSpec: QuickSpec {
                 let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
                 waitUntil(timeout: Timeout) { done in
                     callback = { result in
-                        expect(mockViewController.view.subviews.contains(webViewUserAgent.webview)).to(beFalse())
+                        Task { @MainActor in
+                            expect(mockViewController.view.subviews.contains(webViewUserAgent.webview)).to(beFalse())
+                        }
                         expect(result).to(haveWebAuthError(error))
                         done()
                     }
@@ -170,14 +192,16 @@ class WebViewProviderSpec: QuickSpec {
         
         describe("WKURLSchemeHandler") {
             it("should handle custom scheme callbacks correctly") {
-                webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: customSchemeRedirectURL, viewController: mockViewController, callback: callback)
-                let mockCustomSchemeTask = MockURLSchemeTask(request: URLRequest(url: customSchemeURLWithCode))
-                webViewUserAgent.webView(mockWebView, start: mockCustomSchemeTask)
-                
-                expect(mockCustomSchemeTask.didFailWithErrorCalled).to(beTrue())
-                expect((mockCustomSchemeTask.error! as NSError).domain).to(equal(WebViewUserAgent.customSchemeRedirectionSuccessMessage))
-                expect((mockCustomSchemeTask.error! as NSError).code).to(equal(200))
-                expect((mockCustomSchemeTask.error! as NSError).localizedDescription).to(equal("WebViewProvider: WKURLSchemeHandler: Succesfully redirected back to the app"))
+                Task { @MainActor in
+                    webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: customSchemeRedirectURL, viewController: mockViewController, callback: callback)
+                    let mockCustomSchemeTask = MockURLSchemeTask(request: URLRequest(url: customSchemeURLWithCode))
+                    webViewUserAgent.webView(mockWebView, start: mockCustomSchemeTask)
+                    
+                    expect(mockCustomSchemeTask.didFailWithErrorCalled).to(beTrue())
+                    expect((mockCustomSchemeTask.error! as NSError).domain).to(equal(WebViewUserAgent.customSchemeRedirectionSuccessMessage))
+                    expect((mockCustomSchemeTask.error! as NSError).code).to(equal(200))
+                    expect((mockCustomSchemeTask.error! as NSError).localizedDescription).to(equal("WebViewProvider: WKURLSchemeHandler: Succesfully redirected back to the app"))
+                }
             }
             
             it("should handle custom scheme callbacks correctly when resource loading is stopped") {
@@ -190,11 +214,13 @@ class WebViewProviderSpec: QuickSpec {
                         expect(result).to(haveWebAuthError(WebAuthError(code: .webViewFailure("The WebView's resource loading was stopped."))))
                         done()
                     }
-                    webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: customSchemeRedirectURL, viewController: mockViewController, callback: callback)
-                    let mockCustomSchemeTask = MockURLSchemeTask(request: URLRequest(url: customSchemeRedirectURL))
-                    webViewUserAgent.webView(mockWebView, stop: mockCustomSchemeTask)
-                    expect(mockCustomSchemeTask.didFailWithErrorCalled).to(beTrue())
-                    expect((mockCustomSchemeTask.error! as NSError).domain).to(equal(WebViewUserAgent.customSchemeRedirectionFailureMessage))
+                    Task { @MainActor in
+                        webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: customSchemeRedirectURL, viewController: mockViewController, callback: callback)
+                        let mockCustomSchemeTask = MockURLSchemeTask(request: URLRequest(url: customSchemeRedirectURL))
+                        webViewUserAgent.webView(mockWebView, stop: mockCustomSchemeTask)
+                        expect(mockCustomSchemeTask.didFailWithErrorCalled).to(beTrue())
+                        expect((mockCustomSchemeTask.error! as NSError).domain).to(equal(WebViewUserAgent.customSchemeRedirectionFailureMessage))
+                    }
                 }
             }
         }
@@ -208,27 +234,31 @@ class WebViewProviderSpec: QuickSpec {
             }
 
             it("should handle navigation actions correctly when a valid redirect URL is passed") {
-                webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
-                
-                let navigationAction = MockWKNavigationAction(url: redirectURL)
-                var decisionHandlerCalled = false
-                webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy in
-                    expect(policy).to(equal(.cancel))
-                    decisionHandlerCalled = true
+                Task { @MainActor in
+                    webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
+                    
+                    let navigationAction = MockWKNavigationAction(url: redirectURL)
+                    var decisionHandlerCalled = false
+                    webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy in
+                        expect(policy).to(equal(.cancel))
+                        decisionHandlerCalled = true
+                    }
+                    expect(decisionHandlerCalled).to(beTrue())
                 }
-                expect(decisionHandlerCalled).to(beTrue())
             }
             
             it("should handle navigation actions correctly when a invalid redirect URL is passed") {
-                webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
-                
-                let navigationAction = MockWKNavigationAction(url: URL(string:"https://okta.com/callback")!)
-                var decisionHandlerCalled = false
-                webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy in
-                    expect(policy).to(equal(.allow))
-                    decisionHandlerCalled = true
+                Task { @MainActor in
+                    webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
+                    
+                    let navigationAction = MockWKNavigationAction(url: URL(string:"https://okta.com/callback")!)
+                    var decisionHandlerCalled = false
+                    webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy in
+                        expect(policy).to(equal(.allow))
+                        decisionHandlerCalled = true
+                    }
+                    expect(decisionHandlerCalled).to(beTrue())
                 }
-                expect(decisionHandlerCalled).to(beTrue())
             }
             
             it("should handle navigation failures correctly when an error during main frame navigation commiting") {

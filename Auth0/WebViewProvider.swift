@@ -66,20 +66,22 @@ public extension WebAuthentication {
 
 }
 
-@MainActor
-class WebViewUserAgent: NSObject, WebAuthUserAgent {
+final class WebViewUserAgent: NSObject, WebAuthUserAgent, Sendable {
 
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
     static let customSchemeRedirectionFailureMessage = "com.auth0.webview.redirection_failure"
     let defaultSchemesSupportedByWKWebview = ["https"]
 
     let request: URLRequest
+    @MainActor
     var webview: WKWebView!
     let viewController: UIViewController
     let redirectURL: URL
     let callback: WebAuthProviderCallback
+    @MainActor
     private weak var presentationWindow: Auth0WindowRepresentable?
 
+    @MainActor
     init(authorizeURL: URL,
          redirectURL: URL,
          viewController: UIViewController = UIViewController(),
@@ -101,6 +103,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         }
     }
 
+    @MainActor
     private func setupWebViewWithCustomScheme() {
         let configuration = WKWebViewConfiguration()
         configuration.setURLSchemeHandler(self, forURLScheme: redirectURL.scheme!)
@@ -109,6 +112,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         webview.navigationDelegate = self
     }
 
+    @MainActor
     private func setupWebViewWithHTTPS() {
         self.webview = WKWebView(frame: .zero)
         self.viewController.view = webview
@@ -116,10 +120,16 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func start() {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            startOnMain()
+        }
+    }
+    
+    @MainActor
+    private func startOnMain() {
         self.webview.load(self.request)
-
         let topViewController: UIViewController?
-
         // Use top view controller from custom window if provided
         if let window = presentationWindow,
            let rootVC = window.rootViewController {
@@ -128,11 +138,18 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
             // Fall back to key window's top view controller
             topViewController = Auth0WindowRepresentable.topViewController
         }
-
         topViewController?.present(self.viewController, animated: true)
     }
-
+    
     func finish(with result: WebAuthResult<Void>) {
+        Task {
+            @MainActor in
+            finishOnMain(with: result)
+        }
+    }
+    
+    @MainActor
+    private func finishOnMain(with result: WebAuthResult<Void>) {
         webview?.removeFromSuperview()
         guard let presenting = viewController.presentingViewController else {
             let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
