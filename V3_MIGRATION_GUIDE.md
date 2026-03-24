@@ -276,9 +276,9 @@ do {
 
 ### CredentialsStorage deleteAllEntries
 
-**New method:** `deleteAllEntries() throws` has been added to the `CredentialsStorage` protocol.
+**New method:** `deleteAllEntries() throws` has been added to the `CredentialsStorage` protocol with a default implementation that triggers an `assertionFailure`.
 
-If your application provides a custom `CredentialsStorage` implementation, you must add this method.
+If you're using a custom `CredentialsStorage` and plan to call `clearAll()`, you'll need to implement `deleteAllEntries()` in your custom storage — otherwise it will trigger an assertion failure. If you're not using `clearAll()`, no migration is required.
 
 <details>
   <summary>Migration example</summary>
@@ -291,7 +291,7 @@ class MyCustomCredentialStorage: CredentialsStorage {
     func deleteEntry(forKey key: String) -> Bool { ... }
 }
 
-// v3 - Must also implement deleteAllEntries()
+// v3 - Implement deleteAllEntries() if you plan to use clearAll()
 class MyCustomCredentialStorage: CredentialsStorage {
     func getEntry(forKey key: String) -> Data? { ... }
     func setEntry(_ data: Data, forKey key: String) -> Bool { ... }
@@ -304,7 +304,7 @@ class MyCustomCredentialStorage: CredentialsStorage {
 ```
 </details>
 
-**Impact:** If you have a custom `CredentialsStorage` implementation, you must add the `deleteAllEntries()` method. The default `SimpleKeychain`-based storage already provides this implementation.
+**Impact:** If you have a custom `CredentialsStorage` implementation and use `clearAll()`, you must implement the `deleteAllEntries()` method. If you don't use `clearAll()`, no changes are needed — the default implementation will only trigger an assertion if called. The default `SimpleKeychain`-based storage already provides this implementation.
 
 ---
 
