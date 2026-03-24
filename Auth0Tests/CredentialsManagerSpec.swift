@@ -315,7 +315,7 @@ class CredentialsManagerSpec: QuickSpec {
                 expect { try failingManager.store(credentials: credentials) }.to(throwError(SimpleKeychainError.interactionNotAllowed))
             }
 
-            it("should succeed in revoke when there are no credentials stored") {
+            it("should yield noCredentials error in revoke when there are no credentials stored") {
                 class EmptyStore: CredentialsStorage {
                     func getEntry(forKey key: String) throws -> Data {
                         throw SimpleKeychainError.itemNotFound
@@ -327,7 +327,7 @@ class CredentialsManagerSpec: QuickSpec {
                 let emptyManager = CredentialsManager(authentication: authentication, storage: EmptyStore())
                 waitUntil(timeout: Timeout) { done in
                     emptyManager.revoke { result in
-                        expect(result).to(beSuccessful())
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials, cause: SimpleKeychainError.itemNotFound)))
                         done()
                     }
                 }
@@ -425,7 +425,7 @@ class CredentialsManagerSpec: QuickSpec {
                 let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
                 waitUntil(timeout: Timeout) { done in
                     failingManager.credentials { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials, cause: SimpleKeychainError.itemNotFound)))
                         done()
                     }
                 }
@@ -468,7 +468,7 @@ class CredentialsManagerSpec: QuickSpec {
                 let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
                 waitUntil(timeout: Timeout) { done in
                     failingManager.ssoCredentials { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials, cause: SimpleKeychainError.itemNotFound)))
                         done()
                     }
                 }
@@ -486,7 +486,7 @@ class CredentialsManagerSpec: QuickSpec {
                 let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
                 waitUntil(timeout: Timeout) { done in
                     failingManager.apiCredentials(forAudience: Audience) { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials, cause: SimpleKeychainError.itemNotFound)))
                         done()
                     }
                 }
@@ -515,13 +515,12 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should not return an error when there are no credentials stored") {
+            it("should return noCredentials error when there are no credentials stored") {
                 try? credentialsManager.clear()
-                
+
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke { result in
-                        expect(result).to(beSuccessful())
-                        expect(credentialsManager.hasValid()).to(beFalse())
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials, cause: SimpleKeychainError.itemNotFound)))
                         done()
                     }
                 }
@@ -790,7 +789,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials, cause: SimpleKeychainError.itemNotFound)))
                         done()
                     }
                 }
@@ -1721,10 +1720,10 @@ class CredentialsManagerSpec: QuickSpec {
             it("should error when there are no credentials stored") {
                 try? credentialsManager.clear()
                 try? credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
-                
+
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.apiCredentials(forAudience: Audience) { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials, cause: SimpleKeychainError.itemNotFound)))
                         done()
                     }
                 }
@@ -2228,7 +2227,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.ssoCredentials { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials, cause: SimpleKeychainError.itemNotFound)))
                         done()
                     }
                 }
@@ -2497,7 +2496,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials, cause: SimpleKeychainError.itemNotFound)))
                         done()
                     }
                 }
