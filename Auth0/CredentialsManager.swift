@@ -181,6 +181,33 @@ public struct CredentialsManager: Sendable {
         return self.storage.deleteEntry(forKey: key)
     }
 
+    /// Clears all credentials stored in the underlying storage, including the main credentials and any API
+    /// credentials for all audiences.
+    ///
+    /// This method delegates to the underlying storage to delete **all** of its entries (for example, all
+    /// Keychain items for the configured service/access group), not just those keys explicitly known to
+    /// ``CredentialsManager``. If the same storage instance or Keychain service/access group is shared with
+    /// other parts of your application, calling this method may delete non-Auth0 data as well.
+    ///
+    /// To avoid unintended data loss, ensure that the storage backing this ``CredentialsManager`` is dedicated
+    /// to Auth0 credentials when using ``clearAll()``.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// try credentialsManager.clearAll()
+    /// ```
+    ///
+    /// - Throws: An error when the delete operation fails.
+    public func clearAll() throws {
+        #if WEB_AUTH_PLATFORM
+        self.biometricSession.lock.lock()
+        self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
+        self.biometricSession.lock.unlock()
+        #endif
+        try self.storage.deleteAllEntries()
+    }
+
     #if WEB_AUTH_PLATFORM
     /// Checks if the current biometric session is valid based on the configured policy.
     ///
