@@ -80,8 +80,8 @@ public struct CredentialsManager: Sendable {
     ///
     /// - Important: Access to this property will not be protected by biometric authentication.
     public var user: UserProfile? {
-        let credentials = try self.retrieveCredentials()
-        let jwt = try decode(jwt: credentials.idToken)
+        guard let credentials = try? self.retrieveCredentials(),
+              let jwt = try? decode(jwt: credentials.idToken) else { return nil }
         return UserProfile(json: jwt.body)
     }
 
@@ -288,7 +288,7 @@ public struct CredentialsManager: Sendable {
                        _ callback: @escaping @Sendable (CredentialsManagerResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
-        guard let credentials = self.retrieveCredentials(),
+        guard let credentials = try? self.retrieveCredentials(),
               let refreshToken = credentials.refreshToken else {
             do {
                 try self.clear()
@@ -336,7 +336,7 @@ public struct CredentialsManager: Sendable {
     ///
     /// - ``Credentials/expiresAt``
     public func hasValid(minTTL: Int = 0) -> Bool {
-        guard let credentials = self.retrieveCredentials() else { return false }
+        guard let credentials = try? self.retrieveCredentials() else { return false }
         return !self.hasExpired(credentials.expiresAt) && !self.willExpire(credentials.expiresAt, within: minTTL)
     }
 
@@ -355,7 +355,7 @@ public struct CredentialsManager: Sendable {
     ///
     /// - Returns: If there are credentials stored containing a refresh token.
     public func canRenew() -> Bool {
-        guard let credentials = self.retrieveCredentials() else { return false }
+        guard let credentials = try? self.retrieveCredentials() else { return false }
         return credentials.refreshToken != nil
     }
 
@@ -739,13 +739,8 @@ public struct CredentialsManager: Sendable {
 
     public func store(apiCredentials: APICredentials, forAudience audience: String, forScope scope: String? = nil) throws {
         let data = try apiCredentials.encode()
-
         let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
-        do {
-            try self.storage.setEntry(data, forKey: key)
-        } catch {
-            
-        }
+        try self.storage.setEntry(data, forKey: key)
     }
 
     private func retrieveCredentials() throws -> Credentials? {
@@ -797,7 +792,7 @@ public struct CredentialsManager: Sendable {
                                              retryCount: Int,
                                              callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
-            guard let credentials = self.retrieveCredentials() else {
+            guard let credentials = try? self.retrieveCredentials() else {
                 complete()
                 return callback(.failure(.noCredentials))
             }
@@ -827,12 +822,15 @@ public struct CredentialsManager: Sendable {
                             let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
                             complete()
                             callback(.failure(error))
-                        } else if !self.store(credentials: newCredentials) {
-                            complete()
-                            callback(.failure(CredentialsManagerError(code: .storeFailed)))
                         } else {
-                            complete()
-                            callback(.success(newCredentials))
+                            do {
+                                try self.store(credentials: newCredentials)
+                                complete()
+                                callback(.success(newCredentials))
+                            } catch {
+                                complete()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                            }
                         }
                     case .failure(let error):
                         complete()
@@ -866,7 +864,7 @@ public struct CredentialsManager: Sendable {
                                         headers: [String: String],
                                         callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
-            guard let credentials = self.retrieveCredentials() else {
+            guard let credentials = try? self.retrieveCredentials() else {
                 complete()
                 return callback(.failure(.noCredentials))
             }
@@ -885,12 +883,13 @@ public struct CredentialsManager: Sendable {
                         let newCredentials = Credentials(from: credentials,
                                                          idToken: ssoCredentials.idToken,
                                                          refreshToken: ssoCredentials.refreshToken ?? refreshToken)
-                        if !self.store(credentials: newCredentials) {
-                            complete()
-                            callback(.failure(CredentialsManagerError(code: .storeFailed)))
-                        } else {
+                        do {
+                            try self.store(credentials: newCredentials)
                             complete()
                             callback(.success(ssoCredentials))
+                        } catch {
+                            complete()
+                            callback(.failure(CredentialsManagerError(code: .storeFailed)))
                         }
                     case .failure(let error):
                         complete()
@@ -908,14 +907,14 @@ public struct CredentialsManager: Sendable {
                                         headers: [String: String],
                                         callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
-            if let apiCredentials = self.retrieveAPICredentials(audience: audience, scope: scope),
+            if let apiCredentials = try? self.retrieveAPICredentials(audience: audience, scope: scope),
                   !self.hasExpired(apiCredentials.expiresAt),
                   !self.willExpire(apiCredentials.expiresAt, within: minTTL),
                !self.hasScopeChanged(from: apiCredentials.scope, to: scope, ignoreOpenid: scope?.contains("openid") == false) {
                 complete()
                 return callback(.success(apiCredentials))
             }
-            guard let currentCredentials = self.retrieveCredentials() else {
+            guard let currentCredentials = try? self.retrieveCredentials() else {
                 complete()
                 return callback(.failure(.noCredentials))
             }
@@ -940,15 +939,16 @@ public struct CredentialsManager: Sendable {
                             let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
                             complete()
                             callback(.failure(error))
-                        } else if !self.store(credentials: newCredentials) {
-                            complete()
-                            callback(.failure(CredentialsManagerError(code: .storeFailed)))
-                        } else if !self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope) {
-                            complete()
-                            callback(.failure(CredentialsManagerError(code: .storeFailed)))
                         } else {
-                            complete()
-                            callback(.success(newAPICredentials))
+                            do {
+                                try self.store(credentials: newCredentials)
+                                try self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope)
+                                complete()
+                                callback(.success(newAPICredentials))
+                            } catch {
+                                complete()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                            }
                         }
                     case .failure(let error):
                         complete()

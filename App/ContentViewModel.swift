@@ -53,12 +53,8 @@ final class ContentViewModel: ObservableObject {
                 .scope("openid profile email offline_access")
                 .start()
 
-            let stored = credentialsManager.store(credentials: credentials)
-            if stored {
-                isAuthenticated = true
-            } else {
-                errorMessage = "Failed to store credentials"
-            }
+            try credentialsManager.store(credentials: credentials)
+            isAuthenticated = true
         } catch let error as Auth0Error {
             errorMessage = "Login failed: \(error.localizedDescription)"
         } catch {
@@ -76,10 +72,8 @@ final class ContentViewModel: ObservableObject {
         do {
             try await Auth0.webAuth().logout()
 
-            let cleared = credentialsManager.clear()
-            if cleared {
-                isAuthenticated = false
-            }
+            try credentialsManager.clear()
+            isAuthenticated = false
         } catch let error as Auth0Error {
             errorMessage = "Logout failed: \(error.localizedDescription)"
         } catch {
