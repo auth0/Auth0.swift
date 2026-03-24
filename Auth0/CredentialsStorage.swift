@@ -24,6 +24,20 @@ public protocol CredentialsStorage {
     /// - Returns: If the entry was deleted.
     func deleteEntry(forKey key: String) -> Bool
 
+    /// Deletes all storage entries managed by this ``CredentialsStorage`` instance.
+    ///
+    /// - Throws: An error when the delete operation fails.
+    func deleteAllEntries() throws
+
+}
+
+extension CredentialsStorage {
+
+    /// Default implementation that triggers an assertion failure.
+    public func deleteAllEntries() throws {
+        assertionFailure("deleteAllEntries() is not implemented. Implement this method in your custom CredentialsStorage.")
+    }
+
 }
 
 /// Conformance to ``CredentialsStorage``.
@@ -63,6 +77,13 @@ extension SimpleKeychain: CredentialsStorage {
         } catch {
             return false
         }
+    }
+
+    /// Deletes all storage entries from the Keychain for the service and access group values.
+    ///
+    /// - Throws: A `SimpleKeychainError` when the operation fails.
+    public func deleteAllEntries() throws {
+        try self.deleteAll()
     }
 
 }

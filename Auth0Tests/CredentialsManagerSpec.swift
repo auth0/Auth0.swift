@@ -200,6 +200,47 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
+        describe("clearAll") {
+
+            afterEach {
+                try? credentialsManager.clearAll()
+            }
+
+            it("should clear all credentials from keychain") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)).to(beTrue())
+
+                expect { try credentialsManager.clearAll() }.toNot(throwError())
+                expect(credentialsManager.hasValid()).to(beFalse())
+                expect(fetchAPICredentials(forAudience: Audience, from: store)).to(beNil())
+            }
+
+            it("should not throw when keychain is already empty") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                expect { try credentialsManager.clearAll() }.toNot(throwError())
+            }
+
+            it("should throw when storage fails") {
+                class FailingStore: CredentialsStorage {
+                    func getEntry(forKey key: String) -> Data? { return nil }
+                    func setEntry(_ data: Data, forKey key: String) -> Bool { return true }
+                    func deleteEntry(forKey key: String) -> Bool { return true }
+                    func deleteAllEntries() throws {
+                        throw NSError(domain: "test", code: -1)
+                    }
+                }
+
+                credentialsManager = CredentialsManager(authentication: authentication, storage: FailingStore())
+                expect { try credentialsManager.clearAll() }.to(throwError())
+            }
+
+        }
+
         describe("custom storage") {
 
             class CustomStore: CredentialsStorage {
@@ -214,6 +255,9 @@ class CredentialsManagerSpec: QuickSpec {
                 func deleteEntry(forKey key: String) -> Bool {
                     store[key] = nil
                     return true
+                }
+                func deleteAllEntries() throws {
+                    store.removeAll()
                 }
             }
 
@@ -700,6 +744,7 @@ class CredentialsManagerSpec: QuickSpec {
                         func deleteEntry(forKey: String) -> Bool {
                             return true
                         }
+                        func deleteAllEntries() throws {}
                     }
 
                     credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
@@ -1639,7 +1684,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                                     scope: Scope)
                                 return try? apiCredentials.encode()
                             }
-                            
+
                             return encodeCredentials(Credentials(refreshToken: RefreshToken))
                         }
                         func setEntry(_ data: Data, forKey: String) -> Bool {
@@ -1648,6 +1693,7 @@ class CredentialsManagerSpec: QuickSpec {
                         func deleteEntry(forKey: String) -> Bool {
                             return true
                         }
+                        func deleteAllEntries() throws {}
                     }
                     
                     _ = credentialsManager.store(credentials: credentials)
@@ -2097,6 +2143,8 @@ class CredentialsManagerSpec: QuickSpec {
                     func deleteEntry(forKey: String) -> Bool {
                         return true
                     }
+
+                    func deleteAllEntries() throws {}
                 }
 
                 credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
@@ -2342,6 +2390,7 @@ class CredentialsManagerSpec: QuickSpec {
                     func deleteEntry(forKey: String) -> Bool {
                         return true
                     }
+                    func deleteAllEntries() throws {}
                 }
 
                 credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
