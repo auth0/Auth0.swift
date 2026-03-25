@@ -30,6 +30,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [CredentialsStorage deleteAllEntries](#credentialsstorage-deleteallentries)
 - [**Swift 6 Concurrency**](#swift-6-concurrency)
   + [Sendable protocol conformances](#sendable-protocol-conformances)
+  + [Sendable conformances for Web Auth typealiases](#sendable-conformances-for-web-auth-typealiases)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
@@ -357,6 +358,18 @@ final class MyLogger: Logger, @unchecked Sendable {
 }
 ```
 </details>
+
+### Sendable conformances for Web Auth typealiases
+
+**Change:** The following public typealias has been updated for Swift 6 concurrency:
+
+| Symbol | v2 | v3 |
+|--------|----|----|
+| `WebAuthProviderCallback` | `(WebAuthResult<Void>) -> Void` | `@Sendable (WebAuthResult<Void>) -> Void` |
+
+**`WebAuthProviderCallback` — now `@Sendable`**
+
+**Impact:** If you pass a closure as a `WebAuthProviderCallback`, all values it captures must be `Sendable`. In most cases this is automatically satisfied, but if your closure captures a non-`Sendable` class you will get a compiler warning under strict concurrency.
 
 ---
 

@@ -10,7 +10,7 @@ import AppKit
 #endif
 
 /// Callback invoked by the ``WebAuthUserAgent`` when the web-based operation concludes.
-public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
+public typealias WebAuthProviderCallback = @Sendable (WebAuthResult<Void>) -> Void
 
 /// Thunk that returns a function that creates and returns a ``WebAuthUserAgent`` to perform a web-based operation.
 /// The ``WebAuthUserAgent`` opens the URL in an external user agent and then invokes the callback when done.

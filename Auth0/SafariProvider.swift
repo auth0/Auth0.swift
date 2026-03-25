@@ -43,6 +43,7 @@ public extension WebAuthentication {
     /// ## See Also
     ///
     /// - <doc:UserAgents>
+    @MainActor
     static func safariProvider(style: UIModalPresentationStyle = .fullScreen,
                                presentationWindow: Auth0WindowRepresentable? = nil) -> WebAuthProvider {
         return { url, callback in
@@ -57,12 +58,15 @@ public extension WebAuthentication {
 
 }
 
-class SafariUserAgent: NSObject, WebAuthUserAgent {
+
+final class SafariUserAgent: NSObject, WebAuthUserAgent, Sendable {
 
     let controller: SFSafariViewController
     let callback: WebAuthProviderCallback
+    @MainActor
     private weak var presentationWindow: Auth0WindowRepresentable?
 
+    @MainActor
     init(controller: SFSafariViewController,
          callback: @escaping WebAuthProviderCallback,
          presentationWindow: Auth0WindowRepresentable? = nil) {
@@ -75,14 +79,20 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func start() {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            startOnMain()
+        }
+    }
+
+    @MainActor
+    private func startOnMain() {
         let topViewController: UIViewController?
 
-        // Use top view controller from custom window if provided
         if let window = presentationWindow,
            let rootVC = window.rootViewController {
             topViewController = Auth0WindowRepresentable.findTopViewController(from: rootVC)
         } else {
-            // Fall back to key window's top view controller
             topViewController = Auth0WindowRepresentable.topViewController
         }
 
@@ -90,19 +100,23 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func finish(with result: WebAuthResult<Void>) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            finishOnMain(with: result)
+        }
+    }
+
+    @MainActor
+    private func finishOnMain(with result: WebAuthResult<Void>) {
         if case .failure(let cause) = result, case .userCancelled = cause {
-            DispatchQueue.main.async { [callback] in
-                callback(result)
-            }
+            callback(result)
         } else {
-            DispatchQueue.main.async { [callback, weak controller] in
-                guard let presenting = controller?.presentingViewController else {
-                    let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
-                    return callback(.failure(error))
-                }
-                presenting.dismiss(animated: true) {
-                    callback(result)
-                }
+            guard let presenting = controller.presentingViewController else {
+                let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
+                return callback(.failure(error))
+            }
+            presenting.dismiss(animated: true) {
+                self.callback(result)
             }
         }
     }

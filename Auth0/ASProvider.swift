@@ -4,6 +4,7 @@ import AuthenticationServices
 typealias ASHandler = ASWebAuthenticationSession.CompletionHandler
 
 extension WebAuthentication {
+    @MainActor
     static func asProvider(redirectURL: URL,
                            ephemeralSession: Bool = false,
                            headers: [String: String]? = nil,
@@ -37,31 +38,35 @@ extension WebAuthentication {
     }
 
      static let completionHandler: (_ callback: @escaping WebAuthProviderCallback) -> ASHandler = { callback in
-        return {
-            guard let callbackURL = $0, $1 == nil else {
-                if let error = $1 as? NSError,
-                    error.userInfo.isEmpty,
-                    case ASWebAuthenticationSessionError.canceledLogin = error {
-                    return callback(.failure(WebAuthError(code: .userCancelled)))
-                } else if let error = $1 {
-                    return callback(.failure(WebAuthError(code: .other, cause: error)))
+        return { url, error in
+            Task { @MainActor in
+                guard let callbackURL = url, error == nil else {
+                    if let error = error as? NSError,
+                        error.userInfo.isEmpty,
+                        case ASWebAuthenticationSessionError.canceledLogin = error {
+                        return callback(.failure(WebAuthError(code: .userCancelled)))
+                    } else if let error {
+                        return callback(.failure(WebAuthError(code: .other, cause: error)))
+                    }
+
+                    return callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
                 }
-
-                return callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
+                _ = TransactionStore.shared.resume(callbackURL)
             }
-
-            _ = TransactionStore.shared.resume(callbackURL)
         }
     }
 }
 
-class ASUserAgent: NSObject, WebAuthUserAgent {
+final class ASUserAgent: NSObject, WebAuthUserAgent, Sendable {
 
+    @MainActor
     private(set) static var currentSession: ASWebAuthenticationSession?
     let callback: WebAuthProviderCallback
 
+    @MainActor
     weak var presentationWindow: Auth0WindowRepresentable?
 
+    @MainActor
     init(session: ASWebAuthenticationSession,
          callback: @escaping WebAuthProviderCallback,
          presentationWindow: Auth0WindowRepresentable? = nil) {
@@ -73,14 +78,21 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
         ASUserAgent.currentSession = session
     }
 
-    func start() {
-        _ = ASUserAgent.currentSession?.start()
-    }
 
+    func start() {
+        Task {
+            @MainActor in
+            _ = ASUserAgent.currentSession?.start()
+        }
+    }
+    
     func finish(with result: WebAuthResult<Void>) {
-        ASUserAgent.currentSession?.cancel()
-        ASUserAgent.currentSession = nil
-        self.callback(result)
+        Task {
+            @MainActor in
+            ASUserAgent.currentSession?.cancel()
+            ASUserAgent.currentSession = nil
+            self.callback(result)
+        }
     }
 
     public override var description: String {

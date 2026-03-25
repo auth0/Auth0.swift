@@ -17,7 +17,7 @@ class TransactionStore: @unchecked Sendable {
     func store(_ transaction: AuthTransaction) {
         self.current = transaction
     }
-
+    
     func cancel() {
         self.current?.cancel()
         self.clear()

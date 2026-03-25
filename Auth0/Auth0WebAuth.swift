@@ -186,6 +186,7 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
+    @MainActor
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
         let mainThreadOnCloseCallback = onCloseCallback.map { dispatchOnMain($0) }
@@ -238,6 +239,7 @@ final class Auth0WebAuth: WebAuth {
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
+    @MainActor
     func logout(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
@@ -355,10 +357,13 @@ final class Auth0WebAuth: WebAuth {
 
 extension Auth0WebAuth {
 
+    
+    @MainActor
     public func start() -> AnyPublisher<Credentials, WebAuthError> {
         return Deferred { Future(self.start) }.eraseToAnyPublisher()
     }
-
+    
+    @MainActor
     public func logout(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
         return Deferred {
             Future { callback in
