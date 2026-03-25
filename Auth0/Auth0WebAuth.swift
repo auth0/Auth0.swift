@@ -34,7 +34,6 @@ final class Auth0WebAuth: WebAuth {
     private(set) var ephemeralSession = false
     private(set) var issuer: String
     private(set) var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
-    private(set) var nonce: String?
     private(set) var maxAge: Int?
     private(set) var organization: String?
     private(set) var invitationURL: URL?
@@ -44,7 +43,11 @@ final class Auth0WebAuth: WebAuth {
     private(set) weak var presentationWindow: Auth0WindowRepresentable?
 
     var state: String {
-        return self.parameters["state"] ?? self.generateDefaultState()
+        return parameters["state"] ?? generateRandomString()
+    }
+
+    var nonce: String {
+        return parameters["nonce"] ?? generateRandomString()
     }
 
     lazy var redirectURL: URL? = {
@@ -97,6 +100,11 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
+    func nonce(_ nonce: String) -> Self {
+        self.parameters["nonce"] = nonce
+        return self
+    }
+
     func state(_ state: String) -> Self {
         self.parameters["state"] = state
         return self
@@ -120,11 +128,6 @@ final class Auth0WebAuth: WebAuth {
 
     func authorizeURL(_ authorizeURL: URL) -> Self {
         self.overrideAuthorizeURL = authorizeURL
-        return self
-    }
-
-    func nonce(_ nonce: String) -> Self {
-        self.nonce = nonce
         return self
     }
 
@@ -196,13 +199,15 @@ final class Auth0WebAuth: WebAuth {
             return mainThreadCallback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
-        let handler = self.handler(redirectURL)
-        let state = self.state
+        let nonce = nonce
+        let state = state
+        let handler = self.handler(redirectURL, nonce: nonce)
 
         let authorizeURL: URL
         do {
             authorizeURL = try self.buildAuthorizeURL(withRedirectURL: redirectURL,
                                                       defaults: handler.defaults,
+                                                      nonce: nonce,
                                                       state: state)
         } catch {
             return mainThreadCallback(.failure(error))
@@ -270,7 +275,8 @@ final class Auth0WebAuth: WebAuth {
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,
                            defaults: [String: String],
-                           state: String?) throws(WebAuthError) -> URL {
+                           nonce: String,
+                           state: String) throws(WebAuthError) -> URL {
         guard let authorize = self.overrideAuthorizeURL ?? URL(string: "authorize", relativeTo: self.url),
               var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true) else {
             let message = "Unable to build authorize URL with base URL: \(self.url.absoluteString)."
@@ -285,7 +291,7 @@ final class Auth0WebAuth: WebAuth {
         entries["response_type"] = self.responseType
         entries["redirect_uri"] = redirectURL.absoluteString
         entries["state"] = state
-        entries["nonce"] = self.nonce
+        entries["nonce"] = nonce
         entries["organization"] = self.organization
 
         if let invitationURL = self.invitationURL {
@@ -318,21 +324,18 @@ final class Auth0WebAuth: WebAuth {
         return components.url!
     }
 
-    func generateDefaultState() -> String {
+    func generateRandomString() -> String {
         let data = Data(count: 32)
         var tempData = data
-
         let result = tempData.withUnsafeMutableBytes {
             SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
         }
-
-        guard result == 0, let state = tempData.a0_encodeBase64URLSafe()
+        guard result == errSecSuccess, let randomString = tempData.a0_encodeBase64URLSafe()
         else { return UUID().uuidString.replacingOccurrences(of: "-", with: "") }
-
-        return state
+        return randomString
     }
 
-    private func handler(_ redirectURL: URL) -> OAuth2Grant {
+    private func handler(_ redirectURL: URL, nonce: String) -> OAuth2Grant {
         var authentication = Auth0Authentication(clientId: self.clientId,
                                                  url: self.url,
                                                  session: self.session,
@@ -344,7 +347,7 @@ final class Auth0WebAuth: WebAuth {
                     issuer: self.issuer,
                     leeway: self.leeway,
                     maxAge: self.maxAge,
-                    nonce: self.nonce,
+                    nonce: nonce,
                     organization: self.organization)
     }
 

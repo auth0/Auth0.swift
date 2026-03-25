@@ -57,6 +57,23 @@ public extension Auth0APIError {
         return Self.networkErrorCodes.contains(code)
     }
 
+    /// Whether the error represents a transient failure that can be retried.
+    ///
+    /// Returns `true` for:
+    /// - Network errors (as determined by ``isNetworkError``)
+    /// - Rate limiting errors (HTTP 429)
+    /// - Server errors (HTTP 5xx)
+    ///
+    /// Use this property to implement custom retry logic for recoverable failures.
+    var isRetryable: Bool {
+        if self.isNetworkError {
+            return true
+        }
+
+        let statusCode = self.statusCode
+        return statusCode == 429 || (500...599).contains(statusCode)
+    }
+
 }
 
 extension Auth0APIError {
@@ -104,25 +121,6 @@ extension Auth0APIError {
             .internationalRoamingOff,
             .callIsActive
         ]
-    }
-
-    /// Determines if the error is retryable based on its type.
-    ///
-    /// Returns `true` for:
-    /// - Network errors (as determined by ``isNetworkError``)
-    /// - Rate limiting errors (HTTP 429)
-    /// - Server errors (HTTP 5xx)
-    ///
-    /// - Returns: `true` if the error is retryable, `false` otherwise.
-    var isRetryable: Bool {
-        // Retry on network errors
-        if self.isNetworkError {
-            return true
-        }
-
-        // Retry on rate limiting (429) or server errors (5xx)
-        let statusCode = self.statusCode
-        return statusCode == 429 || (500...599).contains(statusCode)
     }
 
 }
