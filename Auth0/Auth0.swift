@@ -98,7 +98,6 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
     return authentication(clientId: values.clientId, domain: values.domain, session: session)
 }
 
-
 /**
  Multi-Factor Authentication (MFA) client for performing MFA operations during authentication flows.
 

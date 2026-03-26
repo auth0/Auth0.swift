@@ -29,7 +29,7 @@ struct IDTokenSignatureValidator: JWTAsyncValidator {
         self.context = context
     }
 
-    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void) {
+    func validate(_ jwt: JWT, callback: @escaping @Sendable (Auth0Error?) -> Void) {
         if let error = validateAlg(jwt) { return callback(error) }
         let algorithm = jwt.algorithm!
         if let error = validateKid(jwt) { return callback(error) }

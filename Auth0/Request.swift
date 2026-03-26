@@ -22,13 +22,13 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
     /**
      The callback closure type for the request.
      */
-    public typealias Callback = (Result<T, E>) -> Void
+    public typealias Callback = @Sendable (Result<T, E>) -> Void
 
     let session: URLSession
     let url: URL
     let method: String
     let requestValidator: [RequestValidator]
-    let handle: (Result<ResponseValue, E>, Callback) -> Void
+    let handle: @Sendable (Result<ResponseValue, E>, Callback) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
@@ -39,7 +39,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
          url: URL,
          method: String,
          requestValidator: [RequestValidator] = [],
-         handle: @escaping (Result<ResponseValue, E>, Callback) -> Void,
+         handle: @escaping @Sendable (Result<ResponseValue, E>, Callback) -> Void,
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
          logger: Logger?,

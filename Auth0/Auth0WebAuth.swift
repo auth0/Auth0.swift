@@ -39,7 +39,7 @@ final class Auth0WebAuth: WebAuth {
     private(set) var invitationURL: URL?
     private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
-    private(set) var onCloseCallback: (() -> Void)?
+    private(set) var onCloseCallback: (@Sendable () -> Void)?
     private(set) weak var presentationWindow: Auth0WindowRepresentable?
 
     var state: String {
@@ -176,7 +176,7 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    func onClose(_ callback: (() -> Void)?) -> Self {
+    func onClose(_ callback: (@Sendable () -> Void)?) -> Self {
         self.onCloseCallback = callback
         return self
     }
@@ -187,7 +187,7 @@ final class Auth0WebAuth: WebAuth {
     }
 
     @MainActor
-    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
         let mainThreadOnCloseCallback = onCloseCallback.map { dispatchOnMain($0) }
 
@@ -240,7 +240,7 @@ final class Auth0WebAuth: WebAuth {
     }
 
     @MainActor
-    func logout(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    func logout(federated: Bool, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
         guard barrier.raise() else {

@@ -31,6 +31,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 - [**Swift 6 Concurrency**](#swift-6-concurrency)
   + [Sendable protocol conformances](#sendable-protocol-conformances)
   + [Sendable conformances for Web Auth typealiases](#sendable-conformances-for-web-auth-typealiases)
+  + [@Sendable callback parameters](#sendable-callback-parameters)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
@@ -371,6 +372,42 @@ final class MyLogger: Logger, @unchecked Sendable {
 
 **Impact:** If you pass a closure as a `WebAuthProviderCallback`, all values it captures must be `Sendable`. In most cases this is automatically satisfied, but if your closure captures a non-`Sendable` class you will get a compiler warning under strict concurrency.
 
+### @Sendable callback parameters
+
+**Change:** All public callback parameters are now `@Sendable`. This affects the following APIs:
+
+- `Requestable.start(_:)`
+- `WebAuth.start(_:)`, `WebAuth.logout(federated:callback:)`, `WebAuth.onClose(_:)`
+- `CredentialsManager.credentials(withScope:minTTL:parameters:headers:callback:)`, `revoke(headers:_:)`, `apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)`, `ssoCredentials(parameters:headers:callback:)`, `renew(parameters:headers:callback:)`
+
+**Impact:**
+
+- **Call sites** — No changes required. The compiler infers `@Sendable` automatically for typical trailing closures. You will only see a compiler error in Swift 6 mode if your closure captures a non-`Sendable` type.
+
+- **Custom protocol implementations** (mocks, test doubles) — If you implement `Requestable`, `TokenRequestable`, `WebAuth`, or any other protocol whose method signatures include a callback, you must add `@Sendable` to the matching parameter.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2 - start without @Sendable
+struct MockRequestable: Requestable {
+    func start(_ callback: @escaping (Result<Credentials, AuthenticationError>) -> Void) {
+        callback(.success(mockCredentials))
+    }
+    // ...
+}
+
+// v3 - add @Sendable to match the updated protocol requirement
+struct MockRequestable: Requestable {
+    func start(_ callback: @escaping @Sendable (Result<Credentials, AuthenticationError>) -> Void) {
+        callback(.success(mockCredentials))
+    }
+    // ...
+}
+```
+</details>
+
 ---
 
 ## API Changes
@@ -506,7 +543,7 @@ struct MockTokenRequest: TokenRequestable {
 
     let mockResult: Result<Credentials, AuthenticationError>
 
-    func start(_ callback: @escaping (Result<Credentials, AuthenticationError>) -> Void) {
+    func start(_ callback: @escaping @Sendable (Result<Credentials, AuthenticationError>) -> Void) {
         callback(mockResult)
     }
 
