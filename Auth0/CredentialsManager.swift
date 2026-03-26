@@ -286,7 +286,7 @@ public struct CredentialsManager: Sendable {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
     public func revoke(headers: [String: String] = [:],
-                       _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
+                       _ callback: @escaping @Sendable (CredentialsManagerResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
         guard let credentials = self.retrieveCredentials(),
@@ -417,7 +417,7 @@ public struct CredentialsManager: Sendable {
                             minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
-                            callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                            callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
         if let bioAuth = self.bioAuth {
@@ -526,7 +526,7 @@ public struct CredentialsManager: Sendable {
                             minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
-                            callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                            callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: scope,
                                  minTTL: minTTL,
                                  parameters: parameters,
@@ -604,7 +604,7 @@ public struct CredentialsManager: Sendable {
                                minTTL: Int = 60,
                                parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
-                               callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
+                               callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
         self.retrieveAPICredentials(audience: audience,
                                     scope: scope,
                                     minTTL: minTTL,
@@ -678,7 +678,7 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func ssoCredentials(parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
-                               callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+                               callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
         self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: dispatchOnMain(callback))
     }
 
@@ -723,7 +723,7 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func renew(parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
-                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                      callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: nil,
                                  minTTL: 0,
                                  parameters: parameters,
@@ -771,7 +771,7 @@ public struct CredentialsManager: Sendable {
                                      parameters: [String: Any],
                                      headers: [String: String],
                                      forceRenewal: Bool,
-                                     callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                                     callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentialsWithRetry(scope: scope,
                                          minTTL: minTTL,
                                          parameters: parameters,
@@ -788,7 +788,7 @@ public struct CredentialsManager: Sendable {
                                              headers: [String: String],
                                              forceRenewal: Bool,
                                              retryCount: Int,
-                                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                                             callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             guard let credentials = self.retrieveCredentials() else {
                 complete()
@@ -857,7 +857,7 @@ public struct CredentialsManager: Sendable {
 
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
-                                        callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+                                        callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             guard let credentials = self.retrieveCredentials() else {
                 complete()
@@ -899,7 +899,7 @@ public struct CredentialsManager: Sendable {
                                         minTTL: Int,
                                         parameters: [String: Any],
                                         headers: [String: String],
-                                        callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
+                                        callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             if let apiCredentials = self.retrieveAPICredentials(audience: audience, scope: scope),
                   !self.hasExpired(apiCredentials.expiresAt),

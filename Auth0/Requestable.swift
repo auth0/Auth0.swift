@@ -7,7 +7,7 @@ public protocol Requestable<ResultType, ErrorType>: Sendable {
     func parameters(_ extraParameters: [String: Any]) -> any Requestable<ResultType, ErrorType>
     func headers(_ extraHeaders: [String: String]) -> any Requestable<ResultType, ErrorType>
     func requestValidators(_ extraValidators: [RequestValidator]) -> any Requestable<ResultType, ErrorType>
-    func start(_ callback: @escaping (Result<ResultType, ErrorType>) -> Void)
+    func start(_ callback: @escaping @Sendable (Result<ResultType, ErrorType>) -> Void)
     func start() -> AnyPublisher<ResultType, ErrorType>
     func start() async throws -> ResultType
 }
