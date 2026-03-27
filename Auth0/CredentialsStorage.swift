@@ -8,6 +8,7 @@ public protocol CredentialsStorage {
     ///
     /// - Parameter key: The key to get from the store.
     /// - Returns: The stored data.
+    /// - Throws: An error when the get operation fails.
     func getEntry(forKey key: String) throws -> Data
 
     /// Sets a storage entry.
@@ -15,13 +16,13 @@ public protocol CredentialsStorage {
     /// - Parameters:
     ///   - data: The data to be stored.
     ///   - key: The key to store it to.
-    /// - Returns: If the data was stored.
+    /// - Throws: An error when the store operation fails.
     func setEntry(_ data: Data, forKey key: String) throws
 
     /// Deletes a storage entry.
     ///
     /// - Parameter key: The key to delete from the store.
-    /// - Returns: If the entry was deleted.
+    /// - Throws: An error when the delete operation fails.
     func deleteEntry(forKey key: String) throws
 
     /// Deletes all storage entries managed by this ``CredentialsStorage`` instance.
@@ -64,7 +65,7 @@ extension SimpleKeychain: CredentialsStorage {
     /// Deletes a storage entry.
     ///
     /// - Parameter key: The key to delete from the Keychain.
-    /// - Returns: If the data was deleted.
+    /// - Throws: Error if the delete operation fails.
     public func deleteEntry(forKey key: String) throws {
         try self.deleteItem(forKey: key)
     }

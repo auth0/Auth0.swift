@@ -137,11 +137,8 @@ public struct CredentialsManager: Sendable {
     /// - Parameter credentials: ``Credentials`` instance to store.
     /// - Returns: If the credentials were stored.
     public func store(credentials: Credentials) throws {
-        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
-                                                           requiringSecureCoding: true) else {
-            throw CredentialsManagerError.storeFailed
-        }
-
+        let data = try NSKeyedArchiver.archivedData(withRootObject: credentials,
+                                                    requiringSecureCoding: true)
         try self.storage.setEntry(data, forKey: self.storeKey)
     }
 
@@ -836,7 +833,7 @@ public struct CredentialsManager: Sendable {
                                     callback(.success(newCredentials))
                                 } catch {
                                     complete()
-                                    callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                                    callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                                 }
                             }
                         case .failure(let error):
@@ -901,7 +898,7 @@ public struct CredentialsManager: Sendable {
                                 callback(.success(ssoCredentials))
                             } catch {
                                 complete()
-                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                                callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                             }
                         case .failure(let error):
                             complete()
@@ -964,7 +961,7 @@ public struct CredentialsManager: Sendable {
                                     callback(.success(newAPICredentials))
                                 } catch {
                                     complete()
-                                    callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                                    callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                                 }
                             }
                         case .failure(let error):

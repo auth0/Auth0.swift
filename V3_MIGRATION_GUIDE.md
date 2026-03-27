@@ -335,20 +335,25 @@ class MyCustomStorage: CredentialsStorage {
 
 | Method | New error delivered to callback | Trigger |
 | --- | --- | --- |
+| `revoke(headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws (e.g. item not found). In v2 this returned `.success` |
 | `revoke(headers:callback:)` | `.clearFailed` | Keychain delete fails after a successful token revocation, or when no refresh token is present |
+| `credentials(withScope:minTTL:parameters:headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws when reading stored credentials |
 | `credentials(withScope:minTTL:parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving renewed credentials |
+| `renew(parameters:headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws when reading stored credentials |
 | `renew(parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving renewed credentials |
+| `apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws when reading stored credentials |
 | `apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving exchanged API credentials |
+| `ssoCredentials(parameters:headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws when reading stored credentials |
 | `ssoCredentials(parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving updated credentials after SSO exchange |
 
-In v2, a storage failure inside these methods was silently ignored — the callback was still called with a success result. In v3, the callback receives the appropriate `CredentialsManagerError` instead.
+In v2, storage read failures were swallowed by `try?` — for example, `revoke()` returned `.success` when no credentials were stored and `getEntry(forKey:)` threw. In v3, the underlying storage error is propagated as the `cause` of the `CredentialsManagerError`, giving callers full context to respond appropriately.
 
 <details>
   <summary>Migration example — handling new revoke failure path</summary>
 
 ```swift
-// v2 — a Keychain failure during clear() was silently ignored;
-//       result was always .success after a successful network revocation
+// v2 — storage failures were silently ignored;
+//       revoke returned .success even when nothing was stored
 credentialsManager.revoke { result in
     switch result {
     case .success:
@@ -359,17 +364,20 @@ credentialsManager.revoke { result in
     }
 }
 
-// v3 — a Keychain failure during clear() is surfaced as .clearFailed
+// v3 — storage errors are now surfaced
 credentialsManager.revoke { result in
     switch result {
     case .success:
         navigateToLogin()
     case .failure(let error):
-        switch error.code {
-        case .revokeFailed:
+        switch error {
+        case CredentialsManagerError.noCredentials:
+            // no credentials in storage (getEntry threw) — nothing to revoke
+            navigateToLogin()
+        case CredentialsManagerError.revokeFailed:
             // network revocation failed — refresh token may still be active
             showError(error)
-        case .clearFailed:
+        case CredentialsManagerError.clearFailed:
             // token was revoked but credentials could not be removed from storage
             // treat as logged out since the token is no longer valid
             navigateToLogin()
