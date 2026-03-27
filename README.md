@@ -338,7 +338,11 @@ When your users log in, store their credentials securely in the Keychain.
 
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
-let didStore = credentialsManager.store(credentials: credentials)
+do {
+    try credentialsManager.store(credentials: credentials)
+} catch {
+    print("Failed to store credentials: \(error)")
+}
 ```
 
 ### Retrieve stored credentials
@@ -378,7 +382,11 @@ The stored credentials can be removed from the Keychain by using the `clear()` m
 
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
-let didClear = credentialsManager.clear()
+do {
+    try credentialsManager.clear()
+} catch {
+    print("Failed to clear credentials: \(error)")
+}
 ```
 
 ### Retrieve user information

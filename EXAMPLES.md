@@ -546,10 +546,7 @@ Auth0.webAuth()
     // ...
 }
 
-if !credentialsManager.clear() {
-    // ...
-}
-
+try credentialsManager.clear()
 try DPoP.clearKeypair()
 ```
 
@@ -733,7 +730,11 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your app again.
 
 ```swift
-let didStore = credentialsManager.store(credentials: credentials)
+do {
+    try credentialsManager.store(credentials: credentials)
+} catch {
+    print("Failed to store credentials: \(error)")
+}
 ```
 
 ### Check for stored credentials
@@ -910,7 +911,11 @@ credentialsManager
 The stored [ID token](https://auth0.com/docs/secure/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.
 
 ```swift
-let user = credentialsManager.user
+do {
+    let user = try credentialsManager.userProfile()
+} catch {
+    print("Failed to retrieve user profile: \(error)")
+}
 ```
 
 To get the latest user information, you can use the `renew()` [method](#renew-stored-credentials). Calling this method will automatically update the stored user information. You can also use the `userInfo(withAccessToken:)` [method](#retrieve-user-information) of the Authentication API client, but it will not update the stored user information.
@@ -920,7 +925,11 @@ To get the latest user information, you can use the `renew()` [method](#renew-st
 The stored credentials can be removed from the Keychain by using the `clear()` method.
 
 ```swift
-let didClear = credentialsManager.clear()
+do {
+    try credentialsManager.clear()
+} catch {
+    print("Failed to clear credentials: \(error)")
+}
 ```
 
 ### Clear all stored credentials
@@ -1000,7 +1009,7 @@ let isValid = credentialsManager.isBiometricSessionValid()
 ```
 
 > [!NOTE]
-> Retrieving the user information with `credentialsManager.user` will not be protected by biometric authentication.
+> Retrieving the user information with `credentialsManager.userProfile()` will not be protected by biometric authentication.
 
 ### Other credentials
 
@@ -1146,6 +1155,41 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 ### Credentials Manager errors
 
 The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror) to learn more about the error cases you need to handle, and which ones include a `cause` value.
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(let error):
+        switch error {
+        case CredentialsManagerError.noCredentials:
+            // No credentials stored — prompt login
+            break
+        case CredentialsManagerError.noRefreshToken:
+            // Credentials expired and no refresh token — prompt login
+            break
+        case CredentialsManagerError.renewFailed:
+            // Token renewal failed — check error.cause for details
+            break
+        case CredentialsManagerError.storeFailed:
+            // Failed to save renewed credentials to Keychain
+            break
+        case CredentialsManagerError.clearFailed:
+            // Failed to remove credentials from Keychain
+            break
+        case CredentialsManagerError.biometricsFailed:
+            // Biometric authentication failed — check error.cause for details
+            break
+        case CredentialsManagerError.revokeFailed:
+            // Token revocation failed — check error.cause for details
+            break
+        default:
+            break
+        }
+    }
+}
+```
 
 > [!WARNING]
 > Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror/#topics) instead, which are part of the API.
@@ -2020,10 +2064,7 @@ if DPoP.isNonceRequired(by: response),
 On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair from the Keychain.
 
 ```swift
-if !credentialsManager.clear() {
-    // ...
-}
-
+try credentialsManager.clear()
 try DPoP.clearKeypair()
 ```
 
