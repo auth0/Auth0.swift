@@ -600,6 +600,7 @@ The following APIs have been renamed to align with the Android, Flutter, and Rea
 | --- | --- |
 | `clearSession(federated:)` | `logout(federated:)` |
 | `UserInfo` | `UserProfile` |
+| `CredentialsManager.user` (property, `UserProfile?`) | `CredentialsManager.userProfile()` (throwing function, `UserProfile?`) |
 | `Credentials.expiresIn` | `Credentials.expiresAt` |
 | `APICredentials.expiresIn` | `APICredentials.expiresAt` |
 | `SSOCredentials.expiresIn` | `SSOCredentials.expiresAt` |
@@ -646,6 +647,29 @@ let user: UserInfo = ...
 
 // v3
 let user: UserProfile = ...
+```
+</details>
+
+**`CredentialsManager.user` → `CredentialsManager.userProfile()`**
+
+The `user` computed property on `CredentialsManager` has been replaced with a throwing `userProfile()` function. In v2, storage or decoding failures were silently swallowed and the property returned `nil`. In v3, those errors are propagated to the caller, giving full context to respond appropriately.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2 — errors were silently swallowed
+let user = credentialsManager.user  // nil on any failure
+
+// v3 — errors are propagated
+do {
+    let user = try credentialsManager.userProfile()
+} catch {
+    // handle storage or decoding error
+}
+
+// v3 — if you want to preserve v2 behavior
+let user = try? credentialsManager.userProfile()
 ```
 </details>
 

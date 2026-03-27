@@ -75,14 +75,19 @@ public struct CredentialsManager: Sendable {
     /// ## Usage
     ///
     /// ```swift
-    /// let user = credentialsManager.user
+    /// let user = try credentialsManager.userProfile()
     /// ```
     ///
-    /// - Important: Access to this property will not be protected by biometric authentication.
-    public var user: UserProfile? {
-        guard let credentials = try? self.retrieveCredentials(),
-              let jwt = try? decode(jwt: credentials.idToken) else { return nil }
-        return UserProfile(json: jwt.body)
+    /// - Throws: A ``CredentialsManagerError`` if the credentials cannot be read from storage or the ID token cannot be decoded.
+    /// - Returns: The ``UserProfile`` extracted from the stored ID token, or `nil` if the ID token payload cannot be parsed.
+    /// - Important: Access to this method will not be protected by biometric authentication.
+    public func userProfile() throws -> UserProfile? {
+        if let credentials = try self.retrieveCredentials() {
+            let jwt = try decode(jwt: credentials.idToken)
+            return UserProfile(json: jwt.body)
+        }
+
+        throw CredentialsManagerError(code: .noCredentials)
     }
 
     #if WEB_AUTH_PLATFORM
@@ -116,7 +121,7 @@ public struct CredentialsManager: Sendable {
     ///   - fallbackTitle:    Fallback message to display when Face ID or Touch ID is used after a failed match.
     ///   - evaluationPolicy: Policy to be used for authentication policy evaluation.
     ///   - policy:           The ``BiometricPolicy`` that controls when biometric authentication is required. Defaults to `.default`.
-    /// - Important: Access to the ``user`` property will not be protected by biometric authentication.
+    /// - Important: Access to the ``userProfile()`` method will not be protected by biometric authentication.
     public mutating func enableBiometrics(withTitle title: String,
                                           cancelTitle: String? = nil,
                                           fallbackTitle: String? = nil,

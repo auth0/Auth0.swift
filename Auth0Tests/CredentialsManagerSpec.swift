@@ -384,7 +384,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
-                expect(failingManager.user).to(beNil())
+                expect(try? failingManager.userProfile()).to(beNil())
             }
 
             it("should return false for hasValid when storage throws") {
@@ -642,17 +642,17 @@ class CredentialsManagerSpec: QuickSpec {
             it("should retrieve the user profile when there is an id token stored") {
                 let credentials = Credentials(idToken: ValidToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
                 expect { try credentialsManager.store(credentials: credentials) }.toNot(throwError())
-                expect(credentialsManager.user).toNot(beNil())
+                expect { try credentialsManager.userProfile() }.toNot(throwError())
             }
 
             it("should not retrieve the user profile when there are no credentials stored") {
-                expect(credentialsManager.user).to(beNil())
+                expect { try credentialsManager.userProfile() }.to(throwError())
             }
 
             it("should not retrieve the user profile when the id token is not a jwt") {
                 let credentials = Credentials(accessToken: AccessToken, idToken: "not a jwt", expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
                 expect { try credentialsManager.store(credentials: credentials) }.toNot(throwError())
-                expect(credentialsManager.user).to(beNil())
+                expect { try credentialsManager.userProfile() }.to(throwError())
             }
             
         }
@@ -944,7 +944,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
-                            expect(result).to(haveCredentialsManagerError(.storeFailed))
+                            expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .storeFailed, cause: SimpleKeychainError.interactionNotAllowed)))
                             done()
                         }
                     }
@@ -1893,12 +1893,12 @@ class CredentialsManagerSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience) { result in
-                            expect(result).to(haveCredentialsManagerError(.storeFailed))
+                            expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .storeFailed, cause: SimpleKeychainError.interactionNotAllowed)))
                             done()
                         }
                     }
                 }
-                
+
                 it("renewal request should include custom parameters") {
                     let key = "foo"
                     let value = "bar"
@@ -2338,7 +2338,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.ssoCredentials { result in
-                        expect(result).to(haveCredentialsManagerError(.storeFailed))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .storeFailed, cause: SimpleKeychainError.interactionNotAllowed)))
                         done()
                     }
                 }
@@ -2582,7 +2582,7 @@ class CredentialsManagerSpec: QuickSpec {
                 credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew { result in
-                        expect(result).to(haveCredentialsManagerError(.storeFailed))
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .storeFailed, cause: SimpleKeychainError.interactionNotAllowed)))
                         done()
                     }
                 }
