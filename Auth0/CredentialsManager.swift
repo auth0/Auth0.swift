@@ -82,12 +82,15 @@ public struct CredentialsManager: Sendable {
     /// - Returns: The ``UserProfile`` extracted from the stored ID token, or `nil` if the ID token payload cannot be parsed.
     /// - Important: Access to this method will not be protected by biometric authentication.
     public func userProfile() throws -> UserProfile? {
-        if let credentials = try self.retrieveCredentials() {
+        do {
+            guard let credentials = try self.retrieveCredentials() else {
+                throw CredentialsManagerError(code: .noCredentials)
+            }
             let jwt = try decode(jwt: credentials.idToken)
             return UserProfile(json: jwt.body)
+        } catch {
+            throw CredentialsManagerError(code: .noCredentials, cause: error)
         }
-
-        throw CredentialsManagerError(code: .noCredentials)
     }
 
     #if WEB_AUTH_PLATFORM

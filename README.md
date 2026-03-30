@@ -389,6 +389,19 @@ do {
 }
 ```
 
+### Retrieve stored user profile
+
+The stored user profile can be retrieved from the stored ID token synchronously without checking if credentials are expired:
+
+```swift
+do {
+    let user = try credentialsManager.userProfile()
+    print("User profile: \(user)")
+} catch {
+    print("Failed to retrieve user profile: \(error)")
+}
+```
+
 ### Retrieve user information
 
 Fetch the latest user information from the `/userinfo` endpoint.
