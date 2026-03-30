@@ -48,6 +48,7 @@ extension SimpleKeychain: CredentialsStorage {
     ///
     /// - Parameter key: The key to get from the Keychain.
     /// - Returns: The stored data.
+    /// - Throws: An error when the get operation fails.
     public func getEntry(forKey key: String) throws -> Data {
         try self.data(forKey: key)
     }
@@ -57,7 +58,7 @@ extension SimpleKeychain: CredentialsStorage {
     /// - Parameters:
     ///   - data: The data to be stored.
     ///   - key: The key to store it to.
-    /// - Returns: If the data was stored.
+    /// - Throws: An error when the store operation fails.
     public func setEntry(_ data: Data, forKey key: String) throws {
         try self.set(data, forKey: key)
     }

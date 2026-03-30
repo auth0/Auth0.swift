@@ -242,6 +242,7 @@ The following methods have been updated:
 | `clear() -> Bool` | `clear() throws` |
 | `clear(forAudience:scope:) -> Bool` | `clear(forAudience:scope:) throws` |
 | `store(apiCredentials:forAudience:forScope:)` (silent failure) | `store(apiCredentials:forAudience:forScope:) throws` |
+| `user` (property, returns `UserProfile?`) | `userProfile()` (throwing function, returns `UserProfile?`) |
 
 The `CredentialsStorage` protocol methods have also changed:
 
@@ -347,6 +348,33 @@ class MyCustomStorage: CredentialsStorage {
 | `ssoCredentials(parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving updated credentials after SSO exchange |
 
 In v2, storage read failures were swallowed by `try?` — for example, `revoke()` returned `.success` when no credentials were stored and `getEntry(forKey:)` threw. In v3, the underlying storage error is propagated as the `cause` of the `CredentialsManagerError`, giving callers full context to respond appropriately.
+
+Additionally, the `user` property has been replaced with the `userProfile()` method that now throws errors instead of silently returning `nil`:
+
+| Method | Error thrown | Trigger |
+| --- | --- | --- |
+| `userProfile()` | `.noCredentials` | `getEntry(forKey:)` throws (e.g. item not found) or ID token cannot be decoded |
+
+<details>
+  <summary>Migration example — userProfile error handling</summary>
+
+```swift
+// v2 — storage/decoding failures were silently swallowed
+let user = credentialsManager.user  // nil on any failure
+
+// v3 — errors are now propagated
+do {
+    let user = try credentialsManager.userProfile()
+    print("User profile: \(user)")
+} catch {
+    // handle storage or decoding error
+    print("Failed to retrieve user profile: \(error)")
+}
+
+// v3 — if you want to preserve v2 behavior (not recommended)
+let user = try? credentialsManager.userProfile()
+```
+</details>
 
 <details>
   <summary>Migration example — handling new revoke failure path</summary>
@@ -600,7 +628,6 @@ The following APIs have been renamed to align with the Android, Flutter, and Rea
 | --- | --- |
 | `clearSession(federated:)` | `logout(federated:)` |
 | `UserInfo` | `UserProfile` |
-| `CredentialsManager.user` (property, `UserProfile?`) | `CredentialsManager.userProfile()` (throwing function, `UserProfile?`) |
 | `Credentials.expiresIn` | `Credentials.expiresAt` |
 | `APICredentials.expiresIn` | `APICredentials.expiresAt` |
 | `SSOCredentials.expiresIn` | `SSOCredentials.expiresAt` |
@@ -647,29 +674,6 @@ let user: UserInfo = ...
 
 // v3
 let user: UserProfile = ...
-```
-</details>
-
-**`CredentialsManager.user` → `CredentialsManager.userProfile()`**
-
-The `user` computed property on `CredentialsManager` has been replaced with a throwing `userProfile()` function. In v2, storage or decoding failures were silently swallowed and the property returned `nil`. In v3, those errors are propagated to the caller, giving full context to respond appropriately.
-
-<details>
-  <summary>Migration example</summary>
-
-```swift
-// v2 — errors were silently swallowed
-let user = credentialsManager.user  // nil on any failure
-
-// v3 — errors are propagated
-do {
-    let user = try credentialsManager.userProfile()
-} catch {
-    // handle storage or decoding error
-}
-
-// v3 — if you want to preserve v2 behavior
-let user = try? credentialsManager.userProfile()
 ```
 </details>
 
