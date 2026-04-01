@@ -30,12 +30,16 @@ final class ContentViewModel: ObservableObject {
 
     func login() async {
         isLoading = true
+        errorMessage = nil
         do {
             let credentials = try await authenticationClient
                 .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication", audience: nil, scope: "openid profile email offline_access")
                 .validateClaims()
                 .start()
+            try credentialsManager.store(credentials: credentials)
             isAuthenticated = true
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -53,12 +57,10 @@ final class ContentViewModel: ObservableObject {
                 .scope("openid profile email offline_access")
                 .start()
 
-            let stored = credentialsManager.store(credentials: credentials)
-            if stored {
-                isAuthenticated = true
-            } else {
-                errorMessage = "Failed to store credentials"
-            }
+            try credentialsManager.store(credentials: credentials)
+            isAuthenticated = true
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
         } catch let error as Auth0Error {
             errorMessage = "Login failed: \(error.localizedDescription)"
         } catch {
@@ -76,10 +78,10 @@ final class ContentViewModel: ObservableObject {
         do {
             try await Auth0.webAuth().logout()
 
-            let cleared = credentialsManager.clear()
-            if cleared {
-                isAuthenticated = false
-            }
+            try credentialsManager.clear()
+            isAuthenticated = false
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
         } catch let error as Auth0Error {
             errorMessage = "Logout failed: \(error.localizedDescription)"
         } catch {
@@ -92,10 +94,35 @@ final class ContentViewModel: ObservableObject {
 
     func checkAuthentication() async {
         do {
-            let credentials = try await credentialsManager.credentials()
+            _ = try await credentialsManager.credentials()
             isAuthenticated = true
-        } catch {
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
             isAuthenticated = false
+        } catch {
+            errorMessage = "Unexpected error: \(error.localizedDescription)"
+            isAuthenticated = false
+        }
+    }
+
+    private func handleCredentialsManagerError(_ error: CredentialsManagerError) -> String {
+        switch error {
+        case CredentialsManagerError.noCredentials:
+            return "No credentials found. Please log in again."
+        case CredentialsManagerError.noRefreshToken:
+            return "Session expired. Please log in again."
+        case CredentialsManagerError.renewFailed:
+            return "Failed to renew credentials: \(error.cause?.localizedDescription ?? "Unknown error")"
+        case CredentialsManagerError.storeFailed:
+            return "Failed to save credentials. Please try again."
+        case CredentialsManagerError.clearFailed:
+            return "Failed to clear credentials. Please try again."
+        case CredentialsManagerError.biometricsFailed:
+            return "Biometric authentication failed. Please try again."
+        case CredentialsManagerError.revokeFailed:
+            return "Failed to revoke session: \(error.cause?.localizedDescription ?? "Unknown error")"
+        default:
+            return "Credentials error: \(error.localizedDescription)"
         }
     }
 }

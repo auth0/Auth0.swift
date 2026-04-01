@@ -35,7 +35,7 @@ class BiometricPolicySpec: QuickSpec {
         }
         
         afterEach {
-            _ = credentialsManager.clear()
+            try? credentialsManager.clear()
             credentialsManager.clearBiometricSession()
         }
         
@@ -326,9 +326,9 @@ class BiometricPolicySpec: QuickSpec {
             }
             
             afterEach {
-                _ = credentialsManager1.clear()
-                _ = credentialsManager2.clear()
-                _ = credentialsManager3.clear()
+                try? credentialsManager1.clear()
+                try? credentialsManager2.clear()
+                try? credentialsManager3.clear()
                 credentialsManager.clearBiometricSession()
             }
             
@@ -429,10 +429,10 @@ class BiometricPolicySpec: QuickSpec {
                 credentialsManager.enableBiometrics(withTitle: "Touch to unlock",
                                                    policy: .session(timeoutInSeconds: 300))
                 
-                _ = credentialsManager.store(credentials: credentials)
+                try? credentialsManager.store(credentials: credentials)
                 
                 // Clear credentials should also clear session
-                _ = credentialsManager.clear()
+                try? credentialsManager.clear()
                 
                 expect(credentialsManager.isBiometricSessionValid()).to(beFalse())
             }
