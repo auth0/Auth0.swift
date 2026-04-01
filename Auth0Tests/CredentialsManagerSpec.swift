@@ -374,7 +374,7 @@ class CredentialsManagerSpec: QuickSpec {
                 expect { try failingManager.store(apiCredentials: apiCreds, forAudience: Audience) }.to(throwError())
             }
 
-            it("should return nil for user when storage throws") {
+            it("should throw unknown error with cause when storage throws") {
                 class FailingReadStore: CredentialsStorage {
                     func getEntry(forKey key: String) throws -> Data {
                         throw SimpleKeychainError.itemNotFound
@@ -384,7 +384,14 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 let failingManager = CredentialsManager(authentication: authentication, storage: FailingReadStore())
-                expect(try? failingManager.userProfile()).to(beNil())
+                var thrownError: CredentialsManagerError?
+                expect {
+                    try failingManager.userProfile()
+                }.to(throwError { error in
+                    thrownError = error as? CredentialsManagerError
+                })
+                expect(thrownError?.code) == CredentialsManagerError.Code.unknown
+                expect(thrownError?.cause).notTo(beNil())
             }
 
             it("should return false for hasValid when storage throws") {
@@ -652,7 +659,14 @@ class CredentialsManagerSpec: QuickSpec {
             it("should not retrieve the user profile when the id token is not a jwt") {
                 let credentials = Credentials(accessToken: AccessToken, idToken: "not a jwt", expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
                 expect { try credentialsManager.store(credentials: credentials) }.toNot(throwError())
-                expect { try credentialsManager.userProfile() }.to(throwError())
+                var thrownError: CredentialsManagerError?
+                expect {
+                    try credentialsManager.userProfile()
+                }.to(throwError { error in
+                    thrownError = error as? CredentialsManagerError
+                })
+                expect(thrownError?.code) == CredentialsManagerError.Code.unknown
+                expect(thrownError?.cause).notTo(beNil())
             }
             
         }

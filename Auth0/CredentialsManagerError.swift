@@ -13,6 +13,7 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
         case clearFailed
         case biometricsFailed
         case revokeFailed
+        case unknown
         case largeMinTTL(minTTL: Int, lifetime: Int)
     }
 
@@ -71,7 +72,11 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
     /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let revokeFailed: CredentialsManagerError = .init(code: .revokeFailed)
 
-    /// The `minTTL` requested is greater than the lifetime of the renewed access token. Request a lower `minTTL` or 
+    /// An unknown error occurred.
+    /// The underlying `Error` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let unknown: CredentialsManagerError = .init(code: .unknown)
+
+    /// The `minTTL` requested is greater than the lifetime of the renewed access token. Request a lower `minTTL` or
     /// increase the **Token Expiration** value in the settings page of your [Auth0 API](https://manage.auth0.com/#/apis/).
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let largeMinTTL: CredentialsManagerError = .init(code: .largeMinTTL(minTTL: 0, lifetime: 0))
@@ -92,6 +97,7 @@ public extension CredentialsManagerError {
             return "Clearing of the credentials failed"
         case .biometricsFailed: return "The biometric authentication failed."
         case .revokeFailed: return "The revocation of the refresh token failed."
+        case .unknown: return "An unknown error occurred."
         case .largeMinTTL(let minTTL, let lifetime): return "The minTTL requested (\(minTTL)s) is greater than the"
             + " lifetime of the renewed access token (\(lifetime)s). Request a lower minTTL or increase the"
             + " 'Token Expiration' value in the settings page of your Auth0 API."

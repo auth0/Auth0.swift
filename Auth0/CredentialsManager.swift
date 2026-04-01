@@ -79,6 +79,7 @@ public struct CredentialsManager: Sendable {
     /// ```
     ///
     /// - Throws: A ``CredentialsManagerError`` if the credentials cannot be read from storage or the ID token cannot be decoded.
+    ///   The underlying `Error` can be accessed via the ``Auth0Error/cause-swift.property`` property.
     /// - Returns: The ``UserProfile`` extracted from the stored ID token, or `nil` if the ID token payload cannot be parsed.
     /// - Important: Access to this method will not be protected by biometric authentication.
     public func userProfile() throws -> UserProfile? {
@@ -89,7 +90,7 @@ public struct CredentialsManager: Sendable {
             let jwt = try decode(jwt: credentials.idToken)
             return UserProfile(json: jwt.body)
         } catch {
-            throw CredentialsManagerError(code: .noCredentials, cause: error)
+            throw CredentialsManagerError(code: .unknown, cause: error)
         }
     }
 
