@@ -11,10 +11,6 @@ import UIKit
  */
 public typealias AuthenticationResult<T> = Result<T, AuthenticationError>
 
-/**
- `Result` wrapper for My Account API operations.
- */
-public typealias MyAccountResult<T> = Result<T, MyAccountError>
 
 #if WEB_AUTH_PLATFORM
 /**

@@ -12,7 +12,7 @@ public extension Data {
 
 extension Data {
 
-    func encodeBase64URLSafe() -> String {
+    package func encodeBase64URLSafe() -> String {
         return self
             .base64EncodedString(options: [])
             .replacingOccurrences(of: "+", with: "-")
