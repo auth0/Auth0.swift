@@ -396,27 +396,32 @@ final class MockWebAuth: WebAuth, @unchecked Sendable {
 ```
 </details>
 
-**Impact — value semantics of the builder chain:** In v2, `Auth0WebAuth` was a `final class` — builder methods mutated the instance in place, so discarding the return value still had an effect. In v3, `Auth0WebAuth` is now a `struct` (required for `Sendable` conformance). Each builder method (`.scope()`, `.audience()`, etc.) returns a **new independent copy** — it does not mutate the receiver. Code that previously discarded builder return values will silently produce incorrect results in v3:
+**Impact — builder methods now return copies:** In v2, `Auth0WebAuth` was a `final class`, so builder methods mutated the instance in place. In v3 it is a `struct`, so each builder method returns a new copy without modifying the original.
+
+**If you use method chaining, no change is needed:**
 
 ```swift
-// ⚠️ This worked in v2 (class mutation) but does not behave as expected in v3 (struct copy)
-var webAuth = Auth0.webAuth().scope("openid")
-webAuth.audience("https://api.example.com")
-// ^ The return value (a new copy) is discarded. `audience` is NOT applied to `webAuth`.
-```
-
-Always use a single chained expression, or capture the return value:
-
-```swift
-// ✅ Correct — chain all modifiers
+// ✅ Works the same in v2 and v3
 Auth0.webAuth()
     .scope("openid")
     .audience("https://api.example.com")
     .start { result in ... }
+```
 
-// ✅ Also correct — capture each return value
+**If you call builder methods imperatively, you must assign the return value:**
+
+```swift
+// ⚠️ Broken in v3 — audience is called but its return value is discarded,
+// so it is never applied. In v2 this worked silently because Auth0WebAuth
+// was a class and the method mutated the instance in place.
+// Note: in v2 this pattern would also have produced a "result unused" compiler warning.
 var webAuth = Auth0.webAuth().scope("openid")
-webAuth = webAuth.audience("https://api.example.com")  // reassign
+webAuth.audience("https://api.example.com")
+webAuth.start { result in ... }
+
+// ✅ Fixed — reassign the return value
+var webAuth = Auth0.webAuth().scope("openid")
+webAuth = webAuth.audience("https://api.example.com")
 webAuth.start { result in ... }
 ```
 
