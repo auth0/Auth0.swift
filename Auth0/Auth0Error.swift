@@ -1,8 +1,8 @@
 import Foundation
 
-let unknownError = "a0.sdk.internal_error.unknown"
-let nonJSONError = "a0.sdk.internal_error.plain"
-let emptyBodyError = "a0.sdk.internal_error.empty"
+package let unknownError = "a0.sdk.internal_error.unknown"
+package let nonJSONError = "a0.sdk.internal_error.plain"
+package let emptyBodyError = "a0.sdk.internal_error.empty"
 
 /// Generic representation of Auth0 errors.
 public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible, Sendable {

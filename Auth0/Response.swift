@@ -1,6 +1,6 @@
 import Foundation
 
-struct ResponseValue {
+package struct ResponseValue {
 
     let value: HTTPURLResponse
     let data: Data?

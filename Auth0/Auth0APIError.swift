@@ -1,9 +1,9 @@
 import Foundation
 
-let apiErrorCode = "code"
-let apiErrorDescription = "description"
-let apiErrorCause = "cause"
-let apiErrorDPoPNonce = "dpop_nonce"
+package let apiErrorCode = "code"
+package let apiErrorDescription = "description"
+package let apiErrorCause = "cause"
+package let apiErrorDPoPNonce = "dpop_nonce"
 
 /// Generic representation of Auth0 API errors.
 public protocol Auth0APIError: Auth0Error {

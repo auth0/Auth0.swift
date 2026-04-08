@@ -94,6 +94,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
 
     private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
         var request = request
+        print(request.curlString(with: session))
         do {
             try runClientValidation()
             if let dpop = dpop, try dpop.shouldGenerateProof(for: url, parameters: parameters) {
@@ -192,5 +193,24 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
                        logger: logger,
                        auth0ClientInfo: auth0ClientInfo,
                        dpop: dpop)
+    }
+}
+
+extension URLRequest {
+    func curlString(with session: URLSession) -> String {
+        guard let method = httpMethod, let url = url?.absoluteString else { return "" }
+        var components = ["curl -X \(method)"]
+        components.append("'\(url)'")
+        session.configuration.httpAdditionalHeaders?.forEach { key, value in
+            components.append("-H '\(key): \(value)'")
+        }
+        allHTTPHeaderFields?.forEach { key, value in
+            components.append("-H '\(key): \(value)'")
+        }
+        if let body = httpBody, let bodyString = String(data: body, encoding: .utf8) {
+            let escaped = bodyString.replacingOccurrences(of: "'", with: "'\\''")
+            components.append("-d '\(escaped)'")
+        }
+        return components.joined(separator: " \\\n  ")
     }
 }
