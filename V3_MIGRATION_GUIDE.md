@@ -442,7 +442,9 @@ webAuth.start { result in ... }
 
 **`WebAuthProvider` — now `@Sendable @MainActor`**
 
-**Impact:** If you implement a custom `WebAuthProvider`, the closure must now be both `@Sendable` and `@MainActor`. Since custom providers always present UI, they should already be doing UI work on the main thread. The `@MainActor` annotation formalises this requirement.
+**Impact:** If you implement a custom `WebAuthProvider`, the closure is now `@MainActor` — its body runs on the main actor. `MyUserAgent.init` is therefore called on the main actor; the init does not need to be `@MainActor` itself, but it must not be isolated to a different actor.
+
+Since custom providers always present UI, they should already be doing UI work on the main thread. In most cases no code changes are required — Swift infers `@Sendable @MainActor` from the `WebAuthProvider` typealias automatically.
 
 <details>
   <summary>Migration example</summary>
@@ -454,9 +456,11 @@ let myProvider: WebAuthProvider = { url, callback in
     return agent
 }
 
-// v3 - closure is implicitly @Sendable @MainActor when assigned to WebAuthProvider
+// v3 - Swift infers @Sendable @MainActor from the WebAuthProvider typealias.
+// The closure body runs on the main actor, so MyUserAgent.init is called there.
+// MyUserAgent does not need to be @MainActor, but it must conform to Sendable.
 let myProvider: WebAuthProvider = { url, callback in
-    let agent = MyUserAgent(url: url, callback: callback) // must be constructible on main actor
+    let agent = MyUserAgent(url: url, callback: callback)
     return agent
 }
 ```
