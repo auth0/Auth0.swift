@@ -396,10 +396,8 @@ extension Auth0WebAuth {
         Deferred {
             Future { promise in
                 let box = SendableBox(value: promise)
-                Task { @MainActor in
-                    self.start { result in
-                        box.value(result)
-                    }
+                self.start { result in
+                    box.value(result)
                 }
             }
         }

@@ -90,6 +90,38 @@ Auth0
 
 The following are some of the available Web Auth configuration options. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth/#topics) for the full list.
 
+> [!IMPORTANT]
+> Each configuration method returns a **new copy** of the `WebAuth` instance — it does not modify the original. Always use method chaining, or reassign the return value when configuring conditionally.
+>
+> The following pattern does **not** work — `audience` is called but its return value is discarded, so it is never applied:
+>
+> ```swift
+> // ⚠️ Does not work
+> var webAuth = Auth0.webAuth().scope("openid")
+> webAuth.audience("https://api.example.com") // return value discarded — has no effect
+> webAuth.start { result in ... }
+> ```
+>
+> Instead, either chain all options in a single expression:
+>
+> ```swift
+> // ✅ Recommended — chain everything
+> Auth0
+>     .webAuth()
+>     .scope("openid")
+>     .audience("https://api.example.com")
+>     .start { result in ... }
+> ```
+>
+> Or reassign the return value when you need to configure conditionally:
+>
+> ```swift
+> // ✅ Conditional configuration — reassign the return value
+> var webAuth = Auth0.webAuth().scope("openid")
+> webAuth = webAuth.audience("https://api.example.com")
+> webAuth.start { result in ... }
+> ```
+
 #### Use any Auth0 connection
 
 Specify an Auth0 connection to directly open that identity provider's login page, skipping the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
