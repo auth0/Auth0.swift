@@ -1,4 +1,6 @@
+#if SWIFT_PACKAGE
 import Auth0
+#endif
 
 /// My Account API sub-client for managing the current user's authentication methods.
 ///

@@ -1,5 +1,7 @@
 import Foundation
+#if SWIFT_PACKAGE
 import Auth0
+#endif
 
 struct Auth0MyAccountImpl: MyAccount {
 

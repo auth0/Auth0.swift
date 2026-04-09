@@ -1,4 +1,6 @@
+#if SWIFT_PACKAGE
 import Auth0
+#endif
 
 /// Represents an error during a request to the Auth0 My Account API.
 public struct MyAccountError: Auth0APIError, @unchecked Sendable {

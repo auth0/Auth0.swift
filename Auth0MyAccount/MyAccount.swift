@@ -1,5 +1,7 @@
 import Foundation
+#if SWIFT_PACKAGE
 @_exported import Auth0
+#endif
 
 // MARK: - Factory Methods
 
