@@ -436,6 +436,7 @@ public struct CredentialsManager: Sendable {
                             headers: [String: String] = [:],
                             callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
+        let params = normalize(parameters)
 
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
@@ -449,14 +450,14 @@ public struct CredentialsManager: Sendable {
                 // Session is valid, bypass biometric prompt
                 self.retrieveCredentials(scope: scope,
                                          minTTL: minTTL,
-                                         parameters: parameters,
+                                         parameters: params.asParameters,
                                          headers: headers,
                                          forceRenewal: false,
                                          callback: mainThreadCallback)
                 return
             }
 
-            bioAuth.validateBiometric { error in
+            bioAuth.validateBiometric { @Sendable error in
                 guard error == nil else {
                     return mainThreadCallback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: error!)))
                 }
@@ -466,7 +467,7 @@ public struct CredentialsManager: Sendable {
 
                 self.retrieveCredentials(scope: scope,
                                          minTTL: minTTL,
-                                         parameters: parameters,
+                                         parameters: params.asParameters,
                                          headers: headers,
                                          forceRenewal: false,
                                          callback: mainThreadCallback)
@@ -474,7 +475,7 @@ public struct CredentialsManager: Sendable {
         } else {
             self.retrieveCredentials(scope: scope,
                                      minTTL: minTTL,
-                                     parameters: parameters,
+                                     parameters: params.asParameters,
                                      headers: headers,
                                      forceRenewal: false,
                                      callback: mainThreadCallback)
@@ -803,6 +804,7 @@ public struct CredentialsManager: Sendable {
                                              forceRenewal: Bool,
                                              retryCount: Int,
                                              callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
+        let params = normalize(parameters)
         SynchronizationBarrier.shared.execute { complete in
             do {
                 guard let credentials = try self.retrieveCredentials() else {
@@ -823,7 +825,7 @@ public struct CredentialsManager: Sendable {
 
                 self.authentication
                     .renew(withRefreshToken: refreshToken, scope: scope)
-                    .parameters(parameters)
+                    .parameters(params.asParameters)
                     .headers(headers)
                     .start { result in
                         switch result {
@@ -854,7 +856,7 @@ public struct CredentialsManager: Sendable {
                                 DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) {
                                     self.retrieveCredentialsWithRetry(scope: scope,
                                                                       minTTL: minTTL,
-                                                                      parameters: parameters,
+                                                                      parameters: params.asParameters,
                                                                       headers: headers,
                                                                       forceRenewal: forceRenewal,
                                                                       retryCount: retryCount + 1,
@@ -880,6 +882,7 @@ public struct CredentialsManager: Sendable {
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
                                         callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
+        let params = normalize(parameters)
         SynchronizationBarrier.shared.execute { complete in
             do {
                 guard let credentials = try self.retrieveCredentials() else {
@@ -890,10 +893,10 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noRefreshToken))
                 }
-                
+
                 self.authentication
                     .ssoExchange(withRefreshToken: refreshToken)
-                    .parameters(parameters)
+                    .parameters(params.asParameters)
                     .headers(headers)
                     .start { result in
                         switch result {
@@ -928,6 +931,7 @@ public struct CredentialsManager: Sendable {
                                         parameters: [String: Any],
                                         headers: [String: String],
                                         callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
+        let params = normalize(parameters)
         SynchronizationBarrier.shared.execute { complete in
             do {
                 if let apiCredentials = try? self.retrieveAPICredentials(audience: audience, scope: scope),
@@ -945,10 +949,10 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noRefreshToken))
                 }
-                
+
                 self.authentication
                     .renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
-                    .parameters(parameters)
+                    .parameters(params.asParameters)
                     .headers(headers)
                     .start { result in
                         switch result {
@@ -1067,8 +1071,9 @@ public extension CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
     func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
-                return self.revoke(headers: headers, callback)
+            Future { promise in
+                let box = SendableBox(value: promise)
+                self.revoke(headers: headers) { @Sendable result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }
@@ -1150,12 +1155,12 @@ public extension CredentialsManager {
                      parameters: [String: Any] = [:],
                      headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
-                return self.credentials(withScope: scope,
-                                        minTTL: minTTL,
-                                        parameters: parameters,
-                                        headers: headers,
-                                        callback: callback)
+            Future { promise in
+                let box = SendableBox(value: promise)
+                self.credentials(withScope: scope,
+                                 minTTL: minTTL,
+                                 parameters: parameters,
+                                 headers: headers) { @Sendable result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }
@@ -1242,13 +1247,13 @@ public extension CredentialsManager {
                         parameters: [String: Any] = [:],
                         headers: [String: String] = [:]) -> AnyPublisher<APICredentials, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
-                return self.apiCredentials(forAudience: audience,
-                                           scope: scope,
-                                           minTTL: minTTL,
-                                           parameters: parameters,
-                                           headers: headers,
-                                           callback: callback)
+            Future { promise in
+                let box = SendableBox(value: promise)
+                self.apiCredentials(forAudience: audience,
+                                    scope: scope,
+                                    minTTL: minTTL,
+                                    parameters: parameters,
+                                    headers: headers) { @Sendable result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }
@@ -1324,8 +1329,10 @@ public extension CredentialsManager {
     func ssoCredentials(parameters: [String: Any] = [:],
                         headers: [String: String] = [:]) -> AnyPublisher<SSOCredentials, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
-                return self.ssoCredentials(parameters: parameters, headers: headers, callback: callback)
+            Future { promise in
+                let box = SendableBox(value: promise)
+                self.ssoCredentials(parameters: parameters,
+                                    headers: headers) { @Sendable result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }
@@ -1378,10 +1385,10 @@ public extension CredentialsManager {
     func renew(parameters: [String: Any] = [:],
                headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
-                return self.renew(parameters: parameters,
-                                  headers: headers,
-                                  callback: callback)
+            Future { promise in
+                let box = SendableBox(value: promise)
+                self.renew(parameters: parameters,
+                           headers: headers) { @Sendable result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }

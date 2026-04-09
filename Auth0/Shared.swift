@@ -37,9 +37,29 @@ struct SendableBox<T>: @unchecked Sendable {
     let value: T
 }
 
+/// Serializes a [String: Any] parameter dictionary to Data at the API boundary.
+/// Data is natively Sendable, so the result is safe to capture in concurrent closures.
+/// Returns empty Data for empty input; invalid JSON objects are silently dropped.
+func normalize(_ params: [String: Any]) -> Data {
+    guard !params.isEmpty,
+          JSONSerialization.isValidJSONObject(params),
+          let data = try? JSONSerialization.data(withJSONObject: params) else { return Data() }
+    return data
+}
+
+extension Data {
+    /// Deserializes back to [String: Any] at the point of use.
+    var asParameters: [String: Any] {
+        guard !isEmpty,
+              let obj = try? JSONSerialization.jsonObject(with: self),
+              let dict = obj as? [String: Any] else { return [:] }
+        return dict
+    }
+}
+
 /// Ensures a callback is executed on the main thread.
 /// If already on the main thread, executes immediately. Otherwise, dispatches asynchronously to main.
-func dispatchOnMain<T>(_ callback: @escaping @Sendable (T) -> Void) -> @Sendable (T) -> Void {
+func dispatchOnMain<T: Sendable>(_ callback: @escaping @Sendable (T) -> Void) -> @Sendable (T) -> Void {
     return { result in
         if Thread.isMainThread {
             callback(result)
