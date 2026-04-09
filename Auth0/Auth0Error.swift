@@ -31,7 +31,7 @@ public extension Auth0Error {
 
 extension Auth0Error {
 
-    func appendCause(to message: String) -> String {
+    package func appendCause(to message: String) -> String {
         guard let cause = self.cause else {
             return message
         }
@@ -42,7 +42,7 @@ extension Auth0Error {
         return "\(errorMessage) CAUSE: \(causeMessage)"
     }
 
-    func appendPeriod(to message: String) -> String {
+    package func appendPeriod(to message: String) -> String {
         return message.hasSuffix(".") ? message : "\(message)."
     }
 

@@ -78,7 +78,7 @@ public extension Auth0APIError {
 
 extension Auth0APIError {
 
-    init(cause error: Error, statusCode: Int = 0) {
+    package init(cause error: Error, statusCode: Int = 0) {
         let info: [String: Any] = [
             apiErrorCode: nonJSONError,
             apiErrorDescription: "Unable to complete the operation.",
@@ -87,7 +87,7 @@ extension Auth0APIError {
         self.init(info: info, statusCode: statusCode)
     }
 
-    init(description: String?, statusCode: Int = 0) {
+    package init(description: String?, statusCode: Int = 0) {
         let info: [String: Any] = [
             apiErrorCode: description != nil ? nonJSONError : emptyBodyError,
             apiErrorDescription: description ?? "Empty response body."
@@ -95,7 +95,7 @@ extension Auth0APIError {
         self.init(info: info, statusCode: statusCode)
     }
 
-    init(from response: ResponseValue) {
+    package init(from response: ResponseValue) {
         if let dpopChallenge = DPoP.challenge(from: response.value) {
             var info: [String: Any] = [apiErrorCode: dpopChallenge.errorCode]
             info[apiErrorDescription] = dpopChallenge.errorDescription
