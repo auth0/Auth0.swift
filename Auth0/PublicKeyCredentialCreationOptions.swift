@@ -1,24 +1,24 @@
 #if PASSKEYS_PLATFORM
 import Foundation
 
-struct PublicKeyCredentialCreationOptions: Sendable {
+package struct PublicKeyCredentialCreationOptions: Sendable {
 
-    let relyingParty: PublicKeyRelyingParty
-    let user: PublicKeyUser
-    let challengeData: Data
-
-}
-
-struct PublicKeyRelyingParty: Decodable, Sendable {
-
-    let id: String
+    package let relyingParty: PublicKeyRelyingParty
+    package let user: PublicKeyUser
+    package let challengeData: Data
 
 }
 
-struct PublicKeyUser: Decodable, Sendable {
+package struct PublicKeyRelyingParty: Decodable, Sendable {
 
-    let id: Data
-    let name: String
+    package let id: String
+
+}
+
+package struct PublicKeyUser: Decodable, Sendable {
+
+    package let id: Data
+    package let name: String
 
     enum CodingKeys: String, CodingKey {
         case id

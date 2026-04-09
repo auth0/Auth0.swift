@@ -2,8 +2,8 @@ import Foundation
 
 package struct ResponseValue {
 
-    let value: HTTPURLResponse
-    let data: Data?
+    package let value: HTTPURLResponse
+    package let data: Data?
 
 }
 
