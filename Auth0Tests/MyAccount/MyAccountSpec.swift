@@ -3,6 +3,7 @@ import Quick
 import Nimble
 
 @testable import Auth0
+@testable import Auth0MyAccount
 
 private let Domain = "samples.auth0.com"
 private let Token = "TOKEN"

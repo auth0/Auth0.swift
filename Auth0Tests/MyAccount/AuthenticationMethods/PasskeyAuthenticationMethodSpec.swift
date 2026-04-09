@@ -3,6 +3,7 @@ import Quick
 import Nimble
 
 @testable import Auth0
+@testable import Auth0MyAccount
 
 private let PasskeyId = "passkey|dev_rMJhr6SjnUUcHCxW"
 private let PasskeyType = "passkey"
