@@ -59,7 +59,7 @@ extension Data {
 
 /// Ensures a callback is executed on the main thread.
 /// If already on the main thread, executes immediately. Otherwise, dispatches asynchronously to main.
-func dispatchOnMain<T: Sendable>(_ callback: @escaping @Sendable (T) -> Void) -> @Sendable (T) -> Void {
+func dispatchOnMain<T>(_ callback: @escaping @Sendable (T) -> Void) -> @Sendable (T) -> Void {
     return { result in
         if Thread.isMainThread {
             callback(result)
