@@ -1,5 +1,5 @@
 import Foundation
-import Auth0
+@_exported import Auth0
 
 // MARK: - Factory Methods
 
