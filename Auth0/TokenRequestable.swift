@@ -78,7 +78,7 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
 
      - Parameter callback: Called on completion with a `Result` containing either the decoded value or an error.
      */
-    func start(_ callback: @escaping (Result<ResultType, ErrorType>) -> Void)
+    func start(_ callback: @escaping @Sendable (Result<ResultType, ErrorType>) -> Void)
 
     /**
      Returns a new request with the given parameters merged into the request body.
@@ -115,7 +115,10 @@ public extension TokenRequestable {
      - Returns: A type-erased publisher.
      */
     func start() -> AnyPublisher<ResultType, ErrorType> {
-        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+        return Deferred { Future { [self] promise in
+            let box = SendableBox(value: promise)
+            self.start { @Sendable result in box.value(result) }
+        } }.eraseToAnyPublisher()
     }
 
 }
@@ -130,9 +133,9 @@ public extension TokenRequestable {
 
      - Throws: An error that conforms to ``Auth0APIError``.
      */
-    func start() async throws -> ResultType {
+    func start() async throws -> ResultType where ResultType: Sendable {
         return try await withCheckedThrowingContinuation { continuation in
-            self.start { result in
+            self.start { @Sendable result in
                 continuation.resume(with: result)
             }
         }

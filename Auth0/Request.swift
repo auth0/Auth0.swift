@@ -93,18 +93,19 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
     }
 
     private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
-        var request = request
+        var mutableRequest = request
         do {
             try runClientValidation()
             if let dpop = dpop, try dpop.shouldGenerateProof(for: url, parameters: parameters) {
-                let proof = try dpop.generateProof(for: request as URLRequest)
-                request.setValue(proof, forHTTPHeaderField: "DPoP")
+                let proof = try dpop.generateProof(for: mutableRequest as URLRequest)
+                mutableRequest.setValue(proof, forHTTPHeaderField: "DPoP")
             }
         } catch {
             handle(.failure(E(cause: error)), callback)
             return
         }
 
+        let request = mutableRequest
         logger?.trace(request: request, session: self.session)
 
         let task = session.dataTask(with: request,
