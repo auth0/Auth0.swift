@@ -37,7 +37,7 @@ extension WebAuthentication {
         }
     }
 
-     static let completionHandler: (_ callback: @escaping WebAuthProviderCallback) -> ASHandler = { callback in
+    static let completionHandler: @Sendable (_ callback: @escaping WebAuthProviderCallback) -> ASHandler = { callback in
         return { url, error in
             Task { @MainActor in
                 guard let callbackURL = url, error == nil else {

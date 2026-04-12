@@ -27,14 +27,29 @@ enum LogLevel {
 
 /// Unified logging interface for the SDK.
 /// Provides a consistent, type-safe API for logging across all SDK components.
-enum Auth0Log {
-    
-    /// Shared logging service instance (can be replaced for testing).
-    static var loggingService: UnifiedLogging = OSUnifiedLoggingService()
-    
+///
+/// Inject a custom `UnifiedLogging` service via `init(loggingService:)` for testing or
+/// alternative logging backends. Use `Auth0Log.shared` for the default OS logging behaviour.
+struct Auth0Log: Sendable {
+
+    /// The underlying logging service. Immutable after creation, so safe across concurrency domains.
+    let loggingService: any UnifiedLogging
+
+    /// Creates an `Auth0Log` instance with the given logging service.
+    ///
+    /// - Parameter loggingService: The logging service to use. Defaults to `OSUnifiedLoggingService()`.
+    init(loggingService: any UnifiedLogging = OSUnifiedLoggingService()) {
+        self.loggingService = loggingService
+    }
+
+    /// Shared instance backed by the default OS logging service.
+    ///
+    /// Use this for call sites that do not need a custom service injected.
+    static let shared = Auth0Log()
+
     /// Centralized subsystem identifier for all Auth0 logs.
     static var subsystem: String { OSUnifiedLoggingService.subsystem }
-    
+
     /// Log a message with the specified category and level.
     ///
     /// Use this method for fine-grained control over logging. For common use cases,
@@ -43,15 +58,15 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering and organization. See `LogCategory` for available categories.
     ///   - level: The severity level of the log. Defaults to `.debug`. See `LogLevel` for available levels.
-    ///   - message: The message to log. Evaluated lazily via autoclosure for performance.
-    static func log(
+    ///   - message: The message to log.
+    func log(
         _ category: LogCategory,
         level: LogLevel = .debug,
         message: String
     ) {
         loggingService.log(category, level: level, message: message)
     }
-    
+
     /// Log a debug message.
     ///
     /// Use for detailed information useful during development and debugging.
@@ -59,13 +74,13 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    static func debug(
+    func debug(
         _ category: LogCategory,
         _ message: String
     ) {
         log(category, level: .debug, message: message)
     }
-    
+
     /// Log an informational message.
     ///
     /// Use for general informational messages about application state.
@@ -73,13 +88,13 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    static func info(
+    func info(
         _ category: LogCategory,
-        _ message:  String
+        _ message: String
     ) {
         log(category, level: .info, message: message)
     }
-    
+
     /// Log a warning message.
     ///
     /// Use for potentially problematic situations that aren't errors.
@@ -87,13 +102,13 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    static func warning(
+    func warning(
         _ category: LogCategory,
         _ message: String
     ) {
         log(category, level: .warning, message: message)
     }
-    
+
     /// Log an error message.
     ///
     /// Use for error conditions and failures that need attention.
@@ -101,13 +116,13 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    static func error(
+    func error(
         _ category: LogCategory,
         _ message: String
     ) {
         log(category, level: .error, message: message)
     }
-    
+
     /// Log a fault message for critical system errors.
     ///
     /// Use for serious errors that may cause data loss or application instability.
@@ -115,7 +130,7 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    static func fault(
+    func fault(
         _ category: LogCategory,
         _ message: @autoclosure () -> String
     ) {
