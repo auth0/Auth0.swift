@@ -32,7 +32,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 - [**Swift 6 Concurrency**](#swift-6-concurrency)
   + [Sendable protocol conformances](#sendable-protocol-conformances)
   + [Sendable conformances for Web Auth typealiases](#sendable-conformances-for-web-auth-typealiases)
-  + [@Sendable callback parameters](#sendable-callback-parameters)
+  + [@MainActor callback parameters](#mainactor-callback-parameters)
+  + [@MainActor on async Web Auth methods](#mainactor-on-async-web-auth-methods)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
@@ -188,9 +189,9 @@ Auth0
 
 ### Completion callbacks
 
-**Change:** All completion callbacks now execute on the main thread.
+**Change:** All completion callbacks are now annotated `@MainActor` and are guaranteed to execute on the main thread.
 
-In v2, completion callbacks would sometimes execute on the main thread and sometimes on background threads, depending on where `URLSession` completed the network request. In v3, all completion callbacks are guaranteed to execute on the main thread.
+In v2, completion callbacks would sometimes execute on the main thread and sometimes on background threads, depending on where `URLSession` completed the network request. In v3, all completion callbacks are annotated `@MainActor`, giving both a compile-time guarantee and a runtime guarantee that the callback executes on the main thread.
 
 **Affected APIs:**
 
@@ -562,25 +563,51 @@ final class MyLogger: Logger, @unchecked Sendable {
 
 **Impact:** If you pass a closure as a `WebAuthProviderCallback`, all values it captures must be `Sendable`. In most cases this is automatically satisfied, but if your closure captures a non-`Sendable` class you will get a compiler warning under strict concurrency.
 
-### @Sendable callback parameters
+**`WebAuthProvider` — now `@Sendable @MainActor`**
 
-**Change:** All public callback parameters are now `@Sendable`. This affects the following APIs:
+**Impact:** If you implement a custom `WebAuthProvider`, the closure is now `@MainActor` — its body runs on the main actor. `MyUserAgent.init` is therefore called on the main actor; the init does not need to be `@MainActor` itself, but it must not be isolated to a different actor.
 
-- `Requestable.start(_:)`
-- `WebAuth.start(_:)`, `WebAuth.logout(federated:callback:)`, `WebAuth.onClose(_:)`
-- `CredentialsManager.credentials(withScope:minTTL:parameters:headers:callback:)`, `revoke(headers:_:)`, `apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)`, `ssoCredentials(parameters:headers:callback:)`, `renew(parameters:headers:callback:)`
-
-**Impact:**
-
-- **Call sites** — No changes required. The compiler infers `@Sendable` automatically for typical trailing closures. You will only see a compiler error in Swift 6 mode if your closure captures a non-`Sendable` type.
-
-- **Custom protocol implementations** (mocks, test doubles) — If you implement `Requestable`, `TokenRequestable`, `WebAuth`, or any other protocol whose method signatures include a callback, you must add `@Sendable` to the matching parameter.
+Since custom providers always present UI, they should already be doing UI work on the main thread. In most cases no code changes are required — Swift infers `@Sendable @MainActor` from the `WebAuthProvider` typealias automatically.
 
 <details>
   <summary>Migration example</summary>
 
 ```swift
-// v2 - start without @Sendable
+// v2
+let myProvider: WebAuthProvider = { url, callback in
+    let agent = MyUserAgent(url: url, callback: callback)
+    return agent
+}
+
+// v3 - Swift infers @Sendable @MainActor from the WebAuthProvider typealias.
+// The closure body runs on the main actor, so MyUserAgent.init is called there.
+// MyUserAgent does not need to be @MainActor, but it must conform to Sendable.
+let myProvider: WebAuthProvider = { url, callback in
+    let agent = MyUserAgent(url: url, callback: callback)
+    return agent
+}
+```
+</details>
+
+### @MainActor callback parameters
+
+**Change:** All public callback parameters are now `@MainActor`. This affects the following APIs:
+
+- `Requestable.start(_:)`, `TokenRequestable.start(_:)`
+- `WebAuth.start(_:)`, `WebAuth.logout(federated:callback:)`, `WebAuth.onClose(_:)`
+- `CredentialsManager.credentials(withScope:minTTL:parameters:headers:callback:)`, `revoke(headers:_:)`, `apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)`, `ssoCredentials(parameters:headers:callback:)`, `renew(parameters:headers:callback:)`
+
+**Impact:**
+
+- **Call sites** — No changes required for typical trailing closures. Swift infers `@MainActor` from the parameter type automatically. Most callbacks already perform UI work on the main thread, so this is a no-op in practice.
+
+- **Custom protocol implementations** (mocks, test doubles) — If you implement `Requestable`, `TokenRequestable`, `WebAuth`, or any other protocol whose method signatures include a callback, you must update `@Sendable` to `@MainActor` on the matching parameter.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2 - start without @MainActor
 struct MockRequestable: Requestable {
     func start(_ callback: @escaping (Result<Credentials, AuthenticationError>) -> Void) {
         callback(.success(mockCredentials))
@@ -588,10 +615,10 @@ struct MockRequestable: Requestable {
     // ...
 }
 
-// v3 - add @Sendable to match the updated protocol requirement
+// v3 - add @MainActor to match the updated protocol requirement
 struct MockRequestable: Requestable {
-    func start(_ callback: @escaping @Sendable (Result<Credentials, AuthenticationError>) -> Void) {
-        callback(.success(mockCredentials))
+    func start(_ callback: @escaping @MainActor (Result<Credentials, AuthenticationError>) -> Void) {
+        Task { @MainActor in callback(.success(mockCredentials)) }
     }
     // ...
 }
@@ -733,8 +760,8 @@ struct MockTokenRequest: TokenRequestable {
 
     let mockResult: Result<Credentials, AuthenticationError>
 
-    func start(_ callback: @escaping @Sendable (Result<Credentials, AuthenticationError>) -> Void) {
-        callback(mockResult)
+    func start(_ callback: @escaping @MainActor (Result<Credentials, AuthenticationError>) -> Void) {
+        Task { @MainActor in callback(mockResult) }
     }
 
     func validateClaims() -> any TokenRequestable<Credentials, AuthenticationError> { self }

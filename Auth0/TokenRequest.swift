@@ -182,7 +182,7 @@ extension TokenRequest: TokenRequestable {
 
     // MARK: Requestable
 
-    public func start(_ callback: @escaping (Result<T, E>) -> Void) {
+    public func start(_ callback: @escaping @MainActor (Result<T, E>) -> Void) {
         request.start { result in
             switch result {
             case .success(let value):
@@ -193,9 +193,9 @@ extension TokenRequest: TokenRequestable {
                     }
                     self.verifyClaims(idToken: carrier.idToken) { error in
                         if let error = error {
-                            callback(.failure(E(cause: error)))
+                            Task { @MainActor in callback(.failure(E(cause: error))) }
                         } else {
-                            callback(.success(value))
+                            Task { @MainActor in callback(.success(value)) }
                         }
                     }
                 } else {

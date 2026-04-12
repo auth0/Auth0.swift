@@ -1,7 +1,7 @@
 import Foundation
 
 func authenticationDecodable<T: Decodable>(from result: Result<ResponseValue, AuthenticationError>,
-                                           callback: Request<T, AuthenticationError>.Callback) {
+                                           callback: @Sendable (Result<T, AuthenticationError>) -> Void) {
     do {
         let response = try result.get()
         if let data = response.data {
@@ -20,7 +20,7 @@ func authenticationDecodable<T: Decodable>(from result: Result<ResponseValue, Au
 }
 
 func authenticationObject<T: JSONObjectPayload>(from result: Result<ResponseValue, AuthenticationError>,
-                                                callback: Request<T, AuthenticationError>.Callback) {
+                                                callback: @Sendable (Result<T, AuthenticationError>) -> Void) {
     do {
         let response = try result.get()
         if let dictionary = json(response.data) as? [String: Any],
@@ -35,7 +35,7 @@ func authenticationObject<T: JSONObjectPayload>(from result: Result<ResponseValu
 }
 
 func authenticationDatabaseUser(from result: Result<ResponseValue, AuthenticationError>,
-                                callback: Request<DatabaseUser, AuthenticationError>.Callback) {
+                                callback: @Sendable (Result<DatabaseUser, AuthenticationError>) -> Void) {
     do {
         let response = try result.get()
         if let dictionary = json(response.data) as? [String: Any],
@@ -52,7 +52,7 @@ func authenticationDatabaseUser(from result: Result<ResponseValue, Authenticatio
 }
 
 func authenticationNoBody(from result: Result<ResponseValue, AuthenticationError>,
-                          callback: Request<Void, AuthenticationError>.Callback) {
+                          callback: @Sendable (Result<Void, AuthenticationError>) -> Void) {
     do {
         _ = try result.get()
         callback(.success(()))

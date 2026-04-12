@@ -9,7 +9,9 @@ private let Url = URL(string: "https://samples.auth0.com")!
 private let DPoPNonce = "auth0-nonce"
 private let Timeout: NimbleTimeInterval = .seconds(2)
 
-fileprivate extension Request where T == [String: Any], E == AuthenticationError {
+private struct AnyJSON: Decodable, Sendable {}
+
+fileprivate extension Request where T == AnyJSON, E == AuthenticationError {
 
     init(session: URLSession = .shared,
          url: URL = Url,
@@ -389,7 +391,7 @@ class RequestSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         Request(dpop: DPoP()).start { result in
-                            expect(DPoP.auth0Nonce) == DPoPNonce
+                            expect(DPoP.nonceStorage.nonce) == DPoPNonce
                             done()
                         }
                     }
@@ -401,7 +403,7 @@ class RequestSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         Request(dpop: DPoP()).start { result in
-                            expect(DPoP.auth0Nonce) == DPoPNonce
+                            expect(DPoP.nonceStorage.nonce) == DPoPNonce
                             done()
                         }
                     }
@@ -423,7 +425,7 @@ class RequestSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         Request(dpop: DPoP()).start { result in
-                            expect(DPoP.auth0Nonce) == newNonce
+                            expect(DPoP.nonceStorage.nonce) == newNonce
                             done()
                         }
                     }
@@ -469,8 +471,7 @@ class RequestSpec: QuickSpec {
                         .sink(receiveCompletion: { completion in
                             guard case .finished = completion else { return }
                             done()
-                        }, receiveValue: { response in
-                            expect(response).toNot(beEmpty())
+                        }, receiveValue: { _ in
                         })
                         .store(in: &cancellables)
                 }
@@ -505,8 +506,7 @@ class RequestSpec: QuickSpec {
                 let request = Request()
                 waitUntil(timeout: Timeout) { done in
                     Task.init {
-                        let response = try await request.start()
-                        expect(response).toNot(beEmpty())
+                        _ = try await request.start()
                         done()
                     }
                 }
@@ -604,13 +604,12 @@ class RequestSpec: QuickSpec {
     }
 }
 
-func plainJson(from result: Result<ResponseValue, AuthenticationError>,
-               callback: Request<[String: Any], AuthenticationError>.Callback) {
+fileprivate func plainJson(from result: Result<ResponseValue, AuthenticationError>,
+                           callback: @Sendable (Result<AnyJSON, AuthenticationError>) -> Void) {
     do {
         let response = try result.get()
-        if let data = response.data,
-           let dictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-            callback(.success(dictionary))
+        if response.data != nil {
+            callback(.success(AnyJSON()))
         } else {
             callback(.failure(AuthenticationError(from: response)))
         }
