@@ -2,6 +2,7 @@ import Nimble
 import Foundation
 
 @testable import Auth0
+@testable import Auth0MyAccount
 
 func containItem(withName name: String, value: String? = nil) -> Nimble.Matcher<[URLQueryItem]> {
     return Matcher<[URLQueryItem]>.define("contain item with name <\(name)>") { expression, failureMessage -> MatcherResult in
@@ -580,13 +581,13 @@ extension URLRequest {
     
     func isMyAccountAuthenticationMethods(_ domain: String, _ endpoint: String = "", token: String) -> Bool {
         let subpath = endpoint.isEmpty ? endpoint : "/\(endpoint)"
-        let path = "/me/\(Auth0MyAccount.apiVersion)/authentication-methods\(subpath)"
+        let path = "/me/\(Auth0MyAccountImpl.apiVersion)/authentication-methods\(subpath)"
         return isHost(domain) && isPath(path) && hasBearerToken(token)
     }
     
     func isFactorsMethods(_ domain: String, _ endpoint: String = "", token: String) -> Bool {
         let subpath = endpoint.isEmpty ? endpoint : "/\(endpoint)"
-        let path = "/me/\(Auth0MyAccount.apiVersion)/factors"
+        let path = "/me/\(Auth0MyAccountImpl.apiVersion)/factors"
         return isHost(domain) && isPath(path) && hasBearerToken(token)
     }
 
