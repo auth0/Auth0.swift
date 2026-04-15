@@ -12,6 +12,9 @@ final class ContentViewModel: ObservableObject {
     private let credentialsManager: CredentialsManager
 
     private let authenticationClient: Authentication
+    #if WEB_AUTH_PLATFORM
+    private let webAuth: WebAuth
+    #endif
     init(email: String = "",
          password: String = "",
          isLoading: Bool = false,
@@ -26,6 +29,11 @@ final class ContentViewModel: ObservableObject {
         self.isAuthenticated = isAuthenticated
         self.authenticationClient = authenticationClient
         self.credentialsManager = credentialsManager ?? CredentialsManager(authentication: Auth0.authentication())
+        #if WEB_AUTH_PLATFORM
+        self.webAuth = Auth0
+            .webAuth()
+            .useCredentialsManager(self.credentialsManager)
+        #endif
     }
 
     func login() async {
@@ -52,12 +60,10 @@ final class ContentViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            var credentials = try await Auth0
-                .webAuth()
+            let credentials = try await webAuth
                 .scope("openid profile email offline_access")
                 .start()
 
-            try credentialsManager.store(credentials: credentials)
             isAuthenticated = true
         } catch let error as CredentialsManagerError {
             errorMessage = handleCredentialsManagerError(error)
@@ -76,9 +82,8 @@ final class ContentViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            try await Auth0.webAuth().logout()
+            try await webAuth.logout()
 
-            try credentialsManager.clear()
             isAuthenticated = false
         } catch let error as CredentialsManagerError {
             errorMessage = handleCredentialsManagerError(error)
