@@ -2,7 +2,9 @@ import Nimble
 import Foundation
 
 @testable import Auth0
+#if SWIFT_PACKAGE
 @testable import Auth0MyAccount
+#endif
 
 func containItem(withName name: String, value: String? = nil) -> Nimble.Matcher<[URLQueryItem]> {
     return Matcher<[URLQueryItem]>.define("contain item with name <\(name)>") { expression, failureMessage -> MatcherResult in

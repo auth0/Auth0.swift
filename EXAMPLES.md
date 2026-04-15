@@ -3257,6 +3257,22 @@ Check the [Auth0APIError API documentation](https://auth0.github.io/Auth0.swift/
 
 Use the Auth0 My Account API to manage the current user's account.
 
+#### Import
+
+**Swift Package Manager:** The My Account API ships as a separate `Auth0MyAccount` package product. Add it to your target in Xcode and import it in your source files:
+
+```swift
+import Auth0MyAccount
+```
+
+`Auth0MyAccount` re-exports all `Auth0` public symbols, so a single import is enough — you do not need `import Auth0` alongside it.
+
+**Carthage / CocoaPods:** The My Account API is included in the single `Auth0` framework. No extra dependency or import is needed:
+
+```swift
+import Auth0
+```
+
 To call the My Account API, you need an access token issued specifically for this API, including any required scopes for the operations you want to perform. See [API credentials [EA]](#api-credentials-ea) to learn how to obtain one.
 
 ### Enroll a new passkey

@@ -8,6 +8,7 @@ Auth0.swift v3 includes many significant changes:
 - Behavior changes to improve developer experience:
   - Consistent main thread callback execution for UI updates.
 - Methods added for supporting new features
+- My Account API extracted into a separate `Auth0MyAccount` Swift package product (SPM)
 
 
 As expected with a major release, Auth0.swift v3 contains breaking changes. Please review this guide thoroughly to understand the changes required to migrate your application to v3.
@@ -16,6 +17,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 
 ## Table of Contents
 
+- [**Package Structure**](#package-structure)
+  + [My Account API sub-package (SPM)](#my-account-api-sub-package-spm)
 - [**Dependency Updates**](#dependency-updates)
   + [JWTDecode.swift](#jwtdecodeswift)
 - [**Default Values Changed**](#default-values-changed)
@@ -40,6 +43,43 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [ID Token Validation](#id-token-validation)
 - [**Removed APIs**](#removed-apis)
   + [Management API client (Users)](#management-api-client-users)
+
+---
+
+## Package Structure
+
+### My Account API sub-package (SPM)
+
+**Change:** The My Account API has been extracted into a separate Swift Package Manager product called `Auth0MyAccount`.
+
+**Impact:** This affects SPM users who use the My Account API. Carthage and CocoaPods users are unaffected — both APIs remain in the single `Auth0` framework.
+
+**Action Required (SPM only):**
+
+1. In Xcode, go to your target's **Frameworks, Libraries, and Embedded Content** (or **Package Dependencies**) and add the `Auth0MyAccount` product from the `Auth0.swift` package.
+
+2. Replace `import Auth0` with `import Auth0MyAccount` in any file that uses the My Account API:
+
+```swift
+// Before
+import Auth0
+
+Auth0
+    .myAccount(token: accessToken)
+    // ...
+
+// After
+import Auth0MyAccount  // also re-exports all Auth0 public symbols
+
+myAccount(token: accessToken)
+// ...
+```
+
+> [!NOTE]
+> `Auth0MyAccount` re-exports the entire `Auth0` public API. In files that use both the core SDK and the My Account API, `import Auth0MyAccount` alone is sufficient.
+
+> [!NOTE]
+> Files that only use `Auth0` core APIs (Web Auth, Authentication, Credentials Manager) do not need any changes — keep using `import Auth0`.
 
 ---
 

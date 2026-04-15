@@ -50,6 +50,21 @@ https://github.com/auth0/Auth0.swift
 
 Then, select the dependency rule and press **Add Package**.
 
+Auth0.swift includes two library products:
+
+| Product | Description |
+|---------|-------------|
+| `Auth0` | Core SDK — Web Auth, Authentication API, Credentials Manager |
+| `Auth0MyAccount` | My Account API [EA] — manage the current user's authentication methods |
+
+When prompted to choose package products, add **`Auth0`** to your app target. If you also need the My Account API, add **`Auth0MyAccount`** as well.
+
+> [!NOTE]
+> `Auth0MyAccount` depends on `Auth0`. Adding `Auth0MyAccount` also gives you all `Auth0` public symbols via `import Auth0MyAccount` — no need to import both.
+
+> [!NOTE]
+> When using Carthage or CocoaPods, both APIs are included in the single `Auth0` framework. There is no separate `Auth0MyAccount` framework.
+
 #### Using Cocoapods
 
 Add the following line to your `Podfile`:
