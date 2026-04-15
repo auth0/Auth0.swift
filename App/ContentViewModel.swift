@@ -52,7 +52,7 @@ final class ContentViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let credentials = try await Auth0
+            var credentials = try await Auth0
                 .webAuth()
                 .scope("openid profile email offline_access")
                 .start()
