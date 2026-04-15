@@ -34,6 +34,7 @@ public struct CredentialsManager: Sendable {
     }
 
     private let storeKey: String
+    private let dpopThumbprintKey = "com.auth0.credentials_manager.dpop_thumbprint"
     private let authentication: Authentication
     private let maxRetries: Int
     #if WEB_AUTH_PLATFORM
@@ -166,6 +167,7 @@ public struct CredentialsManager: Sendable {
         self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
         self.biometricSession.lock.unlock()
         #endif
+        try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
         try self.storage.deleteEntry(forKey: self.storeKey)
     }
 
@@ -210,6 +212,7 @@ public struct CredentialsManager: Sendable {
         self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
         self.biometricSession.lock.unlock()
         #endif
+        try DPoP.clearKeypair()
         try self.storage.deleteAllEntries()
     }
 
@@ -765,6 +768,45 @@ public struct CredentialsManager: Sendable {
         return try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
+    private func validateDPoPState(for credentials: Credentials) -> CredentialsManagerError? {
+        let storedThumbprint = self.storage.getEntry(forKey: self.dpopThumbprintKey)
+            .flatMap { String(data: $0, encoding: .utf8) }
+        let isDPoPBound = credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame
+            || storedThumbprint != nil
+
+        guard isDPoPBound else { return nil }
+
+        guard let dpop = self.authentication.dpop else {
+            return .dpopNotConfigured
+        }
+
+        guard (try? dpop.hasKeypair()) == true else {
+            _ = self.clear()
+            return .dpopKeyMissing
+        }
+
+        let currentThumbprint = try? dpop.jkt()
+        if let stored = storedThumbprint, stored != currentThumbprint {
+            _ = self.clear()
+            return .dpopKeyMismatch
+        }
+
+        return nil
+    }
+
+    private func saveDPoPThumbprint(for credentials: Credentials) {
+        let dpopUsed = credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame
+            || self.authentication.dpop != nil
+
+        guard dpopUsed, let dpop = self.authentication.dpop,
+              let thumbprint = try? dpop.jkt() else {
+            _ = self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+            return
+        }
+
+        _ = self.storage.setEntry(Data(thumbprint.utf8), forKey: self.dpopThumbprintKey)
+    }
+
     private func retrieveAPICredentials(audience: String, scope: String?) throws -> APICredentials? {
         let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
         let data = try self.storage.getEntry(forKey: key)
@@ -826,6 +868,10 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noRefreshToken))
                 }
+                if let dpopError = self.validateDPoPState(for: credentials) {
+                    complete()
+                    return callback(.failure(dpopError))
+                }
 
                 self.authentication
                     .renew(withRefreshToken: refreshToken, scope: scope)
@@ -844,6 +890,7 @@ public struct CredentialsManager: Sendable {
                             } else {
                                 do {
                                     try self.store(credentials: newCredentials)
+                                    self.saveDPoPThumbprint(for: newCredentials)
                                     complete()
                                     callback(.success(newCredentials))
                                 } catch {
@@ -897,6 +944,10 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noRefreshToken))
                 }
+                    if let dpopError = self.validateDPoPState(for: credentials) {
+                        complete()
+                        return callback(.failure(dpopError))
+                    }
 
                 self.authentication
                     .ssoExchange(withRefreshToken: refreshToken)
@@ -910,6 +961,7 @@ public struct CredentialsManager: Sendable {
                                                              refreshToken: ssoCredentials.refreshToken ?? refreshToken)
                             do {
                                 try self.store(credentials: newCredentials)
+                                self.saveDPoPThumbprint(for: newCredentials)
                                 complete()
                                 callback(.success(ssoCredentials))
                             } catch {
@@ -953,6 +1005,10 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noRefreshToken))
                 }
+                if let dpopError = self.validateDPoPState(for: currentCredentials) {
+                    complete()
+                    return callback(.failure(dpopError))
+                }
 
                 self.authentication
                     .renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
@@ -974,6 +1030,7 @@ public struct CredentialsManager: Sendable {
                                 do {
                                     try self.store(credentials: newCredentials)
                                     try self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope)
+                                    saveDPoPThumbprint(for: newCredentials)
                                     complete()
                                     callback(.success(newAPICredentials))
                                 } catch {
