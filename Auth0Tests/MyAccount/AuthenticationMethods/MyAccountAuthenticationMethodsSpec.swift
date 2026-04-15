@@ -7,7 +7,9 @@ import AuthenticationServices
 #endif
 
 @testable import Auth0
+#if SWIFT_PACKAGE
 @testable import Auth0MyAccount
+#endif
 
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"

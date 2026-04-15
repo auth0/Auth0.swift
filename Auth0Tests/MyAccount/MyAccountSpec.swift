@@ -3,7 +3,9 @@ import Quick
 import Nimble
 
 @testable import Auth0
+#if SWIFT_PACKAGE
 @testable import Auth0MyAccount
+#endif
 
 private let Domain = "samples.auth0.com"
 private let Token = "TOKEN"

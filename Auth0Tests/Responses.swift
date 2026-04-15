@@ -1,7 +1,9 @@
 import Foundation
 
 @testable import Auth0
+#if SWIFT_PACKAGE
 @testable import Auth0MyAccount
+#endif
 
 let UserId = "auth0|\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
 let SupportAtAuth0 = "support@auth0.com"
