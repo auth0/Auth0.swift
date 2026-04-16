@@ -31,6 +31,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [CredentialsStorage deleteAllEntries](#credentialsstorage-deleteallentries)
 - [**Swift 6 Concurrency**](#swift-6-concurrency)
   + [Sendable protocol conformances](#sendable-protocol-conformances)
+  + [WebAuth is now Sendable](#webauth-is-now-sendable)
   + [Sendable conformances for Web Auth typealiases](#sendable-conformances-for-web-auth-typealiases)
   + [@MainActor callback parameters](#mainactor-callback-parameters)
   + [@MainActor on async Web Auth methods](#mainactor-on-async-web-auth-methods)
@@ -551,13 +552,79 @@ final class MyLogger: Logger, @unchecked Sendable {
 ```
 </details>
 
+### WebAuth is now Sendable
+
+**Change:** The `WebAuth` protocol now inherits from `Sendable`.
+
+```swift
+// v3
+public protocol WebAuth: SenderConstraining, Trackable, Loggable, Sendable { ... }
+```
+
+**Impact — custom `WebAuth` implementations:** If your application defines a custom type conforming to `WebAuth` (for example, a mock or test double), that type must now also conform to `Sendable`.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2 - no Sendable requirement
+class MockWebAuth: WebAuth {
+    // ...
+}
+
+// v3 - must be Sendable
+// For structs with only Sendable stored properties, conformance is automatic:
+struct MockWebAuth: WebAuth { // implicitly Sendable - no changes needed
+    // ...
+}
+
+// For classes, add @unchecked Sendable and ensure thread safety manually:
+final class MockWebAuth: WebAuth, @unchecked Sendable {
+    private let lock = NSLock()
+    // ... thread-safe implementation
+}
+```
+</details>
+
+**Impact — builder methods now return copies:** In v2, `Auth0WebAuth` was a `final class`, so builder methods mutated the instance in place. In v3 it is a `struct`, so each builder method returns a new copy without modifying the original.
+
+**If you use method chaining, no change is needed:**
+
+```swift
+// ✅ Works the same in v2 and v3
+Auth0.webAuth()
+    .scope("openid")
+    .audience("https://api.example.com")
+    .start { result in ... }
+```
+
+**If you call builder methods imperatively, you must assign the return value:**
+
+```swift
+// ⚠️ Broken in v3 — audience is called but its return value is discarded,
+// so it is never applied. In v2 this worked silently because Auth0WebAuth
+// was a class and the method mutated the instance in place.
+// Note: in v2 this pattern would also have produced a "result unused" compiler warning.
+var webAuth = Auth0.webAuth().scope("openid")
+webAuth.audience("https://api.example.com")
+webAuth.start { result in ... }
+
+// ✅ Fixed — reassign the return value
+var webAuth = Auth0.webAuth().scope("openid")
+webAuth = webAuth.audience("https://api.example.com")
+webAuth.start { result in ... }
+```
+
+---
+
 ### Sendable conformances for Web Auth typealiases
 
-**Change:** The following public typealias has been updated for Swift 6 concurrency:
+**Change:** The following public typealiases have been updated for Swift 6 concurrency:
 
 | Symbol | v2 | v3 |
 |--------|----|----|
 | `WebAuthProviderCallback` | `(WebAuthResult<Void>) -> Void` | `@Sendable (WebAuthResult<Void>) -> Void` |
+| `WebAuthProvider` | `(_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent` | `@Sendable @MainActor (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent` |
 
 **`WebAuthProviderCallback` — now `@Sendable`**
 
@@ -624,6 +691,48 @@ struct MockRequestable: Requestable {
 }
 ```
 </details>
+
+### @MainActor on async Web Auth methods
+
+**Change:** The async/await variants of `start()` and `logout(federated:)` on the `WebAuth` protocol are now `@MainActor`:
+
+```swift
+// v3
+@MainActor func start() async throws -> Credentials
+@MainActor func logout(federated: Bool) async throws
+```
+
+**Impact:**
+
+- **Most callers — no action required.** Calling a `@MainActor async` function from any async context is transparent: Swift automatically hops to the main actor at the `await` point and returns to the caller's executor when done.
+
+```swift
+// Works unchanged from any async context
+let credentials = try await Auth0.webAuth().start()
+try await Auth0.webAuth().logout()
+```
+
+- **Custom `WebAuth` conformances (mocks, test doubles)** — Add `@MainActor` to your `start()` and `logout(federated:)` implementations to match the updated protocol requirement.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2
+struct MockWebAuth: WebAuth {
+    func start() async throws -> Credentials { ... }
+    func logout(federated: Bool) async throws { ... }
+}
+
+// v3
+struct MockWebAuth: WebAuth {
+    @MainActor func start() async throws -> Credentials { ... }
+    @MainActor func logout(federated: Bool) async throws { ... }
+}
+```
+</details>
+
+- **Callers using `any WebAuth` (protocol existential)** — The `@MainActor` constraint is now enforced at the call site through the protocol. Under strict concurrency, Swift will emit a warning if you call these methods from a non-isolated context without `await`.
 
 ---
 
