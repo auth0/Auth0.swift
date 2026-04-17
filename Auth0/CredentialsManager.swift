@@ -440,7 +440,6 @@ public struct CredentialsManager: Sendable {
         let mainThreadCallback: @Sendable (CredentialsManagerResult<Credentials>) -> Void = { result in
             Task { @MainActor in callback(result) }
         }
-        let params = normalize(parameters)
 
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {

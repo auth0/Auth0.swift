@@ -668,7 +668,7 @@ let myProvider: WebAuthProvider = { url, callback in
 
 - **Call sites** — No changes required for typical trailing closures. Swift infers `@MainActor` from the parameter type automatically. Most callbacks already perform UI work on the main thread, so this is a no-op in practice.
 
-- **Custom protocol implementations** (mocks, test doubles) — If you implement `Requestable`, `TokenRequestable`, `WebAuth`, or any other protocol whose method signatures include a callback, you must update `@Sendable` to `@MainActor` on the matching parameter.
+- **Custom protocol implementations** (mocks, test doubles) — If you implement `Requestable`, `TokenRequestable`, `WebAuth`, or any other protocol whose method signatures include a callback, you must add `@MainActor` on the matching parameter.
 
 <details>
   <summary>Migration example</summary>
