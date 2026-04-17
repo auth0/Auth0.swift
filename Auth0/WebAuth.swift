@@ -18,7 +18,7 @@ public typealias WebAuthProviderCallback = @Sendable (WebAuthResult<Void>) -> Vo
 /// ## See Also
 ///
 /// - [Example](https://github.com/auth0/Auth0.swift/blob/master/Auth0/SafariProvider.swift)
-public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent
+public typealias WebAuthProvider = @Sendable @MainActor (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent
 
 /// Web-based authentication using Auth0.
 ///
@@ -26,7 +26,7 @@ public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping WebAuthPro
 ///
 /// - ``WebAuthError``
 /// - [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login)
-public protocol WebAuth: SenderConstraining, Trackable, Loggable {
+public protocol WebAuth: SenderConstraining, Trackable, Loggable, Sendable {
 
     /// The Auth0 Client ID.
     var clientId: String { get }
@@ -266,7 +266,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
      application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
-    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void)
+    func start(_ callback: @escaping @Sendable @MainActor (WebAuthResult<Credentials>) -> Void)
 
     #if canImport(_Concurrency)
     /**
@@ -291,6 +291,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
      application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
+    @MainActor
     func start() async throws -> Credentials
     #endif
 
@@ -359,7 +360,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
-    func logout(federated: Bool, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void)
+    func logout(federated: Bool, callback: @escaping @Sendable @MainActor (WebAuthResult<Void>) -> Void)
 
     /**
      Removes the Auth0 session and optionally removes the identity provider (IdP) session.
@@ -436,6 +437,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
+    @MainActor
     func logout(federated: Bool) async throws
     #endif
 
@@ -443,7 +445,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
 public extension WebAuth {
 
-    func logout(federated: Bool = false, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void) {
+    func logout(federated: Bool = false, callback: @Sendable @escaping @MainActor (WebAuthResult<Void>) -> Void) {
         self.logout(federated: federated, callback: callback)
     }
 
