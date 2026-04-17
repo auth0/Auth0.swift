@@ -133,9 +133,9 @@ public extension TokenRequestable {
 
      - Throws: An error that conforms to ``Auth0APIError``.
      */
-    func start() async throws -> ResultType {
+    func start() async throws -> ResultType where ResultType: Sendable {
         return try await withCheckedThrowingContinuation { continuation in
-            self.start { result in
+            self.start { @Sendable result in
                 continuation.resume(with: result)
             }
         }

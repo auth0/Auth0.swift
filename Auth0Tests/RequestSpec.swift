@@ -391,7 +391,7 @@ class RequestSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         Request(dpop: DPoP()).start { result in
-                            expect(DPoP.auth0Nonce) == DPoPNonce
+                            expect(DPoP.nonceStorage.nonce) == DPoPNonce
                             done()
                         }
                     }
@@ -403,7 +403,7 @@ class RequestSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         Request(dpop: DPoP()).start { result in
-                            expect(DPoP.auth0Nonce) == DPoPNonce
+                            expect(DPoP.nonceStorage.nonce) == DPoPNonce
                             done()
                         }
                     }
@@ -425,7 +425,7 @@ class RequestSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         Request(dpop: DPoP()).start { result in
-                            expect(DPoP.auth0Nonce) == newNonce
+                            expect(DPoP.nonceStorage.nonce) == newNonce
                             done()
                         }
                     }

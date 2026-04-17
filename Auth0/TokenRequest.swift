@@ -38,7 +38,7 @@ import os
      .start { result in ... }
  ```
  */
-public struct TokenRequest<T, E: Auth0APIError>: @unchecked Sendable {
+public struct TokenRequest<T: Sendable, E: Auth0APIError>: @unchecked Sendable {
 
     private let request: any Requestable<T, E>
     private let audience: String
@@ -191,7 +191,7 @@ extension TokenRequest: TokenRequestable {
                     guard !carrier.idToken.isEmpty else {
                         return callback(.failure(E(cause: IDTokenDecodingError.missingIDToken)))
                     }
-                    self.verifyClaims(idToken: carrier.idToken) { error in
+                    self.verifyClaims(idToken: carrier.idToken) { @Sendable error in
                         if let error = error {
                             Task { @MainActor in callback(.failure(E(cause: error))) }
                         } else {
@@ -247,7 +247,7 @@ extension TokenRequest: TokenRequestable {
 // MARK: - Private
 
 private extension TokenRequest {
-    func verifyClaims(idToken: String, callback: @escaping (Error?) -> Void) {
+    func verifyClaims(idToken: String, callback: @escaping @Sendable (Error?) -> Void) {
         let context = IDTokenValidatorContext(
             issuer: issuer,
             audience: audience,

@@ -460,7 +460,8 @@ public struct CredentialsManager: Sendable {
                 return
             }
 
-            bioAuth.validateBiometric { error in
+            let params = normalize(parameters)
+            bioAuth.validateBiometric { @Sendable error in
                 guard error == nil else {
                     return mainThreadCallback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: error!)))
                 }
@@ -470,7 +471,7 @@ public struct CredentialsManager: Sendable {
 
                 self.retrieveCredentials(scope: scope,
                                          minTTL: minTTL,
-                                         parameters: parameters,
+                                         parameters: params.asParameters,
                                          headers: headers,
                                          forceRenewal: false,
                                          callback: mainThreadCallback)
@@ -807,6 +808,7 @@ public struct CredentialsManager: Sendable {
                                              forceRenewal: Bool,
                                              retryCount: Int,
                                              callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
+        let params = normalize(parameters)
         SynchronizationBarrier.shared.execute { complete in
             do {
                 guard let credentials = try self.retrieveCredentials() else {
@@ -827,7 +829,7 @@ public struct CredentialsManager: Sendable {
 
                 self.authentication
                     .renew(withRefreshToken: refreshToken, scope: scope)
-                    .parameters(parameters)
+                    .parameters(params.asParameters)
                     .headers(headers)
                     .start { result in
                         switch result {
@@ -858,7 +860,7 @@ public struct CredentialsManager: Sendable {
                                 DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) {
                                     self.retrieveCredentialsWithRetry(scope: scope,
                                                                       minTTL: minTTL,
-                                                                      parameters: parameters,
+                                                                      parameters: params.asParameters,
                                                                       headers: headers,
                                                                       forceRenewal: forceRenewal,
                                                                       retryCount: retryCount + 1,
@@ -884,6 +886,7 @@ public struct CredentialsManager: Sendable {
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
                                         callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
+        let params = normalize(parameters)
         SynchronizationBarrier.shared.execute { complete in
             do {
                 guard let credentials = try self.retrieveCredentials() else {
@@ -894,10 +897,10 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noRefreshToken))
                 }
-                
+
                 self.authentication
                     .ssoExchange(withRefreshToken: refreshToken)
-                    .parameters(parameters)
+                    .parameters(params.asParameters)
                     .headers(headers)
                     .start { result in
                         switch result {
@@ -932,6 +935,7 @@ public struct CredentialsManager: Sendable {
                                         parameters: [String: Any],
                                         headers: [String: String],
                                         callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
+        let params = normalize(parameters)
         SynchronizationBarrier.shared.execute { complete in
             do {
                 if let apiCredentials = try? self.retrieveAPICredentials(audience: audience, scope: scope),
@@ -949,10 +953,10 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noRefreshToken))
                 }
-                
+
                 self.authentication
                     .renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
-                    .parameters(parameters)
+                    .parameters(params.asParameters)
                     .headers(headers)
                     .start { result in
                         switch result {

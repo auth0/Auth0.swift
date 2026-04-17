@@ -22,12 +22,18 @@ protocol LoggerOutput: Sendable {
 }
 
 struct DefaultOutput: LoggerOutput {
-    func log(message: String) {
-        Auth0Log.debug(.networkTracing, message)
+    let logger: Auth0Log
+
+    init(logger: Auth0Log = .shared) {
+        self.logger = logger
     }
-    
+
+    func log(message: String) {
+        logger.debug(.networkTracing, message)
+    }
+
     func newLine() {
-        Auth0Log.debug(.networkTracing, "")
+        logger.debug(.networkTracing, "")
     }
 }
 
