@@ -291,8 +291,10 @@ public struct CredentialsManager: Sendable {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
     public func revoke(headers: [String: String] = [:],
-                       _ callback: @escaping @Sendable (CredentialsManagerResult<Void>) -> Void) {
-        let mainThreadCallback = dispatchOnMain(callback)
+                       _ callback: @escaping @MainActor (CredentialsManagerResult<Void>) -> Void) {
+        let mainThreadCallback: @Sendable (CredentialsManagerResult<Void>) -> Void = { result in
+            Task { @MainActor in callback(result) }
+        }
         do {
             guard let credentials = try self.retrieveCredentials() else {
                 return mainThreadCallback(.success(()))
@@ -434,8 +436,10 @@ public struct CredentialsManager: Sendable {
                             minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
-                            callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
-        let mainThreadCallback = dispatchOnMain(callback)
+                            callback: @escaping @MainActor (CredentialsManagerResult<Credentials>) -> Void) {
+        let mainThreadCallback: @Sendable (CredentialsManagerResult<Credentials>) -> Void = { result in
+            Task { @MainActor in callback(result) }
+        }
 
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
@@ -544,13 +548,13 @@ public struct CredentialsManager: Sendable {
                             minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
-                            callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
+                            callback: @escaping @MainActor (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: scope,
                                  minTTL: minTTL,
                                  parameters: parameters,
                                  headers: headers,
                                  forceRenewal: false,
-                                 callback: dispatchOnMain(callback))
+                                 callback: { result in Task { @MainActor in callback(result) } })
     }
     #endif
 
@@ -622,13 +626,13 @@ public struct CredentialsManager: Sendable {
                                minTTL: Int = 60,
                                parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
-                               callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
+                               callback: @escaping @MainActor (CredentialsManagerResult<APICredentials>) -> Void) {
         self.retrieveAPICredentials(audience: audience,
                                     scope: scope,
                                     minTTL: minTTL,
                                     parameters: parameters,
                                     headers: headers,
-                                    callback: dispatchOnMain(callback))
+                                    callback: { result in Task { @MainActor in callback(result) } })
     }
 
     /// Exchanges the refresh token for a session transfer token that can be used to perform web single sign-on (SSO).
@@ -696,8 +700,8 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func ssoCredentials(parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
-                               callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
-        self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: dispatchOnMain(callback))
+                               callback: @escaping @MainActor (CredentialsManagerResult<SSOCredentials>) -> Void) {
+        self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: { result in Task { @MainActor in callback(result) } })
     }
 
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
@@ -741,13 +745,13 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func renew(parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
-                      callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
+                      callback: @escaping @MainActor (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: nil,
                                  minTTL: 0,
                                  parameters: parameters,
                                  headers: headers,
                                  forceRenewal: true,
-                                 callback: dispatchOnMain(callback))
+                                 callback: { result in Task { @MainActor in callback(result) } })
     }
 
     public func store(apiCredentials: APICredentials, forAudience audience: String, forScope scope: String? = nil) throws {
@@ -1073,7 +1077,7 @@ public extension CredentialsManager {
         return Deferred {
             Future { promise in
                 let box = SendableBox(value: promise)
-                self.revoke(headers: headers) { @Sendable result in box.value(result) }
+                self.revoke(headers: headers) { result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }
@@ -1160,7 +1164,7 @@ public extension CredentialsManager {
                 self.credentials(withScope: scope,
                                  minTTL: minTTL,
                                  parameters: parameters,
-                                 headers: headers) { @Sendable result in box.value(result) }
+                                 headers: headers) { result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }
@@ -1253,7 +1257,7 @@ public extension CredentialsManager {
                                     scope: scope,
                                     minTTL: minTTL,
                                     parameters: parameters,
-                                    headers: headers) { @Sendable result in box.value(result) }
+                                    headers: headers) { result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }
@@ -1332,7 +1336,7 @@ public extension CredentialsManager {
             Future { promise in
                 let box = SendableBox(value: promise)
                 self.ssoCredentials(parameters: parameters,
-                                    headers: headers) { @Sendable result in box.value(result) }
+                                    headers: headers) { result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }
@@ -1388,7 +1392,7 @@ public extension CredentialsManager {
             Future { promise in
                 let box = SendableBox(value: promise)
                 self.renew(parameters: parameters,
-                           headers: headers) { @Sendable result in box.value(result) }
+                           headers: headers) { result in box.value(result) }
             }
         }.eraseToAnyPublisher()
     }

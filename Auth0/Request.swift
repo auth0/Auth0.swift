@@ -18,17 +18,17 @@ let parameterPropertyKey = "com.auth0.parameter"
  }
  ```
  */
-public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
+public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Sendable {
     /**
      The callback closure type for the request.
      */
-    public typealias Callback = @Sendable (Result<T, E>) -> Void
+    public typealias Callback = @MainActor (Result<T, E>) -> Void
 
     let session: URLSession
     let url: URL
     let method: String
     let requestValidator: [RequestValidator]
-    let handle: @Sendable (Result<ResponseValue, E>, Callback) -> Void
+    let handle: @Sendable (Result<ResponseValue, E>, @Sendable (Result<T, E>) -> Void) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
@@ -39,7 +39,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
          url: URL,
          method: String,
          requestValidator: [RequestValidator] = [],
-         handle: @escaping @Sendable (Result<ResponseValue, E>, Callback) -> Void,
+         handle: @escaping @Sendable (Result<ResponseValue, E>, @Sendable (Result<T, E>) -> Void) -> Void,
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
          logger: Logger?,
@@ -89,10 +89,13 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
     public func start(_ callback: @escaping Callback) {
-        self.startDataTask(retryCount: 0, request: self.request, callback: dispatchOnMain(callback))
+        let sendableCallback: @Sendable (Result<T, E>) -> Void = { result in
+            Task { @MainActor in callback(result) }
+        }
+        self.startDataTask(retryCount: 0, request: self.request, callback: sendableCallback)
     }
 
-    private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
+    private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping @Sendable (Result<T, E>) -> Void) {
         var mutableRequest = request
         do {
             try runClientValidation()

@@ -78,7 +78,7 @@ public protocol TokenRequestable<ResultType, ErrorType>: Requestable {
 
      - Parameter callback: Called on completion with a `Result` containing either the decoded value or an error.
      */
-    func start(_ callback: @escaping @Sendable (Result<ResultType, ErrorType>) -> Void)
+    func start(_ callback: @escaping @MainActor (Result<ResultType, ErrorType>) -> Void)
 
     /**
      Returns a new request with the given parameters merged into the request body.
@@ -117,7 +117,7 @@ public extension TokenRequestable {
     func start() -> AnyPublisher<ResultType, ErrorType> {
         return Deferred { Future { [self] promise in
             let box = SendableBox(value: promise)
-            self.start { @Sendable result in box.value(result) }
+            self.start { result in box.value(result) }
         } }.eraseToAnyPublisher()
     }
 
