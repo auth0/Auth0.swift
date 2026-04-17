@@ -5,7 +5,6 @@
 - [Authentication API (iOS / macOS / TVOS / watchOS / visionOS)](#authentication-api-ios--macos--tvos--watchos--visionos)
 - [MFA API (iOS / macOS / tvOS / watchOS / visionOS)](#mfa-api-ios--macos--tvos--watchos--visionos)
 - [My Account API (iOS / macOS / tvOS / watchOS / visionOS) [EA]](#my-account-api-ios--macos--tvos--watchos--visionos-ea)
-- [Management API (Users) (iOS / macOS / TVOS / watchOS / visionOS)](#management-api-users-ios--macos--tvos--watchos--visionos)
 - [Logging](#logging)
 - [Advanced Features](#advanced-features)
 
@@ -14,6 +13,9 @@
 ## Web Auth (iOS / macOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)**
+
+> [!NOTE]
+> All completion callbacks in Auth0.swift execute on the main thread, making it safe to update UI directly. If needed, explicitly dispatch to a background thread.
 
 - [Web Auth signup](#web-auth-signup)
 - [Web Auth configuration](#web-auth-configuration)
@@ -112,7 +114,7 @@ Auth0
 
 #### Add a scope value
 
-Specify a [scope](https://auth0.com/docs/get-started/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
+Specify a [scope](https://auth0.com/docs/get-started/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email offline_access`. Regardless of the scope value specified, `openid` is always included.
 
 ```swift
 Auth0
@@ -157,6 +159,186 @@ Auth0
 
 > [!NOTE]
 > This custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
+
+#### Specify a presentation window
+
+When building apps that support multiple windows (such as iPad apps with Split View or Stage Manager, or macOS apps with multiple windows), you can specify which window should present the authentication UI using the `presentationWindow()` method.
+
+<details>
+  <summary>Using the UIKit app lifecycle</summary>
+
+**iOS / iPadOS:**
+
+```swift
+guard let window = view.window else { return }
+
+Auth0
+    .webAuth()
+    .presentationWindow(window) // Pass the UIWindow
+    .start { result in
+        // ...
+    }
+```
+
+**macOS:**
+
+```swift
+guard let window = view.window else { return }
+
+Auth0
+    .webAuth()
+    .presentationWindow(window) // Pass the NSWindow
+    .start { result in
+        // ...
+    }
+```
+
+</details>
+
+<details>
+  <summary>Using the SwiftUI app lifecycle</summary>
+
+**iOS / iPadOS:**
+
+```swift
+import SwiftUI
+import Auth0
+
+struct ContentView: View {
+    @Environment(\.window) private var window // Custom environment key
+
+    var body: some View {
+        Button("Login") {
+            Task {
+                var webAuth = Auth0.webAuth()
+
+                if let window = window {
+                    webAuth = webAuth.presentationWindow(window)
+                }
+
+                let credentials = try await webAuth.start()
+                // Handle credentials...
+            }
+        }
+    }
+}
+
+// MARK: - Window Environment Setup
+
+@main
+struct YourApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .withWindowReader() // Enable window tracking
+        }
+    }
+}
+
+// Window tracking infrastructure
+private struct WindowKey: EnvironmentKey {
+    static let defaultValue: UIWindow? = nil
+}
+
+extension EnvironmentValues {
+    var window: UIWindow? {
+        get { self[WindowKey.self] }
+        set { self[WindowKey.self] = newValue }
+    }
+}
+
+struct WindowReaderModifier: ViewModifier {
+    @State private var window: UIWindow?
+
+    func body(content: Content) -> some View {
+        content
+            .environment(\.window, window)
+            .background(WindowAccessor(window: $window))
+    }
+}
+
+struct WindowAccessor: UIViewRepresentable {
+    @Binding var window: UIWindow?
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        DispatchQueue.main.async {
+            self.window = uiView.window
+        }
+    }
+}
+
+extension View {
+    func withWindowReader() -> some View {
+        self.modifier(WindowReaderModifier())
+    }
+}
+```
+
+**macOS:**
+
+```swift
+import SwiftUI
+import Auth0
+
+struct ContentView: View {
+    @State private var currentWindow: NSWindow?
+
+    var body: some View {
+        Button("Login") {
+            Task {
+                var webAuth = Auth0.webAuth()
+
+                if let window = currentWindow {
+                    webAuth = webAuth.presentationWindow(window)
+                }
+
+                let credentials = try await webAuth.start()
+                // Handle credentials...
+            }
+        }
+        .onAppear {
+            currentWindow = getCurrentWindow()
+        }
+    }
+
+    private func getCurrentWindow() -> NSWindow? {
+        if let keyWindow = NSApplication.shared.keyWindow {
+            return keyWindow
+        }
+        if let mainWindow = NSApplication.shared.mainWindow {
+            return mainWindow
+        }
+        return NSApplication.shared.windows.first
+    }
+}
+```
+
+</details>
+
+You can also specify a presentation window when using the `SFSafariViewController` or `WKWebView` providers:
+
+```swift
+// SFSafariViewController
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.safariProvider(presentationWindow: window))
+    // ...
+
+// WKWebView
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.webViewProvider(presentationWindow: window))
+    // ...
+```
+
+> [!NOTE]
+> If you don't specify a presentation window, Auth0.swift will automatically use the foreground active scene's key window for multi-window iPad apps.
 
 #### Use `SFSafariViewController` instead of `ASWebAuthenticationSession`
 
@@ -233,7 +415,7 @@ SomeView()
 
 ![Screenshot of SFSafariViewController's documentation](https://github.com/user-attachments/assets/98de5937-3ca4-4779-9e3c-725d8b628870)
 
-This is the case for login, but not for logout. Instead of calling `clearSession()`, you can delete the stored credentials –using the Credentials Manager's `clear()` method– and use `"prompt": "login"` to force the login page even if the session cookie is still present. Since the cookies stored by `SFSafariViewController` are scoped to your app, this should not pose an issue.
+This is the case for login, but not for logout. Instead of calling `logout()`, you can delete the stored credentials –using the Credentials Manager's `clear()` method– and use `"prompt": "login"` to force the login page even if the session cookie is still present. Since the cookies stored by `SFSafariViewController` are scoped to your app, this should not pose an issue.
 
 ```swift
 Auth0
@@ -268,7 +450,45 @@ Auth0
 
 Auth0.swift automatically [validates](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) the ID token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID token have not been tampered with and can be safely used.
 
-### DPoP
+For direct Authentication API calls (`login`, `renew`, `codeExchange`, etc.) and MFA verification calls, ID token validation is **opt-in**. All credential-returning methods return `any TokenRequestable`, and you can chain `.validateClaims()` before `.start(_:)` to enable it:
+
+```swift
+Auth0
+    .authentication()
+    .renew(withRefreshToken: credentials.refreshToken)
+    .validateClaims()
+    .start { result in
+        switch result {
+        case .success(let credentials): print("Renewed: \(credentials)")
+        case .failure(let error): print("Error: \(error)")
+        }
+    }
+```
+
+You can customise the validation by chaining additional modifiers after `validateClaims()`:
+
+```swift
+Auth0
+    .authentication()
+    .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURI)
+    .validateClaims()
+    .withLeeway(120)                            // clock-skew tolerance in seconds
+    .withNonce(nonce)                           // expected nonce claim
+    .withOrganization("org_abc123")             // expected org_id or org_name claim
+    .start { result in ... }
+```
+
+The same API is available on MFA verification:
+
+```swift
+Auth0
+    .mfa()
+    .verify(otp: otp, mfaToken: mfaToken)
+    .validateClaims()
+    .start { result in ... }
+```
+
+### DPoP [EA]
 
 [DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Possession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method.
 
@@ -322,14 +542,11 @@ On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair f
 ```swift
 Auth0.webAuth()
     .useHTTPS()
-    .clearSession { result in 
+    .logout { result in
     // ...
 }
 
-if !credentialsManager.clear() {
-    // ...
-}
-
+try credentialsManager.clear()
 try DPoP.clearKeypair()
 ```
 
@@ -343,11 +560,117 @@ Web Auth will only produce `WebAuthError` error values. You can find the underly
 > [!WARNING]
 > Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/documentation/auth0/webautherror/#topics) instead, which are part of the API.
 
+#### Error handling example
+
+```swift
+Auth0
+    .webAuth()
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+            
+        case .failure(let error):
+            switch error {
+            case .userCancelled:
+                // User pressed the "Cancel" button
+                print("User cancelled")
+                
+            case .authenticationFailed:
+                // Authentication failed on the server side
+                // Access the underlying AuthenticationError for details
+                if let authError = error.cause as? AuthenticationError {
+                    print("Auth failed: \(authError.info["error"] ?? "unknown")")
+                }
+                
+            case .codeExchangeFailed:
+                // Token exchange failed 
+                if let authError = error.cause as? AuthenticationError {
+                    print("Token exchange failed: \(authError.info["error"] ?? "unknown")")
+                }
+                
+            case .unknown(let message):
+                // Configuration errors or unexpected issues
+                print("Unknown error: \(message)")
+                
+            default:
+                print("Error: \(error)")
+            }
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0.webAuth().start()
+    print("Obtained credentials: \(credentials)")
+} catch let error as WebAuthError {
+    switch error {
+    case .userCancelled:
+        print("User cancelled")
+    case .authenticationFailed:
+        if let authError = error.cause as? AuthenticationError {
+            print("Auth failed: \(authError.info["error"] ?? "unknown")")
+        }
+    case .codeExchangeFailed:
+        if let authError = error.cause as? AuthenticationError {
+            print("Token exchange failed: \(authError.info["error"] ?? "unknown")")
+        }
+    case .unknown(let message):
+        print("Unknown error: \(message)")
+    default:
+        print("Error: \(error)")
+    }
+} catch {
+    print("Unexpected error: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .webAuth()
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            switch error {
+            case .userCancelled:
+                print("User cancelled")
+            case .authenticationFailed:
+                if let authError = error.cause as? AuthenticationError {
+                    print("Auth failed: \(authError.info["error"] ?? "unknown")")
+                }
+            case .codeExchangeFailed:
+                if let authError = error.cause as? AuthenticationError {
+                    print("Token exchange failed: \(authError.info["error"] ?? "unknown")")
+                }
+            case .unknown(let message):
+                print("Unknown error: \(message)")
+            default:
+                print("Error: \(error)")
+            }
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
 [Go up ⤴](#examples)
 
 ## Credentials Manager (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)**
+
+> [!NOTE]
+> All completion callbacks in Auth0.swift execute on the main thread, making it safe to update UI directly. If needed, explicitly dispatch to a background thread.
 
 - [Store credentials](#store-credentials)
 - [Check for stored credentials](#check-for-stored-credentials)
@@ -390,11 +713,16 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 >     func fetchCredentials() async throws -> Credentials {
 >         // Safe to call from within an actor
 >         return try await credentialsManager.credentials(withScope: "openid profile email",
->                                                         minTTL: 60,
 >                                                         parameters: [:],
 >                                                         headers: [:])
 >     }
 > }
+> ```
+>
+> The default `minTTL` is 60 seconds. You can override it if needed:
+>
+> ```swift
+> let credentials = try await credentialsManager.credentials(minTTL: 120)
 > ```
 
 ### Store credentials
@@ -402,7 +730,11 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your app again.
 
 ```swift
-let didStore = credentialsManager.store(credentials: credentials)
+do {
+    try credentialsManager.store(credentials: credentials)
+} catch {
+    print("Failed to store credentials: \(error)")
+}
 ```
 
 ### Check for stored credentials
@@ -579,7 +911,11 @@ credentialsManager
 The stored [ID token](https://auth0.com/docs/secure/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.
 
 ```swift
-let user = credentialsManager.user
+do {
+    let user = try credentialsManager.userProfile()
+} catch {
+    print("Failed to retrieve user profile: \(error)")
+}
 ```
 
 To get the latest user information, you can use the `renew()` [method](#renew-stored-credentials). Calling this method will automatically update the stored user information. You can also use the `userInfo(withAccessToken:)` [method](#retrieve-user-information) of the Authentication API client, but it will not update the stored user information.
@@ -589,8 +925,29 @@ To get the latest user information, you can use the `renew()` [method](#renew-st
 The stored credentials can be removed from the Keychain by using the `clear()` method.
 
 ```swift
-let didClear = credentialsManager.clear()
+do {
+    try credentialsManager.clear()
+} catch {
+    print("Failed to clear credentials: \(error)")
+}
 ```
+
+### Clear all stored credentials
+
+To remove **all** credentials stored by the Credentials Manager from the Keychain —including the default credentials entry and any API credentials stored for different audiences— use the `clearAll()` method.
+
+```swift
+do {
+    try credentialsManager.clearAll()
+} catch {
+    print("Failed to clear all credentials: \(error)")
+}
+```
+
+> [!NOTE]
+> `clearAll()` delegates to the underlying storage's `deleteAllEntries()` method, which removes all entries for the configured service/access group. Ensure the storage is dedicated to Auth0 credentials to avoid unintended data loss.
+
+This is different from `clear()`, which only removes the default credentials entry.
 
 ### Biometric authentication
 
@@ -652,7 +1009,7 @@ let isValid = credentialsManager.isBiometricSessionValid()
 ```
 
 > [!NOTE]
-> Retrieving the user information with `credentialsManager.user` will not be protected by biometric authentication.
+> Retrieving the user information with `credentialsManager.userProfile()` will not be protected by biometric authentication.
 
 ### Other credentials
 
@@ -785,7 +1142,7 @@ let cookie = HTTPCookie(properties: [
     .path: "/",
     .name: "auth0_session_transfer_token",
     .value: ssoCredentials.sessionTransferToken,
-    .expires: ssoCredentials.expiresIn,
+    .expires: ssoCredentials.expiresAt,
     .secure: true
 ])!
 
@@ -799,6 +1156,41 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 
 The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(let error):
+        switch error {
+        case CredentialsManagerError.noCredentials:
+            // No credentials stored — prompt login
+            break
+        case CredentialsManagerError.noRefreshToken:
+            // Credentials expired and no refresh token — prompt login
+            break
+        case CredentialsManagerError.renewFailed:
+            // Token renewal failed — check error.cause for details
+            break
+        case CredentialsManagerError.storeFailed:
+            // Failed to save renewed credentials to Keychain
+            break
+        case CredentialsManagerError.clearFailed:
+            // Failed to remove credentials from Keychain
+            break
+        case CredentialsManagerError.biometricsFailed:
+            // Biometric authentication failed — check error.cause for details
+            break
+        case CredentialsManagerError.revokeFailed:
+            // Token revocation failed — check error.cause for details
+            break
+        default:
+            break
+        }
+    }
+}
+```
+
 > [!WARNING]
 > Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror/#topics) instead, which are part of the API.
 
@@ -807,6 +1199,9 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 ## Authentication API (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)**
+
+> [!NOTE]
+> All completion callbacks in Auth0.swift execute on the main thread, making it safe to update UI directly. If needed, explicitly dispatch to a background thread.
 
 - [Log in with database connection](#log-in-with-database-connection)
 - [Sign up with database connection](#sign-up-with-database-connection)
@@ -892,16 +1287,36 @@ Auth0
 </details>
 
 > [!NOTE]
-> The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
+> The default scope value is `openid profile email offline_access`. Regardless of the scope value specified, `openid` is always included.
 
 ### Sign up with database connection
+
+The default connection is `"Username-Password-Authentication"`.
 
 ```swift
 Auth0
     .authentication()
     .signup(email: "support@auth0.com",
             password: "secret-password",
-            connection: "Username-Password-Authentication",
+            userMetadata: ["first_name": "John", "last_name": "Appleseed"])
+    .start { result in
+        switch result {
+        case .success(let user):
+            print("User signed up: \(user)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+Or specify a custom connection:
+
+```swift
+Auth0
+    .authentication()
+    .signup(email: "support@auth0.com",
+            password: "secret-password",
+            connection: "My-Custom-DB",
             userMetadata: ["first_name": "John", "last_name": "Appleseed"])
     .start { result in
         switch result {
@@ -1417,7 +1832,7 @@ Auth0
 
 Fetch the latest user information from the `/userinfo` endpoint.
 
-This method will yield a `UserInfo` instance. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/userinfo) to learn more about its available properties.
+This method will yield a `UserProfile` instance. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/userprofile) to learn more about its available properties.
 
 ```swift
 Auth0
@@ -1598,7 +2013,7 @@ let cookie = HTTPCookie(properties: [
     .path: "/",
     .name: "auth0_session_transfer_token",
     .value: ssoCredentials.sessionTransferToken,
-    .expires: ssoCredentials.expiresIn,
+    .expires: ssoCredentials.expiresAt,
     .secure: true
 ])!
 
@@ -1649,10 +2064,7 @@ if DPoP.isNonceRequired(by: response),
 On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair from the Keychain.
 
 ```swift
-if !credentialsManager.clear() {
-    // ...
-}
-
+try credentialsManager.clear()
 try DPoP.clearKeypair()
 ```
 
@@ -2844,6 +3256,22 @@ Check the [Auth0APIError API documentation](https://auth0.github.io/Auth0.swift/
 > The My Account API is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
 
 Use the Auth0 My Account API to manage the current user's account.
+
+#### Import
+
+**Swift Package Manager:** The My Account API ships as a separate `Auth0MyAccount` package product. Add it to your target in Xcode and import it in your source files:
+
+```swift
+import Auth0MyAccount
+```
+
+`Auth0MyAccount` re-exports all `Auth0` public symbols, so a single import is enough — you do not need `import Auth0` alongside it.
+
+**Carthage / CocoaPods:** The My Account API is included in the single `Auth0` framework. No extra dependency or import is needed:
+
+```swift
+import Auth0
+```
 
 To call the My Account API, you need an access token issued specifically for this API, including any required scopes for the operations you want to perform. See [API credentials [EA]](#api-credentials-ea) to learn how to obtain one.
 
@@ -4141,7 +4569,7 @@ Auth0.swift provides comprehensive logging capabilities for debugging HTTP reque
 
 ### Enable Logging
 
-Enable logging by calling the `logging(enabled:)` method on `WebAuth`, `Authentication`, or `Users`:
+Enable logging by calling the `logging(enabled:)` method on any Auth0.swift client that conforms to `Loggable` (e.g. `Authentication`, `MFAClient`, `MyAccountClient`, or `WebAuth`):
 
 ```swift
 Auth0
@@ -4153,13 +4581,6 @@ Auth0
 ```swift
 Auth0
     .authentication()
-    .logging(enabled: true)
-    // ...
-```
-
-```swift
-Auth0
-    .users(token: credentials.accessToken)
     .logging(enabled: true)
     // ...
 ```

@@ -20,7 +20,6 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)
   + [Authentication API Client](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)
   + [MFA API Client](https://auth0.github.io/Auth0.swift/documentation/auth0/mfaclient)
-  + [Management API Client (Users)](https://auth0.github.io/Auth0.swift/documentation/auth0/users)
 - [**FAQ**](FAQ.md) - answers some common questions about Auth0.swift.
 - [**Auth0 Documentation**](https://auth0.com/docs) - explore our docs site and learn more about Auth0.
 
@@ -50,6 +49,21 @@ https://github.com/auth0/Auth0.swift
 ```
 
 Then, select the dependency rule and press **Add Package**.
+
+Auth0.swift includes two library products:
+
+| Product | Description |
+|---------|-------------|
+| `Auth0` | Core SDK — Web Auth, Authentication API, Credentials Manager |
+| `Auth0MyAccount` | My Account API [EA] — manage the current user's authentication methods |
+
+When prompted to choose package products, add **`Auth0`** to your app target. If you also need the My Account API, add **`Auth0MyAccount`** as well.
+
+> [!NOTE]
+> `Auth0MyAccount` depends on `Auth0`. Adding `Auth0MyAccount` also gives you all `Auth0` public symbols via `import Auth0MyAccount` — no need to import both.
+
+> [!NOTE]
+> When using Carthage or CocoaPods, both APIs are included in the single `Auth0` framework. There is no separate `Auth0MyAccount` framework.
 
 #### Using Cocoapods
 
@@ -115,16 +129,6 @@ Auth0
 ```swift
 Auth0
     .authentication(clientId: "YOUR_AUTH0_CLIENT_ID", domain: "YOUR_AUTH0_DOMAIN")
-    // ...
-```
-</details>
-
-<details>
-  <summary>For the Management API client (Users)</summary>
-
-```swift
-Auth0
-    .users(token: credentials.accessToken, domain: "YOUR_AUTH0_DOMAIN")
     // ...
 ```
 </details>
@@ -236,6 +240,9 @@ Auth0
     }
 ```
 
+> [!NOTE]
+> Completion callbacks are executed on the main thread, making it safe to update UI directly. If needed, explicitly dispatch to a background thread.
+
 <details>
   <summary>Using async/await</summary>
 
@@ -272,13 +279,13 @@ Auth0
 
 Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your app.
 
-Call the `clearSession()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](EXAMPLES.md#clear-stored-credentials).
+Call the `logout()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](EXAMPLES.md#clear-stored-credentials).
 
 ```swift
 Auth0
     .webAuth()
     .useHTTPS() // Use a Universal Link logout URL on iOS 17.4+ / macOS 14.4+
-    .clearSession { result in
+    .logout { result in
         switch result {
         case .success:
             print("Session cookie cleared")
@@ -294,7 +301,7 @@ Auth0
 
 ```swift
 do {
-    try await Auth0.webAuth().useHTTPS().clearSession()
+    try await Auth0.webAuth().useHTTPS().logout()
     print("Session cookie cleared")
     // Delete credentials
 } catch {
@@ -310,7 +317,7 @@ do {
 Auth0
     .webAuth()
     .useHTTPS() // Use a Universal Link logout URL on iOS 17.4+ / macOS 14.4+
-    .clearSession()
+    .logout()
     .sink(receiveCompletion: { completion in
         switch completion {
         case .finished:
@@ -346,7 +353,11 @@ When your users log in, store their credentials securely in the Keychain.
 
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
-let didStore = credentialsManager.store(credentials: credentials)
+do {
+    try credentialsManager.store(credentials: credentials)
+} catch {
+    print("Failed to store credentials: \(error)")
+}
 ```
 
 ### Retrieve stored credentials
@@ -386,7 +397,24 @@ The stored credentials can be removed from the Keychain by using the `clear()` m
 
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
-let didClear = credentialsManager.clear()
+do {
+    try credentialsManager.clear()
+} catch {
+    print("Failed to clear credentials: \(error)")
+}
+```
+
+### Retrieve stored user profile
+
+The stored user profile can be retrieved from the stored ID token synchronously without checking if credentials are expired:
+
+```swift
+do {
+    let user = try credentialsManager.userProfile()
+    print("User profile: \(user)")
+} catch {
+    print("Failed to retrieve user profile: \(error)")
+}
 ```
 
 ### Retrieve user information

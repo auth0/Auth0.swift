@@ -1,4 +1,7 @@
 import Foundation
+#if SWIFT_PACKAGE
+import Auth0
+#endif
 
 func myAcccountDecodable<T: Decodable>(result: Result<ResponseValue, MyAccountError>,
                                        callback: Request<T, MyAccountError>.Callback) {

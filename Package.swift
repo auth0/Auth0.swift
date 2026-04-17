@@ -12,16 +12,19 @@ let swiftSettings: [SwiftSetting] = [
 let package = Package(
     name: "Auth0",
     platforms: [.iOS(.v14), .macOS(.v11), .tvOS(.v14), .watchOS(.v7), .visionOS(.v1)],
-    products: [.library(name: "Auth0", targets: ["Auth0"])],
+    products: [
+        .library(name: "Auth0", targets: ["Auth0"]),
+        .library(name: "Auth0MyAccount", targets: ["Auth0MyAccount"])
+    ],
     dependencies: [
         .package(url: "https://github.com/auth0/SimpleKeychain.git", exact:"1.3.0"),
-        .package(url: "https://github.com/auth0/JWTDecode.swift.git", exact:"3.3.0"),
+        .package(url: "https://github.com/auth0/JWTDecode.swift.git", exact:"4.0.0"),
         .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "7.0.0")),
         .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "13.0.0"))
     ],
     targets: [
         .target(
-            name: "Auth0", 
+            name: "Auth0",
             dependencies: [
                 .product(name: "SimpleKeychain", package: "SimpleKeychain"),
                 .product(name: "JWTDecode", package: "JWTDecode.swift")
@@ -30,10 +33,16 @@ let package = Package(
             exclude: ["Info.plist"],
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: swiftSettings),
+        .target(
+            name: "Auth0MyAccount",
+            dependencies: ["Auth0"],
+            path: "Auth0MyAccount",
+            swiftSettings: swiftSettings),
         .testTarget(
             name: "Auth0Tests",
             dependencies: [
                 "Auth0",
+                "Auth0MyAccount",
                 .product(name: "Quick", package: "Quick"),
                 .product(name: "Nimble", package: "Nimble")
             ],

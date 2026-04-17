@@ -1,8 +1,12 @@
+#if SWIFT_PACKAGE
+import Auth0
+#endif
+
 #if PASSKEYS_PLATFORM
 import Foundation
 
 /// A passkey enrollment challenge.
-public struct PasskeyEnrollmentChallenge {
+public struct PasskeyEnrollmentChallenge: Sendable {
 
     /// Unique identifier of the authentication method.
     public let authenticationMethodId: String

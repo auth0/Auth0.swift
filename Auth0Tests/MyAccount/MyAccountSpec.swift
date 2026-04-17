@@ -3,6 +3,9 @@ import Quick
 import Nimble
 
 @testable import Auth0
+#if SWIFT_PACKAGE
+@testable import Auth0MyAccount
+#endif
 
 private let Domain = "samples.auth0.com"
 private let Token = "TOKEN"
@@ -14,7 +17,7 @@ class MyAccountSpec: QuickSpec {
         describe("global functions") {
 
             it("should return my account client with token and domain") {
-                let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                let myAccount = myAccount(token: Token, domain: Domain)
 
                 expect(myAccount.token) == Token
                 expect(myAccount.url.absoluteString) == "https://\(Domain)/me/v1"
@@ -22,7 +25,7 @@ class MyAccountSpec: QuickSpec {
 
             it("should return my account client with token, domain, and session") {
                 let session = URLSession(configuration: URLSession.shared.configuration)
-                let myAccount = Auth0.myAccount(token: Token, domain: Domain, session: session) as! Auth0MyAccount
+                let myAccount = myAccount(token: Token, domain: Domain, session: session) as! Auth0MyAccountImpl
 
                 expect(myAccount.session).to(be(session))
             }
@@ -30,7 +33,7 @@ class MyAccountSpec: QuickSpec {
             #if !SWIFT_PACKAGE
             it("should return my account client with bundle") {
                 let bundle = Bundle(for: MyAccountSpec.self)
-                let myAccount = Auth0.myAccount(token: Token, bundle: bundle)
+                let myAccount = myAccount(token: Token, bundle: bundle)
 
                 expect(myAccount.url.absoluteString) == "https://\(Domain)/me/v1"
             }
@@ -41,13 +44,13 @@ class MyAccountSpec: QuickSpec {
         describe("endpoint") {
 
             it("should return my account endpoint without trailing slash") {
-                let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                let myAccount = myAccount(token: Token, domain: Domain)
 
                 expect(myAccount.url.absoluteString) == "https://\(Domain)/me/v1"
             }
 
             it("should return my account endpoint with trailing slash") {
-                let myAccount = Auth0.myAccount(token: Token, domain: "\(Domain)/")
+                let myAccount = myAccount(token: Token, domain: "\(Domain)/")
 
                 expect(myAccount.url.absoluteString) == "https://\(Domain)/me/v1"
             }
@@ -57,26 +60,26 @@ class MyAccountSpec: QuickSpec {
         describe("logging") {
 
             it("should have no logging by default") {
-                let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                let myAccount = myAccount(token: Token, domain: Domain)
 
                 expect(myAccount.logger).to(beNil())
             }
 
             it("should enable default logger") {
-                let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                let myAccount = myAccount(token: Token, domain: Domain)
 
                 expect(myAccount.logging(enabled: true).logger).toNot(beNil())
             }
 
             it("should not enable default logger") {
-                let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                let myAccount = myAccount(token: Token, domain: Domain)
 
                 expect(myAccount.logging(enabled: false).logger).to(beNil())
             }
 
             it("should enable custom logger") {
                 let logger = MockLogger()
-                let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                let myAccount = myAccount(token: Token, domain: Domain)
 
                 expect(myAccount.using(logger: logger).logger).toNot(beNil())
             }
@@ -87,8 +90,8 @@ class MyAccountSpec: QuickSpec {
 
             it("should return authentication methods sub-client") {
                 let session = URLSession(configuration: URLSession.shared.configuration)
-                let myAccount = Auth0.myAccount(token: Token, domain: Domain, session: session)
-                let authenticationMethods = myAccount.authenticationMethods as! Auth0MyAccountAuthenticationMethods
+                let myAccount = myAccount(token: Token, domain: Domain, session: session)
+                let authenticationMethods = myAccount.authenticationMethods as! Auth0MyAccountAuthenticationMethodsImpl
 
                 expect(authenticationMethods.token) == Token
                 expect(authenticationMethods.url) == myAccount.url
@@ -98,7 +101,7 @@ class MyAccountSpec: QuickSpec {
             context("endpoint") {
 
                 it("should return my account endpoint without trailing slash") {
-                    let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                    let myAccount = myAccount(token: Token, domain: Domain)
                     let myAccountURL = myAccount.url.absoluteString
                     let authenticationMethodsUrl = myAccount.authenticationMethods.url.absoluteString
 
@@ -106,7 +109,7 @@ class MyAccountSpec: QuickSpec {
                 }
 
                 it("should return my account endpoint with trailing slash") {
-                    let myAccount = Auth0.myAccount(token: Token, domain: "\(Domain)/")
+                    let myAccount = myAccount(token: Token, domain: "\(Domain)/")
                     let myAccountURL = myAccount.url.absoluteString
                     let authenticationMethodsUrl = myAccount.authenticationMethods.url.absoluteString
 
@@ -118,26 +121,26 @@ class MyAccountSpec: QuickSpec {
             context("logging") {
 
                 it("should have no logging by default") {
-                    let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                    let myAccount = myAccount(token: Token, domain: Domain)
 
                     expect(myAccount.authenticationMethods.logger).to(beNil())
                 }
 
                 it("should enable default logger") {
-                    let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                    let myAccount = myAccount(token: Token, domain: Domain)
 
                     expect(myAccount.authenticationMethods.logging(enabled: true).logger).toNot(beNil())
                 }
 
                 it("should not enable default logger") {
-                    let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                    let myAccount = myAccount(token: Token, domain: Domain)
 
                     expect(myAccount.authenticationMethods.logging(enabled: false).logger).to(beNil())
                 }
 
                 it("should enable custom logger") {
                     let logger = MockLogger()
-                    let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                    let myAccount = myAccount(token: Token, domain: Domain)
 
                     expect(myAccount.authenticationMethods.using(logger: logger).logger).toNot(beNil())
                 }

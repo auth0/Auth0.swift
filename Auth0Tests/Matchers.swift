@@ -2,6 +2,9 @@ import Nimble
 import Foundation
 
 @testable import Auth0
+#if SWIFT_PACKAGE
+@testable import Auth0MyAccount
+#endif
 
 func containItem(withName name: String, value: String? = nil) -> Nimble.Matcher<[URLQueryItem]> {
     return Matcher<[URLQueryItem]>.define("contain item with name <\(name)>") { expression, failureMessage -> MatcherResult in
@@ -32,36 +35,6 @@ func haveAuthenticationError<T>(code: String, description: String) -> Nimble.Mat
 }
 #endif
 
-func haveManagementError<T>(_ errorString: String, description: String, code: String, statusCode: Int) -> Nimble.Matcher<ManagementResult<T>> {
-    return Matcher<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> MatcherResult in
-        return try beUnsuccessful(expression, failureMessage) { (error: ManagementError) -> Bool in
-            return errorString == error.info["error"] as? String
-            && code == error.code
-            && description == error.localizedDescription
-            && statusCode == error.statusCode
-        }
-    }
-}
-
-func haveManagementError<T>(description: String, code: String, statusCode: Int = 0, cause: Error? = nil) -> Nimble.Matcher<ManagementResult<T>> {
-    return Matcher<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> MatcherResult in
-        return try beUnsuccessful(expression, failureMessage) { (error: ManagementError) -> Bool in
-            return code == error.code
-            && description == error.localizedDescription
-            && statusCode == error.statusCode
-            && (cause == nil || error.cause?.localizedDescription == cause?.localizedDescription)
-        }
-    }
-}
-
-func haveManagementError<T>(description: String, statusCode: Int) -> Nimble.Matcher<ManagementResult<T>> {
-    return Matcher<ManagementResult<T>>.define("be an error result") { expression, failureMessage -> MatcherResult in
-        return try beUnsuccessful(expression, failureMessage) { (error: ManagementError) -> Bool in
-            return error.localizedDescription == description && error.statusCode == statusCode
-        }
-    }
-}
-
 #if WEB_AUTH_PLATFORM
 func haveWebAuthError<T>(_ expected: WebAuthError) -> Nimble.Matcher<WebAuthResult<T>> {
     return Matcher<WebAuthResult<T>>.define("be an error result") { expression, failureMessage -> MatcherResult in
@@ -71,12 +44,22 @@ func haveWebAuthError<T>(_ expected: WebAuthError) -> Nimble.Matcher<WebAuthResu
         }
     }
 }
+
+func haveUnknownError<T>(containing text: String) -> Nimble.Matcher<WebAuthResult<T>> {
+    return Matcher<WebAuthResult<T>>.define("be an unknown error containing <\(text)>") { expression, failureMessage -> MatcherResult in
+        return try beUnsuccessful(expression, failureMessage) { (error: WebAuthError) -> Bool in
+            guard case .unknown(let message) = error.code else { return false }
+            guard error.cause == nil else { return false }
+            return message.contains(text)
+        }
+    }
+}
 #endif
 
 func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError) -> Nimble.Matcher<CredentialsManagerResult<T>> {
     return Matcher<CredentialsManagerResult<T>>.define("be an error result") { expression, failureMessage -> MatcherResult in
         return try beUnsuccessful(expression, failureMessage) { (error: CredentialsManagerError) -> Bool in
-            return error == expected
+            return expected == error
             && (expected.cause == nil || error.cause?.localizedDescription == expected.cause?.localizedDescription)
         }
     }
@@ -365,12 +348,6 @@ func beSuccessful<T>() -> Nimble.Matcher<AuthenticationResult<T>> {
     }
 }
 
-func beSuccessful<T>() -> Nimble.Matcher<ManagementResult<T>> {
-    return Matcher<ManagementResult<T>>.define("be a successful result") { expression, failureMessage -> MatcherResult in
-        return try beSuccessful(expression, failureMessage)
-    }
-}
-
 #if WEB_AUTH_PLATFORM
 func beSuccessful<T>() -> Nimble.Matcher<WebAuthResult<T>> {
     return Matcher<WebAuthResult<T>>.define("be a successful result") { expression, failureMessage -> MatcherResult in
@@ -434,19 +411,9 @@ func beUnsuccessful<T>() -> Nimble.Matcher<CredentialsManagerResult<T>> {
     }
 }
 
-func haveProfile(_ sub: String) -> Nimble.Matcher<AuthenticationResult<UserInfo>> {
-    return Matcher<AuthenticationResult<UserInfo>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> MatcherResult in
-        return try beSuccessful(expression, failureMessage) { (userInfo: UserInfo) -> Bool in userInfo.sub == sub }
-    }
-}
-
-func haveObjectWithAttributes(_ attributes: [String]) -> Nimble.Matcher<ManagementResult<[String: Any]>> {
-    return Matcher<ManagementResult<[String: Any]>>.define("have attributes \(attributes)") { expression, failureMessage -> MatcherResult in
-        return try beSuccessful(expression, failureMessage) { (value: [String: Any]) -> Bool in
-            return Array(value.keys).reduce(true, { (initial, value) -> Bool in
-                return initial && attributes.contains(value)
-            })
-        }
+func haveProfile(_ sub: String) -> Nimble.Matcher<AuthenticationResult<UserProfile>> {
+    return Matcher<AuthenticationResult<UserProfile>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage) { (userInfo: UserProfile) -> Bool in userInfo.sub == sub }
     }
 }
 
@@ -616,13 +583,13 @@ extension URLRequest {
     
     func isMyAccountAuthenticationMethods(_ domain: String, _ endpoint: String = "", token: String) -> Bool {
         let subpath = endpoint.isEmpty ? endpoint : "/\(endpoint)"
-        let path = "/me/\(Auth0MyAccount.apiVersion)/authentication-methods\(subpath)"
+        let path = "/me/\(Auth0MyAccountImpl.apiVersion)/authentication-methods\(subpath)"
         return isHost(domain) && isPath(path) && hasBearerToken(token)
     }
     
     func isFactorsMethods(_ domain: String, _ endpoint: String = "", token: String) -> Bool {
         let subpath = endpoint.isEmpty ? endpoint : "/\(endpoint)"
-        let path = "/me/\(Auth0MyAccount.apiVersion)/factors"
+        let path = "/me/\(Auth0MyAccountImpl.apiVersion)/factors"
         return isHost(domain) && isPath(path) && hasBearerToken(token)
     }
 

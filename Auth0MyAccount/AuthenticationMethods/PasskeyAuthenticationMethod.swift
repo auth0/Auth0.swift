@@ -1,3 +1,7 @@
+#if SWIFT_PACKAGE
+import Auth0
+#endif
+
 #if PASSKEYS_PLATFORM
 import Foundation
 

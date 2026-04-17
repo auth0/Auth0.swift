@@ -1,22 +1,25 @@
 import Foundation
+#if SWIFT_PACKAGE
+import Auth0
+#endif
 
-struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
+struct Auth0MyAccountAuthenticationMethodsImpl: MyAccountAuthenticationMethods {
     let url: URL
     let session: URLSession
     let token: String
 
-    var telemetry: Telemetry
+    var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
 
     init(token: String,
          url: URL,
          session: URLSession = .shared,
-         telemetry: Telemetry = Telemetry(),
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo(),
          logger: Logger? = nil) {
         self.token = token
         self.url = url
         self.session = session
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
         self.logger = logger
     }
 
@@ -25,7 +28,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
-                                    connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
+                                    connection: String?) -> any Requestable<PasskeyEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = ["type": "passkey"]
         payload["identity_user_id"] = userIdentityId
         payload["connection"] = connection
@@ -37,12 +40,12 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func enroll(passkey: NewPasskey,
-                challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+                challenge: PasskeyEnrollmentChallenge) -> any Requestable<PasskeyAuthenticationMethod, MyAccountError> {
         let resourceId = challenge.authenticationMethodId.removingPercentEncoding!
         let path = "\(resourceId)/verify"
         let credentialId = passkey.credentialID.encodeBase64URLSafe()
@@ -71,11 +74,11 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       auth0ClientInfo: self.auth0ClientInfo)
     }
     #endif
 
-    func enrollRecoveryCode() -> Request<RecoveryCodeEnrollmentChallenge, MyAccountError> {
+    func enrollRecoveryCode() -> any Requestable<RecoveryCodeEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "recovery-code"
         return Request(session: session,
@@ -85,10 +88,10 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
-    func enrollTOTP() -> Request<TOTPEnrollmentChallenge, MyAccountError> {
+    func enrollTOTP() -> any Requestable<TOTPEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "totp"
         return Request(session: session,
@@ -98,10 +101,10 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
-    func enrollPushNotification() -> Request<PushEnrollmentChallenge, MyAccountError> {
+    func enrollPushNotification() -> any Requestable<PushEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "push-notification"
         return Request(session: session,
@@ -111,10 +114,10 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
-    func enrollEmail(emailAddress: String) -> Request<EmailEnrollmentChallenge, MyAccountError> {
+    func enrollEmail(emailAddress: String) -> any Requestable<EmailEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "email"
         payload["email"] = emailAddress
@@ -125,11 +128,11 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
+                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> any Requestable<PhoneEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "phone"
         payload["phone_number"] = phoneNumber
@@ -141,12 +144,12 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmTOTPEnrollment(id: String,
                                authSession: String,
-                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+                               otpCode: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         payload["otp_code"] = otpCode
@@ -157,12 +160,12 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmEmailEnrollment(id: String,
                                 authSession: String,
-                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+                                otpCode: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         payload["otp_code"] = otpCode
@@ -173,11 +176,11 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmPushNotificationEnrollment(id: String,
-                                           authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
+                                           authSession: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
 
@@ -188,12 +191,12 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmPhoneEnrollment(id: String,
                                 authSession: String,
-                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+                                otpCode: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         payload["otp_code"] = otpCode
@@ -204,11 +207,11 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func confirmRecoveryCodeEnrollment(id: String,
-                                       authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
+                                       authSession: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         return Request(session: session,
@@ -218,46 +221,46 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
-    func deleteAuthenticationMethod(by id: String) -> Request<Void, MyAccountError> {
+    func deleteAuthenticationMethod(by id: String) -> any Requestable<Void, MyAccountError> {
         return Request(session: session,
                        url: self.url.appending("authentication-methods").appending(id),
                        method: "DELETE",
                        handle: myAccountDecodableNoBody,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError> {
+    func getAuthenticationMethods() -> any Requestable<[AuthenticationMethod], MyAccountError> {
         return Request(session: session,
                        url: url.appending("authentication-methods"),
                        method: "GET",
                        handle: getAuthMethodsDecodable,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
-    func getFactors() -> Request<[Factor], MyAccountError> {
+    func getFactors() -> any Requestable<[Factor], MyAccountError> {
         return Request(session: session,
                        url: url.appending("factors"),
                        method: "GET",
                        handle: getFactorsDecodable,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
-    func getAuthenticationMethod(by id: String) -> Request<AuthenticationMethod, MyAccountError> {
+    func getAuthenticationMethod(by id: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
         return Request(session: session,
                        url: url.appending("authentication-methods").appending(id),
                        method: "GET",
                        handle: myAcccountDecodable,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 }

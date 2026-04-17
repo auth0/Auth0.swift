@@ -3,6 +3,9 @@ import Quick
 import Nimble
 
 @testable import Auth0
+#if SWIFT_PACKAGE
+@testable import Auth0MyAccount
+#endif
 
 private let AuthenticationMethodId = "baz"
 private let AuthenticationSession = "7p0knAl_iQedbOuG2vBrU0QKREz8J300DkuCzTRRGuFsQ_Z6XqcADPdrB26RxqDx"

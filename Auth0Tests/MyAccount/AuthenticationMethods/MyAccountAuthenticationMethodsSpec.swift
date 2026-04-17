@@ -7,6 +7,9 @@ import AuthenticationServices
 #endif
 
 @testable import Auth0
+#if SWIFT_PACKAGE
+@testable import Auth0MyAccount
+#endif
 
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
@@ -38,27 +41,27 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
         describe("init") {
 
             it("should init with token and url") {
-                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
+                let authMethods = Auth0MyAccountAuthenticationMethodsImpl(token: AccessToken, url: DomainURL)
                 expect(authMethods.token) == AccessToken
                 expect(authMethods.url) == DomainURL
             }
 
             it("should init with token, url, and session") {
                 let session = URLSession(configuration: URLSession.shared.configuration)
-                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
+                let authMethods = Auth0MyAccountAuthenticationMethodsImpl(token: AccessToken,
                                                                       url: DomainURL,
                                                                       session: session)
                 expect(authMethods.session).to(be(session))
             }
 
-            it("should init with token, url, and telemetry") {
+            it("should init with token, url, and auth0ClientInfo") {
                 let telemetryInfo = "info"
-                var telemetry = Telemetry()
-                telemetry.info = telemetryInfo
-                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
+                var auth0ClientInfo = Auth0ClientInfo()
+                auth0ClientInfo.info = telemetryInfo
+                let authMethods = Auth0MyAccountAuthenticationMethodsImpl(token: AccessToken,
                                                                       url: DomainURL,
-                                                                      telemetry: telemetry)
-                expect(authMethods.telemetry.info) == telemetryInfo
+                                                                      auth0ClientInfo: auth0ClientInfo)
+                expect(authMethods.auth0ClientInfo.info) == telemetryInfo
             }
         }
 

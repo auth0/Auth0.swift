@@ -1,11 +1,11 @@
 import Foundation
 
-let unknownError = "a0.sdk.internal_error.unknown"
-let nonJSONError = "a0.sdk.internal_error.plain"
-let emptyBodyError = "a0.sdk.internal_error.empty"
+package let unknownError = "a0.sdk.internal_error.unknown"
+package let nonJSONError = "a0.sdk.internal_error.plain"
+package let emptyBodyError = "a0.sdk.internal_error.empty"
 
 /// Generic representation of Auth0 errors.
-public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
+public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible, Sendable {
 
     /// The underlying `Error` value, if any.
     var cause: Error? { get }
@@ -31,7 +31,7 @@ public extension Auth0Error {
 
 extension Auth0Error {
 
-    func appendCause(to message: String) -> String {
+    package func appendCause(to message: String) -> String {
         guard let cause = self.cause else {
             return message
         }
@@ -42,7 +42,7 @@ extension Auth0Error {
         return "\(errorMessage) CAUSE: \(causeMessage)"
     }
 
-    func appendPeriod(to message: String) -> String {
+    package func appendPeriod(to message: String) -> String {
         return message.hasSuffix(".") ? message : "\(message)."
     }
 

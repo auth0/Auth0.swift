@@ -1,4 +1,7 @@
 import Foundation
+#if SWIFT_PACKAGE
+@_exported import Auth0
+#endif
 
 // MARK: - Factory Methods
 
@@ -7,7 +10,7 @@ import Foundation
 /// ## Usage
 ///
 /// ```swift
-/// Auth0.myAccount(token: apiCredentials.accessToken, domain: "samples.us.auth0.com")
+/// Auth0MyAccount.myAccount(token: apiCredentials.accessToken, domain: "samples.us.auth0.com")
 /// ```
 ///
 /// You can use the refresh token to get an access token for the My Account API. Refer to
@@ -24,7 +27,7 @@ import Foundation
 ///   - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
 /// - Returns: My Account API client.
 public func myAccount(token: String, domain: String, session: URLSession = .shared) -> MyAccount {
-    return Auth0MyAccount(token: token, url: .httpsURL(from: domain), session: session)
+    return Auth0MyAccountImpl(token: token, url: .httpsURL(from: domain), session: session)
 }
 
 /// Auth0 My Account API client for managing the current user's account.
@@ -32,7 +35,7 @@ public func myAccount(token: String, domain: String, session: URLSession = .shar
 /// ## Usage
 ///
 /// ```swift
-/// Auth0.myAccount(token: apiCredentials.accessToken)
+/// Auth0MyAccount.myAccount(token: apiCredentials.accessToken)
 /// ```
 ///
 /// You can use the refresh token to get an access token for the My Account API. Refer to
@@ -67,6 +70,13 @@ public func myAccount(token: String, session: URLSession = .shared, bundle: Bund
     let values = plistValues(bundle: bundle)!
     return myAccount(token: token, domain: values.domain, session: session)
 }
+
+// MARK: - Result Wrapper
+
+/**
+ `Result` wrapper for My Account API operations.
+ */
+public typealias MyAccountResult<T> = Result<T, MyAccountError>
 
 // MARK: - MyAccountClient
 

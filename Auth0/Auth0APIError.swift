@@ -1,9 +1,9 @@
 import Foundation
 
-let apiErrorCode = "code"
-let apiErrorDescription = "description"
-let apiErrorCause = "cause"
-let apiErrorDPoPNonce = "dpop_nonce"
+package let apiErrorCode = "code"
+package let apiErrorDescription = "description"
+package let apiErrorCause = "cause"
+package let apiErrorDPoPNonce = "dpop_nonce"
 
 /// Generic representation of Auth0 API errors.
 public protocol Auth0APIError: Auth0Error {
@@ -78,7 +78,7 @@ public extension Auth0APIError {
 
 extension Auth0APIError {
 
-    init(cause error: Error, statusCode: Int = 0) {
+    package init(cause error: Error, statusCode: Int = 0) {
         let info: [String: Any] = [
             apiErrorCode: nonJSONError,
             apiErrorDescription: "Unable to complete the operation.",
@@ -87,7 +87,7 @@ extension Auth0APIError {
         self.init(info: info, statusCode: statusCode)
     }
 
-    init(description: String?, statusCode: Int = 0) {
+    package init(description: String?, statusCode: Int = 0) {
         let info: [String: Any] = [
             apiErrorCode: description != nil ? nonJSONError : emptyBodyError,
             apiErrorDescription: description ?? "Empty response body."
@@ -95,7 +95,7 @@ extension Auth0APIError {
         self.init(info: info, statusCode: statusCode)
     }
 
-    init(from response: ResponseValue) {
+    package init(from response: ResponseValue) {
         if let dpopChallenge = DPoP.challenge(from: response.value) {
             var info: [String: Any] = [apiErrorCode: dpopChallenge.errorCode]
             info[apiErrorDescription] = dpopChallenge.errorDescription

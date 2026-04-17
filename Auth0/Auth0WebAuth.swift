@@ -1,6 +1,11 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 import Combine
+#if os(iOS) || os(visionOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 final class Auth0WebAuth: WebAuth {
 
@@ -9,7 +14,7 @@ final class Auth0WebAuth: WebAuth {
     let session: URLSession
     let storage: TransactionStore
 
-    var telemetry: Telemetry
+    var auth0ClientInfo: Auth0ClientInfo
     var barrier: Barrier
     var logger: Logger?
     var dpop: DPoP?
@@ -34,7 +39,8 @@ final class Auth0WebAuth: WebAuth {
     private(set) var invitationURL: URL?
     private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
-    private(set) var onCloseCallback: (() -> Void)?
+    private(set) var onCloseCallback: (@Sendable () -> Void)?
+    private(set) weak var presentationWindow: Auth0WindowRepresentable?
 
     var state: String {
         return parameters["state"] ?? generateRandomString()
@@ -68,13 +74,13 @@ final class Auth0WebAuth: WebAuth {
          url: URL,
          session: URLSession = URLSession.shared,
          storage: TransactionStore = TransactionStore.shared,
-         telemetry: Telemetry = Telemetry(),
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo(),
          barrier: Barrier = QueueBarrier.shared) {
         self.clientId = clientId
         self.url = url
         self.session = session
         self.storage = storage
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
         self.barrier = barrier
         self.issuer = url.absoluteString
     }
@@ -170,18 +176,27 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    func onClose(_ callback: (() -> Void)?) -> Self {
+    func onClose(_ callback: (@Sendable () -> Void)?) -> Self {
         self.onCloseCallback = callback
         return self
     }
 
-    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    func presentationWindow(_ window: Auth0WindowRepresentable) -> Self {
+        self.presentationWindow = window
+        return self
+    }
+
+    @MainActor
+    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) {
+        let mainThreadCallback = dispatchOnMain(callback)
+        let mainThreadOnCloseCallback = onCloseCallback.map { dispatchOnMain($0) }
+
         guard barrier.raise() else {
-            return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
+            return mainThreadCallback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
         guard let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            return mainThreadCallback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
         let nonce = nonce
@@ -195,21 +210,22 @@ final class Auth0WebAuth: WebAuth {
                                                       nonce: nonce,
                                                       state: state)
         } catch {
-            return callback(.failure(error))
+            return mainThreadCallback(.failure(error))
         }
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      ephemeralSession: ephemeralSession,
-                                                                     headers: headers)
-        let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
+                                                                     headers: headers,
+                                                                     presentationWindow: self.presentationWindow)
+        let userAgent = provider(authorizeURL) { [storage, barrier, mainThreadOnCloseCallback] result in
             storage.clear()
             barrier.lower()
 
             switch result {
             case .success:
-                onCloseCallback?()
+                mainThreadOnCloseCallback?()
             case .failure(let error):
-                callback(.failure(error))
+                mainThreadCallback(.failure(error))
             }
         }
         let transaction = LoginTransaction(redirectURL: redirectURL,
@@ -217,15 +233,18 @@ final class Auth0WebAuth: WebAuth {
                                            userAgent: userAgent,
                                            handler: handler,
                                            logger: self.logger,
-                                           callback: callback)
+                                           callback: mainThreadCallback)
         self.storage.store(transaction)
         userAgent.start()
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
-    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    @MainActor
+    func logout(federated: Bool, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void) {
+        let mainThreadCallback = dispatchOnMain(callback)
+
         guard barrier.raise() else {
-            return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
+            return mainThreadCallback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
         let endpoint = federated ?
@@ -238,16 +257,18 @@ final class Auth0WebAuth: WebAuth {
         components?.queryItems = queryItems + [returnTo, clientId]
 
         guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            return mainThreadCallback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, headers: headers)
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
+                                                                     headers: headers,
+                                                                     presentationWindow: self.presentationWindow)
         let userAgent = provider(logoutURL) { [storage, barrier] result in
             storage.clear()
             barrier.lower()
-            callback(result)
+            mainThreadCallback(result)
         }
-        let transaction = ClearSessionTransaction(userAgent: userAgent)
+        let transaction = LogoutTransaction(userAgent: userAgent)
         self.storage.store(transaction)
         userAgent.start()
     }
@@ -277,7 +298,7 @@ final class Auth0WebAuth: WebAuth {
             guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
                   let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
                   let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
-                throw WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))
+                throw WebAuthError(code: .unknown("Invalid invitation URL: missing organization or invitation parameters"))
             }
 
             entries["organization"] = organizationId
@@ -298,7 +319,7 @@ final class Auth0WebAuth: WebAuth {
 
         entries["scope"] = includeRequiredScope(in: entries["scope"])
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
-        components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
+        components.queryItems = self.auth0ClientInfo.queryItemsWithTelemetry(queryItems: items)
         components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
         return components.url!
     }
@@ -318,7 +339,7 @@ final class Auth0WebAuth: WebAuth {
         var authentication = Auth0Authentication(clientId: self.clientId,
                                                  url: self.url,
                                                  session: self.session,
-                                                 telemetry: self.telemetry)
+                                                 auth0ClientInfo: self.auth0ClientInfo)
         authentication.dpop = self.dpop
         authentication.logger = self.logger
         return PKCE(authentication: authentication,
@@ -336,14 +357,17 @@ final class Auth0WebAuth: WebAuth {
 
 extension Auth0WebAuth {
 
+    
+    @MainActor
     public func start() -> AnyPublisher<Credentials, WebAuthError> {
         return Deferred { Future(self.start) }.eraseToAnyPublisher()
     }
-
-    public func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
+    
+    @MainActor
+    public func logout(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
         return Deferred {
             Future { callback in
-                self.clearSession(federated: federated) { result in
+                self.logout(federated: federated) { result in
                     callback(result)
                 }
             }
@@ -370,10 +394,10 @@ extension Auth0WebAuth {
         }
     }
 
-    func clearSession(federated: Bool) async throws {
+    func logout(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
-                self.clearSession(federated: federated) { result in
+                self.logout(federated: federated) { result in
                     continuation.resume(with: result)
                 }
             }
