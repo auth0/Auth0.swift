@@ -72,7 +72,7 @@ final class WebViewUserAgent: NSObject, WebAuthUserAgent, Sendable {
     static let customSchemeRedirectionFailureMessage = "com.auth0.webview.redirection_failure"
     let defaultSchemesSupportedByWKWebview = ["https"]
 
-    let request: URLRequest
+    nonisolated let request: URLRequest
     @MainActor
     var webview: WKWebView!
     let viewController: UIViewController
