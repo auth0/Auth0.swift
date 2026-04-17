@@ -190,13 +190,12 @@ extension WebViewUserAgent: WKURLSchemeHandler {
 /// Handling of HTTPS callbacks.
 extension WebViewUserAgent: WKNavigationDelegate {
 
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString), let scheme = callbackUrl.scheme, scheme == "https" {
             _ = TransactionStore.shared.resume(callbackUrl)
-            decisionHandler(.cancel)
-        } else {
-            decisionHandler(.allow)
+            return .cancel
         }
+        return .allow
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {
