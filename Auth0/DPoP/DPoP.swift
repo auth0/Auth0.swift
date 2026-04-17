@@ -8,8 +8,17 @@ final class NonceStorage: @unchecked Sendable {
     private var _nonce: String?
 
     var nonce: String? { queue.sync { _nonce } }
-    func store(_ nonce: String) { queue.sync { _nonce = nonce } }
-    func clear() { queue.sync { _nonce = nil } }
+    func store(_ nonce: String) {
+        queue.async { [weak self] in
+            self?._nonce = nonce
+        }
+    }
+    
+    func clear() {
+        queue.async { [weak self] in
+            self?._nonce = nil
+        }
+    }
 }
 
 // MARK: - DPoP Service
