@@ -436,7 +436,6 @@ public struct CredentialsManager: Sendable {
                             headers: [String: String] = [:],
                             callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
-        let params = normalize(parameters)
 
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
@@ -450,13 +449,14 @@ public struct CredentialsManager: Sendable {
                 // Session is valid, bypass biometric prompt
                 self.retrieveCredentials(scope: scope,
                                          minTTL: minTTL,
-                                         parameters: params.asParameters,
+                                         parameters: parameters,
                                          headers: headers,
                                          forceRenewal: false,
                                          callback: mainThreadCallback)
                 return
             }
 
+            let params = normalize(parameters)
             bioAuth.validateBiometric { @Sendable error in
                 guard error == nil else {
                     return mainThreadCallback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: error!)))
@@ -475,7 +475,7 @@ public struct CredentialsManager: Sendable {
         } else {
             self.retrieveCredentials(scope: scope,
                                      minTTL: minTTL,
-                                     parameters: params.asParameters,
+                                     parameters: parameters,
                                      headers: headers,
                                      forceRenewal: false,
                                      callback: mainThreadCallback)
