@@ -21,6 +21,7 @@
 - [Web Auth configuration](#web-auth-configuration)
 - [ID token validation](#id-token-validation)
 - [DPoP](#dpop)
+- [Automatic credentials management](#automatic-credentials-management)
 - [Web Auth errors](#web-auth-errors)
 
 ### Web Auth signup
@@ -584,6 +585,50 @@ try DPoP.clearKeypair()
 
 > [!NOTE]  
 > When logging out, you do not need to call `useDPoP()` as it has no effect during the logout process.
+
+### Automatic credentials management
+
+By default, the Web Auth client automatically stores credentials after a successful login and clears them after a successful logout, using an internal `CredentialsManager`. This means you don't need to manually call `store(credentials:)` or `clear()` on the Credentials Manager when using Web Auth.
+
+```swift
+// Credentials are automatically stored after login
+let credentials = try await Auth0.webAuth().start()
+
+// Credentials are automatically cleared after logout
+try await Auth0.webAuth().logout()
+```
+
+#### Use a custom Credentials Manager
+
+If you already have a `CredentialsManager` instance (for example, to check for stored credentials or to renew tokens), you can pass it to the Web Auth client. This ensures the same Credentials Manager is used for both automatic and manual credential operations.
+
+```swift
+let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+
+// Use the same CredentialsManager for Web Auth and manual operations
+let credentials = try await Auth0
+    .webAuth()
+    .useCredentialsManager(credentialsManager)
+    .start()
+
+// Later, retrieve stored credentials using the same instance
+let storedCredentials = try await credentialsManager.credentials()
+```
+
+#### Disable automatic credentials management
+
+If you prefer to manage credentials yourself, you can disable automatic credentials management.
+
+```swift
+let credentials = try await Auth0
+    .webAuth()
+    .useCredentialsManager(enabled: false)
+    .start()
+
+// You must manually store the credentials
+let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+try credentialsManager.store(credentials: credentials)
+```
 
 ### Web Auth errors
 

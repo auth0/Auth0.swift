@@ -25,6 +25,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 - [**Behavior Changes**](#behavior-changes)
   + [Completion callbacks](#completion-callbacks)
   + [Credentials Manager error handling](#credentials-manager-error-handling)
+  + [Automatic credentials management in Web Auth](#automatic-credentials-management-in-web-auth)
 - [**Methods Added**](#methods-added)
   + [Web Auth](#web-auth)
   + [Credentials Manager clearAll](#credentials-manager-clearall)
@@ -421,13 +422,94 @@ credentialsManager.revoke { result in
 
 **Reason:** Returning `Bool` or `nil` silently swallows the underlying Keychain error, making it impossible to distinguish a missing item from a permissions failure or a corrupted entry. Throwing the error directly gives callers full context to respond appropriately—for example, by prompting the user to re-authenticate or surfacing a meaningful error message.
 
+### Automatic credentials management in Web Auth
+
+**Change:** The Web Auth client now automatically stores credentials after a successful login and clears them after a successful logout, using an internal `CredentialsManager`.
+
+**Impact:** If your app already stores credentials after login or clears them after logout using a `CredentialsManager`, you can remove that manual code. If you need to opt out of this behavior or use a specific `CredentialsManager` instance, see the migration examples below.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2 - had to manually store credentials after login
+Auth0
+    .webAuth()
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            try? credentialsManager.store(credentials: credentials)
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+
+// v2 - had to manually clear credentials after logout
+Auth0
+    .webAuth()
+    .clearSession { result in
+        switch result {
+        case .success:
+            try? credentialsManager.clear()
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+
+// v3 - credentials are automatically stored and cleared
+Auth0
+    .webAuth()
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+            // Credentials are already stored automatically
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+
+Auth0
+    .webAuth()
+    .logout { result in
+        switch result {
+        case .success:
+            print("Logged out")
+            // Credentials are already cleared automatically
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+
+// v3 - use a custom CredentialsManager
+Auth0
+    .webAuth()
+    .useCredentialsManager(credentialsManager)
+    .start { result in
+        // ...
+    }
+
+// v3 - opt out of automatic credentials management
+Auth0
+    .webAuth()
+    .useCredentialsManager(enabled: false)
+    .start { result in
+        // ...
+    }
+```
+</details>
+
+**Reason:** Most apps need to store credentials after login and clear them after logout. Automating this reduces boilerplate and prevents common mistakes such as forgetting to store or clear credentials.
+
 ## Methods Added
 
 ### Web Auth
 
-Auth0.swift will use a current key window to present the in-app browser for Web Auth. When using ASWebAuthenticationSession, it will grab a key window and use it as the ASPresentationAnchor. With SFSafariViewController, Auth0.swift will present it using the topmost view controller in this key window. While this approach works well for single-window apps, on multi-window apps the in-app browser may show up in a different window than expected. Auth0.swift now supports passing a custom window in which to present the in-app browser. For this reason, the following method is added to the Web Auth builder:
+Auth0.swift will use a current key window to present the in-app browser for Web Auth. When using ASWebAuthenticationSession, it will grab a key window and use it as the ASPresentationAnchor. With SFSafariViewController, Auth0.swift will present it using the topmost view controller in this key window. While this approach works well for single-window apps, on multi-window apps the in-app browser may show up in a different window than expected. Auth0.swift now supports passing a custom window in which to present the in-app browser. For this reason, the following methods are added to the Web Auth builder:
 
 - `presentationWindow(_ window:)`
+- `useCredentialsManager(_ credentialsManager:)` — Use a custom `CredentialsManager` instance for automatic credential storage and clearing.
+- `useCredentialsManager(enabled:)` — Enable or disable automatic credentials management.
 
 <details>
   <summary>Code</summary>
@@ -436,6 +518,22 @@ Auth0.swift will use a current key window to present the in-app browser for Web 
 Auth0
     .webAuth()
     .presentationWindow(window)
+    .start { result in
+        // ...
+    }
+
+// Use a custom CredentialsManager
+Auth0
+    .webAuth()
+    .useCredentialsManager(credentialsManager)
+    .start { result in
+        // ...
+    }
+
+// Disable automatic credentials management
+Auth0
+    .webAuth()
+    .useCredentialsManager(enabled: false)
     .start { result in
         // ...
     }

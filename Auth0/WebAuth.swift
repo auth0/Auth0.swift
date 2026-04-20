@@ -214,7 +214,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable, Sendable {
     ///
     /// ## See Also
     ///
-    /// - ``useCredentialsManager(_:)-8fx8``
+    /// - ``useCredentialsManager(_:)``
     /// - ``useCredentialsManager(enabled:)``
     var credentialsManager: CredentialsManager? { get }
 
@@ -238,7 +238,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable, Sendable {
     ///
     /// ## See Also
     ///
-    /// - ``useCredentialsManager(_:)-8fx8``
+    /// - ``useCredentialsManager(_:)``
     func useCredentialsManager(enabled: Bool) -> Self
 
     /// Specify a callback to be called when the ``WebAuthUserAgent`` closes, while the flow continues with the code exchange.
