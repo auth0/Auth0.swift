@@ -2127,6 +2127,9 @@ try credentialsManager.clear()
 try DPoP.clearKeypair()
 ```
 
+> [!NOTE]
+> The Credentials Manager stores the DPoP key thumbprint as a SHA-256 hash in device storage. The raw key thumbprint is never persisted.
+
 ### Authentication API client configuration
 
 #### Add custom parameters

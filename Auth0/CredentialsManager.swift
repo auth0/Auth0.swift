@@ -5,6 +5,7 @@ import Foundation
 import SimpleKeychain
 import JWTDecode
 import Combine
+import CryptoKit
 #if WEB_AUTH_PLATFORM
 import LocalAuthentication
 #endif
@@ -780,12 +781,24 @@ public struct CredentialsManager: Sendable {
             return .dpopNotConfigured
         }
 
-        guard (try? dpop.hasKeypair()) == true else {
+        var hasKeyPair = true
+        do {
+            hasKeyPair = try dpop.hasKeypair()
+        } catch {
+            hasKeyPair = false
+        }
+
+        if hasKeyPair == false {
             _ = self.clear()
             return .dpopKeyMissing
         }
 
-        let currentThumbprint = try? dpop.jkt()
+        // Hash the current thumbprint to compare against the stored hash
+        let currentThumbprint = (try? dpop.jkt()).map { thumbprint in
+            SHA256.hash(data: Data(thumbprint.utf8))
+                .map { String(format: "%02x", $0) }
+                .joined()
+        }
         if let stored = storedThumbprint, stored != currentThumbprint {
             _ = self.clear()
             return .dpopKeyMismatch
@@ -796,15 +809,24 @@ public struct CredentialsManager: Sendable {
 
     private func saveDPoPThumbprint(for credentials: Credentials) {
         let dpopUsed = credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame
-            || self.authentication.dpop != nil
+        || self.authentication.dpop != nil
 
-        guard dpopUsed, let dpop = self.authentication.dpop,
-              let thumbprint = try? dpop.jkt() else {
+        guard dpopUsed,
+              let dpop = self.authentication.dpop else {
             _ = self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
             return
         }
 
-        _ = self.storage.setEntry(Data(thumbprint.utf8), forKey: self.dpopThumbprintKey)
+        do {
+            let thumbprint = try dpop.jkt()
+            // Store a SHA-256 hash of the thumbprint to avoid persisting the raw key thumbprint in device storage
+            let hashedThumbprint = SHA256.hash(data: Data(thumbprint.utf8))
+                .map { String(format: "%02x", $0) }
+                .joined()
+            _ = self.storage.setEntry(Data(hashedThumbprint.utf8), forKey: self.dpopThumbprintKey)
+        } catch {
+            _ = self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+        }
     }
 
     private func retrieveAPICredentials(audience: String, scope: String?) throws -> APICredentials? {
@@ -944,10 +966,10 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noRefreshToken))
                 }
-                    if let dpopError = self.validateDPoPState(for: credentials) {
-                        complete()
-                        return callback(.failure(dpopError))
-                    }
+                if let dpopError = self.validateDPoPState(for: credentials) {
+                    complete()
+                    return callback(.failure(dpopError))
+                }
 
                 self.authentication
                     .ssoExchange(withRefreshToken: refreshToken)
