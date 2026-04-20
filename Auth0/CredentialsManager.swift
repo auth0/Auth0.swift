@@ -910,7 +910,6 @@ public struct CredentialsManager: Sendable {
                             } else {
                                 do {
                                     try self.store(credentials: newCredentials)
-                                    self.saveDPoPThumbprint(for: newCredentials)
                                     complete()
                                     callback(.success(newCredentials))
                                 } catch {
@@ -981,7 +980,6 @@ public struct CredentialsManager: Sendable {
                                                              refreshToken: ssoCredentials.refreshToken ?? refreshToken)
                             do {
                                 try self.store(credentials: newCredentials)
-                                self.saveDPoPThumbprint(for: newCredentials)
                                 complete()
                                 callback(.success(ssoCredentials))
                             } catch {
@@ -1050,7 +1048,6 @@ public struct CredentialsManager: Sendable {
                                 do {
                                     try self.store(credentials: newCredentials)
                                     try self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope)
-                                    saveDPoPThumbprint(for: newCredentials)
                                     complete()
                                     callback(.success(newAPICredentials))
                                 } catch {
