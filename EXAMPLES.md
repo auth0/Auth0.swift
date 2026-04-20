@@ -739,6 +739,7 @@ Auth0
 - [Clear stored credentials](#clear-stored-credentials)
 - [Biometric authentication](#biometric-authentication)
 - [Other credentials](#other-credentials)
+- [DPoP error handling](#dpop-error-handling)
 - [Credentials Manager errors](#credentials-manager-errors)
 
 The Credentials Manager utility allows you to securely store and retrieve the user's credentials from the Keychain.
@@ -1210,6 +1211,39 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 
 > [!IMPORTANT]
 > Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the default Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
+
+### DPoP error handling
+
+When using DPoP with the Credentials Manager, additional validation is performed on credential retrieval to ensure the DPoP key pair is consistent. The following errors may be returned:
+
+- **`dpopNotConfigured`**: The stored credentials are DPoP-bound but the `Authentication` client was not configured with DPoP via `.useDPoP()`. Ensure the `Authentication` client used by the `CredentialsManager` has DPoP enabled.
+
+- **`dpopKeyMissing`**: The DPoP key pair is no longer available in the Keychain (e.g., due to app reinstall or Keychain reset). Stored credentials are cleared automatically. The user must log in again.
+
+- **`dpopKeyMismatch`**: The current DPoP key pair does not match the one used when the credentials were saved. Stored credentials are cleared automatically. The user must log in again.
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(let error):
+        switch error {
+        case .dpopNotConfigured:
+            print("DPoP is not configured on the Authentication client")
+        case .dpopKeyMissing:
+            print("DPoP key pair was lost, user must log in again")
+        case .dpopKeyMismatch:
+            print("DPoP key pair changed, user must log in again")
+        default:
+            print("Failed with: \(error)")
+        }
+    }
+}
+```
+
+> [!NOTE]
+> The Credentials Manager stores a SHA-256 hash of the DPoP key thumbprint — the raw thumbprint is never persisted in device storage.
 
 ### Credentials Manager errors
 
@@ -2127,8 +2161,6 @@ try credentialsManager.clear()
 try DPoP.clearKeypair()
 ```
 
-> [!NOTE]
-> The Credentials Manager stores the DPoP key thumbprint as a SHA-256 hash in device storage. The raw key thumbprint is never persisted.
 
 ### Authentication API client configuration
 
