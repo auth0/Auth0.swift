@@ -151,6 +151,7 @@ public struct CredentialsManager: Sendable {
         let data = try NSKeyedArchiver.archivedData(withRootObject: credentials,
                                                     requiringSecureCoding: true)
         try self.storage.setEntry(data, forKey: self.storeKey)
+        try saveDPoPThumbprint(for: credentials)
     }
 
     /// Clears credentials stored in the Keychain.
@@ -769,9 +770,10 @@ public struct CredentialsManager: Sendable {
         return try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
-    private func validateDPoPState(for credentials: Credentials) -> CredentialsManagerError? {
-        let storedThumbprint = self.storage.getEntry(forKey: self.dpopThumbprintKey)
+    private func validateDPoPState(for credentials: Credentials) throws -> CredentialsManagerError? {
+        let storedThumbprint = try self.storage.getEntry(forKey: self.dpopThumbprintKey)
             .flatMap { String(data: $0, encoding: .utf8) }
+
         let isDPoPBound = credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame
             || storedThumbprint != nil
 
@@ -789,31 +791,27 @@ public struct CredentialsManager: Sendable {
         }
 
         if hasKeyPair == false {
-            _ = self.clear()
+            try self.clear()
             return .dpopKeyMissing
         }
 
         // Hash the current thumbprint to compare against the stored hash
-        let currentThumbprint = (try? dpop.jkt()).map { thumbprint in
-            SHA256.hash(data: Data(thumbprint.utf8))
-                .map { String(format: "%02x", $0) }
-                .joined()
-        }
+        let currentThumbprint = try dpop.jkt()
         if let stored = storedThumbprint, stored != currentThumbprint {
-            _ = self.clear()
+            try self.clear()
             return .dpopKeyMismatch
         }
 
         return nil
     }
 
-    private func saveDPoPThumbprint(for credentials: Credentials) {
+    private func saveDPoPThumbprint(for credentials: Credentials) throws {
         let dpopUsed = credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame
         || self.authentication.dpop != nil
 
         guard dpopUsed,
               let dpop = self.authentication.dpop else {
-            _ = self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+            try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
             return
         }
 
@@ -823,9 +821,9 @@ public struct CredentialsManager: Sendable {
             let hashedThumbprint = SHA256.hash(data: Data(thumbprint.utf8))
                 .map { String(format: "%02x", $0) }
                 .joined()
-            _ = self.storage.setEntry(Data(hashedThumbprint.utf8), forKey: self.dpopThumbprintKey)
+            try self.storage.setEntry(Data(hashedThumbprint.utf8), forKey: self.dpopThumbprintKey)
         } catch {
-            _ = self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+            try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
         }
     }
 
