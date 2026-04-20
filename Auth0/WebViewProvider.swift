@@ -72,7 +72,7 @@ final class WebViewUserAgent: NSObject, WebAuthUserAgent, Sendable {
     static let customSchemeRedirectionFailureMessage = "com.auth0.webview.redirection_failure"
     let defaultSchemesSupportedByWKWebview = ["https"]
 
-    let request: URLRequest
+    nonisolated let request: URLRequest
     @MainActor
     var webview: WKWebView!
     let viewController: UIViewController
@@ -190,13 +190,12 @@ extension WebViewUserAgent: WKURLSchemeHandler {
 /// Handling of HTTPS callbacks.
 extension WebViewUserAgent: WKNavigationDelegate {
 
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString), let scheme = callbackUrl.scheme, scheme == "https" {
             _ = TransactionStore.shared.resume(callbackUrl)
-            decisionHandler(.cancel)
-        } else {
-            decisionHandler(.allow)
+            return .cancel
         }
+        return .allow
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {

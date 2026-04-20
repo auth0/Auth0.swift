@@ -270,31 +270,23 @@ class WebViewProviderSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     Task { @MainActor in
                         webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
-                        
+
                         let navigationAction = MockWKNavigationAction(url: redirectURL)
-                        var decisionHandlerCalled = false
-                        webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy in
-                            expect(policy).to(equal(.cancel))
-                            decisionHandlerCalled = true
-                        }
-                        expect(decisionHandlerCalled).to(beTrue())
+                        let policy = await webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction)
+                        expect(policy).to(equal(.cancel))
                         done()
                     }
                 }
             }
-            
+
             it("should handle navigation actions correctly when a invalid redirect URL is passed") {
                 waitUntil(timeout: Timeout) { done in
                     Task { @MainActor in
                         webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
-                        
+
                         let navigationAction = MockWKNavigationAction(url: URL(string:"https://okta.com/callback")!)
-                        var decisionHandlerCalled = false
-                        webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy in
-                            expect(policy).to(equal(.allow))
-                            decisionHandlerCalled = true
-                        }
-                        expect(decisionHandlerCalled).to(beTrue())
+                        let policy = await webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction)
+                        expect(policy).to(equal(.allow))
                         done()
                     }
                 }
