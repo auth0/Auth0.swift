@@ -4,11 +4,14 @@
 
 Auth0.swift v3 includes many significant changes:
 
-- Updated default values for better out-of-the-box behavior.
-- Behavior changes to improve developer experience:
-  - Consistent main thread callback execution for UI updates.
-- Methods added for supporting new features
-
+- **Swift 6 concurrency:** Full strict concurrency compliance with `Sendable` conformances, `@MainActor` callbacks, and `@Sendable` closures across all public APIs.
+- **Improved error handling:** `CredentialsManager` and `CredentialsStorage` methods now throw errors instead of returning `Bool` or optional values, giving callers full context to respond appropriately.
+- **Updated default values** for better out-of-the-box behavior.
+- **Behavior changes** to improve developer experience:
+  - All completion callbacks are guaranteed to execute on the main thread.
+- **Renamed APIs** for alignment with the Android, Flutter, and React Native Auth0 SDKs.
+- **New APIs:** Multi-window support, `clearAll()`, ID token validation, and protocol-based return types for easier testing.
+- **Removed APIs:** The Management API client has been removed.
 
 As expected with a major release, Auth0.swift v3 contains breaking changes. Please review this guide thoroughly to understand the changes required to migrate your application to v3.
 
@@ -455,14 +458,10 @@ This is different from the existing `clear()` method, which only removes the def
 
 ```swift
 // Clear only the default credentials entry (existing method)
-let cleared = credentialsManager.clear()
+try credentialsManager.clear()
 
 // Clear ALL keychain entries managed by the Credentials Manager (new method)
-do {
-    try credentialsManager.clearAll()
-} catch {
-    print("Failed to clear all credentials: \(error)")
-}
+try credentialsManager.clearAll()
 ```
 </details>
 
@@ -487,9 +486,9 @@ class MyCustomCredentialStorage: CredentialsStorage {
 
 // v3 - Implement deleteAllEntries() if you plan to use clearAll()
 class MyCustomCredentialStorage: CredentialsStorage {
-    func getEntry(forKey key: String) -> Data? { ... }
-    func setEntry(_ data: Data, forKey key: String) -> Bool { ... }
-    func deleteEntry(forKey key: String) -> Bool { ... }
+    func getEntry(forKey key: String) throws -> Data { ... }
+    func setEntry(_ data: Data, forKey key: String) throws { ... }
+    func deleteEntry(forKey key: String) throws { ... }
 
     func deleteAllEntries() throws {
         // Delete all entries from your custom storage
@@ -847,7 +846,7 @@ auth.auth0ClientInfo.enabled = false
 ```
 </details>
 
-## Request to Requestable
+### Request to Requestable
 
 **Change:** All `Authentication` and `MFAClient` methods now return protocol types instead of the concrete `Request` struct:
 
@@ -907,6 +906,7 @@ func testLoginSuccess() {
 }
 ```
 </details>
+
 ### ID Token Validation
 
 **Change:** All credential-returning methods on `Authentication` and `MFAClient` now return `any TokenRequestable<T, E>`. `TokenRequestable` extends `Requestable` and adds opt-in ID token claim validation via a chainable builder API.
