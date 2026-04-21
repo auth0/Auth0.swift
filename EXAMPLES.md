@@ -21,6 +21,7 @@
 - [Web Auth configuration](#web-auth-configuration)
 - [ID token validation](#id-token-validation)
 - [DPoP](#dpop)
+- [Automatic credentials management](#automatic-credentials-management)
 - [Web Auth errors](#web-auth-errors)
 
 ### Web Auth signup
@@ -584,6 +585,32 @@ try DPoP.clearKeypair()
 
 > [!NOTE]  
 > When logging out, you do not need to call `useDPoP()` as it has no effect during the logout process.
+
+### Automatic credentials management
+
+You can pass a `CredentialsManager` instance to the Web Auth client to automatically store credentials after a successful login and clear them after a successful logout. If no credentials manager is set, credentials are returned directly without being stored.
+
+```swift
+let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+
+// Credentials are automatically stored after login
+let credentials = try await Auth0
+    .webAuth()
+    .useCredentialsManager(credentialsManager)
+    .start()
+
+// Later, retrieve stored credentials using the same instance
+let storedCredentials = try await credentialsManager.credentials()
+
+// Credentials are automatically cleared after logout
+try await Auth0
+    .webAuth()
+    .useCredentialsManager(credentialsManager)
+    .logout()
+```
+
+> [!NOTE]
+> If the credentials manager fails to store or clear credentials, a `WebAuthError.credentialsManagerError` will be thrown. The underlying error can be accessed via the `cause` property.
 
 ### Web Auth errors
 

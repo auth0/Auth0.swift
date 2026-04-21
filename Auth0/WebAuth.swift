@@ -208,6 +208,23 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable, Sendable {
     /// - ``WebAuthProvider``
     func provider(_ provider: @escaping WebAuthProvider) -> Self
 
+    /// The ``CredentialsManager`` used by this WebAuth client to automatically store credentials after login
+    /// and clear them after logout.
+    /// Returns `nil` if no credentials manager has been set.
+    ///
+    /// ## See Also
+    ///
+    /// - ``useCredentialsManager(_:)``
+    var credentialsManager: CredentialsManager? { get }
+
+    /// Use a ``CredentialsManager`` to automatically store credentials after successful login and
+    /// clear them after successful logout. If no credentials manager is set, credentials are returned
+    /// directly without being stored.
+    ///
+    /// - Parameter credentialsManager: A ``CredentialsManager`` instance to use.
+    /// - Returns: The same `WebAuth` instance to allow method chaining.
+    func useCredentialsManager(_ credentialsManager: CredentialsManager) -> Self
+
     /// Specify a callback to be called when the ``WebAuthUserAgent`` closes, while the flow continues with the code exchange.
     ///
     /// - Parameter callback: A callback to be executed

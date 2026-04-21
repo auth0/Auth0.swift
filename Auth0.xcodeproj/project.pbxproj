@@ -41,6 +41,7 @@
 		5C0AF09D2833420200162044 /* WebAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AF09C2833420200162044 /* WebAuthentication.swift */; };
 		5C0AF09E2833420200162044 /* WebAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AF09C2833420200162044 /* WebAuthentication.swift */; };
 		5C0E5B6D2DE1100000D38F4C /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552D23C9123000C89615 /* Mocks.swift */; };
+		5C0E5B6E2DE1100100D38F4D /* SpyCredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552E23C9123100C89616 /* SpyCredentialsStorage.swift */; };
 		5C0E5B712DE915DB00D38F4C /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5C0E5B722DE915E100D38F4C /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5C0E5B732DE915EB00D38F4C /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -146,6 +147,7 @@
 		5C4F552623C8FBA100C89615 /* JWKS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552223C8FBA100C89615 /* JWKS.swift */; };
 		5C4F552E23C9123000C89615 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		5C4F553123C9123000C89615 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552D23C9123000C89615 /* Mocks.swift */; };
+		5C4F553223C9123100C89616 /* SpyCredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552E23C9123100C89616 /* SpyCredentialsStorage.swift */; };
 		5C4F553523C9124200C89615 /* JWKSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F553423C9124200C89615 /* JWKSpec.swift */; };
 		5C4F553A23C9125600C89615 /* JWTAlgorithmSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F553923C9125600C89615 /* JWTAlgorithmSpec.swift */; };
 		5C505FAC2E216677005D0757 /* DPoPError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FAB2E216672005D0757 /* DPoPError.swift */; };
@@ -281,6 +283,7 @@
 		5CDF67522DD3DB5400A9B513 /* MyAccountHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF674D2DD3DB4E00A9B513 /* MyAccountHandlers.swift */; };
 		5CE775A2244FCF2000D054A0 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		5CE775A3244FCF3600D054A0 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552D23C9123000C89615 /* Mocks.swift */; };
+		5CE775A4244FCF3700D054A1 /* SpyCredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552E23C9123100C89616 /* SpyCredentialsStorage.swift */; };
 		5CE775A4244FCF3A00D054A0 /* BioAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */; };
 		5CE775A5244FCF3F00D054A0 /* IDTokenValidatorBaseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7523D0C15000074024 /* IDTokenValidatorBaseSpec.swift */; };
 		5CE775A6244FCF4100D054A0 /* IDTokenValidatorMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D5323D0BA4B00074024 /* IDTokenValidatorMocks.swift */; };
@@ -569,6 +572,7 @@
 		C1B3BA4A2C24BA37004A32A4 /* CredentialsManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */; };
 		C1B3BA4B2C24BA37004A32A4 /* CredentialsManagerErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D95275F878E00F15A67 /* CredentialsManagerErrorSpec.swift */; };
 		C1B3BA4C2C24BA37004A32A4 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552D23C9123000C89615 /* Mocks.swift */; };
+		C1B3BA4D2C24BA38004A32A5 /* SpyCredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552E23C9123100C89616 /* SpyCredentialsStorage.swift */; };
 		C1B3BA4D2C24BA37004A32A4 /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
 		C1B3BA4E2C24BA37004A32A4 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
 		C1B3BA4F2C24BA37004A32A4 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
@@ -952,6 +956,7 @@
 		5C4F552223C8FBA100C89615 /* JWKS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWKS.swift; sourceTree = "<group>"; };
 		5C4F552C23C9123000C89615 /* Generators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Generators.swift; sourceTree = "<group>"; };
 		5C4F552D23C9123000C89615 /* Mocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
+		5C4F552E23C9123100C89616 /* SpyCredentialsStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpyCredentialsStorage.swift; sourceTree = "<group>"; };
 		5C4F553423C9124200C89615 /* JWKSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWKSpec.swift; sourceTree = "<group>"; };
 		5C4F553923C9125600C89615 /* JWTAlgorithmSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTAlgorithmSpec.swift; sourceTree = "<group>"; };
 		5C505FAB2E216672005D0757 /* DPoPError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPError.swift; sourceTree = "<group>"; };
@@ -1523,6 +1528,7 @@
 				5FBBF03A1CC96AA70024D2AF /* Responses.swift */,
 				5C4F552C23C9123000C89615 /* Generators.swift */,
 				5C4F552D23C9123000C89615 /* Mocks.swift */,
+				5C4F552E23C9123100C89616 /* SpyCredentialsStorage.swift */,
 				5F06DD951CC451430011842B /* Info.plist */,
 				5FE686A01D1877C10075874C /* Auth0.plist */,
 			);
@@ -2753,6 +2759,7 @@
 				5F1FBB9C1D8A44C1006B0B85 /* ResponseSpec.swift in Sources */,
 				5C3D886A2DC2CCA200AACC34 /* PasskeyLoginChallenge.swift in Sources */,
 				5C4F553123C9123000C89615 /* Mocks.swift in Sources */,
+				5C4F553223C9123100C89616 /* SpyCredentialsStorage.swift in Sources */,
 				5FE686AA1D1894AA0075874C /* Auth0ClientInfoSpec.swift in Sources */,
 				5C41F6B6244DCF2F00252548 /* LoginTransactionSpec.swift in Sources */,
 				5CB41D6523D0BACF00074024 /* IDTokenValidatorMocks.swift in Sources */,
@@ -2854,6 +2861,7 @@
 				5CCDDC442E29703100079840 /* KeychainKeyStoreSpec.swift in Sources */,
 				5C505FFF2E283A81005D0757 /* SecureEnclaveKeyStoreSpec.swift in Sources */,
 				5CE775A3244FCF3600D054A0 /* Mocks.swift in Sources */,
+				5CE775A4244FCF3700D054A1 /* SpyCredentialsStorage.swift in Sources */,
 				5CE775B3244FD71000D054A0 /* WebAuthSpec.swift in Sources */,
 				5C3D880F2DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */,
 				5C15745F2DD7D83B00BF9373 /* MyAccountAuthenticationMethodsSpec.swift in Sources */,
@@ -3075,6 +3083,7 @@
 				5C505FF12E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */,
 				5C505FEE2E27E967005D0757 /* ECPublicKeySpec.swift in Sources */,
 				5C0E5B6D2DE1100000D38F4C /* Mocks.swift in Sources */,
+				5C0E5B6E2DE1100100D38F4D /* SpyCredentialsStorage.swift in Sources */,
 				5F331B101D4BB80700AE4382 /* Auth0Spec.swift in Sources */,
 				5C809D98275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */,
 				C12BFE432C352DD400D1CC00 /* NetworkStub.swift in Sources */,
@@ -3258,6 +3267,7 @@
 				5C505FF32E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */,
 				C1B3BA4B2C24BA37004A32A4 /* CredentialsManagerErrorSpec.swift in Sources */,
 				C1B3BA4C2C24BA37004A32A4 /* Mocks.swift in Sources */,
+				C1B3BA4D2C24BA38004A32A5 /* SpyCredentialsStorage.swift in Sources */,
 				C1B3BA4D2C24BA37004A32A4 /* Matchers.swift in Sources */,
 				5C3D88112DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */,
 				C1B3BA4E2C24BA37004A32A4 /* Responses.swift in Sources */,

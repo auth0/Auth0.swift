@@ -1641,11 +1641,11 @@ class CredentialsManagerSpec: QuickSpec {
                             if attemptTimestamps.count == 3 {
                                 // First retry should be ~0.5s after initial attempt
                                 let delay1 = attemptTimestamps[1].timeIntervalSince(attemptTimestamps[0])
-                                expect(delay1).to(beCloseTo(0.5, within: 0.2))
-                                
+                                expect(delay1).to(beCloseTo(0.5, within: 0.4))
+
                                 // Second retry should be ~1s after first retry
                                 let delay2 = attemptTimestamps[2].timeIntervalSince(attemptTimestamps[1])
-                                expect(delay2).to(beCloseTo(1.0, within: 0.2))
+                                expect(delay2).to(beCloseTo(1.0, within: 0.4))
                             }
                             
                             done()

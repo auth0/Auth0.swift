@@ -41,12 +41,17 @@ struct Auth0WebAuth: WebAuth, Sendable {
     private(set) var provider: WebAuthProvider?
     private(set) var onCloseCallback: (@Sendable @MainActor () -> Void)?
     private(set) var presentationWindow: Auth0WindowRepresentable?
+    private var _credentialsManager: CredentialsManager?
 
     private var _redirectURL: URL?
 
     var redirectURL: URL? {
         get { _redirectURL ?? computeDefaultRedirectURL() }
         set { _redirectURL = newValue }
+    }
+
+    var credentialsManager: CredentialsManager? {
+        return _credentialsManager
     }
 
     var state: String {
@@ -199,6 +204,12 @@ struct Auth0WebAuth: WebAuth, Sendable {
         }
     }
 
+    func useCredentialsManager(_ credentialsManager: CredentialsManager) -> Self {
+        var copy = self
+        copy._credentialsManager = credentialsManager
+        return copy
+    }
+
     @MainActor
     private func _start(_ callback: @escaping @Sendable @MainActor (WebAuthResult<Credentials>) -> Void) {
         guard barrier.raise() else {
@@ -223,6 +234,18 @@ struct Auth0WebAuth: WebAuth, Sendable {
             return callback(.failure(error))
         }
 
+        let credentialsManager = self.credentialsManager
+        let storingCallback: @MainActor @Sendable (WebAuthResult<Credentials>) -> Void = { result in
+            if case .success(let credentials) = result, let cm = credentialsManager {
+                do {
+                    try cm.store(credentials: credentials)
+                } catch {
+                    return callback(.failure(WebAuthError(code: .credentialsManagerError, cause: error)))
+                }
+            }
+            callback(result)
+        }
+
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      ephemeralSession: ephemeralSession,
                                                                      headers: headers,
@@ -238,7 +261,7 @@ struct Auth0WebAuth: WebAuth, Sendable {
                     Task { @MainActor in closeCallback() }
                 }
             case .failure(let error):
-                Task { @MainActor in callback(.failure(error)) }
+                Task { @MainActor in storingCallback(.failure(error)) }
             }
         }
         let transaction = LoginTransaction(redirectURL: redirectURL,
@@ -246,7 +269,7 @@ struct Auth0WebAuth: WebAuth, Sendable {
                                            userAgent: userAgent,
                                            handler: handler,
                                            logger: self.logger,
-                                           callback: callback)
+                                           callback: storingCallback)
         self.storage.store(transaction)
         userAgent.start()
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
@@ -275,13 +298,25 @@ struct Auth0WebAuth: WebAuth, Sendable {
             return callback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
+        let credentialsManager = self.credentialsManager
+        let clearingCallback: @MainActor @Sendable (WebAuthResult<Void>) -> Void = { result in
+            if case .success = result, let cm = credentialsManager {
+                do {
+                    try cm.clear()
+                } catch {
+                    return callback(.failure(WebAuthError(code: .credentialsManagerError, cause: error)))
+                }
+            }
+            callback(result)
+        }
+
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      headers: headers,
                                                                      presentationWindow: self.presentationWindow)
         let userAgent = provider(logoutURL) { [storage, barrier] result in
             storage.clear()
             barrier.lower()
-            Task { @MainActor in callback(result) }
+            Task { @MainActor in clearingCallback(result) }
         }
         let transaction = LogoutTransaction(userAgent: userAgent)
         self.storage.store(transaction)
