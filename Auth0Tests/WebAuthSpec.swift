@@ -575,26 +575,8 @@ class WebAuthSpec: QuickSpec {
 
             context("credentials manager") {
 
-                it("should enable credentials manager by default") {
-                    expect(newWebAuth().credentialsManagerEnabled).to(beTrue())
-                }
-
-                it("should have a default credentials manager") {
-                    expect(newWebAuth().credentialsManager).toNot(beNil())
-                }
-
-                it("should disable credentials manager") {
-                    let webAuth = newWebAuth().useCredentialsManager(enabled: false)
-                    expect(webAuth.credentialsManagerEnabled).to(beFalse())
-                    expect(webAuth.credentialsManager).to(beNil())
-                }
-
-                it("should re-enable credentials manager") {
-                    let webAuth = newWebAuth()
-                        .useCredentialsManager(enabled: false)
-                        .useCredentialsManager(enabled: true)
-                    expect(webAuth.credentialsManagerEnabled).to(beTrue())
-                    expect(webAuth.credentialsManager).toNot(beNil())
+                it("should not have a credentials manager by default") {
+                    expect(newWebAuth().credentialsManager).to(beNil())
                 }
 
                 it("should use a custom credentials manager") {
@@ -606,30 +588,6 @@ class WebAuthSpec: QuickSpec {
                     // Verify it uses the custom CM by storing and checking the spy
                     try? webAuth.credentialsManager?.store(credentials: Credentials())
                     expect(storage.setEntryCallCount).to(equal(1))
-                }
-
-                it("should enable credentials manager when setting a custom one") {
-                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
-                    let customCM = CredentialsManager(authentication: authentication, storage: SpyCredentialsStorage())
-                    let webAuth = newWebAuth()
-                        .useCredentialsManager(enabled: false)
-                        .useCredentialsManager(customCM)
-                    expect(webAuth.credentialsManagerEnabled).to(beTrue())
-                    expect(webAuth.credentialsManager).toNot(beNil())
-                }
-
-                it("should clear custom credentials manager when disabling") {
-                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
-                    let storage = SpyCredentialsStorage()
-                    let customCM = CredentialsManager(authentication: authentication, storage: storage)
-                    let webAuth = newWebAuth()
-                        .useCredentialsManager(customCM)
-                        .useCredentialsManager(enabled: false)
-                    expect(webAuth.credentialsManager).to(beNil())
-                    // After re-enabling, it should use the default CM, not the custom one
-                    _ = webAuth.useCredentialsManager(enabled: true)
-                    try? webAuth.credentialsManager?.store(credentials: Credentials())
-                    expect(storage.setEntryCallCount).to(equal(0))
                 }
 
             }
@@ -1057,7 +1015,7 @@ class WebAuthSpec: QuickSpec {
                     storage.deleteEntryCallCount = 0
 
                     var result: WebAuthResult<Void>?
-                    _ = auth.useCredentialsManager(cm)
+                    auth = auth.useCredentialsManager(cm)
                         .provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.logout() { result = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
@@ -1073,7 +1031,7 @@ class WebAuthSpec: QuickSpec {
                     storage.deleteEntryCallCount = 0
 
                     var result: WebAuthResult<Void>?
-                    _ = auth.useCredentialsManager(cm)
+                    auth = auth.useCredentialsManager(cm)
                         .provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.logout() { result = $0 }
                     TransactionStore.shared.cancel()
@@ -1081,7 +1039,7 @@ class WebAuthSpec: QuickSpec {
                     expect(storage.deleteEntryCallCount).to(equal(0))
                 }
 
-                it("should not clear credentials when credentials manager is disabled") {
+                it("should not clear credentials when no credentials manager is set") {
                     let storage = SpyCredentialsStorage()
                     let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
                     let cm = CredentialsManager(authentication: authentication, storage: storage)
@@ -1089,9 +1047,7 @@ class WebAuthSpec: QuickSpec {
                     storage.deleteEntryCallCount = 0
 
                     var result: WebAuthResult<Void>?
-                    _ = auth.useCredentialsManager(cm)
-                        .useCredentialsManager(enabled: false)
-                        .provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.logout() { result = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(result).toEventually(beSuccessful())

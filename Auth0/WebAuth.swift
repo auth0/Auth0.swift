@@ -210,36 +210,20 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable, Sendable {
 
     /// The ``CredentialsManager`` used by this WebAuth client to automatically store credentials after login
     /// and clear them after logout.
-    /// Returns `nil` if the credentials manager has been disabled.
+    /// Returns `nil` if no credentials manager has been set.
     ///
     /// ## See Also
     ///
     /// - ``useCredentialsManager(_:)``
-    /// - ``useCredentialsManager(enabled:)``
     var credentialsManager: CredentialsManager? { get }
 
-    /// Use a custom ``CredentialsManager`` to automatically store credentials after successful login and
-    /// clear them after successful logout. By default, the WebAuth client uses an internal ``CredentialsManager``.
+    /// Use a ``CredentialsManager`` to automatically store credentials after successful login and
+    /// clear them after successful logout. If no credentials manager is set, credentials are returned
+    /// directly without being stored.
     ///
     /// - Parameter credentialsManager: A ``CredentialsManager`` instance to use.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    ///
-    /// ## See Also
-    ///
-    /// - ``useCredentialsManager(enabled:)``
     func useCredentialsManager(_ credentialsManager: CredentialsManager) -> Self
-
-    /// Enable or disable automatic credentials management. When enabled (the default), credentials are
-    /// automatically stored after login and cleared after logout. When disabled, no credentials will be
-    /// automatically stored or cleared.
-    ///
-    /// - Parameter enabled: Whether to use credentials management.
-    /// - Returns: The same `WebAuth` instance to allow method chaining.
-    ///
-    /// ## See Also
-    ///
-    /// - ``useCredentialsManager(_:)``
-    func useCredentialsManager(enabled: Bool) -> Self
 
     /// Specify a callback to be called when the ``WebAuthUserAgent`` closes, while the flow continues with the code exchange.
     ///

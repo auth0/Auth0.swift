@@ -588,24 +588,12 @@ try DPoP.clearKeypair()
 
 ### Automatic credentials management
 
-By default, the Web Auth client automatically stores credentials after a successful login and clears them after a successful logout, using an internal `CredentialsManager`. This means you don't need to manually call `store(credentials:)` or `clear()` on the Credentials Manager when using Web Auth.
-
-```swift
-// Credentials are automatically stored after login
-let credentials = try await Auth0.webAuth().start()
-
-// Credentials are automatically cleared after logout
-try await Auth0.webAuth().logout()
-```
-
-#### Use a custom Credentials Manager
-
-If you already have a `CredentialsManager` instance (for example, to check for stored credentials or to renew tokens), you can pass it to the Web Auth client. This ensures the same Credentials Manager is used for both automatic and manual credential operations.
+You can pass a `CredentialsManager` instance to the Web Auth client to automatically store credentials after a successful login and clear them after a successful logout. If no credentials manager is set, credentials are returned directly without being stored.
 
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 
-// Use the same CredentialsManager for Web Auth and manual operations
+// Credentials are automatically stored after login
 let credentials = try await Auth0
     .webAuth()
     .useCredentialsManager(credentialsManager)
@@ -613,22 +601,16 @@ let credentials = try await Auth0
 
 // Later, retrieve stored credentials using the same instance
 let storedCredentials = try await credentialsManager.credentials()
-```
 
-#### Disable automatic credentials management
-
-If you prefer to manage credentials yourself, you can disable automatic credentials management.
-
-```swift
-let credentials = try await Auth0
+// Credentials are automatically cleared after logout
+try await Auth0
     .webAuth()
-    .useCredentialsManager(enabled: false)
-    .start()
-
-// You must manually store the credentials
-let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
-try credentialsManager.store(credentials: credentials)
+    .useCredentialsManager(credentialsManager)
+    .logout()
 ```
+
+> [!NOTE]
+> If the credentials manager fails to store or clear credentials, a `WebAuthError.credentialsManagerError` will be thrown. The underlying error can be accessed via the `cause` property.
 
 ### Web Auth errors
 

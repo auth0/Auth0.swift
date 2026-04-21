@@ -41,9 +41,7 @@ struct Auth0WebAuth: WebAuth, Sendable {
     private(set) var provider: WebAuthProvider?
     private(set) var onCloseCallback: (@Sendable @MainActor () -> Void)?
     private(set) var presentationWindow: Auth0WindowRepresentable?
-    private(set) var credentialsManagerEnabled: Bool = true
-    private var _customCredentialsManager: CredentialsManager?
-    private var _defaultCredentialsManager: CredentialsManager?
+    private var _credentialsManager: CredentialsManager?
 
     private var _redirectURL: URL?
 
@@ -53,8 +51,7 @@ struct Auth0WebAuth: WebAuth, Sendable {
     }
 
     var credentialsManager: CredentialsManager? {
-        guard credentialsManagerEnabled else { return nil }
-        return _customCredentialsManager ?? _defaultCredentialsManager
+        return _credentialsManager
     }
 
     var state: String {
@@ -78,8 +75,6 @@ struct Auth0WebAuth: WebAuth, Sendable {
         self.auth0ClientInfo = auth0ClientInfo
         self.barrier = barrier
         self.issuer = url.absoluteString
-        let authentication = Auth0Authentication(clientId: clientId, url: url, session: session)
-        self._defaultCredentialsManager = CredentialsManager(authentication: authentication)
     }
 
     func connection(_ connection: String) -> Self {
@@ -211,17 +206,7 @@ struct Auth0WebAuth: WebAuth, Sendable {
 
     func useCredentialsManager(_ credentialsManager: CredentialsManager) -> Self {
         var copy = self
-        copy._customCredentialsManager = credentialsManager
-        copy.credentialsManagerEnabled = true
-        return copy
-    }
-
-    func useCredentialsManager(enabled: Bool) -> Self {
-        var copy = self
-        copy.credentialsManagerEnabled = enabled
-        if !enabled {
-            copy._customCredentialsManager = nil
-        }
+        copy._credentialsManager = credentialsManager
         return copy
     }
 
@@ -252,7 +237,11 @@ struct Auth0WebAuth: WebAuth, Sendable {
         let credentialsManager = self.credentialsManager
         let storingCallback: @MainActor @Sendable (WebAuthResult<Credentials>) -> Void = { result in
             if case .success(let credentials) = result, let cm = credentialsManager {
-                try? cm.store(credentials: credentials)
+                do {
+                    try cm.store(credentials: credentials)
+                } catch {
+                    return callback(.failure(WebAuthError(code: .credentialsManagerError, cause: error)))
+                }
             }
             callback(result)
         }
@@ -312,7 +301,11 @@ struct Auth0WebAuth: WebAuth, Sendable {
         let credentialsManager = self.credentialsManager
         let clearingCallback: @MainActor @Sendable (WebAuthResult<Void>) -> Void = { result in
             if case .success = result, let cm = credentialsManager {
-                try? cm.clear()
+                do {
+                    try cm.clear()
+                } catch {
+                    return callback(.failure(WebAuthError(code: .credentialsManagerError, cause: error)))
+                }
             }
             callback(result)
         }
