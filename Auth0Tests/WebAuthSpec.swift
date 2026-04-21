@@ -1018,6 +1018,7 @@ class WebAuthSpec: QuickSpec {
                     auth = auth.useCredentialsManager(cm)
                         .provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(result).toEventually(beSuccessful())
                     expect(storage.deleteEntryCallCount).to(equal(1))
@@ -1034,6 +1035,7 @@ class WebAuthSpec: QuickSpec {
                     auth = auth.useCredentialsManager(cm)
                         .provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     TransactionStore.shared.cancel()
                     expect(result).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(storage.deleteEntryCallCount).to(equal(0))
@@ -1049,6 +1051,7 @@ class WebAuthSpec: QuickSpec {
                     var result: WebAuthResult<Void>?
                     auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(result).toEventually(beSuccessful())
                     expect(storage.deleteEntryCallCount).to(equal(0))
