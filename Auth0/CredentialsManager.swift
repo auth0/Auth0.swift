@@ -5,7 +5,6 @@ import Foundation
 import SimpleKeychain
 import JWTDecode
 import Combine
-import CryptoKit
 #if WEB_AUTH_PLATFORM
 import LocalAuthentication
 #endif
@@ -818,10 +817,7 @@ public struct CredentialsManager: Sendable {
         do {
             let thumbprint = try dpop.jkt()
             // Store a SHA-256 hash of the thumbprint to avoid persisting the raw key thumbprint in device storage
-            let hashedThumbprint = SHA256.hash(data: Data(thumbprint.utf8))
-                .map { String(format: "%02x", $0) }
-                .joined()
-            try self.storage.setEntry(Data(hashedThumbprint.utf8), forKey: self.dpopThumbprintKey)
+            try self.storage.setEntry(Data(thumbprint.utf8), forKey: self.dpopThumbprintKey)
         } catch {
             try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
         }

@@ -3421,14 +3421,10 @@ class CredentialsManagerSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
                         expect(result).to(beSuccessful())
->>>>>>> e6ed3035 (test(credentials-manager): Add 100% coverage for DPoP validation errors)
-                        done()
                     }
                 }
             }
 
-<<<<<<< HEAD
-=======
             // MARK: dpopNotConfigured
 
             it("should return dpopNotConfigured when DPoP credentials exist but authentication has no DPoP") {
