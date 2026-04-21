@@ -538,6 +538,9 @@ Auth0
 > [!NOTE]
 > If the credentials manager fails to store or clear credentials, a `WebAuthError.credentialsManagerError` will be thrown. The underlying error can be accessed via the `cause` property.
 
+> [!IMPORTANT]
+> When using `useCredentialsManager(_:)`, do **not** manually call `store(credentials:)` after login or `clear()` after logout on the same `CredentialsManager` instance. The Web Auth client handles this automatically. Manually storing or clearing credentials alongside automatic management can lead to race conditions or inconsistent state.
+
 **Reason:** Many apps need to store credentials after login and clear them after logout. The `useCredentialsManager(_:)` method reduces boilerplate and prevents common mistakes such as forgetting to store or clear credentials.
 
 ## Methods Added
