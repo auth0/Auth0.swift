@@ -11,6 +11,7 @@ public struct WebAuthError: Auth0Error, Sendable {
         case authenticationFailed
         case codeExchangeFailed
         case idTokenValidationFailed
+        case credentialsManagerError
         case other
         case unknown(String)
     }
@@ -56,6 +57,10 @@ public struct WebAuthError: Auth0Error, Sendable {
     /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
 
+    /// The credentials manager failed to store or clear credentials.
+    /// The underlying ``CredentialsManagerError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let credentialsManagerError: WebAuthError = .init(code: .credentialsManagerError)
+
     /// An unexpected error occurred, and an `Error` value is available.
     /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let other: WebAuthError = .init(code: .other)
@@ -79,6 +84,7 @@ public extension WebAuthError {
         case .authenticationFailed: return "The authentication request failed."
         case .codeExchangeFailed: return "The authorization code exchange failed."
         case .idTokenValidationFailed: return "The ID token validation performed after authentication failed."
+        case .credentialsManagerError: return "The credentials manager failed to store or clear credentials."
         case .other: return "An unexpected error occurred."
         case .unknown(let message): return message
         }

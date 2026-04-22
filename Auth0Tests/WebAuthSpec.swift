@@ -573,6 +573,25 @@ class WebAuthSpec: QuickSpec {
 
             }
 
+            context("credentials manager") {
+
+                it("should not have a credentials manager by default") {
+                    expect(newWebAuth().credentialsManager).to(beNil())
+                }
+
+                it("should use a custom credentials manager") {
+                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
+                    let storage = SpyCredentialsStorage()
+                    let customCM = CredentialsManager(authentication: authentication, storage: storage)
+                    let webAuth = newWebAuth().useCredentialsManager(customCM)
+                    expect(webAuth.credentialsManager).toNot(beNil())
+                    // Verify it uses the custom CM by storing and checking the spy
+                    try? webAuth.credentialsManager?.store(credentials: Credentials())
+                    expect(storage.setEntryCallCount).to(equal(1))
+                }
+
+            }
+
         }
 
         #if os(iOS) || os(visionOS)
@@ -986,6 +1005,60 @@ class WebAuthSpec: QuickSpec {
 
             }
 
+            context("credentials manager") {
+
+                it("should clear credentials on successful logout") {
+                    let storage = SpyCredentialsStorage()
+                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
+                    let cm = CredentialsManager(authentication: authentication, storage: storage)
+                    try? cm.store(credentials: Credentials())
+                    storage.deleteEntryCallCount = 0
+
+                    var result: WebAuthResult<Void>?
+                    auth = auth.useCredentialsManager(cm)
+                        .provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
+                    _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
+                    expect(result).toEventually(beSuccessful())
+                    expect(storage.deleteEntryCallCount).to(equal(1))
+                }
+
+                it("should not clear credentials on failed logout") {
+                    let storage = SpyCredentialsStorage()
+                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
+                    let cm = CredentialsManager(authentication: authentication, storage: storage)
+                    try? cm.store(credentials: Credentials())
+                    storage.deleteEntryCallCount = 0
+
+                    var result: WebAuthResult<Void>?
+                    auth = auth.useCredentialsManager(cm)
+                        .provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
+                    TransactionStore.shared.cancel()
+                    expect(result).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
+                    expect(storage.deleteEntryCallCount).to(equal(0))
+                }
+
+                it("should not clear credentials when no credentials manager is set") {
+                    let storage = SpyCredentialsStorage()
+                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
+                    let cm = CredentialsManager(authentication: authentication, storage: storage)
+                    try? cm.store(credentials: Credentials())
+                    storage.deleteEntryCallCount = 0
+
+                    var result: WebAuthResult<Void>?
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
+                    _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
+                    expect(result).toEventually(beSuccessful())
+                    expect(storage.deleteEntryCallCount).to(equal(0))
+                }
+
+            }
+
             context("barrier") {
 
                 beforeEach {
@@ -1092,3 +1165,5 @@ class MockUserAgent: WebAuthUserAgent {
     }
 
 }
+
+
