@@ -420,6 +420,52 @@ class MyCustomStorage: CredentialsStorage {
 
 In v2, storage read failures were swallowed by `try?` — for example, `revoke()` returned `.success` when no credentials were stored and `getEntry(forKey:)` threw. In v3, the underlying storage error is propagated as the `cause` of the `CredentialsManagerError`, giving callers full context to respond appropriately.
 
+**DPoP validation errors:** When DPoP-bound credentials are stored, the Credentials Manager now validates the DPoP state before attempting renewal. The following new errors can be thrown by `credentials()`, `apiCredentials()`, and `ssoCredentials()`:
+
+| Method | New error delivered to callback | Trigger |
+| --- | --- | --- |
+| `credentials(...)` | `.dpopNotConfigured` | Stored credentials are DPoP-bound but the `Authentication` client was not configured with `.useDPoP()` |
+| `credentials(...)` | `.dpopKeyMissing` | Stored credentials are DPoP-bound but the DPoP key pair is no longer available in the Keychain |
+| `credentials(...)` | `.dpopKeyMismatch` | Stored credentials are DPoP-bound but the current DPoP key pair does not match the one used when credentials were saved |
+| `apiCredentials(...)` | `.dpopNotConfigured` | Same as above — DPoP-bound credentials without DPoP configuration |
+| `apiCredentials(...)` | `.dpopKeyMissing` | Same as above — DPoP key pair no longer in Keychain |
+| `apiCredentials(...)` | `.dpopKeyMismatch` | Same as above — DPoP key pair mismatch |
+| `ssoCredentials(...)` | `.dpopNotConfigured` | Same as above — DPoP-bound credentials without DPoP configuration |
+| `ssoCredentials(...)` | `.dpopKeyMissing` | Same as above — DPoP key pair no longer in Keychain |
+| `ssoCredentials(...)` | `.dpopKeyMismatch` | Same as above — DPoP key pair mismatch |
+
+Additionally, `store(credentials:)` now persists the DPoP thumbprint alongside credentials when the `Authentication` client is configured with DPoP. This allows the Credentials Manager to detect key changes across app launches.
+
+<details>
+  <summary>Migration example — handling DPoP validation errors</summary>
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        // use credentials
+        break
+    case .failure(let error):
+        switch error {
+        case .dpopNotConfigured:
+            // re-initialize CredentialsManager with DPoP-configured Authentication client
+            break
+        case .dpopKeyMissing:
+            // DPoP key was deleted from Keychain — clear credentials and re-authenticate
+            try? credentialsManager.clear()
+            navigateToLogin()
+        case .dpopKeyMismatch:
+            // DPoP key changed — clear credentials and re-authenticate
+            try? credentialsManager.clear()
+            navigateToLogin()
+        default:
+            showError(error)
+        }
+    }
+}
+```
+</details>
+
 Additionally, the `user` property has been replaced with the `userProfile()` method that now throws errors instead of silently returning `nil`:
 
 | Method | Error thrown | Trigger |
