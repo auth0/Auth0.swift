@@ -171,7 +171,7 @@ public struct CredentialsManager: Sendable {
         self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
         self.biometricSession.lock.unlock()
         #endif
-        try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+        try? self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
         try self.storage.deleteEntry(forKey: self.storeKey)
     }
 
@@ -773,8 +773,8 @@ public struct CredentialsManager: Sendable {
     }
 
     private func validateDPoPState(for credentials: Credentials) throws {
-        let storedThumbprint = try self.storage.getEntry(forKey: self.dpopThumbprintKey)
-        let storedThumbPrintValue = String(data: storedThumbprint, encoding: .utf8)
+        let storedThumbprint = try? self.storage.getEntry(forKey: self.dpopThumbprintKey)
+        let storedThumbPrintValue = storedThumbprint.flatMap { String(data: $0, encoding: .utf8) }
 
         let isDPoPBound = credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame
             || storedThumbPrintValue != nil
@@ -815,7 +815,7 @@ public struct CredentialsManager: Sendable {
 
         guard dpopUsed,
               let dpop = self.authentication.dpop else {
-            try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+            try? self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
             return
         }
 
@@ -824,7 +824,7 @@ public struct CredentialsManager: Sendable {
             // Store a SHA-256 hash of the thumbprint to avoid persisting the raw key thumbprint in device storage
             try self.storage.setEntry(Data(thumbprint.utf8), forKey: self.dpopThumbprintKey)
         } catch {
-            try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+            try? self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
         }
     }
 
@@ -936,6 +936,9 @@ public struct CredentialsManager: Sendable {
                             }
                         }
                     }
+            } catch let error as CredentialsManagerError {
+                complete()
+                callback(.failure(error))
             } catch {
                 complete()
                 callback(.failure(CredentialsManagerError(code: .noCredentials, cause: error)))
@@ -987,6 +990,9 @@ public struct CredentialsManager: Sendable {
                             callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: error)))
                         }
                     }
+            } catch let error as CredentialsManagerError {
+                complete()
+                return callback(.failure(error))
             } catch {
                 complete()
                 return callback(.failure(CredentialsManagerError(code: .noCredentials, cause: error)))
@@ -1053,6 +1059,9 @@ public struct CredentialsManager: Sendable {
                             callback(.failure(CredentialsManagerError(code: .apiExchangeFailed, cause: error)))
                         }
                     }
+            } catch let error as CredentialsManagerError {
+                complete()
+                callback(.failure(error))
             } catch {
                 complete()
                 callback(.failure(CredentialsManagerError(code: .noCredentials, cause: error)))
