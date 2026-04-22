@@ -55,6 +55,7 @@ public extension Requestable {
 
      - Throws: An error that conforms to ``Auth0APIError``.
      */
+    @MainActor
     func start() async throws -> ResultType where ResultType: Sendable {
         return try await withCheckedThrowingContinuation { continuation in
             self.start { @Sendable result in

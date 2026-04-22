@@ -4,11 +4,14 @@
 
 Auth0.swift v3 includes many significant changes:
 
-- Updated default values for better out-of-the-box behavior.
-- Behavior changes to improve developer experience:
-  - Consistent main thread callback execution for UI updates.
-- Methods added for supporting new features
-
+- **Swift 6 concurrency:** Full strict concurrency compliance with `Sendable` conformances, `@MainActor` callbacks, and `@Sendable` closures across all public APIs.
+- **Improved error handling:** `CredentialsManager` and `CredentialsStorage` methods now throw errors instead of returning `Bool` or optional values, giving callers full context to respond appropriately.
+- **Updated default values** for better out-of-the-box behavior.
+- **Behavior changes** to improve developer experience:
+  - All completion callbacks are guaranteed to execute on the main thread.
+- **Renamed APIs** for alignment with the Android, Flutter, and React Native Auth0 SDKs.
+- **New APIs:** Multi-window support, `clearAll()`, ID token validation, and protocol-based return types for easier testing.
+- **Removed APIs:** The Management API client has been removed.
 
 As expected with a major release, Auth0.swift v3 contains breaking changes. Please review this guide thoroughly to understand the changes required to migrate your application to v3.
 
@@ -23,7 +26,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Credentials Manager minTTL](#credentials-manager-minttl)
   + [Signup connection](#signup-connection)
 - [**Behavior Changes**](#behavior-changes)
-  + [Completion callbacks](#completion-callbacks)
+  + [Main thread result delivery](#main-thread-result-delivery)
   + [Credentials Manager error handling](#credentials-manager-error-handling)
   + [Automatic credentials management in Web Auth](#automatic-credentials-management-in-web-auth)
 - [**Methods Added**](#methods-added)
@@ -189,22 +192,30 @@ Auth0
 
 ## Behavior Changes
 
-### Completion callbacks
+### Main thread result delivery
 
-**Change:** All completion callbacks are now annotated `@MainActor` and are guaranteed to execute on the main thread.
+**Change:** All three API variants — callback, Combine, and async/await — now guarantee that results are delivered on the main thread.
 
-In v2, completion callbacks would sometimes execute on the main thread and sometimes on background threads, depending on where `URLSession` completed the network request. In v3, all completion callbacks are annotated `@MainActor`, giving both a compile-time guarantee and a runtime guarantee that the callback executes on the main thread.
+Any method returning `Requestable` or `TokenRequestable` delivers its result on the main thread regardless of which variant you use:
+
+| Variant | How main thread delivery is guaranteed |
+| --- | --- |
+| **Callback** | The callback parameter is annotated `@MainActor`, giving both a compile-time and runtime guarantee. |
+| **Combine** | The publisher applies `.receive(on: DispatchQueue.main)` internally, so subscribers always receive values and completions on the main thread. |
+| **Async/await** | The `start()` method is annotated `@MainActor`, so it always resumes on the main actor. |
+
+In v2, completion callbacks would sometimes execute on the main thread and sometimes on background threads, depending on where `URLSession` completed the network request. The Combine and async/await variants inherited the same unpredictable threading. In v3, all three variants guarantee main thread delivery.
 
 **Affected APIs:**
 
-- All Authentication API methods using callbacks
-- All Credentials Manager methods using callbacks
-- All Web Auth methods using callbacks
+- All Authentication API methods (callback, Combine, and async/await)
+- All Credentials Manager methods (callback, Combine, and async/await)
+- All Web Auth methods (callback, Combine, and async/await)
 
-**Impact:** If your code performs CPU-intensive work in callbacks, you should explicitly dispatch to a background queue.
+**Impact:** If your code performs CPU-intensive work in callbacks or Combine subscribers, you should explicitly dispatch to a background queue. You no longer need `DispatchQueue.main.async` or `.receive(on: DispatchQueue.main)` when consuming results from Auth0.swift.
 
 <details>
-  <summary>Migration example</summary>
+  <summary>Migration example — callback</summary>
 
 ```swift
 // v2 - thread was unpredictable, had to dispatch to main for UI updates
@@ -231,7 +242,64 @@ credentialsManager.credentials { result in
 ```
 </details>
 
-**Reason:** After performing operations with Auth0.swift, it's common to run presentation logic – for example, to show an error or navigate to the main flow of the app. Having callbacks execute on the main thread by default improves developer experience and reduces boilerplate.
+<details>
+  <summary>Migration example — Combine</summary>
+
+```swift
+// v2 - had to use receive(on:) to ensure main thread delivery
+Auth0
+    .authentication()
+    .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication")
+    .start()
+    .receive(on: DispatchQueue.main)
+    .sink(receiveCompletion: { completion in
+        // ...
+    }, receiveValue: { credentials in
+        self.updateUI(credentials)
+    })
+    .store(in: &cancellables)
+
+// v3 - receive(on:) is no longer needed, results are already on the main thread
+Auth0
+    .authentication()
+    .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication")
+    .start()
+    .sink(receiveCompletion: { completion in
+        // ...
+    }, receiveValue: { credentials in
+        self.updateUI(credentials)
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Migration example — async/await</summary>
+
+```swift
+// v2 - start() could resume on any thread; had to hop to main for UI work
+Task {
+    let credentials = try await Auth0
+        .authentication()
+        .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication")
+        .start()
+    await MainActor.run {
+        self.updateUI(credentials)
+    }
+}
+
+// v3 - start() is @MainActor, so it always resumes on the main thread
+Task {
+    let credentials = try await Auth0
+        .authentication()
+        .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication")
+        .start()
+    self.updateUI(credentials) // already on main thread
+}
+```
+</details>
+
+**Reason:** After performing operations with Auth0.swift, it's common to run presentation logic – for example, to show an error or navigate to the main flow of the app. Guaranteeing main thread delivery across all three API variants improves developer experience and eliminates an entire class of threading bugs.
 
 ### Credentials Manager error handling
 
@@ -586,14 +654,10 @@ This is different from the existing `clear()` method, which only removes the def
 
 ```swift
 // Clear only the default credentials entry (existing method)
-let cleared = credentialsManager.clear()
+try credentialsManager.clear()
 
 // Clear ALL keychain entries managed by the Credentials Manager (new method)
-do {
-    try credentialsManager.clearAll()
-} catch {
-    print("Failed to clear all credentials: \(error)")
-}
+try credentialsManager.clearAll()
 ```
 </details>
 
@@ -618,9 +682,9 @@ class MyCustomCredentialStorage: CredentialsStorage {
 
 // v3 - Implement deleteAllEntries() if you plan to use clearAll()
 class MyCustomCredentialStorage: CredentialsStorage {
-    func getEntry(forKey key: String) -> Data? { ... }
-    func setEntry(_ data: Data, forKey key: String) -> Bool { ... }
-    func deleteEntry(forKey key: String) -> Bool { ... }
+    func getEntry(forKey key: String) throws -> Data { ... }
+    func setEntry(_ data: Data, forKey key: String) throws { ... }
+    func deleteEntry(forKey key: String) throws { ... }
 
     func deleteAllEntries() throws {
         // Delete all entries from your custom storage
@@ -979,7 +1043,7 @@ auth.auth0ClientInfo.enabled = false
 ```
 </details>
 
-## Request to Requestable
+### Request to Requestable
 
 **Change:** All `Authentication` and `MFAClient` methods now return protocol types instead of the concrete `Request` struct:
 
@@ -1039,6 +1103,7 @@ func testLoginSuccess() {
 }
 ```
 </details>
+
 ### ID Token Validation
 
 **Change:** All credential-returning methods on `Authentication` and `MFAClient` now return `any TokenRequestable<T, E>`. `TokenRequestable` extends `Requestable` and adds opt-in ID token claim validation via a chainable builder API.
