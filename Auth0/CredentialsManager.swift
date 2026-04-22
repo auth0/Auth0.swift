@@ -153,7 +153,9 @@ public struct CredentialsManager: Sendable {
         let data = try NSKeyedArchiver.archivedData(withRootObject: credentials,
                                                     requiringSecureCoding: true)
         try self.storage.setEntry(data, forKey: self.storeKey)
-        try saveDPoPThumbprint(for: credentials)
+        do {
+            try saveDPoPThumbprint(for: credentials)
+        } catch { }
     }
 
     /// Clears credentials stored in the Keychain.
@@ -171,8 +173,8 @@ public struct CredentialsManager: Sendable {
         self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
         self.biometricSession.lock.unlock()
         #endif
-        try? self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
         try self.storage.deleteEntry(forKey: self.storeKey)
+        try? self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
     }
 
     /// Clears API credentials stored in the Keychain for a given audience value.
@@ -785,14 +787,9 @@ public struct CredentialsManager: Sendable {
             throw CredentialsManagerError.dpopNotConfigured
         }
 
-        var hasKeyPair = true
-        do {
-            hasKeyPair = try dpop.hasKeypair()
-        } catch {
-            hasKeyPair = false
-        }
+        var hasKeyPair = try? dpop.hasKeypair()
 
-        if hasKeyPair == false {
+        guard hasKeyPair == true else {
             try self.clear()
             throw CredentialsManagerError.dpopKeyMissing
         }
@@ -810,21 +807,18 @@ public struct CredentialsManager: Sendable {
     }
 
     private func saveDPoPThumbprint(for credentials: Credentials) throws {
-        let dpopUsed = credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame
-        || self.authentication.dpop != nil
-
-        guard dpopUsed,
+        // token type must be DPoP and authentication must have non nil dpop property
+        guard credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame,
               let dpop = self.authentication.dpop else {
-            try? self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+            try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
             return
         }
 
-        do {
-            let thumbprint = try dpop.jkt()
+        if let thumbprint = try? dpop.jkt() {
             // Store a SHA-256 hash of the thumbprint to avoid persisting the raw key thumbprint in device storage
             try self.storage.setEntry(Data(thumbprint.utf8), forKey: self.dpopThumbprintKey)
-        } catch {
-            try? self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+        } else {
+            try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
         }
     }
 
