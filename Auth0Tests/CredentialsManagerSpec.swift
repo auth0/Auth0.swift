@@ -3343,48 +3343,48 @@ class CredentialsManagerSpec: QuickSpec {
 
         describe("main thread callback execution") {
 
-            afterEach {
-                try? credentialsManager.clear()
-            }
+                afterEach {
+                    try? credentialsManager.clear()
+                }
 
-            it("should execute credentials() callback on main thread") {
-                try? credentialsManager.store(credentials: credentials)
+                it("should execute credentials() callback on main thread") {
+                    try? credentialsManager.store(credentials: credentials)
 
-                waitUntil(timeout: Timeout) { done in
-                    credentialsManager.credentials { result in
-                        expect(Thread.isMainThread).to(beTrue())
-                        done()
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.credentials { result in
+                            expect(Thread.isMainThread).to(beTrue())
+                            done()
+                        }
                     }
                 }
-            }
 
-            it("should execute revoke() callback on main thread") {
-                try? credentialsManager.store(credentials: credentials)
-                NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken]) },
-                                    response: revokeTokenResponse())
+                it("should execute revoke() callback on main thread") {
+                    try? credentialsManager.store(credentials: credentials)
+                    NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken]) },
+                                        response: revokeTokenResponse())
 
-                waitUntil(timeout: Timeout) { done in
-                    credentialsManager.revoke { result in
-                        expect(Thread.isMainThread).to(beTrue())
-                        done()
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.revoke { result in
+                            expect(Thread.isMainThread).to(beTrue())
+                            done()
+                        }
                     }
                 }
-            }
 
-            it("should execute renew() callback on main thread") {
-                try? credentialsManager.store(credentials: credentials)
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: RefreshToken, expiresAt: ExpiresIn))
+                it("should execute renew() callback on main thread") {
+                    try? credentialsManager.store(credentials: credentials)
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
+                                        response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: RefreshToken, expiresAt: ExpiresIn))
 
-                waitUntil(timeout: Timeout) { done in
-                    credentialsManager.renew { result in
-                        expect(Thread.isMainThread).to(beTrue())
-                        done()
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.renew { result in
+                            expect(Thread.isMainThread).to(beTrue())
+                            done()
+                        }
                     }
                 }
-            }
 
-        }
+            }
 
     }
 }

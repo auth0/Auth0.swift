@@ -234,11 +234,10 @@ struct Auth0WebAuth: WebAuth, Sendable {
             return callback(.failure(error))
         }
 
-        let credentialsManager = self.credentialsManager
         let storingCallback: @MainActor @Sendable (WebAuthResult<Credentials>) -> Void = { result in
-            if case .success(let credentials) = result, let cm = credentialsManager {
+            if case .success(let credentials) = result, let credentialsManager {
                 do {
-                    try cm.store(credentials: credentials)
+                    try credentialsManager.store(credentials: credentials)
                 } catch {
                     return callback(.failure(WebAuthError(code: .credentialsManagerError, cause: error)))
                 }
