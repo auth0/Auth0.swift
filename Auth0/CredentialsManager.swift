@@ -153,9 +153,7 @@ public struct CredentialsManager: Sendable {
         let data = try NSKeyedArchiver.archivedData(withRootObject: credentials,
                                                     requiringSecureCoding: true)
         try self.storage.setEntry(data, forKey: self.storeKey)
-        do {
-            try saveDPoPThumbprint(for: credentials)
-        } catch { }
+        try? saveDPoPThumbprint(for: credentials)
     }
 
     /// Clears credentials stored in the Keychain.
