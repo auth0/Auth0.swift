@@ -787,7 +787,7 @@ public struct CredentialsManager: Sendable {
             throw CredentialsManagerError.dpopNotConfigured
         }
 
-        var hasKeyPair = try? dpop.hasKeypair()
+        let hasKeyPair = try? dpop.hasKeypair()
 
         guard hasKeyPair == true else {
             try self.clear()

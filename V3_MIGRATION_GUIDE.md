@@ -450,12 +450,13 @@ credentialsManager.credentials { result in
         case .dpopNotConfigured:
             // Developer forgot to call useDPoP() on the Authentication client
             // passed to the credentials manager. Fix the client configuration.
+            ```swift
+                CredentialsManager(authentication: Auth0.authentication().useDPoP())
+            ```swift
         case .dpopKeyMissing:
-            // DPoP key was lost 
-            // Clear local state and prompt user to re-authenticate
+            // DPoP key was lost. Clear local state and prompt user to re-authenticate
         case .dpopKeyMismatch:
-            // DPoP key exists but doesn't match the one used at login (key rotation)
-            // Clear local state and prompt user to re-authenticate
+            // DPoP key exists but doesn't match the one used at login (key rotation). Clear local state and prompt user to re-authenticate
         default:
             showError(error)
         }
@@ -463,6 +464,9 @@ credentialsManager.credentials { result in
 }
 ```
 </details>
+
+> [!NOTE]
+> These errors are related for you if you are using DPoP support and you must ensure to handle these errors when migrating to V3.
 
 Additionally, the `user` property has been replaced with the `userProfile()` method that now throws errors instead of silently returning `nil`:
 
