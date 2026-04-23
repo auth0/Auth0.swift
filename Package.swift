@@ -4,7 +4,7 @@ import PackageDescription
 
 let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst, .visionOS]
 let swiftSettings: [SwiftSetting] = [
-    .swiftLanguageMode(.v5),
+    .swiftLanguageMode(.v6),
     .define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms)),
     .define("PASSKEYS_PLATFORM", .when(platforms: webAuthPlatforms))
 ]
