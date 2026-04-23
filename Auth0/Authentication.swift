@@ -19,6 +19,8 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     var clientId: String { get }
     /// The Auth0 Domain URL.
     var url: URL { get }
+    /// The DPoP instance for Demonstration of Proof-of-Possession, if configured.
+    var dpop: DPoP? { get set }
 
     // MARK: - Methods
 
