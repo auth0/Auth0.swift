@@ -808,13 +808,14 @@ public struct CredentialsManager: Sendable {
 
     private func saveDPoPThumbprint(for credentials: Credentials) throws {
         // token type must be DPoP and authentication must have non nil dpop property
-        guard credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame,
-              let dpop = self.authentication.dpop else {
+        guard credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame ||
+               self.authentication.dpop != nil else {
             try self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
             return
         }
 
-        if let thumbprint = try? dpop.jkt() {
+        if let dpop = authentication.dpop,
+            let thumbprint = try? dpop.jkt() {
             // Store a SHA-256 hash of the thumbprint to avoid persisting the raw key thumbprint in device storage
             try self.storage.setEntry(Data(thumbprint.utf8), forKey: self.dpopThumbprintKey)
         } else {

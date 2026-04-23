@@ -424,7 +424,7 @@ In v2, storage read failures were swallowed by `try?` — for example, `revoke()
 
 | Method | New error delivered to callback | Trigger |
 | --- | --- | --- |
-| `credentials(...)` | `.dpopNotConfigured` | Stored credentials are DPoP-bound but the `Authentication` client was not configured with `.useDPoP()` |
+| `credentials(...)` | `.dpopNotConfigured` | Stored credentials are DPoP-bound but the `Authentication()` client was not configured with `.useDPoP()` |
 | `credentials(...)` | `.dpopKeyMissing` | Stored credentials are DPoP-bound but the DPoP key pair is no longer available in the Keychain |
 | `credentials(...)` | `.dpopKeyMismatch` | Stored credentials are DPoP-bound but the current DPoP key pair does not match the one used when credentials were saved |
 | `apiCredentials(...)` | `.dpopNotConfigured` | Same as above — DPoP-bound credentials without DPoP configuration |
@@ -448,16 +448,14 @@ credentialsManager.credentials { result in
     case .failure(let error):
         switch error {
         case .dpopNotConfigured:
-            // re-initialize CredentialsManager with DPoP-configured Authentication client
-            break
+            // Developer forgot to call useDPoP() on the Authentication client
+            // passed to the credentials manager. Fix the client configuration.
         case .dpopKeyMissing:
-            // DPoP key was deleted from Keychain — clear credentials and re-authenticate
-            try? credentialsManager.clear()
-            navigateToLogin()
+            // DPoP key was lost 
+            // Clear local state and prompt user to re-authenticate
         case .dpopKeyMismatch:
-            // DPoP key changed — clear credentials and re-authenticate
-            try? credentialsManager.clear()
-            navigateToLogin()
+            // DPoP key exists but doesn't match the one used at login (key rotation)
+            // Clear local state and prompt user to re-authenticate
         default:
             showError(error)
         }
