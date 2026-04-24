@@ -1,6 +1,6 @@
 # v3 Migration Guide
 
-> **Note:** This guide is actively maintained during the v3 development phase. As new changes are merged, this document will be updated to reflect the latest breaking changes and migration steps.
+> [!NOTE] This guide is actively maintained during the v3 development phase. As new changes are merged, this document will be updated to reflect the latest breaking changes and migration steps.
 
 Auth0.swift v3 includes many significant changes:
 
@@ -9,6 +9,7 @@ Auth0.swift v3 includes many significant changes:
 - **Updated default values** for better out-of-the-box behavior.
 - **Behavior changes** to improve developer experience:
   - All completion callbacks are guaranteed to execute on the main thread.
+  - Improved error handling surfacing in `CredentialsManager` methods.
 - **Renamed APIs** for alignment with the Android, Flutter, and React Native Auth0 SDKs.
 - **New APIs:** Multi-window support, `clearAll()`, ID token validation, and protocol-based return types for easier testing.
 - **Removed APIs:** The Management API client has been removed.
@@ -20,7 +21,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 ## Table of Contents
 
 - [**Swift 6 Concurrency**](#swift-6-concurrency)
-  + [WebAuth is now a struct](#webauth-is-now-sendable)
+  + [WebAuth is now Sendable](#webauth-is-now-sendable)
   + [Sendable protocol conformances](#sendable-protocol-conformances)
   + [Sendable conformances for Web Auth typealiases](#sendable-conformances-for-web-auth-typealiases)
   + [@MainActor callback parameters](#mainactor-callback-parameters)
@@ -34,6 +35,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 - [**Behavior Changes**](#behavior-changes)
   + [Main thread result delivery](#main-thread-result-delivery)
   + [Credentials Manager error handling](#credentials-manager-error-handling)
+  + [DPoP validation errors](#dpop-validation-errors)
   + [Automatic credentials management in Web Auth](#automatic-credentials-management-in-web-auth)
 - [**Methods Added**](#methods-added)
   + [Web Auth](#web-auth)
@@ -169,6 +171,9 @@ final class MyLogger: Logger, @unchecked Sendable {
 
 ### Sendable conformances for Web Auth typealiases
 
+> [!NOTE]
+> This section only applies if you implement a **custom `WebAuthProvider`** — i.e. you replace the default browser (ASWebAuthenticationSession) with your own using `.provider(_:)` on the Web Auth builder. Most apps do not do this and can skip this section.
+
 **Change:** The following public typealiases have been updated for Swift 6 concurrency:
 
 | Symbol | v2 | v3 |
@@ -178,7 +183,34 @@ final class MyLogger: Logger, @unchecked Sendable {
 
 **`WebAuthProviderCallback` — now `@Sendable`**
 
-**Impact:** If you pass a closure as a `WebAuthProviderCallback`, all values it captures must be `Sendable`. In most cases this is automatically satisfied, but if your closure captures a non-`Sendable` class you will get a compiler warning under strict concurrency.
+**Impact:** The `callback` parameter your `WebAuthProvider` closure receives is a `WebAuthProviderCallback`. If you store it inside your custom user agent, any values the closure captures must be `Sendable`. In most cases this is automatically satisfied, but if your closure captures a non-`Sendable` class the compiler will flag it — as a **warning** in Swift 5 with `-strict-concurrency=complete`, or as a **build error** in Swift 6 language mode.
+
+<details>
+  <summary>Migration example — non-Sendable capture</summary>
+
+```swift
+// ❌ Compiler warning — MyBrowserDelegate is not Sendable
+class MyBrowserDelegate {
+    func browserDidFinish() { ... }
+}
+
+let delegate = MyBrowserDelegate()
+let callback: WebAuthProviderCallback = { result in
+    delegate.browserDidFinish() // ⚠️ capture of non-Sendable type
+}
+
+// ✅ Fix — mark the class as Sendable
+final class MyBrowserDelegate: Sendable {
+    func browserDidFinish() { ... }
+}
+
+// ✅ Or isolate to @MainActor (since browser callbacks are UI work)
+@MainActor
+class MyBrowserDelegate {
+    func browserDidFinish() { ... }
+}
+```
+</details>
 
 **`WebAuthProvider` — now `@Sendable @MainActor`**
 
@@ -187,7 +219,7 @@ final class MyLogger: Logger, @unchecked Sendable {
 Since custom providers always present UI, they should already be doing UI work on the main thread. In most cases no code changes are required — Swift infers `@Sendable @MainActor` from the `WebAuthProvider` typealias automatically.
 
 <details>
-  <summary>Migration example</summary>
+  <summary>Migration example — custom WebAuthProvider</summary>
 
 ```swift
 // v2
@@ -196,9 +228,9 @@ let myProvider: WebAuthProvider = { url, callback in
     return agent
 }
 
-// v3 - Swift infers @Sendable @MainActor from the WebAuthProvider typealias.
-// The closure body runs on the main actor, so MyUserAgent.init is called there.
-// MyUserAgent does not need to be @MainActor, but it must conform to Sendable.
+// v3 — no code change needed. Swift infers @Sendable @MainActor from the
+// WebAuthProvider typealias. MyUserAgent.init runs on the main actor
+// and MyUserAgent must conform to Sendable.
 let myProvider: WebAuthProvider = { url, callback in
     let agent = MyUserAgent(url: url, callback: callback)
     return agent
@@ -427,6 +459,8 @@ Auth0
 
 **Reason:** By default, new Auth0 tenants have a database connection called `Username-Password-Authentication`. Since it's the default database connection name that many customers use, having it as the default reduces boilerplate.
 
+---
+
 ## Behavior Changes
 
 ### Main thread result delivery
@@ -584,14 +618,24 @@ do {
     try credentialsManager.store(credentials: credentials)
     // stored successfully
 } catch {
-    // handle error
+    // Storage failed — the underlying Keychain error is available via `error`.
+    // The user is still authenticated (credentials are valid in memory),
+    // but they will be prompted to log in again on the next app launch.
+    // Report to your error monitoring service (e.g. Sentry, Crashlytics, Datadog):
+    //   Sentry.capture(error: error)
+    //   Crashlytics.crashlytics().record(error: error)
 }
 
 do {
     try credentialsManager.clear()
     // cleared successfully
 } catch {
-    // handle error
+    // Keychain delete failed. Treat the user as logged out regardless —
+    // the session is no longer usable.
+    // Report to your error monitoring service (e.g. Sentry, Crashlytics, Datadog):
+    //   Sentry.capture(error: error)
+    //   Crashlytics.crashlytics().record(error: error)
+    navigateToLogin()
 }
 
 // v3 — if you want to silently ignore failures (not recommended)
@@ -642,68 +686,13 @@ class MyCustomStorage: CredentialsStorage {
 
 **Downstream impact on async methods:** Because `clear()` and `store(credentials:)` now surface errors, several callback-based methods gain new failure paths that were previously silent:
 
-| Method | New error delivered to callback | Trigger |
+| Error | Trigger | Affected methods |
 | --- | --- | --- |
-| `revoke(headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws (e.g. item not found). In v2 this returned `.success` |
-| `revoke(headers:callback:)` | `.clearFailed` | Keychain delete fails after a successful token revocation, or when no refresh token is present |
-| `credentials(withScope:minTTL:parameters:headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws when reading stored credentials |
-| `credentials(withScope:minTTL:parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving renewed credentials |
-| `renew(parameters:headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws when reading stored credentials |
-| `renew(parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving renewed credentials |
-| `apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws when reading stored credentials |
-| `apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving exchanged API credentials |
-| `ssoCredentials(parameters:headers:callback:)` | `.noCredentials` | `getEntry(forKey:)` throws when reading stored credentials |
-| `ssoCredentials(parameters:headers:callback:)` | `.storeFailed` | Keychain write fails when saving updated credentials after SSO exchange |
+| `.noCredentials` | **New in v3:** `getEntry(forKey:)` throws when reading stored credentials (e.g. item not found). In v2 this was swallowed by `try?` — `revoke()` even returned `.success` when nothing was stored. `.noCredentials` already existed in v2 but was only thrown when stored data couldn't be decoded; it now also fires when the Keychain read itself fails. | `credentials()`, `renew()`, `apiCredentials()`, `ssoCredentials()`, `revoke()` |
+| `.storeFailed` | Keychain write fails when saving renewed or exchanged credentials. | `credentials()`, `renew()`, `apiCredentials()`, `ssoCredentials()` |
+| `.clearFailed` | Keychain delete fails after successful token revocation, or when no refresh token is present. | `revoke()` |
 
-In v2, storage read failures were swallowed by `try?` — for example, `revoke()` returned `.success` when no credentials were stored and `getEntry(forKey:)` threw. In v3, the underlying storage error is propagated as the `cause` of the `CredentialsManagerError`, giving callers full context to respond appropriately.
-
-**DPoP validation errors:** When DPoP-bound credentials are stored, the Credentials Manager now validates the DPoP state before attempting renewal. The following new errors can be thrown by `credentials()`, `apiCredentials()`, and `ssoCredentials()`:
-
-| Method | New error delivered to callback | Trigger |
-| --- | --- | --- |
-| `credentials(...)` | `.dpopNotConfigured` | Stored credentials are DPoP-bound but the `Authentication()` client was not configured with `.useDPoP()` |
-| `credentials(...)` | `.dpopKeyMissing` | Stored credentials are DPoP-bound but the DPoP key pair is no longer available in the Keychain |
-| `credentials(...)` | `.dpopKeyMismatch` | Stored credentials are DPoP-bound but the current DPoP key pair does not match the one used when credentials were saved |
-| `apiCredentials(...)` | `.dpopNotConfigured` | Same as above — DPoP-bound credentials without DPoP configuration |
-| `apiCredentials(...)` | `.dpopKeyMissing` | Same as above — DPoP key pair no longer in Keychain |
-| `apiCredentials(...)` | `.dpopKeyMismatch` | Same as above — DPoP key pair mismatch |
-| `ssoCredentials(...)` | `.dpopNotConfigured` | Same as above — DPoP-bound credentials without DPoP configuration |
-| `ssoCredentials(...)` | `.dpopKeyMissing` | Same as above — DPoP key pair no longer in Keychain |
-| `ssoCredentials(...)` | `.dpopKeyMismatch` | Same as above — DPoP key pair mismatch |
-
-Additionally, `store(credentials:)` now persists the DPoP thumbprint alongside credentials when the `Authentication` client is configured with DPoP. This allows the Credentials Manager to detect key changes across app launches.
-
-<details>
-  <summary>Migration example — handling DPoP validation errors</summary>
-
-```swift
-credentialsManager.credentials { result in
-    switch result {
-    case .success(let credentials):
-        // use credentials
-        break
-    case .failure(let error):
-        switch error {
-        case .dpopNotConfigured:
-            // Developer forgot to call useDPoP() on the Authentication client
-            // passed to the credentials manager. Fix the client configuration.
-            ```swift
-                CredentialsManager(authentication: Auth0.authentication().useDPoP())
-            ```swift
-        case .dpopKeyMissing:
-            // DPoP key was lost. Clear local state and prompt user to re-authenticate
-        case .dpopKeyMismatch:
-            // DPoP key exists but doesn't match the one used at login (key rotation). Clear local state and prompt user to re-authenticate
-        default:
-            showError(error)
-        }
-    }
-}
-```
-</details>
-
-> [!NOTE]
-> These errors are related for you if you are using DPoP support and you must ensure to handle these errors when migrating to V3.
+In v3, the underlying storage error is propagated as the `cause` of the `CredentialsManagerError`, giving callers full context to respond appropriately.
 
 Additionally, the `user` property has been replaced with the `userProfile()` method that now throws errors instead of silently returning `nil`:
 
@@ -774,6 +763,49 @@ credentialsManager.revoke { result in
 </details>
 
 **Reason:** Returning `Bool` or `nil` silently swallows the underlying Keychain error, making it impossible to distinguish a missing item from a permissions failure or a corrupted entry. Throwing the error directly gives callers full context to respond appropriately—for example, by prompting the user to re-authenticate or surfacing a meaningful error message.
+
+### DPoP validation errors
+
+When DPoP-bound credentials are stored, the Credentials Manager now validates the DPoP state before attempting renewal. The following new errors can be thrown by `credentials()`, `apiCredentials()`, and `ssoCredentials()`:
+
+> [!NOTE]
+> These errors are only relevant if you are using DPoP support. Ensure you handle these errors when migrating to v3.
+
+| Error | Trigger | Affected methods |
+| --- | --- | --- |
+| `.dpopNotConfigured` | Stored credentials are DPoP-bound but the `Authentication` client was not configured with `.useDPoP()`. | `credentials()`, `apiCredentials()`, `ssoCredentials()` |
+| `.dpopKeyMissing` | Stored credentials are DPoP-bound but the DPoP key pair is no longer available in the Keychain. | `credentials()`, `apiCredentials()`, `ssoCredentials()` |
+| `.dpopKeyMismatch` | Stored credentials are DPoP-bound but the current DPoP key pair does not match the one used when credentials were saved. | `credentials()`, `apiCredentials()`, `ssoCredentials()` |
+
+Additionally, `store(credentials:)` now persists the DPoP thumbprint alongside credentials when the `Authentication` client is configured with DPoP. This allows the Credentials Manager to detect key changes across app launches.
+
+<details>
+  <summary>Migration example — handling DPoP validation errors</summary>
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        // use credentials
+        break
+    case .failure(let error):
+        switch error {
+        case .dpopNotConfigured:
+            // Developer forgot to call useDPoP() on the Authentication client
+            // passed to the credentials manager. Fix the client configuration.
+            // e.g.:
+            CredentialsManager(authentication: Auth0.authentication().useDPoP())
+        case .dpopKeyMissing:
+            // DPoP key was lost. Clear local state and prompt user to re-authenticate
+        case .dpopKeyMismatch:
+            // DPoP key exists but doesn't match the one used at login (key rotation). Clear local state and prompt user to re-authenticate
+        default:
+            showError(error)
+        }
+    }
+}
+```
+</details>
 
 ### Automatic credentials management in Web Auth
 
@@ -900,10 +932,13 @@ Auth0
 
 ### Web Auth
 
-Auth0.swift will use a current key window to present the in-app browser for Web Auth. When using ASWebAuthenticationSession, it will grab a key window and use it as the ASPresentationAnchor. With SFSafariViewController, Auth0.swift will present it using the topmost view controller in this key window. While this approach works well for single-window apps, on multi-window apps the in-app browser may show up in a different window than expected. Auth0.swift now supports passing a custom window in which to present the in-app browser. For this reason, the following methods are added to the Web Auth builder:
+Auth0.swift uses the current key window to present the in-app browser for Web Auth. When using ASWebAuthenticationSession, it grabs the key window and uses it as the ASPresentationAnchor; with SFSafariViewController, it presents using the topmost view controller in that window. While this works well for single-window apps, multi-window apps may see the in-app browser appear in an unexpected window. Auth0.swift now supports passing a custom window for presentation. The following methods are added to the Web Auth builder:
 
 - `presentationWindow(_ window:)`
 - `useCredentialsManager(_ credentialsManager:)` — Use a `CredentialsManager` instance for automatic credential storage and clearing.
+
+> [!NOTE]
+> `useCredentialsManager(_:)` is optional. If you prefer to store and clear credentials manually after login and logout, you can continue to do so without calling this method.
 
 <details>
   <summary>Code</summary>
@@ -925,6 +960,14 @@ Auth0
     }
 ```
 </details>
+
+> [!IMPORTANT]
+> `Auth0WebAuth` is a **struct** in v3 — every `Auth0.webAuth()` call creates a fresh instance. The `CredentialsManager` you pass via `useCredentialsManager(_:)` is stored on that instance only. This means you **must** call `useCredentialsManager(_:)` on **both** your `start()` and `logout()` call chains independently. If you omit it on the logout call, the logout will succeed but credentials will **not** be cleared automatically.
+>
+> ```swift
+> // ✅ Credentials will be cleared automatically
+> Auth0.webAuth().useCredentialsManager(credentialsManager).logout { ... }
+> ```
 
 ### Credentials Manager clearAll
 
@@ -1194,11 +1237,12 @@ Chain any combination of the following modifiers after `validateClaims()`:
 | `.withMaxAge(_ maxAge: Int?)` | `nil` (skip) | Maximum seconds since last authentication (`auth_time`). |
 | `.withOrganization(_ organization: String?)` | `nil` (skip) | Expected `org_id` or `org_name` claim. |
 
-> **Note:** When using Web Auth (PKCE flow), ID token validation is performed automatically. You do not need to call `validateClaims()` yourself.
+> [!NOTE] When using Web Auth (PKCE flow), ID token validation is performed automatically. You do not need to call `validateClaims()` yourself.
 
-> **Note:** If `validateClaims()` is enabled but the response does not contain an ID token, the request fails with `AuthenticationError` wrapping `IDTokenDecodingError.missingIDToken` rather than silently succeeding.
+> [!NOTE] This applies to the `Authentication` client only. If `validateClaims()` is enabled but the response does not contain an ID token, the request fails with `AuthenticationError` wrapping `IDTokenDecodingError.missingIDToken` rather than silently succeeding. In Web Auth, a missing ID token results in `WebAuthError.idTokenValidationFailed` instead.
 
-**Affected methods** (now return `any TokenRequestable` instead of `Request`):
+<details>
+  <summary>Affected methods (now return <code>any TokenRequestable</code> instead of <code>Request</code>)</summary>
 
 - `Authentication.login(email:code:audience:scope:)`
 - `Authentication.login(phoneNumber:code:audience:scope:)`
@@ -1216,6 +1260,8 @@ Chain any combination of the following modifiers after `validateClaims()`:
 - `MFAClient.verify(oobCode:bindingCode:mfaToken:)`
 - `MFAClient.verify(otp:mfaToken:)`
 - `MFAClient.verify(recoveryCode:mfaToken:)`
+
+</details>
 
 **Impact:** No migration required for existing call sites. If you implement the `Authentication` protocol in your own mocks or test doubles, update the return type of the affected methods from `Request<Credentials, AuthenticationError>` to `any TokenRequestable<Credentials, AuthenticationError>` (see the [mocking example](#request-to-requestable) above).
 
