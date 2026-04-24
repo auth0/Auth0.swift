@@ -1,12 +1,6 @@
 import Foundation
 import SimpleKeychain
 
-/// Validates DPoP state before credential renewal and manages thumbprint persistence.
-///
-/// Encapsulates two concerns that were previously split across `validateDPoPState(for:)` and
-/// `saveDPoPThumbprint(for:)` in `CredentialsManager`:
-/// - Pre-renewal validation: confirms the DPoP key pair is present and matches the stored thumbprint.
-/// - Post-store bookkeeping: persists (or clears) the thumbprint alongside new credentials.
 struct DPoPCredentialValidator: Sendable {
 
     private let authentication: Authentication
