@@ -40,16 +40,14 @@ struct DPoPCredentialValidator: Sendable {
 
         let hasKeyPair = try? dpop.hasKeypair()
         guard hasKeyPair == true else {
-            try? storage.deleteEntry(forKey: credentialsKey)
-            try? storage.deleteEntry(forKey: thumbprintKey)
+            try clearAll()
             throw CredentialsManagerError.dpopKeyMissing
         }
 
         let currentThumbprint = try dpop.jkt()
         if let stored = storedThumbprint {
             guard stored == currentThumbprint else {
-                try? storage.deleteEntry(forKey: credentialsKey)
-                try? storage.deleteEntry(forKey: thumbprintKey)
+                try clearAll()
                 throw CredentialsManagerError.dpopKeyMismatch
             }
         } else {
@@ -77,6 +75,11 @@ struct DPoPCredentialValidator: Sendable {
     }
 
     // MARK: - Private
+
+    private func clearAll() throws {
+        try storage.deleteEntry(forKey: credentialsKey)
+        try? storage.deleteEntry(forKey: thumbprintKey)
+    }
 
     private func storedThumbprintValue() -> String? {
         let data = try? storage.getEntry(forKey: thumbprintKey)
