@@ -9,6 +9,12 @@ let swiftSettings: [SwiftSetting] = [
     .define("PASSKEYS_PLATFORM", .when(platforms: webAuthPlatforms))
 ]
 
+let testSwiftSettings: [SwiftSetting] = [
+    .swiftLanguageMode(.v5),
+    .define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms)),
+    .define("PASSKEYS_PLATFORM", .when(platforms: webAuthPlatforms))
+]
+
 let package = Package(
     name: "Auth0",
     platforms: [.iOS(.v14), .macOS(.v11), .tvOS(.v14), .watchOS(.v7), .visionOS(.v1)],
@@ -39,6 +45,6 @@ let package = Package(
             ],
             path: "Auth0Tests",
             exclude: ["Info.plist", "Auth0.plist"],
-            swiftSettings: swiftSettings)
+            swiftSettings: testSwiftSettings)
     ]
 )

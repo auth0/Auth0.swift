@@ -51,7 +51,7 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 
 ## Swift 6 Concurrency
 
-v3 adopts Swift 6 strict concurrency by adding `Sendable` conformances across the SDK. If your application defines custom types conforming to SDK protocols, some changes may be required.
+The `Auth0` library target is now compiled with Swift 6 language mode, enforcing strict concurrency. v3 adopts this by adding `Sendable` conformances across the SDK. If your application defines custom types conforming to SDK protocols, some changes may be required.
 
 ### WebAuth is now Sendable
 
