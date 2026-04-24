@@ -1,6 +1,5 @@
 # v3 Migration Guide
 
-> [!NOTE] This guide is actively maintained during the v3 development phase. As new changes are merged, this document will be updated to reflect the latest breaking changes and migration steps.
 
 Auth0.swift v3 includes many significant changes:
 
@@ -295,24 +294,6 @@ try await Auth0.webAuth().logout()
 ```
 
 - **Custom `WebAuth` conformances (mocks, test doubles)** — Add `@MainActor` to your `start()` and `logout(federated:)` implementations to match the updated protocol requirement.
-
-<details>
-  <summary>Migration example</summary>
-
-```swift
-// v2
-struct MockWebAuth: WebAuth {
-    func start() async throws -> Credentials { ... }
-    func logout(federated: Bool) async throws { ... }
-}
-
-// v3
-struct MockWebAuth: WebAuth {
-    @MainActor func start() async throws -> Credentials { ... }
-    @MainActor func logout(federated: Bool) async throws { ... }
-}
-```
-</details>
 
 - **Callers using `any WebAuth` (protocol existential)** — The `@MainActor` constraint is now enforced at the call site through the protocol. Under strict concurrency, Swift will emit a warning if you call these methods from a non-isolated context without `await`.
 
@@ -977,18 +958,6 @@ This method removes **all** entries managed by the Credentials Manager from the 
 
 This is different from the existing `clear()` method, which only removes the default credentials entry.
 
-<details>
-  <summary>Code</summary>
-
-```swift
-// Clear only the default credentials entry (existing method)
-try credentialsManager.clear()
-
-// Clear ALL keychain entries managed by the Credentials Manager (new method)
-try credentialsManager.clearAll()
-```
-</details>
-
 **Impact:** This is a new additive API. No migration is required. Use it when you need to completely wipe all stored credentials (e.g., on account deletion or full sign-out).
 
 ### CredentialsStorage deleteAllEntries
@@ -1063,79 +1032,17 @@ The following APIs have been renamed to align with the Android, Flutter, and Rea
 
 The `clearSession(federated:)` method on the Web Auth client has been renamed to `logout(federated:)`. This affects all three API flavors: callback-based, Combine, and async/await.
 
-<details>
-  <summary>Migration example</summary>
-
-```swift
-// v2
-Auth0
-    .webAuth()
-    .clearSession { result in
-        // ...
-    }
-
-try await Auth0.webAuth().clearSession()
-
-// v3
-Auth0
-    .webAuth()
-    .logout { result in
-        // ...
-    }
-
-try await Auth0.webAuth().logout()
-```
-</details>
-
 **`UserInfo` → `UserProfile`**
 
 The `UserInfo` struct has been renamed to `UserProfile`. The `userInfo(withAccessToken:)` method name on the Authentication client is unchanged, as it maps to the OIDC `/userinfo` endpoint.
-
-<details>
-  <summary>Migration example</summary>
-
-```swift
-// v2
-let user: UserInfo = ...
-
-// v3
-let user: UserProfile = ...
-```
-</details>
 
 **`expiresIn` → `expiresAt`**
 
 The `expiresIn` property on `Credentials`, `APICredentials`, and `SSOCredentials` has been renamed to `expiresAt`. The JSON key (`expires_in`) and Keychain storage key are unchanged.
 
-<details>
-  <summary>Migration example</summary>
-
-```swift
-// v2
-let expiry = credentials.expiresIn
-
-// v3
-let expiry = credentials.expiresAt
-```
-</details>
-
 **`Telemetry` → `Auth0ClientInfo`**
 
 The `Telemetry` struct has been renamed to `Auth0ClientInfo`, and the `telemetry` property on `Trackable` conforming types has been renamed to `auth0ClientInfo`.
-
-<details>
-  <summary>Migration example</summary>
-
-```swift
-// v2
-var auth = Auth0.authentication()
-auth.telemetry.enabled = false
-
-// v3
-var auth = Auth0.authentication()
-auth.auth0ClientInfo.enabled = false
-```
-</details>
 
 ### Request to Requestable
 
@@ -1285,8 +1192,6 @@ For example, if you were reading or updating user metadata:
 1. **Create a backend endpoint** (e.g. `PATCH /me/metadata`) that accepts the operation your app needs.
 2. **Call that endpoint from your app**, passing the user's access token as a `Bearer` token in the `Authorization` header.
 3. **On your backend**, obtain a machine-to-machine token via the [Client Credentials flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow) and use it to call the [Management API](https://auth0.com/docs/api/management/v2) with the precise scopes required.
-
-**Reason:** The Management API is not designed for direct use from mobile apps — it is heavily restricted for public clients (only a small subset of operations are permitted, and sensitive actions such as managing roles, rules, or other users are not available). It also requires its own audience (`https://YOUR_AUTH0_DOMAIN/api/v2/`), and each individual access token is scoped to a single audience. If your app also needs to call your own backend API, you must set that API's identifier as the audience at login, which means the same token cannot be used for the Management API.
 
 ---
 [Go up ⤴](#table-of-contents)
