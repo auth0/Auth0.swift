@@ -12,12 +12,17 @@ struct DPoPCredentialValidator: Sendable {
     private let authentication: Authentication
     private let sendableStorage: SendableBox<CredentialsStorage>
     private let thumbprintKey: String
+    private let credentialsKey: String
 
     private var storage: CredentialsStorage { sendableStorage.value }
 
-    init(authentication: Authentication, storage: CredentialsStorage, thumbprintKey: String) {
+    init(authentication: Authentication,
+         storage: CredentialsStorage,
+         credentialsKey: String,
+         thumbprintKey: String) {
         self.authentication = authentication
         self.sendableStorage = SendableBox(value: storage)
+        self.credentialsKey = credentialsKey
         self.thumbprintKey = thumbprintKey
     }
 
@@ -41,14 +46,16 @@ struct DPoPCredentialValidator: Sendable {
 
         let hasKeyPair = try? dpop.hasKeypair()
         guard hasKeyPair == true else {
-            try storage.deleteEntry(forKey: thumbprintKey)
+            try? storage.deleteEntry(forKey: credentialsKey)
+            try? storage.deleteEntry(forKey: thumbprintKey)
             throw CredentialsManagerError.dpopKeyMissing
         }
 
         let currentThumbprint = try dpop.jkt()
         if let stored = storedThumbprint {
             guard stored == currentThumbprint else {
-                try storage.deleteEntry(forKey: thumbprintKey)
+                try? storage.deleteEntry(forKey: credentialsKey)
+                try? storage.deleteEntry(forKey: thumbprintKey)
                 throw CredentialsManagerError.dpopKeyMismatch
             }
         } else {

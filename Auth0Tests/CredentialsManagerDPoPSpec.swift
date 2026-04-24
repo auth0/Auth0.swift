@@ -295,6 +295,140 @@ class CredentialsManagerDPoPSpec: QuickSpec {
 
         }
 
+        // MARK: - ssoCredentials DPoP validation
+
+        describe("ssoCredentials DPoP validation") {
+
+            it("should return dpopNotConfigured when DPoP credentials exist but authentication has no DPoP") {
+                let auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                let manager = CredentialsManager(authentication: auth, storage: spyStorage)
+                let dpopCredentials = Credentials(accessToken: AccessToken,
+                                                  tokenType: "DPoP",
+                                                  idToken: IdToken,
+                                                  refreshToken: RefreshToken,
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  scope: Scope)
+                try manager.store(credentials: dpopCredentials)
+                waitUntil(timeout: Timeout) { done in
+                    manager.ssoCredentials { result in
+                        expect(result).to(haveCredentialsManagerError(.dpopNotConfigured))
+                        done()
+                    }
+                }
+            }
+
+            it("should return dpopKeyMissing and clear credentials when key pair is gone") {
+                let keyStore = MockDPoPKeyStore(failHasPrivateKey: true)
+                var auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                auth.dpop = DPoP(keyStore: keyStore)
+                let manager = CredentialsManager(authentication: auth, storage: spyStorage)
+                let dpopCredentials = Credentials(accessToken: AccessToken,
+                                                  tokenType: "DPoP",
+                                                  idToken: IdToken,
+                                                  refreshToken: RefreshToken,
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  scope: Scope)
+                try manager.store(credentials: dpopCredentials)
+                waitUntil(timeout: Timeout) { done in
+                    manager.ssoCredentials { result in
+                        expect(result).to(haveCredentialsManagerError(.dpopKeyMissing))
+                        expect(spyStorage.store["credentials"]).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+            it("should return dpopKeyMismatch and clear credentials when thumbprint does not match") {
+                let keyStore = MockDPoPKeyStore()
+                var auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                auth.dpop = DPoP(keyStore: keyStore)
+                let manager = CredentialsManager(authentication: auth, storage: spyStorage)
+                let dpopCredentials = Credentials(accessToken: AccessToken,
+                                                  tokenType: "DPoP",
+                                                  idToken: IdToken,
+                                                  refreshToken: RefreshToken,
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  scope: Scope)
+                try manager.store(credentials: dpopCredentials)
+                spyStorage.store[dpopThumbprintKey] = Data("stale_thumbprint_from_old_key".utf8)
+                waitUntil(timeout: Timeout) { done in
+                    manager.ssoCredentials { result in
+                        expect(result).to(haveCredentialsManagerError(.dpopKeyMismatch))
+                        expect(spyStorage.store["credentials"]).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+        }
+
+        // MARK: - apiCredentials DPoP validation
+
+        describe("apiCredentials DPoP validation") {
+
+            it("should return dpopNotConfigured when DPoP credentials exist but authentication has no DPoP") {
+                let auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                let manager = CredentialsManager(authentication: auth, storage: spyStorage)
+                let dpopCredentials = Credentials(accessToken: AccessToken,
+                                                  tokenType: "DPoP",
+                                                  idToken: IdToken,
+                                                  refreshToken: RefreshToken,
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  scope: Scope)
+                try manager.store(credentials: dpopCredentials)
+                waitUntil(timeout: Timeout) { done in
+                    manager.apiCredentials(forAudience: "https://api.example.com") { result in
+                        expect(result).to(haveCredentialsManagerError(.dpopNotConfigured))
+                        done()
+                    }
+                }
+            }
+
+            it("should return dpopKeyMissing and clear credentials when key pair is gone") {
+                let keyStore = MockDPoPKeyStore(failHasPrivateKey: true)
+                var auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                auth.dpop = DPoP(keyStore: keyStore)
+                let manager = CredentialsManager(authentication: auth, storage: spyStorage)
+                let dpopCredentials = Credentials(accessToken: AccessToken,
+                                                  tokenType: "DPoP",
+                                                  idToken: IdToken,
+                                                  refreshToken: RefreshToken,
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  scope: Scope)
+                try manager.store(credentials: dpopCredentials)
+                waitUntil(timeout: Timeout) { done in
+                    manager.apiCredentials(forAudience: "https://api.example.com") { result in
+                        expect(result).to(haveCredentialsManagerError(.dpopKeyMissing))
+                        expect(spyStorage.store["credentials"]).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+            it("should return dpopKeyMismatch and clear credentials when thumbprint does not match") {
+                let keyStore = MockDPoPKeyStore()
+                var auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                auth.dpop = DPoP(keyStore: keyStore)
+                let manager = CredentialsManager(authentication: auth, storage: spyStorage)
+                let dpopCredentials = Credentials(accessToken: AccessToken,
+                                                  tokenType: "DPoP",
+                                                  idToken: IdToken,
+                                                  refreshToken: RefreshToken,
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  scope: Scope)
+                try manager.store(credentials: dpopCredentials)
+                spyStorage.store[dpopThumbprintKey] = Data("stale_thumbprint_from_old_key".utf8)
+                waitUntil(timeout: Timeout) { done in
+                    manager.apiCredentials(forAudience: "https://api.example.com") { result in
+                        expect(result).to(haveCredentialsManagerError(.dpopKeyMismatch))
+                        expect(spyStorage.store["credentials"]).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+        }
+
         // MARK: - clear()
 
         describe("clear") {

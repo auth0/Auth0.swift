@@ -74,6 +74,7 @@ public struct CredentialsManager: Sendable {
         self.maxRetries = max(0, maxRetries)
         self.dpopValidator = DPoPCredentialValidator(authentication: authentication,
                                                      storage: storage,
+                                                     credentialsKey: storeKey,
                                                      thumbprintKey: dpopThumbprintKey)
     }
 
