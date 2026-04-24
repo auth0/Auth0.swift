@@ -4,6 +4,12 @@ import PackageDescription
 
 let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst, .visionOS]
 let swiftSettings: [SwiftSetting] = [
+    .swiftLanguageMode(.v6),
+    .define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms)),
+    .define("PASSKEYS_PLATFORM", .when(platforms: webAuthPlatforms))
+]
+
+let testSwiftSettings: [SwiftSetting] = [
     .swiftLanguageMode(.v5),
     .define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms)),
     .define("PASSKEYS_PLATFORM", .when(platforms: webAuthPlatforms))
@@ -39,6 +45,6 @@ let package = Package(
             ],
             path: "Auth0Tests",
             exclude: ["Info.plist", "Auth0.plist"],
-            swiftSettings: swiftSettings)
+            swiftSettings: testSwiftSettings)
     ]
 )
