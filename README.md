@@ -8,7 +8,13 @@
 
 📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 💡 [**Examples**](#examples) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
 
-Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
+> [!IMPORTANT]
+> **🚀 v3 Beta Available**
+> A new major version `3.0.0-beta.1` of Auth0.swift is now available in beta. It includes breaking changes and improvements over v2.
+>
+> We'd love for you to try it out and share your feedback! Please [open an issue](https://github.com/auth0/Auth0.swift/issues) if you encounter any problems or have suggestions.
+>
+> 📚 [Migration Guide](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.1/V3_MIGRATION_GUIDE.md) &nbsp;•&nbsp; 📦 [v3 Changelog](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.1/CHANGELOG.md)
 
 ## Documentation
 
