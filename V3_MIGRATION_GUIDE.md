@@ -238,7 +238,7 @@ let myProvider: WebAuthProvider = { url, callback in
 
 **Change:** All public callback parameters are now `@MainActor`. This affects the following APIs:
 
-- `Requestable.start(_:)`, `TokenRequestable.start(_:)` — covers all `Authentication` and `MFAClient` methods, which return these protocol types
+- `Requestable.start(_:)`, `TokenRequestable.start(_:)` — covers all `Authentication`, `MFAClient`, and `MyAccount` / `MyAccountAuthenticationMethods` methods, which return these protocol types
 - `WebAuth.start(_:)`, `WebAuth.logout(federated:callback:)`, `WebAuth.onClose(_:)`
 - `CredentialsManager.credentials(withScope:minTTL:parameters:headers:callback:)`, `revoke(headers:_:)`, `apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)`, `ssoCredentials(parameters:headers:callback:)`, `renew(parameters:headers:callback:)`
 
@@ -454,6 +454,7 @@ In v2, completion callbacks would sometimes execute on the main thread and somet
 - All Authentication API methods (callback, Combine, and async/await)
 - All Credentials Manager methods (callback, Combine, and async/await)
 - All Web Auth methods (callback, Combine, and async/await)
+- All My Account API methods (callback, Combine, and async/await)
 
 **Impact:** If your code performs CPU-intensive work in callbacks or Combine subscribers, you should explicitly dispatch to a background queue. You no longer need `DispatchQueue.main.async` or `.receive(on: DispatchQueue.main)` when consuming results from Auth0.swift.
 
