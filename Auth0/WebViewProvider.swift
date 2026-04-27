@@ -36,6 +36,8 @@
 /// ```
 ///
 /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
+/// - Parameter presentationWindow: Optional `UIWindow/NSWindow` to use for presenting the browser. If not specified,
+/// the active key window will be used.
 /// - Returns: A ``WebAuthProvider`` instance.
 ///
 /// > Note: To use Universal Login's biometrics and passkeys with `WKWebView`, you must
@@ -48,38 +50,50 @@
 ///
 /// - [OAuth 2.0 Best Practices for Native Apps](https://auth0.com/blog/oauth-2-best-practices-for-native-apps)
 public extension WebAuthentication {
-
-    static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
+    @MainActor
+    static func webViewProvider(style: UIModalPresentationStyle = .fullScreen,
+                                presentationWindow: Auth0WindowRepresentable? = nil) -> WebAuthProvider {
         return { url, callback  in
             let redirectURL = extractRedirectURL(from: url)!
 
             return WebViewUserAgent(authorizeURL: url,
                                     redirectURL: redirectURL,
                                     modalPresentationStyle: style,
+                                    presentationWindow: presentationWindow,
                                     callback: callback)
         }
     }
 
 }
 
-class WebViewUserAgent: NSObject, WebAuthUserAgent {
+final class WebViewUserAgent: NSObject, WebAuthUserAgent, Sendable {
 
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
     static let customSchemeRedirectionFailureMessage = "com.auth0.webview.redirection_failure"
     let defaultSchemesSupportedByWKWebview = ["https"]
 
-    let request: URLRequest
+    nonisolated let request: URLRequest
+    @MainActor
     var webview: WKWebView!
     let viewController: UIViewController
     let redirectURL: URL
     let callback: WebAuthProviderCallback
+    @MainActor
+    private weak var presentationWindow: Auth0WindowRepresentable?
 
-    init(authorizeURL: URL, redirectURL: URL, viewController: UIViewController = UIViewController(), modalPresentationStyle: UIModalPresentationStyle = .fullScreen, callback: @escaping WebAuthProviderCallback) {
+    @MainActor
+    init(authorizeURL: URL,
+         redirectURL: URL,
+         viewController: UIViewController = UIViewController(),
+         modalPresentationStyle: UIModalPresentationStyle = .fullScreen,
+         presentationWindow: UIWindow? = nil,
+         callback: @escaping WebAuthProviderCallback) {
         self.request = URLRequest(url: authorizeURL)
         self.redirectURL = redirectURL
         self.callback = callback
         self.viewController = viewController
         self.viewController.modalPresentationStyle = modalPresentationStyle
+        self.presentationWindow = presentationWindow
 
         super.init()
         if !defaultSchemesSupportedByWKWebview.contains(redirectURL.scheme!) {
@@ -89,6 +103,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         }
     }
 
+    @MainActor
     private func setupWebViewWithCustomScheme() {
         let configuration = WKWebViewConfiguration()
         configuration.setURLSchemeHandler(self, forURLScheme: redirectURL.scheme!)
@@ -97,6 +112,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         webview.navigationDelegate = self
     }
 
+    @MainActor
     private func setupWebViewWithHTTPS() {
         self.webview = WKWebView(frame: .zero)
         self.viewController.view = webview
@@ -104,20 +120,43 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func start() {
-        self.webview.load(self.request)
-        UIWindow.topViewController?.present(self.viewController, animated: true)
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            startOnMain()
+        }
     }
-
+    
+    @MainActor
+    private func startOnMain() {
+        self.webview.load(self.request)
+        let topViewController: UIViewController?
+        // Use top view controller from custom window if provided
+        if let window = presentationWindow,
+           let rootVC = window.rootViewController {
+            topViewController = Auth0WindowRepresentable.findTopViewController(from: rootVC)
+        } else {
+            // Fall back to key window's top view controller
+            topViewController = Auth0WindowRepresentable.topViewController
+        }
+        topViewController?.present(self.viewController, animated: true)
+    }
+    
     func finish(with result: WebAuthResult<Void>) {
-        DispatchQueue.main.async { [weak webview, weak viewController, callback] in
-            webview?.removeFromSuperview()
-            guard let presenting = viewController?.presentingViewController else {
-                let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
-                return callback(.failure(error))
-            }
-            presenting.dismiss(animated: true) {
-                callback(result)
-            }
+        Task {
+            @MainActor in
+            finishOnMain(with: result)
+        }
+    }
+    
+    @MainActor
+    private func finishOnMain(with result: WebAuthResult<Void>) {
+        webview?.removeFromSuperview()
+        guard let presenting = viewController.presentingViewController else {
+            let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
+            return callback(.failure(error))
+        }
+        presenting.dismiss(animated: true) {
+            self.callback(result)
         }
     }
 
@@ -151,13 +190,12 @@ extension WebViewUserAgent: WKURLSchemeHandler {
 /// Handling of HTTPS callbacks.
 extension WebViewUserAgent: WKNavigationDelegate {
 
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString), let scheme = callbackUrl.scheme, scheme == "https" {
             _ = TransactionStore.shared.resume(callbackUrl)
-            decisionHandler(.cancel)
-        } else {
-            decisionHandler(.allow)
+            return .cancel
         }
+        return .allow
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {

@@ -1,17 +1,15 @@
 import Foundation
 
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
+
 /**
  `Result` wrapper for Authentication API operations.
  */
 public typealias AuthenticationResult<T> = Result<T, AuthenticationError>
-
-/**
- `Result` wrapper for Management API operations.
-
- - Warning: Deprecated. The Management API client is deprecated and will be removed in the next major version.
- */
-@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
-public typealias ManagementResult<T> = Result<T, ManagementError>
 
 /**
  `Result` wrapper for My Account API operations.
@@ -19,6 +17,14 @@ public typealias ManagementResult<T> = Result<T, ManagementError>
 public typealias MyAccountResult<T> = Result<T, MyAccountError>
 
 #if WEB_AUTH_PLATFORM
+/**
+ `UIWindow or NSWindow` wrapper for presentation window
+ */
+#if canImport(UIKit)
+public typealias Auth0WindowRepresentable = UIWindow
+#elseif canImport(AppKit)
+public typealias Auth0WindowRepresentable = NSWindow
+#endif
 /**
  `Result` wrapper for Web Auth operations.
  */
@@ -31,9 +37,9 @@ public typealias WebAuthResult<T> = Result<T, WebAuthError>
 public typealias CredentialsManagerResult<T> = Result<T, CredentialsManagerError>
 
 /**
- Default scope value used across Auth0.swift. Equals to `openid profile email`.
+ Default scope value used across Auth0.swift. Equals to `openid profile email offline_access`.
  */
-public let defaultScope = "openid profile email"
+public let defaultScope = "openid profile email offline_access"
 
 /**
  [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate a user with Database, Social,
@@ -91,7 +97,6 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
     let values = plistValues(bundle: bundle)!
     return authentication(clientId: values.clientId, domain: values.domain, session: session)
 }
-
 
 /**
  Multi-Factor Authentication (MFA) client for performing MFA operations during authentication flows.
@@ -163,78 +168,6 @@ public func mfa(session: URLSession = .shared,
                session: session)
 }
 
-/**
- [Management API v2](https://auth0.com/docs/api/management/v2) client for performing operations with the Users endpoints.
-
- ## Usage
-
- ```swift
- Auth0.users(token: credentials.accessToken)
- ```
-
- You can only perform the following operations:
-
- * Get a user by ID
- * Update the user's `user_metadata`
- * Link users
- * Unlink users
-
- The Auth0 Domain is loaded from the `Auth0.plist` file in your main bundle. It should have the following content:
-
- ```xml
- <?xml version="1.0" encoding="UTF-8"?>
- <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
- <plist version="1.0">
- <dict>
-     <key>ClientId</key>
-     <string>YOUR_AUTH0_CLIENT_ID</string>
-     <key>Domain</key>
-     <string>YOUR_AUTH0_DOMAIN</string>
- </dict>
- </plist>
- ```
-
- - Parameters:
-   - token:   Access token for the Management API with the correct allowed scopes to perform the desired action.
-   - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
-   - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
- - Returns: Management API v2 client.
- - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
- */
-@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
-public func users(token: String, session: URLSession = .shared, bundle: Bundle = .main) -> Users {
-    let values = plistValues(bundle: bundle)!
-    return users(token: token, domain: values.domain, session: session)
-}
-
-/**
- [Management API v2](https://auth0.com/docs/api/management/v2) client for performing operations with the Users endpoints.
-
- ## Usage
-
- ```swift
- Auth0.users(token: credentials.accessToken, domain: "samples.us.auth0.com")
- ```
-
- You can only perform the following operations:
- 
- * Get a user by ID
- * Update the user's `user_metadata`
- * Link users
- * Unlink users
-
- - Parameters:
-   - token:   Access token for the Management API with the correct allowed scopes to perform the desired action.
-   - domain:  Domain of your Auth0 account, for example `samples.us.auth0.com`.
-   - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
- - Returns: Management API v2 client.
- - Warning: The Management API client is deprecated and will be removed in the next major version.
- */
-@available(*, deprecated, message: "The Management API client is deprecated and will be removed in the next major version.")
-public func users(token: String, domain: String, session: URLSession = .shared) -> Users {
-    return Management(token: token, url: .httpsURL(from: domain), session: session)
-}
-
 #if WEB_AUTH_PLATFORM
 /**
  [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) client for performing web-based
@@ -296,13 +229,13 @@ public func webAuth(clientId: String, domain: String, session: URLSession = .sha
 func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
     guard let path = bundle.path(forResource: "Auth0", ofType: "plist"),
           let values = NSDictionary(contentsOfFile: path) as? [String: Any] else {
-            Auth0Log.error(.configuration, "Missing Auth0.plist file with 'ClientId' and 'Domain' entries in main bundle!")
+            Auth0Log.shared.error(.configuration, "Missing Auth0.plist file with 'ClientId' and 'Domain' entries in main bundle!")
             return nil
         }
 
     guard let clientId = values["ClientId"] as? String, let domain = values["Domain"] as? String else {
-            Auth0Log.error(.configuration, "Auth0.plist file at \(path) is missing 'ClientId' and/or 'Domain' entries!")
-            Auth0Log.debug(.configuration, "File currently has the following entries: \(String(describing: values))")
+            Auth0Log.shared.error(.configuration, "Auth0.plist file at \(path) is missing 'ClientId' and/or 'Domain' entries!")
+            Auth0Log.shared.debug(.configuration, "File currently has the following entries: \(String(describing: values))")
             return nil
         }
     return (clientId: clientId, domain: domain)

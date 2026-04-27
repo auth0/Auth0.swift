@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
 
@@ -19,4 +18,3 @@ enum JWTAlgorithm: String {
         }
     }
 }
-#endif

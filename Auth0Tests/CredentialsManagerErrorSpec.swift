@@ -127,6 +127,12 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for unknown error") {
+                let message = "An unknown error occurred."
+                let error = CredentialsManagerError(code: .unknown)
+                expect(error.localizedDescription) == message
+            }
+
             it("should return message when minTTL is too big") {
                 let minTTL = 7200
                 let lifetime = 3600
@@ -149,6 +155,66 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 let message = "The revocation of the refresh token failed. CAUSE: \(cause.localizedDescription)."
                 let error = CredentialsManagerError(code: .revokeFailed, cause: cause)
                 expect(error.localizedDescription) == message
+            }
+
+            it("should return message for DPoP key missing") {
+                let message = "The stored credentials are DPoP-bound but the DPoP key pair is no longer available in the Keychain."
+                let error = CredentialsManagerError(code: .dpopKeyMissing)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return message for DPoP not configured") {
+                let message = "The stored credentials are DPoP-bound but the Authentication client used by this"
+                    + " CredentialsManager was not configured with DPoP via .useDPoP()."
+                let error = CredentialsManagerError(code: .dpopNotConfigured)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return message for DPoP key mismatch") {
+                let message = "The stored credentials are DPoP-bound but the current DPoP key pair does not match the one"
+                    + " used when the credentials were saved."
+                let error = CredentialsManagerError(code: .dpopKeyMismatch)
+                expect(error.localizedDescription) == message
+            }
+
+        }
+
+        describe("DPoP error equality and pattern matching") {
+
+            it("dpopKeyMissing should be equal by code") {
+                let error = CredentialsManagerError(code: .dpopKeyMissing)
+                expect(error) == CredentialsManagerError.dpopKeyMissing
+            }
+
+            it("dpopNotConfigured should be equal by code") {
+                let error = CredentialsManagerError(code: .dpopNotConfigured)
+                expect(error) == CredentialsManagerError.dpopNotConfigured
+            }
+
+            it("dpopKeyMismatch should be equal by code") {
+                let error = CredentialsManagerError(code: .dpopKeyMismatch)
+                expect(error) == CredentialsManagerError.dpopKeyMismatch
+            }
+
+            it("dpopKeyMissing should pattern match by code") {
+                let error = CredentialsManagerError(code: .dpopKeyMissing)
+                expect(error ~= CredentialsManagerError.dpopKeyMissing) == true
+            }
+
+            it("dpopNotConfigured should pattern match by code") {
+                let error = CredentialsManagerError(code: .dpopNotConfigured)
+                expect(error ~= CredentialsManagerError.dpopNotConfigured) == true
+            }
+
+            it("dpopKeyMismatch should pattern match by code") {
+                let error = CredentialsManagerError(code: .dpopKeyMismatch)
+                expect(error ~= CredentialsManagerError.dpopKeyMismatch) == true
+            }
+
+            it("DPoP errors should not equal each other") {
+                expect(CredentialsManagerError.dpopKeyMissing) != CredentialsManagerError.dpopNotConfigured
+                expect(CredentialsManagerError.dpopKeyMissing) != CredentialsManagerError.dpopKeyMismatch
+                expect(CredentialsManagerError.dpopNotConfigured) != CredentialsManagerError.dpopKeyMismatch
             }
 
         }

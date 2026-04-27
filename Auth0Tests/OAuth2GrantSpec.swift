@@ -146,30 +146,35 @@ class OAuth2GrantSpec: QuickSpec {
                 }
             }
 
-            it("should produce pkce not allowed error") {
+            it("should produce unknown error for PKCE not allowed") {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
-                let expectedError = WebAuthError(code: .pkceNotAllowed)
                 NetworkStub.addStub(condition: {
                     $0.isToken(domain.host!) && $0.hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])
                 }, response: authFailure(error: "foo", description: "Unauthorized"))
                 waitUntil { done in
                     pkce.credentials(from: values) {
-                        expect($0).to(haveWebAuthError(expectedError))
+                        guard case .failure(let error) = $0,
+                              case .unknown(let message) = error.code else {
+                            fail("Expected unknown error")
+                            done()
+                            return
+                        }
+                        expect(message).to(contain("PKCE not allowed"))
                         done()
                     }
                 }
             }
 
-            it("should produce other error") {
+            it("should produce code exchange failed error") {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
                 let errorCode = "foo"
                 let errorDescription = "bar"
                 let cause = AuthenticationError(info: ["error": errorCode, "error_description": errorDescription], statusCode: 400)
-                let expectedError = WebAuthError(code: .other, cause: cause)
+                let expectedError = WebAuthError(code: .codeExchangeFailed, cause: cause)
                 NetworkStub.addStub(condition: {
                     $0.isToken(domain.host!) && $0.hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])
                 }, response: authFailure(error: errorCode, description: errorDescription))

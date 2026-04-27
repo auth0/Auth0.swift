@@ -18,32 +18,32 @@ let parameterPropertyKey = "com.auth0.parameter"
  }
  ```
  */
-public struct Request<T, E: Auth0APIError>: Requestable {
+public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Sendable {
     /**
      The callback closure type for the request.
      */
-    public typealias Callback = (Result<T, E>) -> Void
+    public typealias Callback = @MainActor (Result<T, E>) -> Void
 
     let session: URLSession
     let url: URL
     let method: String
     let requestValidator: [RequestValidator]
-    let handle: (Result<ResponseValue, E>, Callback) -> Void
+    let handle: @Sendable (Result<ResponseValue, E>, @Sendable (Result<T, E>) -> Void) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
-    let telemetry: Telemetry
+    let auth0ClientInfo: Auth0ClientInfo
     let dpop: DPoP?
 
     init(session: URLSession,
          url: URL,
          method: String,
          requestValidator: [RequestValidator] = [],
-         handle: @escaping (Result<ResponseValue, E>, Callback) -> Void,
+         handle: @escaping @Sendable (Result<ResponseValue, E>, @Sendable (Result<T, E>) -> Void) -> Void,
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
          logger: Logger?,
-         telemetry: Telemetry,
+         auth0ClientInfo: Auth0ClientInfo,
          dpop: DPoP? = nil) {
         self.session = session
         self.url = url
@@ -52,7 +52,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         self.requestValidator = requestValidator
         self.parameters = parameters
         self.logger = logger
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
         self.headers = headers
         self.dpop = dpop
     }
@@ -77,7 +77,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
-        telemetry.addTelemetryHeader(request: request)
+        auth0ClientInfo.addTelemetryHeader(request: request)
         return request as URLRequest
     }
 
@@ -89,22 +89,26 @@ public struct Request<T, E: Auth0APIError>: Requestable {
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
     public func start(_ callback: @escaping Callback) {
-        self.startDataTask(retryCount: 0, request: self.request, callback: callback)
+        let sendableCallback: @Sendable (Result<T, E>) -> Void = { result in
+            Task { @MainActor in callback(result) }
+        }
+        self.startDataTask(retryCount: 0, request: self.request, callback: sendableCallback)
     }
 
-    private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
-        var request = request
+    private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping @Sendable (Result<T, E>) -> Void) {
+        var mutableRequest = request
         do {
             try runClientValidation()
             if let dpop = dpop, try dpop.shouldGenerateProof(for: url, parameters: parameters) {
-                let proof = try dpop.generateProof(for: request as URLRequest)
-                request.setValue(proof, forHTTPHeaderField: "DPoP")
+                let proof = try dpop.generateProof(for: mutableRequest as URLRequest)
+                mutableRequest.setValue(proof, forHTTPHeaderField: "DPoP")
             }
         } catch {
             handle(.failure(E(cause: error)), callback)
             return
         }
 
+        let request = mutableRequest
         logger?.trace(request: request, session: self.session)
 
         let task = session.dataTask(with: request,
@@ -144,7 +148,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
      - Parameter extraParameters: Additional parameters for the request.
      */
-    public func parameters(_ extraParameters: [String: Any]) -> Self {
+    public func parameters(_ extraParameters: [String: Any]) -> any Requestable<T, E> {
         var parameters = extraParameters.merging(self.parameters) {(current, _) in current}
 
         parameters["scope"] = includeRequiredScope(in: parameters["scope"] as? String)
@@ -156,7 +160,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        parameters: parameters,
                        headers: self.headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -165,7 +169,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
      - Parameter extraHeaders: Additional headers for the request.
      */
-    public func headers(_ extraHeaders: [String: String]) -> Self {
+    public func headers(_ extraHeaders: [String: String]) -> any Requestable<T, E> {
         let headers = extraHeaders.merging(self.headers) {(current, _) in current}
 
         return Request(session: self.session,
@@ -175,11 +179,11 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        parameters: self.parameters,
                        headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
-    public func requestValidators(_ extraValidators: [RequestValidator]) -> Self {
+    public func requestValidators(_ extraValidators: [RequestValidator]) -> any Requestable<T, E> {
         var requestValidator = extraValidators
         requestValidator.append(contentsOf: self.requestValidator)
         return Request(session: session,
@@ -190,43 +194,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        parameters: parameters,
                        headers: headers,
                        logger: logger,
-                       telemetry: telemetry,
+                       auth0ClientInfo: auth0ClientInfo,
                        dpop: dpop)
     }
 }
-
-// MARK: - Combine
-
-public extension Request {
-
-    /**
-     Combine publisher for the request.
-
-     - Returns: A type-erased publisher.
-     */
-    func start() -> AnyPublisher<T, E> {
-        return Deferred { Future(self.start) }.eraseToAnyPublisher()
-    }
-
-}
-
-// MARK: - Async/Await
-
-#if canImport(_Concurrency)
-public extension Request {
-
-    /**
-     Performs the request.
-
-     - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
-     */
-    func start() async throws -> T {
-        return try await withCheckedThrowingContinuation { continuation in
-            self.start { result in
-                continuation.resume(with: result)
-            }
-        }
-    }
-
-}
-#endif

@@ -1,5 +1,5 @@
 /// List of authentication methods belonging to the authenticated user.
-public struct AuthenticationMethods: Decodable {
+public struct AuthenticationMethods: Decodable, Sendable {
     public let authenticationMethods: [AuthenticationMethod]
 
     enum CodingKeys: String, CodingKey {
@@ -7,7 +7,7 @@ public struct AuthenticationMethods: Decodable {
     }
 }
 
-public struct AuthenticationMethod: Decodable {
+public struct AuthenticationMethod: Decodable, Sendable {
     /// Authentication method type (factor)
     public let type: String?
 

@@ -5,7 +5,7 @@ private struct _A0Credentials {
     let tokenType: String
     let idToken: String
     let refreshToken: String?
-    let expiresIn: Date
+    let expiresAt: Date
     let scope: String?
     let recoveryCode: String?
 }
@@ -26,7 +26,7 @@ public final class Credentials: NSObject, Sendable {
     public let tokenType: String
 
     /// When the access token expires.
-    public let expiresIn: Date
+    public let expiresAt: Date
 
     /// Token that can be used to request a new access token.
     ///
@@ -76,7 +76,7 @@ public final class Credentials: NSObject, Sendable {
                                     tokenType: self.tokenType,
                                     idToken: redacted,
                                     refreshToken: (self.refreshToken != nil) ? redacted : nil,
-                                    expiresIn: self.expiresIn,
+                                    expiresAt: self.expiresAt,
                                     scope: self.scope,
                                     recoveryCode: (self.recoveryCode != nil) ? redacted : nil)
         return String(describing: values).replacingOccurrences(of: "_A0Credentials", with: "Credentials")
@@ -89,14 +89,14 @@ public final class Credentials: NSObject, Sendable {
                 tokenType: String = "",
                 idToken: String = "",
                 refreshToken: String? = nil,
-                expiresIn: Date = Date(),
+                expiresAt: Date = Date(),
                 scope: String? = nil,
                 recoveryCode: String? = nil) {
         self.accessToken = accessToken
         self.tokenType = tokenType
         self.idToken = idToken
         self.refreshToken = refreshToken
-        self.expiresIn = expiresIn
+        self.expiresAt = expiresAt
         self.scope = scope
         self.recoveryCode = recoveryCode
     }
@@ -110,7 +110,7 @@ extension Credentials: Codable {
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case tokenType = "token_type"
-        case expiresIn = "expires_in"
+        case expiresAt = "expires_in"
         case refreshToken = "refresh_token"
         case idToken = "id_token"
         case scope
@@ -127,20 +127,20 @@ extension Credentials: Codable {
         let scope = try values.decodeIfPresent(String.self, forKey: .scope)
         let recoveryCode = try values.decodeIfPresent(String.self, forKey: .recoveryCode)
 
-        var expiresIn: Date?
-        if let string = try? values.decode(String.self, forKey: .expiresIn), let double = Double(string) {
-            expiresIn = Date(timeIntervalSinceNow: double)
-        } else if let double = try? values.decode(Double.self, forKey: .expiresIn) {
-            expiresIn = Date(timeIntervalSinceNow: double)
-        } else if let date = try? values.decode(Date.self, forKey: .expiresIn) {
-            expiresIn = date
+        var expiresAt: Date?
+        if let string = try? values.decode(String.self, forKey: .expiresAt), let double = Double(string) {
+            expiresAt = Date(timeIntervalSinceNow: double)
+        } else if let double = try? values.decode(Double.self, forKey: .expiresAt) {
+            expiresAt = Date(timeIntervalSinceNow: double)
+        } else if let date = try? values.decode(Date.self, forKey: .expiresAt) {
+            expiresAt = date
         }
 
         self.init(accessToken: accessToken ?? "",
                   tokenType: tokenType ?? "",
                   idToken: idToken ?? "",
                   refreshToken: refreshToken,
-                  expiresIn: expiresIn ?? Date(),
+                  expiresAt: expiresAt ?? Date(),
                   scope: scope,
                   recoveryCode: recoveryCode)
     }
@@ -157,7 +157,7 @@ extension Credentials: NSSecureCoding {
         let tokenType = aDecoder.decodeObject(of: NSString.self, forKey: "tokenType")
         let idToken = aDecoder.decodeObject(of: NSString.self, forKey: "idToken")
         let refreshToken = aDecoder.decodeObject(of: NSString.self, forKey: "refreshToken")
-        let expiresIn = aDecoder.decodeObject(of: NSDate.self, forKey: "expiresIn")
+        let expiresAt = aDecoder.decodeObject(of: NSDate.self, forKey: "expiresIn")
         let scope = aDecoder.decodeObject(of: NSString.self, forKey: "scope")
         let recoveryCode = aDecoder.decodeObject(of: NSString.self, forKey: "recoveryCode")
 
@@ -165,7 +165,7 @@ extension Credentials: NSSecureCoding {
                   tokenType: tokenType as String? ?? "",
                   idToken: idToken as String? ?? "",
                   refreshToken: refreshToken as String?,
-                  expiresIn: expiresIn as Date? ?? Date(),
+                  expiresAt: expiresAt as Date? ?? Date(),
                   scope: scope as String?,
                   recoveryCode: recoveryCode as String?)
     }
@@ -176,7 +176,7 @@ extension Credentials: NSSecureCoding {
         aCoder.encode(self.tokenType as NSString, forKey: "tokenType")
         aCoder.encode(self.idToken as NSString, forKey: "idToken")
         aCoder.encode(self.refreshToken as NSString?, forKey: "refreshToken")
-        aCoder.encode(self.expiresIn as NSDate, forKey: "expiresIn")
+        aCoder.encode(self.expiresAt as NSDate, forKey: "expiresIn")
         aCoder.encode(self.scope as NSString?, forKey: "scope")
         aCoder.encode(self.recoveryCode as NSString?, forKey: "recoveryCode")
     }
@@ -195,7 +195,7 @@ extension Credentials {
                   tokenType: credentials.tokenType,
                   idToken: idToken ?? credentials.idToken,
                   refreshToken: refreshToken ?? credentials.refreshToken,
-                  expiresIn: credentials.expiresIn,
+                  expiresAt: credentials.expiresAt,
                   scope: credentials.scope)
     }
 
