@@ -6,7 +6,7 @@ This document provides context and guidelines for AI coding assistants working w
 
 **Auth0.swift** is the official Auth0 SDK for Apple platforms — providing authentication, authorization, and credential management for iOS, macOS, tvOS, watchOS, and visionOS apps.
 
-- **Language:** Swift 5.0+ (Package.swift uses Swift 6.0 tools)
+- **Language:** Swift 6.0 (swift-tools-version: 6.0, Swift 6 language mode for library, Swift 5 language mode for tests)
 - **Tech Stack:** Apple platforms, Xcode 16.x, SPM + CocoaPods + Carthage, URLSession, Combine, CryptoKit
 - **Package Manager:** Swift Package Manager (primary), CocoaPods, Carthage (development deps)
 - **Minimum Platform Versions:** iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, visionOS 1.0
@@ -97,39 +97,60 @@ xcodebuild test -project Auth0.xcodeproj \
 
 ```
 Auth0.swift/
-├── Auth0/                        # Library source (85 Swift files)
+├── Auth0/                        # Library source (109 Swift files)
 │   ├── Auth0.swift               # Public result type aliases & top-level factory functions
 │   ├── Authentication.swift      # Authentication protocol (OAuth2 / OIDC)
 │   ├── Auth0Authentication.swift # Concrete Authentication implementation
 │   ├── AuthenticationError.swift # Authentication API error type
-│   ├── CredentialsManager.swift  # Thread-safe Keychain credential storage & renewal
+│   ├── CredentialsManager.swift  # Sendable credential storage, renewal, biometric auth
 │   ├── CredentialsManagerError.swift
 │   ├── Credentials.swift         # User credentials model
 │   ├── WebAuth.swift             # Web Auth protocol (Universal Login)
 │   ├── Auth0WebAuth.swift        # Concrete WebAuth implementation
 │   ├── WebAuthError.swift
+│   ├── MobileWebAuth.swift       # iOS/visionOS ASWebAuthenticationPresentationContextProviding
+│   ├── DesktopWebAuth.swift      # macOS ASWebAuthenticationPresentationContextProviding
+│   ├── ASProvider.swift          # ASWebAuthenticationSession provider + ASUserAgent
+│   ├── SafariProvider.swift      # SFSafariViewController provider
 │   ├── Version.swift             # Single source of truth for SDK version string
 │   ├── DPoP/                     # DPoP (Demonstration of Proof-of-Possession) support
 │   │   ├── DPoP.swift
-│   │   └── DPoPError.swift
+│   │   ├── DPoPError.swift
+│   │   ├── DPoPChallenge.swift
+│   │   ├── DPoPKeyStore.swift
+│   │   ├── DPoPProofGenerator.swift
+│   │   ├── ECPublicKey.swift
+│   │   ├── KeychainKeyStore.swift
+│   │   ├── SecureEnclaveKeyStore.swift
+│   │   └── SenderConstraining.swift
 │   ├── MFA/                      # Multi-factor authentication
 │   │   ├── MFAClient.swift
 │   │   ├── Auth0MFAClient.swift
-│   │   └── MFAErrors.swift
-│   ├── MyAccount/                # My Account API
-│   │   ├── MyAccount.swift
-│   │   ├── MyAccountError.swift
-│   │   └── AuthenticationMethods/
-│   └── Utils/                    # Internal utilities
-├── Auth0Tests/                   # Test specs (56 files, mirrors Auth0/ structure)
+│   │   ├── MFAErrors.swift
+│   │   ├── MFAHandlers.swift
+│   │   ├── MFAChallenge.swift
+│   │   ├── MFAEnrollmentChallenge.swift
+│   │   ├── OTPMFAEnrollmentChallenge.swift
+│   │   ├── PushMFAEnrollmentChallenge.swift
+│   │   ├── Authenticator.swift
+│   │   └── ListAuthenticatorsValidator.swift
+│   └── MyAccount/                # My Account API
+│       ├── MyAccount.swift
+│       ├── Auth0MyAccount.swift
+│       ├── MyAccountError.swift
+│       ├── MyAccountHandlers.swift
+│       └── AuthenticationMethods/
+├── Auth0Tests/                   # Test specs (62 files, mirrors Auth0/ structure)
 │   ├── Auth0Spec.swift
 │   ├── AuthenticationSpec.swift
 │   ├── CredentialsManagerSpec.swift
 │   ├── DPoP/
 │   ├── MFA/
-│   └── MyAccount/
+│   ├── MyAccount/
+│   └── Extensions/
 ├── Documentation.docc/           # DocC documentation bundle
-├── App/                          # Demo application
+├── App/                          # Demo application (multi-platform)
+├── AppTests/                     # Demo application tests
 ├── fastlane/                     # Release automation (Fastfile)
 ├── .github/
 │   ├── workflows/
@@ -139,7 +160,8 @@ Auth0.swift/
 │   │   └── rl-scanner.yml
 │   └── actions/
 │       ├── setup/                # Composite: Ruby + CocoaPods + Xcode setup
-│       └── test/                 # Composite: Carthage bootstrap + xcodebuild
+│       ├── test/                 # Composite: Carthage bootstrap + xcodebuild
+│       └── rl-scanner/           # Composite: RL Security Scanner
 ├── Auth0.xcodeproj
 ├── Auth0.podspec
 ├── Package.swift
@@ -153,7 +175,7 @@ Auth0.swift/
 |------|---------|
 | `Auth0/Auth0.swift` | Entry point: result type aliases and factory functions (`Auth0.authentication()`, `Auth0.webAuth()`, etc.) |
 | `Auth0/Version.swift` | Version string — single source of truth; bump here for every release |
-| `Auth0/CredentialsManager.swift` | Thread-safe credential storage, renewal, biometric auth |
+| `Auth0/CredentialsManager.swift` | Sendable credential storage, renewal, biometric auth |
 | `Auth0/Authentication.swift` | Full OAuth2/OIDC Authentication protocol definition |
 | `Auth0/WebAuth.swift` | Universal Login protocol (iOS/macOS/visionOS only, `WEB_AUTH_PLATFORM`) |
 | `Auth0.podspec` | CocoaPods spec; `s.version` must match `Version.swift` |
@@ -222,8 +244,8 @@ func getCredentials(completion: @escaping (Any?, Error?) -> Void) {
 - **Protocol + concrete implementation:** Every public API is a protocol (`Authentication`, `WebAuth`, `MFAClient`); the concrete type is package-internal (`Auth0Authentication`, `Auth0WebAuth`).
 - **Builder pattern:** `WebAuth` uses a fluent builder — `webAuth.scope("openid").connection("google-oauth2").start()`.
 - **Result type aliases:** Each subsystem has a typed result alias — `AuthenticationResult<T>`, `WebAuthResult<T>`, `CredentialsManagerResult<T>`, `MyAccountResult<T>`.
-- **Dual API (callback + async/await):** Every public method exposes both a completion handler variant and a Swift concurrency (`async throws`) variant.
-- **Sendable / thread safety:** `CredentialsManager` is `Sendable`; concurrent methods use `NSLock` internally. Document thread-safety limits in DocC comments.
+- **Tri-brid concurrency (callback + Combine + async/await):** Every public async API exposes three variants — a completion handler, a Combine `AnyPublisher`, and a Swift concurrency (`async throws`) method.
+- **Sendable / thread safety:** `CredentialsManager` is a `Sendable` struct; uses `SendableBox` for internal storage and `NSLock` for biometric session state. Document thread-safety limits in DocC comments.
 
 ---
 
@@ -267,7 +289,7 @@ Keep a Changelog format. Update `CHANGELOG.md` for every user-facing change unde
 - Add DocC comments (`/// ...`) to all `public` types, methods, and properties.
 - Update `CHANGELOG.md` for every user-facing addition, change, fix, deprecation, or security update.
 - Gate WebAuth and Passkeys code with `#if WEB_AUTH_PLATFORM` / `#if PASSKEYS_PLATFORM`.
-- Expose both a completion-handler API and an `async throws` API for any new public method.
+- Expose all three concurrency variants (completion handler, Combine `AnyPublisher`, and `async throws`) for any new public async method.
 - Keep `Auth0/Version.swift` and `Auth0.podspec` `s.version` in sync.
 - Follow the existing error hierarchy — use or extend typed error structs (`AuthenticationError`, `WebAuthError`, etc.).
 - Run `swiftlint lint` and resolve all warnings before submitting.
@@ -316,7 +338,7 @@ Keep a Changelog format. Update `CHANGELOG.md` for every user-facing change unde
 | Package | Version | Purpose |
 |---------|---------|---------|
 | `SimpleKeychain` | 1.3.0 | Keychain access abstraction |
-| `JWTDecode.swift` | 3.3.0 | ID token parsing and validation |
+| `JWTDecode.swift` | 4.0.0 | ID token parsing and validation |
 
 ### Test Only
 
@@ -353,8 +375,8 @@ Keep a Changelog format. Update `CHANGELOG.md` for every user-facing change unde
 
 1. **Missing conditional compilation flag:** `WebAuth` and Passkeys types only exist on `WEB_AUTH_PLATFORM`. Forgetting `#if WEB_AUTH_PLATFORM` causes tvOS/watchOS build failures.
 2. **Carthage vs SPM for development:** The Xcode project uses Carthage-built `.xcframework`s. Run `carthage bootstrap --use-xcframeworks` before opening the project in Xcode; SPM is only used for `swift test` in CI.
-3. **Thread safety of CredentialsManager:** Only `credentials()`, `apiCredentials()`, `ssoCredentials()`, and `renew()` are thread-safe. Accessing non-thread-safe properties (e.g., `bioAuth`) from concurrent contexts requires external synchronization.
-4. **Swift 6 concurrency:** `Package.swift` uses Swift language mode v5 but `swift-tools-version:6.0`. Adding new `Sendable` conformances requires understanding the existing lock-based concurrency model — check `@unchecked Sendable` usages first.
+3. **Thread safety of CredentialsManager:** `CredentialsManager` is a `Sendable` struct. It uses `SendableBox` for storage and `NSLock` in the internal `BiometricSession` class. Biometric session state is protected by locking — be careful when modifying concurrency internals.
+4. **Swift 6 concurrency:** The library target uses Swift 6 language mode (`swiftLanguageMode(.v6)`); tests use Swift 5 mode. Adding new `Sendable` conformances requires understanding the existing concurrency model — check `@unchecked Sendable` and `SendableBox` usages first.
 5. **Nimble async matchers:** Use `await expect(value).to(...)` — not `expect(value).toEventually(...)` with a synchronous expectation, which produces flaky tests under Swift concurrency.
 
 ---
