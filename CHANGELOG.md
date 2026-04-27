@@ -4,12 +4,14 @@
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.18.0...3.0.0-beta.1)
 
 **⚠️ BREAKING CHANGES**
+- Rename clearSession() to logout() and UserInfo to UserProfile [\#1105](https://github.com/auth0/Auth0.swift/pull/1105)([utkrishtsahu](https://github.com/utkrishtsahu))
 - feat: SDK refactoring for better error handling of the errors thrown from CredentialsStorage [\#1127](https://github.com/auth0/Auth0.swift/pull/1127) ([NandanPrabhu](https://github.com/NandanPrabhu))
 - rename expiresIn to expiresAt and Telemetry to Auth0ClientInfo [\#1114](https://github.com/auth0/Auth0.swift/pull/1114) ([utkrishtsahu](https://github.com/utkrishtsahu))
 - feat: remove Management API client [\#1104](https://github.com/auth0/Auth0.swift/pull/1104) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+- feat: Add Error handling for DPoP thumbprint mismatch error [\#1145](https://github.com/auth0/Auth0.swift/pull/1145) ([NandanPrabhu](https://github.com/NandanPrabhu))
+- feat: Swift 6 strict concurrency compliance for WebAuth Part 2 [\#1138](https://github.com/auth0/Auth0.swift/pull/1138) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
 
 **Added**
-- feat: Add Error handling for DPoP thumbprint mismatch error [\#1145](https://github.com/auth0/Auth0.swift/pull/1145) ([NandanPrabhu](https://github.com/NandanPrabhu))
 - feat: integrate credentials manager with webauth [\#1146](https://github.com/auth0/Auth0.swift/pull/1146) ([subhankarmaiti](https://github.com/subhankarmaiti))
 - feat: add clearAll() API to CredentialsManager and deleteAllEntries() method CredentialsStorage [\#1116](https://github.com/auth0/Auth0.swift/pull/1116) ([utkrishtsahu](https://github.com/utkrishtsahu))
 - ID token validation for the API that return id token as part of Credentials and SSOCredentials [\#1091](https://github.com/auth0/Auth0.swift/pull/1091) ([NandanPrabhu](https://github.com/NandanPrabhu))
