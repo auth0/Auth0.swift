@@ -43,6 +43,7 @@ This guide covers every breaking change and the steps to migrate. Review it full
   + [ID Token Validation](#id-token-validation)
 - [**Removed APIs**](#removed-apis)
   + [Management API client (Users)](#management-api-client-users)
+- [**Getting Help**](#getting-help)
 
 ---
 
@@ -1172,6 +1173,15 @@ For example, if you were reading or updating user metadata:
 1. **Create a backend endpoint** (e.g. `PATCH /me/metadata`) that accepts the operation your app needs.
 2. **Call that endpoint from your app**, passing the user's access token as a `Bearer` token in the `Authorization` header.
 3. **On your backend**, obtain a machine-to-machine token via the [Client Credentials flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow) and use it to call the [Management API](https://auth0.com/docs/api/management/v2) with the precise scopes required.
+
+---
+
+## Getting Help
+
+If you encounter issues during migration:
+
+- [GitHub Issues](https://github.com/auth0/Auth0.swift/issues) - Report bugs or ask questions
+- [Auth0 Community](https://community.auth0.com/) - Community support
 
 ---
 [Go up ⤴](#table-of-contents)

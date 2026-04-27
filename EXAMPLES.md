@@ -168,12 +168,21 @@ Auth0
 
 #### Get a refresh token
 
-You must request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) from Auth0.
+The default scope already includes `offline_access`, so a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) is requested automatically. If you are specifying a custom scope, include `offline_access` explicitly:
 
 ```swift
 Auth0
     .webAuth()
     .scope("openid profile email offline_access read:todos")
+    // ...
+```
+
+To opt out of refresh tokens, specify a scope without `offline_access`:
+
+```swift
+Auth0
+    .webAuth()
+    .scope("openid profile email")
     // ...
 ```
 
@@ -608,6 +617,9 @@ try await Auth0
     .useCredentialsManager(credentialsManager)
     .logout()
 ```
+
+> [!IMPORTANT]
+> Call `useCredentialsManager(_:)` on **both** your `start()` and `logout()` call chains. Omitting it on `logout()` will succeed but credentials will **not** be cleared automatically. Do not manually call `store(credentials:)` after login or `clear()` after logout on the same instance — doing so can lead to race conditions or inconsistent state.
 
 > [!NOTE]
 > If the credentials manager fails to store or clear credentials, a `WebAuthError.credentialsManagerError` will be thrown. The underlying error can be accessed via the `cause` property.
@@ -1250,6 +1262,32 @@ credentialsManager.credentials { result in
 }
 ```
 
+To revoke the stored refresh token and clear credentials, use the `revoke()` method:
+
+```swift
+credentialsManager.revoke { result in
+    switch result {
+    case .success:
+        // Refresh token revoked and credentials cleared
+        break
+    case .failure(let error):
+        switch error {
+        case CredentialsManagerError.noCredentials:
+            // No credentials in storage — nothing to revoke
+            break
+        case CredentialsManagerError.revokeFailed:
+            // Network revocation failed — the refresh token may still be active
+            break
+        case CredentialsManagerError.clearFailed:
+            // Token was revoked but credentials could not be removed from storage
+            break
+        default:
+            break
+        }
+    }
+}
+```
+
 #### DPoP error handling
 
 When using DPoP with the Credentials Manager, additional validation is performed on credential retrieval to ensure the DPoP key pair is consistent. The following errors may be returned:
@@ -1267,16 +1305,17 @@ credentialsManager.credentials { result in
         print("Obtained credentials: \(credentials)")
     case .failure(let error):
         switch error {
-           case .dpopNotConfigured:
-            // Developer forgot to call useDPoP() on the Authentication client
-            // passed to the credentials manager. Fix the client configuration.
-            ```swift
-                CredentialsManager(authentication: Auth0.authentication().useDPoP())
-            ```swift
+        case .dpopNotConfigured:
+            // Authentication client was not configured with .useDPoP().
+            // Fix the CredentialsManager initialisation:
+            //   CredentialsManager(authentication: Auth0.authentication().useDPoP())
+            break
         case .dpopKeyMissing:
-            // DPoP key was lost. Prompt user to re-authenticate
+            // DPoP key was lost (e.g. app reinstall). Prompt user to re-authenticate.
+            break
         case .dpopKeyMismatch:
-            // DPoP key exists but doesn't match the one used at login (key rotation). Prompt user to re-authenticate
+            // DPoP key doesn't match the one used at login. Prompt user to re-authenticate.
+            break
         default:
             print("Failed with: \(error)")
         }
@@ -4392,252 +4431,6 @@ The My Account API client will only produce `MyAccountError` error values.
 - Use the `isRetryable` property to check if the error represents a transient failure that can be retried (network errors, rate limiting, or server errors).
 
 See the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/myaccounterror) to learn more about the available `MyAccountError` properties.
-
-[Go up ⤴](#examples)
-
-## Management API (Users) (iOS / macOS / tvOS / watchOS / visionOS)
-
-**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/users)**
-
-- [Retrieve user metadata](#retrieve-user-metadata)
-- [Update user metadata](#update-user-metadata)
-- [Link an account](#link-an-account)
-- [Management API client configuration](#management-api-client-configuration)
-- [Management API client errors](#management-api-client-errors)
-
-You can request more information from a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2).
-
-To call the Management API, you need an access token that has the API Identifier of the Management API as a target [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) value. Specify `https://YOUR_AUTH0_DOMAIN/api/v2/` as the audience when logging in to achieve this. 
-
-For example, if you are using Web Auth:
-
-```swift
-Auth0
-    .webAuth()
-    .audience("https://YOUR_AUTH0_DOMAIN/api/v2/")
-    // ...
-```
-
-> [!NOTE]
-> For security reasons, mobile apps are restricted to a subset of the Management API functionality.
-
-> [!IMPORTANT]
-> Auth0 access tokens [do not support](https://community.auth0.com/t/how-do-i-specify-multiple-audiences/10830) multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your app.
-
-### Retrieve user metadata
-
-To call this method, you must request the `read:current_user` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
-
-```swift
-Auth0
-    .users(token: credentials.accessToken)
-    .get("user-id", fields: ["user_metadata"])
-    .start { result in
-        switch result {
-        case .success(let user):
-            print("Obtained user with metadata: \(user)")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }
-```
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let user = try await Auth0
-        .users(token: credentials.accessToken)
-        .get("user-id", fields: ["user_metadata"])
-        .start()
-    print("Obtained user with metadata: \(user)") 
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .users(token: credentials.accessToken)
-    .get("user-id", fields: ["user_metadata"])
-    .start()
-    .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print("Failed with: \(error)")
-        }
-    }, receiveValue: { user in
-        print("Obtained user with metadata: \(user)")
-    })
-    .store(in: &cancellables)
-```
-</details>
-
-> [!TIP]
-> An alternative is to use a [post-login Action](https://auth0.com/docs/customize/actions/flows-and-triggers/login-flow/api-object) to add the metadata to the ID token as a custom claim.
-
-### Update user metadata
-
-To call this method, you must request the `update:current_user_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
-
-```swift
-Auth0
-    .users(token: credentials.accessToken)
-    .patch("user-id", 
-           userMetadata: ["first_name": "John", "last_name": "Appleseed"])
-    .start { result in
-        switch result {
-        case .success(let user):
-            print("Updated user: \(user)")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }
-```
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let user = try await Auth0
-        .users(token: credentials.accessToken)
-        .patch("user-id", 
-               userMetadata: ["first_name": "John", "last_name": "Appleseed"])
-        .start()
-    print("Updated user: \(user)") 
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .users(token: credentials.accessToken)
-    .patch("user-id", 
-           userMetadata: ["first_name": "John", "last_name": "Appleseed"])
-    .start()
-    .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print("Failed with: \(error)")
-        }
-    }, receiveValue: { user in
-        print("Updated user: \(user)") 
-    })
-    .store(in: &cancellables)
-```
-</details>
-
-### Link an account
-
-Your users may want to link their other accounts to the account they are logged in to. To achieve this, you need the user ID for the primary account and the idToken for the secondary account. You also need to request the `update:current_user_identities` scope when logging in.
-
-You can get the primary user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the primary user's ID token, or from the `sub` property of a `UserInfo` instance.
-
-```swift
-Auth0
-    .users(token: credentials.accessToken)
-    .link("primary-user-id", withOtherUserToken: "secondary-id-token")
-    .start { result in
-        switch result {
-        case .success:
-            print("Accounts linked")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }
-```
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    _ = try await Auth0
-        .users(token: credentials.accessToken)
-        .link("primary-user-id", withOtherUserToken: "secondary-id-token")
-        .start()
-    print("Accounts linked")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .users(token: credentials.accessToken)
-    .link("primary-user-id", withOtherUserToken: "secondary-id-token")
-    .start()
-    .sink(receiveCompletion: { completion in
-        switch completion {
-        case .finished:
-            print("Accounts linked")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }, receiveValue: { _ in })
-    .store(in: &cancellables)
-```
-</details>
-
-### Management API client configuration
-
-#### Add custom parameters
-
-Use the `parameters()` method to add custom parameters to any request.
-
-```swift
-Auth0
-    .users(token: credentials.accessToken)
-    .patch(userId, userMetadata: userMetadata) // Any request
-    .parameters(["key": "value"])
-    // ...
-```
-
-#### Add custom headers
-
-Use the `headers()` method to add custom headers to any request.
-
-```swift
-Auth0
-    .users(token: credentials.accessToken)
-    .patch(userId, userMetadata: userMetadata) // Any request
-    .headers(["key": "value"])
-    // ...
-```
-
-#### Use a custom `URLSession` instance
-
-You can specify a custom `URLSession` instance for more advanced networking configuration, such as customizing timeout values.
-
-```swift
-Auth0
-    .users(session: customURLSession)
-    // ...
-```
-
-### Management API client errors
-
-The Management API client will only produce `ManagementError` error values.
-
-- The `info` property contains additional information about the error.
-- The `cause` property contains the underlying error value, if any.
-- Use the `isNetworkError` property to check if the request failed due to networking issues.
-- Use the `isRetryable` property to check if the error represents a transient failure that can be retried (network errors, rate limiting, or server errors).
-
-Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/managementerror) to learn more about the available `ManagementError` properties.
 
 [Go up ⤴](#examples)
 
