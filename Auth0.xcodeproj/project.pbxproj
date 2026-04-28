@@ -155,6 +155,11 @@
 		5C505FAE2E216677005D0757 /* DPoPError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FAB2E216672005D0757 /* DPoPError.swift */; };
 		5C505FAF2E216677005D0757 /* DPoPError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FAB2E216672005D0757 /* DPoPError.swift */; };
 		5C505FB02E216677005D0757 /* DPoPError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FAB2E216672005D0757 /* DPoPError.swift */; };
+		AA000001000000000000AAA1 /* DPoPCredentialValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AAA0 /* DPoPCredentialValidator.swift */; };
+		AA000001000000000000AAA2 /* DPoPCredentialValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AAA0 /* DPoPCredentialValidator.swift */; };
+		AA000001000000000000AAA3 /* DPoPCredentialValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AAA0 /* DPoPCredentialValidator.swift */; };
+		AA000001000000000000AAA4 /* DPoPCredentialValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AAA0 /* DPoPCredentialValidator.swift */; };
+		AA000001000000000000AAA5 /* DPoPCredentialValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AAA0 /* DPoPCredentialValidator.swift */; };
 		5C505FB22E21669F005D0757 /* SenderConstraining.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FB12E216699005D0757 /* SenderConstraining.swift */; };
 		5C505FB32E21669F005D0757 /* SenderConstraining.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FB12E216699005D0757 /* SenderConstraining.swift */; };
 		5C505FB42E21669F005D0757 /* SenderConstraining.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FB12E216699005D0757 /* SenderConstraining.swift */; };
@@ -960,6 +965,7 @@
 		5C4F553423C9124200C89615 /* JWKSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWKSpec.swift; sourceTree = "<group>"; };
 		5C4F553923C9125600C89615 /* JWTAlgorithmSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTAlgorithmSpec.swift; sourceTree = "<group>"; };
 		5C505FAB2E216672005D0757 /* DPoPError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPError.swift; sourceTree = "<group>"; };
+		AA000001000000000000AAA0 /* DPoPCredentialValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPCredentialValidator.swift; sourceTree = "<group>"; };
 		5C505FB12E216699005D0757 /* SenderConstraining.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SenderConstraining.swift; sourceTree = "<group>"; };
 		5C505FB72E2166FB005D0757 /* DPoPProofGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPProofGenerator.swift; sourceTree = "<group>"; };
 		5C505FBD2E216746005D0757 /* DPoPChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPChallenge.swift; sourceTree = "<group>"; };
@@ -1380,6 +1386,7 @@
 			children = (
 				5C79AE072E040CA600CD0D41 /* DPoP.swift */,
 				5C505FAB2E216672005D0757 /* DPoPError.swift */,
+				AA000001000000000000AAA0 /* DPoPCredentialValidator.swift */,
 				5C505FB12E216699005D0757 /* SenderConstraining.swift */,
 				5C505FC32E216783005D0757 /* ECPublicKey.swift */,
 				5C505FB72E2166FB005D0757 /* DPoPProofGenerator.swift */,
@@ -2535,6 +2542,7 @@
 				5CDF67392DD3A8D600A9B513 /* Auth0APIError.swift in Sources */,
 				5C0AF09D2833420200162044 /* WebAuthentication.swift in Sources */,
 				5C505FB02E216677005D0757 /* DPoPError.swift in Sources */,
+				AA000001000000000000AAA1 /* DPoPCredentialValidator.swift in Sources */,
 				5CB41D4823D0BA2C00074024 /* IDTokenValidator.swift in Sources */,
 				D499DB1A2E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
 				D499DB1B2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
@@ -2718,6 +2726,7 @@
 				5C505FB32E21669F005D0757 /* SenderConstraining.swift in Sources */,
 				5C505FBE2E21674A005D0757 /* DPoPChallenge.swift in Sources */,
 				5C505FAF2E216677005D0757 /* DPoPError.swift in Sources */,
+				AA000001000000000000AAA2 /* DPoPCredentialValidator.swift in Sources */,
 				5F74CB411CEFD5E600226823 /* JSONObjectPayload.swift in Sources */,
 				5C41F6CB244F96E300252548 /* BioAuthentication.swift in Sources */,
 				V17KI34D4PWP799FLD81GPVP /* BiometricPolicy.swift in Sources */,
@@ -2956,6 +2965,7 @@
 				5C6513AA2791CDDE004EBC22 /* Version.swift in Sources */,
 				5C505FD32E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C505FAD2E216677005D0757 /* DPoPError.swift in Sources */,
+				AA000001000000000000AAA3 /* DPoPCredentialValidator.swift in Sources */,
 				5B1748761EF2D3A70060E653 /* Shared.swift in Sources */,
 				5C80980E275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
 				F11977F4EFCC4656965E3131 /* JWK+RSA.swift in Sources */,
@@ -3045,6 +3055,7 @@
 				5C6513A92791CDDE004EBC22 /* Version.swift in Sources */,
 				5C505FD22E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C505FAC2E216677005D0757 /* DPoPError.swift in Sources */,
+				AA000001000000000000AAA4 /* DPoPCredentialValidator.swift in Sources */,
 				5B1748771EF2D3A90060E653 /* Shared.swift in Sources */,
 				5C80980D275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
 				8D1D6205C538412A9B9A21C7 /* JWK+RSA.swift in Sources */,
@@ -3157,6 +3168,7 @@
 				C1B3B9FD2C24B6D4004A32A4 /* BioAuthentication.swift in Sources */,
 				2Z7FPPVSUUJRZC06V5RA8B2B /* BiometricPolicy.swift in Sources */,
 				5C505FAE2E216677005D0757 /* DPoPError.swift in Sources */,
+				AA000001000000000000AAA5 /* DPoPCredentialValidator.swift in Sources */,
 				C1B3B9FE2C24B6D4004A32A4 /* CredentialsManager.swift in Sources */,
 				C1B3B9FF2C24B6D4004A32A4 /* CredentialsStorage.swift in Sources */,
 				C1B3BA002C24B6D4004A32A4 /* CredentialsManagerError.swift in Sources */,
