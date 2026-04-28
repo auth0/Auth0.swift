@@ -4,6 +4,7 @@
 import Quick
 import Nimble
 import WebKit
+import Foundation
 @testable import Auth0
 
 private let Timeout: NimbleTimeInterval = .seconds(2)
@@ -272,7 +273,8 @@ class WebViewProviderSpec: QuickSpec {
                         webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
 
                         let navigationAction = MockWKNavigationAction(url: redirectURL)
-                        let policy = await webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction)
+                        var policy: WKNavigationActionPolicy?
+                        webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy = $0 }
                         expect(policy).to(equal(.cancel))
                         done()
                     }
@@ -285,8 +287,75 @@ class WebViewProviderSpec: QuickSpec {
                         webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
 
                         let navigationAction = MockWKNavigationAction(url: URL(string:"https://okta.com/callback")!)
-                        let policy = await webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction)
+                        var policy: WKNavigationActionPolicy?
+                        webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy = $0 }
                         expect(policy).to(equal(.allow))
+                        done()
+                    }
+                }
+            }
+
+            it("should resume the transaction when a matching https redirect URL is received") {
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        let transaction = SpyTransaction()
+                        transaction.isResumed = true
+                        TransactionStore.shared.store(transaction)
+                        webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
+
+                        let navigationAction = MockWKNavigationAction(url: redirectURL)
+                        webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { _ in }
+                        expect(transaction.isResumed).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should cancel navigation and resume transaction when redirect URL has query params") {
+                let redirectURLWithCode = URL(string: "https://auth0.com/callback?code=abc123&state=xyz")!
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        let transaction = SpyTransaction()
+                        transaction.isResumed = true
+                        TransactionStore.shared.store(transaction)
+                        webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
+
+                        let navigationAction = MockWKNavigationAction(url: redirectURLWithCode)
+                        var policy: WKNavigationActionPolicy?
+                        webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy = $0 }
+                        expect(policy).to(equal(.cancel))
+                        expect(transaction.isResumed).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should allow navigation for a custom scheme redirect URL (handled by WKURLSchemeHandler instead)") {
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: customSchemeRedirectURL, viewController: mockViewController, callback: callback)
+
+                        let navigationAction = MockWKNavigationAction(url: customSchemeURLWithCode)
+                        var policy: WKNavigationActionPolicy?
+                        webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy = $0 }
+                        expect(policy).to(equal(.allow))
+                        done()
+                    }
+                }
+            }
+
+            it("should not resume the transaction when an unrelated URL is navigated to") {
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        let transaction = SpyTransaction()
+                        TransactionStore.shared.store(transaction)
+                        webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
+
+                        let navigationAction = MockWKNavigationAction(url: URL(string: "https://auth0.com/login")!)
+                        var policy: WKNavigationActionPolicy?
+                        webViewUserAgent.webView(mockWebView, decidePolicyFor: navigationAction) { policy = $0 }
+                        expect(policy).to(equal(.allow))
+                        expect(transaction.isCancelled).to(beFalse())
                         done()
                     }
                 }
