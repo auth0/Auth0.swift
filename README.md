@@ -10,7 +10,7 @@
 
 > [!IMPORTANT]
 > **🚀 v3 Beta Available**
-> A new major version `3.0.0-beta.1` of Auth0.swift is now available in beta. It includes breaking changes and improvements over v2.
+> A new major version [`3.0.0-beta.1`](https://github.com/auth0/Auth0.swift/releases/tag/3.0.0-beta.1) of Auth0.swift is now available in beta. It includes breaking changes and improvements over v2.
 >
 > We'd love for you to try it out and share your feedback! Please [open an issue](https://github.com/auth0/Auth0.swift/issues) if you encounter any problems or have suggestions.
 >
