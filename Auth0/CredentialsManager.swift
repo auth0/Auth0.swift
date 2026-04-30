@@ -725,36 +725,37 @@ public struct CredentialsManager: Sendable {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
-    private func validateDPoPState(for credentials: Credentials) throws {
+    private func validateDPoPState(for credentials: Credentials) -> CredentialsManagerError? {
         let storedThumbprint = self.storage.getEntry(forKey: self.dpopThumbprintKey)
         let storedThumbPrintValue = storedThumbprint.flatMap { String(data: $0, encoding: .utf8) }
 
         let isDPoPBound = credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame
-            || storedThumbPrintValue != nil
+        || storedThumbPrintValue != nil
 
-        guard isDPoPBound else { return }
+        guard isDPoPBound else { return nil }
 
         guard let dpop = self.authentication.dpop else {
-            throw CredentialsManagerError.dpopNotConfigured
+            return CredentialsManagerError.dpopNotConfigured
         }
 
         let hasKeyPair = try? dpop.hasKeypair()
 
         guard hasKeyPair == true else {
             _ = self.clear()
-            throw CredentialsManagerError.dpopKeyMissing
+            return CredentialsManagerError.dpopKeyMissing
         }
 
         // Hash the current thumbprint to compare against the stored hash
-        let currentThumbprint = try dpop.jkt()
+        let currentThumbprint = try? dpop.jkt()
         if let stored = storedThumbPrintValue {
             if stored != currentThumbprint {
                 _ = self.clear()
-                throw CredentialsManagerError.dpopKeyMismatch
+                return CredentialsManagerError.dpopKeyMismatch
             }
-        } else {
+        } else if let currentThumbprint {
             _ = self.storage.setEntry(Data(currentThumbprint.utf8), forKey: dpopThumbprintKey)
         }
+        return nil
     }
 
     private func saveDPoPThumbprint(for credentials: Credentials) {
@@ -818,25 +819,27 @@ public struct CredentialsManager: Sendable {
                                              retryCount: Int,
                                              callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
-            do {
-                guard let credentials = self.retrieveCredentials() else {
-                    complete()
-                    return callback(.failure(.noCredentials))
-                }
-                guard forceRenewal ||
-                      self.hasExpired(credentials.expiresIn) ||
-                      self.willExpire(credentials.expiresIn, within: minTTL) ||
-                      self.hasScopeChanged(from: credentials.scope, to: scope) else {
-                    complete()
-                    return callback(.success(credentials))
-                }
-                guard let refreshToken = credentials.refreshToken else {
-                    complete()
-                    return callback(.failure(.noRefreshToken))
-                }
-
-                try self.validateDPoPState(for: credentials)
-
+            guard let credentials = self.retrieveCredentials() else {
+                complete()
+                return callback(.failure(.noCredentials))
+            }
+            guard forceRenewal ||
+                    self.hasExpired(credentials.expiresIn) ||
+                    self.willExpire(credentials.expiresIn, within: minTTL) ||
+                    self.hasScopeChanged(from: credentials.scope, to: scope) else {
+                complete()
+                return callback(.success(credentials))
+            }
+            guard let refreshToken = credentials.refreshToken else {
+                complete()
+                return callback(.failure(.noRefreshToken))
+            }
+            
+            if let error = self.validateDPoPState(for: credentials) {
+                complete()
+                return callback(.failure(error))
+            }
+            
             self.authentication
                 .renew(withRefreshToken: refreshToken, scope: scope)
                 .parameters(parameters)
@@ -866,25 +869,18 @@ public struct CredentialsManager: Sendable {
                             let delay = pow(2.0, Double(retryCount)) * 0.5
                             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) {
                                 self.retrieveCredentialsWithRetry(scope: scope,
-                                                                 minTTL: minTTL,
-                                                                 parameters: parameters,
-                                                                 headers: headers,
-                                                                 forceRenewal: forceRenewal,
-                                                                 retryCount: retryCount + 1,
-                                                                 callback: callback)
+                                                                  minTTL: minTTL,
+                                                                  parameters: parameters,
+                                                                  headers: headers,
+                                                                  forceRenewal: forceRenewal,
+                                                                  retryCount: retryCount + 1,
+                                                                  callback: callback)
                             }
                         } else {
                             callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
                         }
                     }
                 }
-            } catch let error as CredentialsManagerError {
-                complete()
-                callback(.failure(error))
-            } catch {
-                complete()
-                callback(.failure(CredentialsManagerError(code: .noCredentials, cause: error)))
-            }
         }
     }
 
@@ -897,46 +893,41 @@ public struct CredentialsManager: Sendable {
                                         headers: [String: String],
                                         callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
-            do {
-                guard let credentials = self.retrieveCredentials() else {
-                    complete()
-                    return callback(.failure(.noCredentials))
-                }
-                guard let refreshToken = credentials.refreshToken else {
-                    complete()
-                    return callback(.failure(.noRefreshToken))
-                }
-                try self.validateDPoPState(for: credentials)
-
-                self.authentication
-                    .ssoExchange(withRefreshToken: refreshToken)
-                    .parameters(parameters)
-                    .headers(headers)
-                    .start { result in
-                        switch result {
-                        case .success(let ssoCredentials):
-                            let newCredentials = Credentials(from: credentials,
-                                                             idToken: ssoCredentials.idToken,
-                                                             refreshToken: ssoCredentials.refreshToken ?? refreshToken)
-                            if !self.store(credentials: newCredentials) {
-                                complete()
-                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
-                            } else {
-                                complete()
-                                callback(.success(ssoCredentials))
-                            }
-                        case .failure(let error):
-                            complete()
-                            callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: error)))
-                        }
-                    }
-            } catch let error as CredentialsManagerError {
+            guard let credentials = self.retrieveCredentials() else {
                 complete()
-                callback(.failure(error))
-            } catch {
-                complete()
-                callback(.failure(CredentialsManagerError(code: .noCredentials, cause: error)))
+                return callback(.failure(.noCredentials))
             }
+            guard let refreshToken = credentials.refreshToken else {
+                complete()
+                return callback(.failure(.noRefreshToken))
+            }
+            if let error = self.validateDPoPState(for: credentials) {
+                complete()
+                return callback(.failure(error))
+            }
+
+            self.authentication
+                .ssoExchange(withRefreshToken: refreshToken)
+                .parameters(parameters)
+                .headers(headers)
+                .start { result in
+                    switch result {
+                    case .success(let ssoCredentials):
+                        let newCredentials = Credentials(from: credentials,
+                                                         idToken: ssoCredentials.idToken,
+                                                         refreshToken: ssoCredentials.refreshToken ?? refreshToken)
+                        if !self.store(credentials: newCredentials) {
+                            complete()
+                            callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                        } else {
+                            complete()
+                            callback(.success(ssoCredentials))
+                        }
+                    case .failure(let error):
+                        complete()
+                        callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: error)))
+                    }
+                }
         }
     }
 
@@ -948,62 +939,57 @@ public struct CredentialsManager: Sendable {
                                         headers: [String: String],
                                         callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
-            do {
-                if let apiCredentials = self.retrieveAPICredentials(audience: audience, scope: scope),
-                   !self.hasExpired(apiCredentials.expiresIn),
-                   !self.willExpire(apiCredentials.expiresIn, within: minTTL),
-                   !self.hasScopeChanged(from: apiCredentials.scope, to: scope, ignoreOpenid: scope?.contains("openid") == false) {
-                    complete()
-                    return callback(.success(apiCredentials))
-                }
-                guard let currentCredentials = self.retrieveCredentials() else {
-                    complete()
-                    return callback(.failure(.noCredentials))
-                }
-                guard let refreshToken = currentCredentials.refreshToken else {
-                    complete()
-                    return callback(.failure(.noRefreshToken))
-                }
-                try self.validateDPoPState(for: currentCredentials)
-
-                self.authentication
-                    .renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
-                    .parameters(parameters)
-                    .headers(headers)
-                    .start { result in
-                        switch result {
-                        case .success(let credentials):
-                            let newCredentials = Credentials(from: currentCredentials,
-                                                             idToken: credentials.idToken,
-                                                             refreshToken: credentials.refreshToken ?? refreshToken)
-                            let newAPICredentials = APICredentials(from: credentials)
-                            if self.willExpire(newAPICredentials.expiresIn, within: minTTL) {
-                                let tokenTTL = Int(newAPICredentials.expiresIn.timeIntervalSinceNow)
-                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
-                                complete()
-                                callback(.failure(error))
-                            } else if !self.store(credentials: newCredentials) {
-                                complete()
-                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
-                            } else if !self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope) {
-                                complete()
-                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
-                            } else {
-                                complete()
-                                callback(.success(newAPICredentials))
-                            }
-                        case .failure(let error):
-                            complete()
-                            callback(.failure(CredentialsManagerError(code: .apiExchangeFailed, cause: error)))
-                        }
-                    }
-            } catch let error as CredentialsManagerError {
+            if let apiCredentials = self.retrieveAPICredentials(audience: audience, scope: scope),
+               !self.hasExpired(apiCredentials.expiresIn),
+               !self.willExpire(apiCredentials.expiresIn, within: minTTL),
+               !self.hasScopeChanged(from: apiCredentials.scope, to: scope, ignoreOpenid: scope?.contains("openid") == false) {
                 complete()
-                callback(.failure(error))
-            } catch {
-                complete()
-                callback(.failure(CredentialsManagerError(code: .noCredentials, cause: error)))
+                return callback(.success(apiCredentials))
             }
+            guard let currentCredentials = self.retrieveCredentials() else {
+                complete()
+                return callback(.failure(.noCredentials))
+            }
+            guard let refreshToken = currentCredentials.refreshToken else {
+                complete()
+                return callback(.failure(.noRefreshToken))
+            }
+            if let error = self.validateDPoPState(for: currentCredentials) {
+                complete()
+                return callback(.failure(error))
+            }
+
+            self.authentication
+                .renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
+                .parameters(parameters)
+                .headers(headers)
+                .start { result in
+                    switch result {
+                    case .success(let credentials):
+                        let newCredentials = Credentials(from: currentCredentials,
+                                                         idToken: credentials.idToken,
+                                                         refreshToken: credentials.refreshToken ?? refreshToken)
+                        let newAPICredentials = APICredentials(from: credentials)
+                        if self.willExpire(newAPICredentials.expiresIn, within: minTTL) {
+                            let tokenTTL = Int(newAPICredentials.expiresIn.timeIntervalSinceNow)
+                            let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
+                            complete()
+                            callback(.failure(error))
+                        } else if !self.store(credentials: newCredentials) {
+                            complete()
+                            callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                        } else if !self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope) {
+                            complete()
+                            callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                        } else {
+                            complete()
+                            callback(.success(newAPICredentials))
+                        }
+                    case .failure(let error):
+                        complete()
+                        callback(.failure(CredentialsManagerError(code: .apiExchangeFailed, cause: error)))
+                    }
+                }
         }
     }
 
