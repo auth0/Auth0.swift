@@ -10,6 +10,8 @@ Auth0.swift v3 is a Swift 6-ready release with improved error handling, predicta
 - **New APIs:** Multi-window Web Auth support, `clearAll()`, automatic credentials management, and ID token validation.
 - **Removed APIs:** The Management API client and the deprecated MFA methods on the `Authentication` protocol have been removed.
 
+- This guide covers every breaking change and the steps to migrate. Review it fully before upgrading.
+
 ---
 
 ## Table of Contents
