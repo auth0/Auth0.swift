@@ -66,10 +66,6 @@ struct MockAuthentication: Authentication {
 
     func login(email: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
     func login(phoneNumber: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
-    func login(withOTP otp: String, mfaToken: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
-    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
-    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> any Requestable<Challenge, AuthenticationError> { StubRequestable() }
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
     func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }

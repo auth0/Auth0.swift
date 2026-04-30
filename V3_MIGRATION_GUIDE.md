@@ -8,9 +8,9 @@ Auth0.swift v3 is a Swift 6-ready release with improved error handling, predicta
 - **Updated defaults:** Scope now includes `offline_access`, `minTTL` defaults to 60 seconds, and `signup` defaults the `connection` to `"Username-Password-Authentication"`.
 - **Renamed APIs** for consistency with the Android, Flutter, and React Native Auth0 SDKs.
 - **New APIs:** Multi-window Web Auth support, `clearAll()`, automatic credentials management, and ID token validation.
-- **Removed:** The Management API client has been removed.
+- **Removed APIs:** The Management API client and the deprecated MFA methods on the `Authentication` protocol have been removed.
 
-This guide covers every breaking change and the steps to migrate. Review it fully before upgrading.
+- This guide covers every breaking change and the steps to migrate. Review it fully before upgrading.
 
 ---
 
@@ -43,6 +43,7 @@ This guide covers every breaking change and the steps to migrate. Review it full
   + [ID Token Validation](#id-token-validation)
 - [**Removed APIs**](#removed-apis)
   + [Management API client (Users)](#management-api-client-users)
+  + [MFA methods on Authentication protocol](#mfa-methods-on-authentication-protocol)
 - [**Getting Help**](#getting-help)
 
 ---
@@ -1137,9 +1138,6 @@ Chain any combination of the following modifiers after `validateClaims()`:
 - `Authentication.login(phoneNumber:code:audience:scope:)`
 - `Authentication.login(usernameOrEmail:password:realmOrConnection:audience:scope:)`
 - `Authentication.loginDefaultDirectory(withUsername:password:audience:scope:)`
-- `Authentication.login(withOTP:mfaToken:)`
-- `Authentication.login(withOOBCode:mfaToken:bindingCode:)`
-- `Authentication.login(withRecoveryCode:mfaToken:)`
 - `Authentication.login(appleAuthorizationCode:fullName:profile:audience:scope:)`
 - `Authentication.login(facebookSessionAccessToken:profile:audience:scope:)`
 - `Authentication.login(passkey:challenge:connection:audience:scope:)` (both `LoginPasskey` and `SignupPasskey` variants)
@@ -1183,6 +1181,28 @@ If you encounter issues during migration:
 
 - [GitHub Issues](https://github.com/auth0/Auth0.swift/issues) - Report bugs or ask questions
 - [Auth0 Community](https://community.auth0.com/) - Community support
+
+### MFA methods on Authentication protocol
+
+**Change:** The following deprecated MFA methods have been removed from the `Authentication` protocol:
+
+- `login(withOTP:mfaToken:)`
+- `login(withOOBCode:mfaToken:bindingCode:)`
+- `login(withRecoveryCode:mfaToken:)`
+- `multifactorChallenge(mfaToken:types:authenticatorId:)`
+
+**Impact:** Any code that calls these methods on an `Authentication` client will no longer compile.
+
+**Migration:** Use the dedicated `MFAClient` protocol instead, accessible via `Auth0.mfa()`:
+
+| Before (v2) | After (v3) |
+| --- | --- |
+| `Auth0.authentication().login(withOTP: otp, mfaToken: mfaToken)` | `Auth0.mfa().verify(otp: otp, mfaToken: mfaToken)` |
+| `Auth0.authentication().login(withOOBCode: code, mfaToken: mfaToken, bindingCode: bindingCode)` | `Auth0.mfa().verify(oobCode: code, bindingCode: bindingCode, mfaToken: mfaToken)` |
+| `Auth0.authentication().login(withRecoveryCode: code, mfaToken: mfaToken)` | `Auth0.mfa().verify(recoveryCode: code, mfaToken: mfaToken)` |
+| `Auth0.authentication().multifactorChallenge(mfaToken: mfaToken, types: types, authenticatorId: id)` | `Auth0.mfa().challenge(with: id, mfaToken: mfaToken)` |
+
+See the [MFA API section](EXAMPLES.md#mfa-api-ios--macos--tvos--watchos--visionos) in EXAMPLES.md for full usage details.
 
 ---
 [Go up ⤴](#table-of-contents)
