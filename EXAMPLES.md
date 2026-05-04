@@ -264,6 +264,9 @@ Auth0
 > [!WARNING]
 > The use of `WKWebView` for performing web-based authentication [is not recommended](https://auth0.com/blog/oauth-2-best-practices-for-native-apps), and some social identity providers –such as Google– do not support it.
 
+> [!NOTE]
+> Interactive dismissal (e.g. swiping down the sheet) is handled automatically and will produce a `WebAuthError` with code `.userCancelled`.
+
 ### ID token validation
 
 Auth0.swift automatically [validates](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) the ID token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID token have not been tampered with and can be safely used.

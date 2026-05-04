@@ -9,6 +9,37 @@ final class ContentViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
     private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
     
+    /// Web Authentication using WKWebView with pageSheet presentation
+    func webViewLogin() async {
+        isLoading = true
+        errorMessage = nil
+
+        #if os(iOS)
+        do {
+            let credentials = try await Auth0
+                .webAuth()
+                .provider(WebAuthentication.webViewProvider(style: .pageSheet))
+                .scope("openid profile email offline_access")
+                .start()
+
+            let stored = credentialsManager.store(credentials: credentials)
+            if stored {
+                isAuthenticated = true
+                print("Access Token: \(credentials.accessToken)")
+            } else {
+                errorMessage = "Failed to store credentials"
+            }
+        } catch let error as Auth0Error {
+            errorMessage = "Login failed: \(error.localizedDescription)"
+            print("WebView login failed with error: \(error)")
+        } catch {
+            errorMessage = "Unexpected error: \(error.localizedDescription)"
+        }
+        #endif
+
+        isLoading = false
+    }
+
     /// Web Authentication using Universal Login (Recommended)
     func webLogin() async {
         isLoading = true

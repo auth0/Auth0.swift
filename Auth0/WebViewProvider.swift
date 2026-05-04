@@ -105,12 +105,17 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
 
     func start() {
         self.webview.load(self.request)
-        UIWindow.topViewController?.present(self.viewController, animated: true)
+        UIWindow.topViewController?.present(self.viewController, animated: true) { [weak self] in
+            self?.viewController.presentationController?.delegate = self
+        }
     }
 
     func finish(with result: WebAuthResult<Void>) {
         DispatchQueue.main.async { [weak webview, weak viewController, callback] in
             webview?.removeFromSuperview()
+            if case .failure(let cause) = result, case .userCancelled = cause {
+                return callback(result)
+            }
             guard let presenting = viewController?.presentingViewController else {
                 let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
                 return callback(.failure(error))
@@ -176,6 +181,16 @@ extension WebViewUserAgent: WKNavigationDelegate {
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         self.finish(with: .failure(WebAuthError(code: .webViewFailure("The WebView's content process was terminated."))))
+    }
+
+}
+
+extension WebViewUserAgent: UIAdaptivePresentationControllerDelegate {
+
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead
+        // TransactionStore is internal
+        TransactionStore.shared.cancel()
     }
 
 }
