@@ -34,6 +34,7 @@ public struct CredentialsManager: Sendable {
     }
 
     private let storeKey: String
+    private let dpopThumbprintKey: String
     private let authentication: Authentication
     private let maxRetries: Int
     #if WEB_AUTH_PLATFORM
@@ -57,13 +58,16 @@ public struct CredentialsManager: Sendable {
     /// - Parameters:
     ///   - authentication: Auth0 Authentication API client.
     ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to 'credentials'.
+    ///   - dpopThumprintKey: Key used to store dpop thumbprint. Defaults to 'dpop_thumbprint'.
     ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `SimpleKeychain` instance.
     ///   - maxRetries:     Maximum number of retry attempts for credential renewal on transient errors. Defaults to 0.
     public init(authentication: Authentication,
                 storeKey: String = "credentials",
+                dpopThumbprintKey: String = "dpop_thumbprint",
                 storage: CredentialsStorage = SimpleKeychain(),
                 maxRetries: Int = 0) {
         self.storeKey = storeKey
+        self.dpopThumbprintKey = dpopThumbprintKey
         self.authentication = authentication
         self.sendableStorage = SendableBox(value: storage)
         self.maxRetries = max(0, maxRetries)
@@ -143,7 +147,11 @@ public struct CredentialsManager: Sendable {
             return false
         }
 
-        return self.storage.setEntry(data, forKey: self.storeKey)
+        guard self.storage.setEntry(data, forKey: self.storeKey) else {
+            return false
+        }
+        saveDPoPThumbprint(for: credentials)
+        return true
     }
 
     /// Clears credentials stored in the Keychain.
@@ -161,7 +169,9 @@ public struct CredentialsManager: Sendable {
         self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
         self.biometricSession.lock.unlock()
         #endif
-        return self.storage.deleteEntry(forKey: self.storeKey)
+        let result = self.storage.deleteEntry(forKey: self.storeKey)
+        _ = self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+        return result
     }
 
     /// Clears API credentials stored in the Keychain for a given audience value.
@@ -715,6 +725,56 @@ public struct CredentialsManager: Sendable {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
+    private func validateDPoPState(for credentials: Credentials) -> CredentialsManagerError? {
+        let storedThumbprint = self.storage.getEntry(forKey: self.dpopThumbprintKey)
+        let storedThumbPrintValue = storedThumbprint.flatMap { String(data: $0, encoding: .utf8) }
+
+        let isDPoPBound = credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame
+        || storedThumbPrintValue != nil
+
+        guard isDPoPBound else { return nil }
+
+        guard let dpop = self.authentication.dpop else {
+            return CredentialsManagerError.dpopNotConfigured
+        }
+
+        let hasKeyPair = try? dpop.hasKeypair()
+
+        guard hasKeyPair == true else {
+            _ = self.clear()
+            return CredentialsManagerError.dpopKeyMissing
+        }
+
+        // Hash the current thumbprint to compare against the stored hash
+        let currentThumbprint = try? dpop.jkt()
+        if let stored = storedThumbPrintValue {
+            if stored != currentThumbprint {
+                _ = self.clear()
+                return CredentialsManagerError.dpopKeyMismatch
+            }
+        } else if let currentThumbprint {
+            _ = self.storage.setEntry(Data(currentThumbprint.utf8), forKey: dpopThumbprintKey)
+        }
+        return nil
+    }
+
+    private func saveDPoPThumbprint(for credentials: Credentials) {
+        // token type must be DPoP and authentication must have non nil dpop property
+        guard credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame ||
+               self.authentication.dpop != nil else {
+            _ = self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+            return
+        }
+
+        if let dpop = self.authentication.dpop,
+            let thumbprint = try? dpop.jkt() {
+            // Store the thumbprint to avoid persisting the raw key thumbprint in device storage
+            _ = self.storage.setEntry(Data(thumbprint.utf8), forKey: self.dpopThumbprintKey)
+        } else {
+            _ = self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+        }
+    }
+
     private func retrieveAPICredentials(audience: String, scope: String?) -> APICredentials? {
         let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
         guard let data = self.storage.getEntry(forKey: key) else { return nil }
@@ -764,9 +824,9 @@ public struct CredentialsManager: Sendable {
                 return callback(.failure(.noCredentials))
             }
             guard forceRenewal ||
-                  self.hasExpired(credentials.expiresIn) ||
-                  self.willExpire(credentials.expiresIn, within: minTTL) ||
-                  self.hasScopeChanged(from: credentials.scope, to: scope) else {
+                    self.hasExpired(credentials.expiresIn) ||
+                    self.willExpire(credentials.expiresIn, within: minTTL) ||
+                    self.hasScopeChanged(from: credentials.scope, to: scope) else {
                 complete()
                 return callback(.success(credentials))
             }
@@ -774,7 +834,12 @@ public struct CredentialsManager: Sendable {
                 complete()
                 return callback(.failure(.noRefreshToken))
             }
-
+            
+            if let error = self.validateDPoPState(for: credentials) {
+                complete()
+                return callback(.failure(error))
+            }
+            
             self.authentication
                 .renew(withRefreshToken: refreshToken, scope: scope)
                 .parameters(parameters)
@@ -804,12 +869,12 @@ public struct CredentialsManager: Sendable {
                             let delay = pow(2.0, Double(retryCount)) * 0.5
                             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) {
                                 self.retrieveCredentialsWithRetry(scope: scope,
-                                                                 minTTL: minTTL,
-                                                                 parameters: parameters,
-                                                                 headers: headers,
-                                                                 forceRenewal: forceRenewal,
-                                                                 retryCount: retryCount + 1,
-                                                                 callback: callback)
+                                                                  minTTL: minTTL,
+                                                                  parameters: parameters,
+                                                                  headers: headers,
+                                                                  forceRenewal: forceRenewal,
+                                                                  retryCount: retryCount + 1,
+                                                                  callback: callback)
                             }
                         } else {
                             callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
@@ -835,6 +900,10 @@ public struct CredentialsManager: Sendable {
             guard let refreshToken = credentials.refreshToken else {
                 complete()
                 return callback(.failure(.noRefreshToken))
+            }
+            if let error = self.validateDPoPState(for: credentials) {
+                complete()
+                return callback(.failure(error))
             }
 
             self.authentication
@@ -871,8 +940,8 @@ public struct CredentialsManager: Sendable {
                                         callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             if let apiCredentials = self.retrieveAPICredentials(audience: audience, scope: scope),
-                  !self.hasExpired(apiCredentials.expiresIn),
-                  !self.willExpire(apiCredentials.expiresIn, within: minTTL),
+               !self.hasExpired(apiCredentials.expiresIn),
+               !self.willExpire(apiCredentials.expiresIn, within: minTTL),
                !self.hasScopeChanged(from: apiCredentials.scope, to: scope, ignoreOpenid: scope?.contains("openid") == false) {
                 complete()
                 return callback(.success(apiCredentials))
@@ -884,6 +953,10 @@ public struct CredentialsManager: Sendable {
             guard let refreshToken = currentCredentials.refreshToken else {
                 complete()
                 return callback(.failure(.noRefreshToken))
+            }
+            if let error = self.validateDPoPState(for: currentCredentials) {
+                complete()
+                return callback(.failure(error))
             }
 
             self.authentication
