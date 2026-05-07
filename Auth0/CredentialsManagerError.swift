@@ -13,6 +13,9 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
         case biometricsFailed
         case revokeFailed
         case largeMinTTL(minTTL: Int, lifetime: Int)
+        case dpopKeyMissing
+        case dpopKeyMismatch
+        case dpopNotConfigured
     }
 
     let code: Code
@@ -70,6 +73,22 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
     /// increase the **Token Expiration** value in the settings page of your [Auth0 API](https://manage.auth0.com/#/apis/).
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let largeMinTTL: CredentialsManagerError = .init(code: .largeMinTTL(minTTL: 0, lifetime: 0))
+
+    /// The stored credentials are DPoP-bound but the DPoP key pair is no longer available in the Keychain.
+    /// Stored credentials are cleared automatically when this error is returned.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
+    public static let dpopKeyMissing: CredentialsManagerError = .init(code: .dpopKeyMissing)
+
+    /// The stored credentials are DPoP-bound but the `Authentication` client used by this
+    /// `CredentialsManager` was not configured with DPoP via `.useDPoP()`.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
+    public static let dpopNotConfigured: CredentialsManagerError = .init(code: .dpopNotConfigured)
+
+    /// The stored credentials are DPoP-bound but the current DPoP key pair does not match the one
+    /// used when the credentials were saved.
+    /// Stored credentials are cleared automatically when this error is returned.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
+    public static let dpopKeyMismatch: CredentialsManagerError = .init(code: .dpopKeyMismatch)
 }
 
 // MARK: - Error Messages
@@ -88,6 +107,14 @@ public extension CredentialsManagerError {
         case .largeMinTTL(let minTTL, let lifetime): return "The minTTL requested (\(minTTL)s) is greater than the"
             + " lifetime of the renewed access token (\(lifetime)s). Request a lower minTTL or increase the"
             + " 'Token Expiration' value in the settings page of your Auth0 API."
+        case .dpopKeyMissing:
+            return "The stored credentials are DPoP-bound but the DPoP key pair is no longer available in the Keychain."
+        case .dpopKeyMismatch:
+            return "The stored credentials are DPoP-bound but the current DPoP key pair does not match the one"
+            + " used when the credentials were saved."
+        case .dpopNotConfigured:
+            return "The stored credentials are DPoP-bound but the Authentication client used by this"
+            + " CredentialsManager was not configured with DPoP via .useDPoP()."
         }
     }
 

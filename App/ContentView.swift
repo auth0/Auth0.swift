@@ -20,6 +20,17 @@ struct ContentView: View {
                         }
                         .buttonStyle(SecondaryButtonStyle())
                         .disabled(viewModel.isLoading)
+
+                        // WebView Login Button (WKWebView, pageSheet)
+                        Button {
+                            Task {
+                                await viewModel.webViewLogin()
+                            }
+                        } label: {
+                            Text("Login with WebView (Page Sheet)")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
                         
                         // Logout Button
                         Button {

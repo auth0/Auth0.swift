@@ -1,5 +1,15 @@
 # Change Log
 
+## [2.19.0](https://github.com/auth0/Auth0.swift/tree/2.19.0) (2026-05-05)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.18.0...2.19.0)
+
+**Added**
+- feat: handle interactive dismissal for WKWebView sheet presentation [\#1168](https://github.com/auth0/Auth0.swift/pull/1168) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+- feat: Add Error handling for DPoP thumbprint mismatch error to master [\#1166](https://github.com/auth0/Auth0.swift/pull/1166) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
+**Fixed**
+- refactor: Align nonce computation with other mobile SDKs [\#1118](https://github.com/auth0/Auth0.swift/pull/1118) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [2.18.0](https://github.com/auth0/Auth0.swift/tree/2.18.0) (2026-03-05)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.17.1...2.18.0)
 
