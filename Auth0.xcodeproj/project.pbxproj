@@ -109,6 +109,18 @@
 		5C3D886B2DC2CCA200AACC34 /* PasskeyLoginChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D88672DC2CCA100AACC34 /* PasskeyLoginChallenge.swift */; };
 		5C41F6A4244DC94E00252548 /* LoginTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* LoginTransaction.swift */; };
 		5C41F6AA244DCAFB00252548 /* ClearSessionTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */; };
+		45ABAB0DC62040D5BE4C6194 /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5BDA5FD4244027BC13F2E4 /* AuthorizationCode.swift */; };
+		661172DE23ED4234BCD26105 /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5BDA5FD4244027BC13F2E4 /* AuthorizationCode.swift */; };
+		7ABF1BB71A2C4A6FA2F012FA /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5BDA5FD4244027BC13F2E4 /* AuthorizationCode.swift */; };
+		4CDBDAA7BBC34FCBB2A8B32D /* PARUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9228F2EB0E384154B9A28063 /* PARUtils.swift */; };
+		6BC10C2912E94D188B7FB610 /* PARUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9228F2EB0E384154B9A28063 /* PARUtils.swift */; };
+		539F3B3326294B42A40E4A61 /* PARUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9228F2EB0E384154B9A28063 /* PARUtils.swift */; };
+		B3F756F9B4A247B3BD6127D7 /* PARTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97AFC84E7B144285A9F0C3AF /* PARTransaction.swift */; };
+		88DFB5E5D9A24EBCB4F7B1C9 /* PARTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97AFC84E7B144285A9F0C3AF /* PARTransaction.swift */; };
+		BA438A8B931B47549AF59C58 /* PARTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97AFC84E7B144285A9F0C3AF /* PARTransaction.swift */; };
+		017C2B6A702C46DAA56A665B /* PARWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AF474A3493489D94B0172A /* PARWebAuth.swift */; };
+		9B4737A6D35046FD9728D1F8 /* PARWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AF474A3493489D94B0172A /* PARWebAuth.swift */; };
+		0CD5CF64ECCD42468508DE77 /* PARWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AF474A3493489D94B0172A /* PARWebAuth.swift */; };
 		5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */; };
 		5C41F6B6244DCF2F00252548 /* LoginTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B4244DCEED00252548 /* LoginTransactionSpec.swift */; };
 		5C41F6C3244F965E00252548 /* Array+Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F551923C8FB8E00C89615 /* Array+Encode.swift */; };
@@ -944,6 +956,10 @@
 		5C3D88232DC1509300AACC34 /* LoginPasskey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPasskey.swift; sourceTree = "<group>"; };
 		5C3D88672DC2CCA100AACC34 /* PasskeyLoginChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeyLoginChallenge.swift; sourceTree = "<group>"; };
 		5C41F6A3244DC94E00252548 /* LoginTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTransaction.swift; sourceTree = "<group>"; };
+		0F5BDA5FD4244027BC13F2E4 /* AuthorizationCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationCode.swift; sourceTree = "<group>"; };
+		9228F2EB0E384154B9A28063 /* PARUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PARUtils.swift; sourceTree = "<group>"; };
+		97AFC84E7B144285A9F0C3AF /* PARTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PARTransaction.swift; sourceTree = "<group>"; };
+		23AF474A3493489D94B0172A /* PARWebAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PARWebAuth.swift; sourceTree = "<group>"; };
 		5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearSessionTransaction.swift; sourceTree = "<group>"; };
 		5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileWebAuth.swift; sourceTree = "<group>"; };
 		5C41F6B4244DCEED00252548 /* LoginTransactionSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTransactionSpec.swift; sourceTree = "<group>"; };
@@ -1279,6 +1295,10 @@
 			isa = PBXGroup;
 			children = (
 				5C41F6A3244DC94E00252548 /* LoginTransaction.swift */,
+				0F5BDA5FD4244027BC13F2E4 /* AuthorizationCode.swift */,
+				9228F2EB0E384154B9A28063 /* PARUtils.swift */,
+				97AFC84E7B144285A9F0C3AF /* PARTransaction.swift */,
+				23AF474A3493489D94B0172A /* PARWebAuth.swift */,
 				5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */,
 			);
 			name = Transactions;
@@ -2597,6 +2617,10 @@
 				5FE2F8B81CD0E910003628F4 /* Request.swift in Sources */,
 				5CDF67512DD3DB5400A9B513 /* MyAccountHandlers.swift in Sources */,
 				5C41F6A4244DC94E00252548 /* LoginTransaction.swift in Sources */,
+				45ABAB0DC62040D5BE4C6194 /* AuthorizationCode.swift in Sources */,
+				4CDBDAA7BBC34FCBB2A8B32D /* PARUtils.swift in Sources */,
+				B3F756F9B4A247B3BD6127D7 /* PARTransaction.swift in Sources */,
+				017C2B6A702C46DAA56A665B /* PARWebAuth.swift in Sources */,
 				5F3965C21CF67CF000CDE7C0 /* WebAuth.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* TransactionStore.swift in Sources */,
 				5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */,
@@ -2673,6 +2697,10 @@
 				5C3D87F32DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */,
 				5C41F6CE244F970500252548 /* IDTokenValidator.swift in Sources */,
 				5C41F6CA244F96AE00252548 /* LoginTransaction.swift in Sources */,
+				661172DE23ED4234BCD26105 /* AuthorizationCode.swift in Sources */,
+				6BC10C2912E94D188B7FB610 /* PARUtils.swift in Sources */,
+				88DFB5E5D9A24EBCB4F7B1C9 /* PARTransaction.swift in Sources */,
+				9B4737A6D35046FD9728D1F8 /* PARWebAuth.swift in Sources */,
 				D499DAF92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
 				D499DAFA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
 				D499DAFB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */,
@@ -3176,6 +3204,10 @@
 				C1B3BA152C24B6D4004A32A4 /* ASProvider.swift in Sources */,
 				5CDF672C2DD395C700A9B513 /* NewPasskey.swift in Sources */,
 				C1B3BA172C24B6D4004A32A4 /* LoginTransaction.swift in Sources */,
+				7ABF1BB71A2C4A6FA2F012FA /* AuthorizationCode.swift in Sources */,
+				539F3B3326294B42A40E4A61 /* PARUtils.swift in Sources */,
+				BA438A8B931B47549AF59C58 /* PARTransaction.swift in Sources */,
+				0CD5CF64ECCD42468508DE77 /* PARWebAuth.swift in Sources */,
 				5CDF673A2DD3A8D600A9B513 /* Auth0APIError.swift in Sources */,
 				C1B3BA182C24B6D4004A32A4 /* ClearSessionTransaction.swift in Sources */,
 				C1B3BA192C24B6D4004A32A4 /* MobileWebAuth.swift in Sources */,

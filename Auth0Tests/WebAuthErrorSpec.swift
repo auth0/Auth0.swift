@@ -107,6 +107,14 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for invalid request_uri") {
+                let uri = "some-invalid-uri"
+                let message = "The request_uri '\(uri)' is invalid."
+                + " It must start with 'urn:ietf:params:oauth:request_uri:'."
+                let error = WebAuthError(code: .invalidRequestUri(uri))
+                expect(error.localizedDescription) == message
+            }
+
             it("should return message for PKCE not allowed") {
                 let message = "Unable to perform authentication with PKCE."
                 + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
