@@ -220,6 +220,17 @@ class WebViewProviderSpec: QuickSpec {
             }
         }
         
+        describe("UIAdaptivePresentationControllerDelegate") {
+            it("should cancel the transaction when the sheet is interactively dismissed") {
+                webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
+                let transaction = SpyTransaction()
+                TransactionStore.shared.store(transaction)
+                let presentationController = UIPresentationController(presentedViewController: mockViewController, presenting: nil)
+                webViewUserAgent.presentationControllerDidDismiss(presentationController)
+                expect(transaction.isCancelled) == true
+            }
+        }
+
         describe("WKURLSchemeHandler") {
             it("should handle custom scheme callbacks correctly") {
                 waitUntil(timeout: Timeout) { done in
