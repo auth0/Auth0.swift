@@ -1,6 +1,7 @@
 import Foundation
 import Quick
 import Nimble
+import Combine
 
 @testable import Auth0
 
@@ -216,6 +217,104 @@ class PARWebAuthSpec: QuickSpec {
                         .sessionTransferToken("token")
                         .useEphemeralSession()
                     expect(result) === par
+                }
+            }
+        }
+
+        // MARK: - Combine API
+
+        describe("Combine API") {
+            var cancellables: Set<AnyCancellable>!
+
+            beforeEach {
+                cancellables = []
+            }
+
+            afterEach {
+                cancellables.removeAll()
+                TransactionStore.shared.clear()
+            }
+
+            it("should publish error on invalid request_uri") {
+                waitUntil { done in
+                    let par = newPARWebAuth()
+                    par.start(requestUri: InvalidRequestUri)
+                        .sink(receiveCompletion: { completion in
+                            if case .failure(let error) = completion {
+                                expect(error) == WebAuthError(code: .invalidRequestUri(InvalidRequestUri))
+                                done()
+                            }
+                        }, receiveValue: { _ in
+                            fail("Should not emit authorization code")
+                        })
+                        .store(in: &cancellables)
+                }
+            }
+
+            it("should publish error on user cancellation") {
+                waitUntil { done in
+                    let par = newPARWebAuth()
+                        .provider { url, callback in
+                            callback(.failure(WebAuthError(code: .userCancelled)))
+                            return SpyUserAgent()
+                        }
+                    par.start(requestUri: ValidRequestUri)
+                        .sink(receiveCompletion: { completion in
+                            if case .failure(let error) = completion {
+                                expect(error) == WebAuthError.userCancelled
+                                done()
+                            }
+                        }, receiveValue: { _ in
+                            fail("Should not emit authorization code")
+                        })
+                        .store(in: &cancellables)
+                }
+            }
+        }
+
+        // MARK: - Async/Await API
+
+        describe("Async/Await API") {
+
+            afterEach {
+                TransactionStore.shared.clear()
+            }
+
+            it("should throw error on invalid request_uri") {
+                waitUntil { done in
+                    Task {
+                        do {
+                            let par = newPARWebAuth()
+                            _ = try await par.start(requestUri: InvalidRequestUri)
+                            fail("Should have thrown an error")
+                        } catch let error as WebAuthError {
+                            expect(error) == WebAuthError(code: .invalidRequestUri(InvalidRequestUri))
+                            done()
+                        } catch {
+                            fail("Unexpected error type: \(error)")
+                        }
+                    }
+                }
+            }
+
+            it("should throw error on user cancellation") {
+                waitUntil { done in
+                    Task {
+                        do {
+                            let par = newPARWebAuth()
+                                .provider { url, callback in
+                                    callback(.failure(WebAuthError(code: .userCancelled)))
+                                    return SpyUserAgent()
+                                }
+                            _ = try await par.start(requestUri: ValidRequestUri)
+                            fail("Should have thrown an error")
+                        } catch let error as WebAuthError {
+                            expect(error) == WebAuthError.userCancelled
+                            done()
+                        } catch {
+                            fail("Unexpected error type: \(error)")
+                        }
+                    }
                 }
             }
         }
