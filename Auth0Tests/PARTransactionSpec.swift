@@ -89,7 +89,7 @@ class PARTransactionSpec: QuickSpec {
                     expect(transaction.resume(url)) == true
                     expect(transaction.userAgent).to(beNil())
                     if case .failure(let error) = result {
-                        expect(error) == WebAuthError.noAuthorizationCode
+                        expect(error) == WebAuthError(code: .noAuthorizationCode(["state": "some-state"]))
                     } else {
                         fail("Expected failure result")
                     }

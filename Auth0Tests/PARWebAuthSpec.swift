@@ -35,7 +35,7 @@ class PARWebAuthSpec: QuickSpec {
                     par.start(requestUri: InvalidRequestUri) { result = $0 }
                     expect(result).toNot(beNil())
                     if case .failure(let error) = result {
-                        expect(error) == WebAuthError.invalidRequestUri
+                        expect(error) == WebAuthError(code: .invalidRequestUri(InvalidRequestUri))
                     } else {
                         fail("Expected invalidRequestUri error")
                     }
@@ -46,7 +46,7 @@ class PARWebAuthSpec: QuickSpec {
                     let par = newPARWebAuth()
                     par.start(requestUri: "") { result = $0 }
                     if case .failure(let error) = result {
-                        expect(error) == WebAuthError.invalidRequestUri
+                        expect(error) == WebAuthError(code: .invalidRequestUri(""))
                     } else {
                         fail("Expected invalidRequestUri error")
                     }
@@ -184,7 +184,7 @@ class PARWebAuthSpec: QuickSpec {
 
                     expect(result).toEventuallyNot(beNil())
                     if case .failure(let error) = result {
-                        expect(error) == WebAuthError.noAuthorizationCode
+                        expect(error) == WebAuthError(code: .noAuthorizationCode(["state": "some-state"]))
                     } else {
                         fail("Expected noAuthorizationCode error")
                     }

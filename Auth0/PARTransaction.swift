@@ -36,17 +36,20 @@ class PARTransaction: NSObject, AuthTransaction {
             result[item.name] = item.value
         }
 
-        if let error = items["error"] {
-            let description = items["error_description"] ?? "Unknown error"
+        if items["error"] != nil {
             let cause = AuthenticationError(info: items, statusCode: 302)
-            self.finishUserAgent(with: .failure(WebAuthError(code: .other, cause: cause)))
+            let error = WebAuthError(code: .other, cause: cause)
+            self.finishUserAgent(with: .failure(error))
+            self.callback(.failure(error))
         } else if let code = items["code"] {
             self.finishUserAgent(with: .success(()))
             let authorizationCode = AuthorizationCode(code: code, state: items["state"])
             self.callback(.success(authorizationCode))
             return true
         } else {
-            self.finishUserAgent(with: .failure(WebAuthError(code: .noAuthorizationCode(items))))
+            let error = WebAuthError(code: .noAuthorizationCode(items))
+            self.finishUserAgent(with: .failure(error))
+            self.callback(.failure(error))
         }
 
         return true
