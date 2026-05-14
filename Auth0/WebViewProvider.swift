@@ -138,7 +138,9 @@ final class WebViewUserAgent: NSObject, WebAuthUserAgent, Sendable {
             // Fall back to key window's top view controller
             topViewController = Auth0WindowRepresentable.topViewController
         }
-        topViewController?.present(self.viewController, animated: true)
+        topViewController?.present(self.viewController, animated: true) { [weak self] in
+            self?.viewController.presentationController?.delegate = self
+        }
     }
     
     func finish(with result: WebAuthResult<Void>) {
@@ -214,6 +216,16 @@ extension WebViewUserAgent: WKNavigationDelegate {
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         self.finish(with: .failure(WebAuthError(code: .webViewFailure("The WebView's content process was terminated."))))
+    }
+
+}
+
+extension WebViewUserAgent: UIAdaptivePresentationControllerDelegate {
+
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead
+        // TransactionStore is internal
+        TransactionStore.shared.cancel()
     }
 
 }

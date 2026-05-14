@@ -15,6 +15,7 @@ final class ContentViewModel: ObservableObject {
     #if WEB_AUTH_PLATFORM
     private let webAuth: WebAuth
     #endif
+
     init(email: String = "",
          password: String = "",
          isLoading: Bool = false,
@@ -60,7 +61,30 @@ final class ContentViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let credentials = try await webAuth
+            _ = try await webAuth
+                .scope("openid profile email offline_access")
+                .start()
+
+            isAuthenticated = true
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
+        } catch let error as Auth0Error {
+            errorMessage = "Login failed: \(error.localizedDescription)"
+        } catch {
+            errorMessage = "Unexpected error: \(error.localizedDescription)"
+        }
+
+        isLoading = false
+    }
+
+    #if os(iOS)
+    func webViewLogin() async {
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            _ = try await webAuth
+                .provider(WebAuthentication.webViewProvider(style: .pageSheet))
                 .scope("openid profile email offline_access")
                 .start()
 
@@ -77,13 +101,11 @@ final class ContentViewModel: ObservableObject {
     }
     #endif
 
-    #if WEB_AUTH_PLATFORM
     func logout(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
         do {
             try await webAuth.logout()
-
             isAuthenticated = false
         } catch let error as CredentialsManagerError {
             errorMessage = handleCredentialsManagerError(error)

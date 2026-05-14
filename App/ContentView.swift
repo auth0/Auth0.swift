@@ -25,11 +25,11 @@ struct ContentView: View {
                 TextField(text: $viewModel.email) {
                     Text("email")
                 }
-                
+
                 SecureField(text: $viewModel.password) {
                     Text("password")
                 }
-                
+
                 Button {
                     Task {
                         await viewModel.login()
@@ -37,26 +37,35 @@ struct ContentView: View {
                 } label: {
                     Text("Login")
                 }
-
             }
+
+            #if WEB_AUTH_PLATFORM
             Button {
                 Task {
-                    
-                    #if WEB_AUTH_PLATFORM
                     #if os(macOS)
                     await viewModel.webLogin(presentationWindow: currentWindow)
                     #else
                     await viewModel.webLogin(presentationWindow: window)
                     #endif
-                    #endif
                 }
             } label: {
-                VStack(spacing: 4) {
-                    Text("Login")
-                }
+                Text("Login with Browser")
             }
-            .buttonStyle(PrimaryButtonStyle())
+            .buttonStyle(SecondaryButtonStyle())
             .disabled(viewModel.isLoading)
+
+            #if os(iOS)
+            Button {
+                Task {
+                    await viewModel.webViewLogin()
+                }
+            } label: {
+                Text("Login with WebView (Page Sheet)")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .disabled(viewModel.isLoading)
+            #endif
+            #endif
 
             Divider()
                 .padding(.vertical)
@@ -97,7 +106,6 @@ struct ContentView: View {
         }
         #if os(macOS)
         .onAppear {
-            // Capture the window on appear for macOS
             currentWindow = getCurrentWindow()
         }
         #endif
@@ -192,4 +200,3 @@ extension View {
 }
 
 #endif
-
