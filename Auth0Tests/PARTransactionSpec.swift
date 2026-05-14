@@ -8,14 +8,14 @@ class PARTransactionSpec: QuickSpec {
 
     override class func spec() {
         var transaction: PARTransaction!
-        let userAgent = SpyUserAgent()
         let redirectURL = URL(string: "https://samples.auth0.com/callback")!
         let code = "auth_code_123"
 
         describe("PAR transaction") {
 
-            context("resume with code") {
+            context("resume") {
                 it("should return authorization code") {
+                    let userAgent = SpyUserAgent()
                     var result: WebAuthResult<AuthorizationCode>?
                     transaction = PARTransaction(redirectURL: redirectURL,
                                                   userAgent: userAgent,
@@ -33,6 +33,7 @@ class PARTransactionSpec: QuickSpec {
                 }
 
                 it("should return authorization code with state from redirect") {
+                    let userAgent = SpyUserAgent()
                     var result: WebAuthResult<AuthorizationCode>?
                     transaction = PARTransaction(redirectURL: redirectURL,
                                                   userAgent: userAgent,
@@ -46,16 +47,18 @@ class PARTransactionSpec: QuickSpec {
                         fail("Expected success result")
                     }
                 }
-            }
 
-            context("resume with error") {
-                it("should handle error response") {
+                it("should handle url with error") {
+                    let userAgent = SpyUserAgent()
                     var result: WebAuthResult<AuthorizationCode>?
                     transaction = PARTransaction(redirectURL: redirectURL,
                                                   userAgent: userAgent,
                                                   callback: { result = $0 })
                     let url = URL(string: "https://samples.auth0.com/callback?error=access_denied&error_description=Unauthorized")!
+                    let errorInfo = ["error": "access_denied", "error_description": "Unauthorized"]
+                    let expectedError = WebAuthError(code: .other, cause: AuthenticationError(info: errorInfo, statusCode: 302))
                     expect(transaction.resume(url)) == true
+                    expect(userAgent.result).to(haveWebAuthError(expectedError))
                     expect(transaction.userAgent).to(beNil())
                     if case .failure(let error) = result {
                         expect(error.cause).toNot(beNil())
@@ -65,22 +68,23 @@ class PARTransactionSpec: QuickSpec {
                 }
 
                 it("should handle error response without description") {
+                    let userAgent = SpyUserAgent()
                     var result: WebAuthResult<AuthorizationCode>?
                     transaction = PARTransaction(redirectURL: redirectURL,
                                                   userAgent: userAgent,
                                                   callback: { result = $0 })
                     let url = URL(string: "https://samples.auth0.com/callback?error=server_error")!
                     expect(transaction.resume(url)) == true
-                    if case .failure = result {
-                        // Expected
+                    expect(transaction.userAgent).to(beNil())
+                    if case .failure(let error) = result {
+                        expect(error.cause).toNot(beNil())
                     } else {
                         fail("Expected failure result")
                     }
                 }
-            }
 
-            context("resume with missing code") {
                 it("should fail when code is missing from callback") {
+                    let userAgent = SpyUserAgent()
                     var result: WebAuthResult<AuthorizationCode>?
                     transaction = PARTransaction(redirectURL: redirectURL,
                                                   userAgent: userAgent,
@@ -94,26 +98,26 @@ class PARTransactionSpec: QuickSpec {
                         fail("Expected failure result")
                     }
                 }
-            }
 
-            context("resume with invalid URL") {
-                it("should fail for URL without query parameters") {
-                    var result: WebAuthResult<AuthorizationCode>?
+                it("should fail to handle invalid url") {
+                    let userAgent = SpyUserAgent()
                     transaction = PARTransaction(redirectURL: redirectURL,
                                                   userAgent: userAgent,
-                                                  callback: { result = $0 })
+                                                  callback: { _ in })
                     let url = URL(string: "foo")!
+                    let expectedError = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
                     expect(transaction.resume(url)) == false
+                    expect(userAgent.result).to(haveWebAuthError(expectedError))
                     expect(transaction.userAgent).to(beNil())
                 }
             }
 
             context("cancel") {
                 it("should cancel current transaction") {
-                    var result: WebAuthResult<AuthorizationCode>?
+                    let userAgent = SpyUserAgent()
                     transaction = PARTransaction(redirectURL: redirectURL,
                                                   userAgent: userAgent,
-                                                  callback: { result = $0 })
+                                                  callback: { _ in })
                     transaction.cancel()
                     expect(transaction.userAgent).to(beNil())
                     expect(userAgent.result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))

@@ -37,7 +37,7 @@ public class PARWebAuth {
 
     private var sessionTransferTokenValue: String?
     private var customProvider: WebAuthProvider?
-    private var ephemeralSession = false
+    private(set) var ephemeralSession = false
 
     lazy var redirectURL: URL? = {
         guard let bundleID = Bundle.main.bundleIdentifier, let domain = self.url.host else { return nil }

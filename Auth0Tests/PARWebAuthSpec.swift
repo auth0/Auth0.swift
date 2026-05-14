@@ -27,6 +27,90 @@ class PARWebAuthSpec: QuickSpec {
             TransactionStore.shared.clear()
         }
 
+        // MARK: - Init
+
+        describe("init") {
+
+            it("should init with client id & url") {
+                let par = PARWebAuth(clientId: ClientId, url: DomainURL)
+                expect(par.clientId) == ClientId
+                expect(par.url) == DomainURL
+            }
+
+            it("should init with client id, url, storage & barrier") {
+                let storage = TransactionStore.shared
+                let barrier = MockPARBarrier()
+                let par = PARWebAuth(clientId: ClientId,
+                                     url: DomainURL,
+                                     storage: storage,
+                                     barrier: barrier)
+                expect(par.clientId) == ClientId
+                expect(par.url) == DomainURL
+            }
+
+        }
+
+        // MARK: - Redirect URI
+
+        describe("redirect uri") {
+
+            it("should build with the domain") {
+                let par = newPARWebAuth()
+                expect(par.redirectURL).toNot(beNil())
+                expect(par.redirectURL?.absoluteString).to(contain(Domain))
+            }
+
+        }
+
+        // MARK: - Builder Methods
+
+        describe("builder methods") {
+
+            it("should return self for chaining") {
+                let par = newPARWebAuth()
+                let result = par
+                    .sessionTransferToken("token")
+                    .useEphemeralSession()
+                expect(result) === par
+            }
+
+            it("should set session transfer token") {
+                var capturedURL: URL?
+                let par = newPARWebAuth()
+                    .sessionTransferToken("sst_value")
+                    .provider { url, callback in
+                        capturedURL = url
+                        return SpyUserAgent()
+                    }
+                par.start(requestUri: ValidRequestUri) { _ in }
+                expect(capturedURL).toEventuallyNot(beNil())
+                let components = URLComponents(url: capturedURL!, resolvingAgainstBaseURL: true)!
+                expect(components.queryItems).to(containItem(withName: "session_transfer_token", value: "sst_value"))
+            }
+
+            it("should set custom provider") {
+                var isStarted = false
+                let par = newPARWebAuth()
+                    .provider { url, _ in
+                        isStarted = true
+                        return SpyUserAgent()
+                    }
+                par.start(requestUri: ValidRequestUri) { _ in }
+                expect(isStarted).toEventually(beTrue())
+            }
+
+            it("should not use ephemeral session by default") {
+                expect(newPARWebAuth().ephemeralSession).to(beFalse())
+            }
+
+            it("should use ephemeral session") {
+                expect(newPARWebAuth().useEphemeralSession().ephemeralSession).to(beTrue())
+            }
+
+        }
+
+        // MARK: - Start (Callback)
+
         describe("start") {
 
             context("validation") {
@@ -63,6 +147,15 @@ class PARWebAuthSpec: QuickSpec {
                     } else {
                         fail("Expected transactionActiveAlready error")
                     }
+                }
+
+                it("should produce a no bundle identifier error when redirect URL is missing") {
+                    let expectedError = WebAuthError(code: .noBundleIdentifier)
+                    var result: WebAuthResult<AuthorizationCode>?
+                    let par = newPARWebAuth()
+                    par.redirectURL = nil
+                    par.start(requestUri: ValidRequestUri) { result = $0 }
+                    expect(result).toEventually(haveWebAuthError(expectedError))
                 }
             }
 
@@ -210,15 +303,85 @@ class PARWebAuthSpec: QuickSpec {
                 }
             }
 
-            context("builder methods") {
-                it("should return self for chaining") {
-                    let par = newPARWebAuth()
-                    let result = par
-                        .sessionTransferToken("token")
-                        .useEphemeralSession()
-                    expect(result) === par
+            context("transaction") {
+
+                beforeEach {
+                    TransactionStore.shared.clear()
                 }
+
+                it("should store a new transaction") {
+                    let par = newPARWebAuth()
+                        .provider { url, callback in PARMockUserAgent(callback: callback) }
+                    par.start(requestUri: ValidRequestUri) { _ in }
+                    expect(TransactionStore.shared.current).toNot(beNil())
+                    TransactionStore.shared.cancel()
+                }
+
+                it("should cancel the current transaction") {
+                    var result: WebAuthResult<AuthorizationCode>?
+                    let par = newPARWebAuth()
+                        .provider { url, callback in PARMockUserAgent(callback: callback) }
+                    par.start(requestUri: ValidRequestUri) { result = $0 }
+                    TransactionStore.shared.cancel()
+                    expect(TransactionStore.shared.current).to(beNil())
+                }
+
             }
+
+            context("barrier") {
+
+                beforeEach {
+                    QueueBarrier.shared.lower()
+                }
+
+                it("should raise the barrier") {
+                    let par = PARWebAuth(clientId: ClientId,
+                                         url: DomainURL,
+                                         storage: TransactionStore.shared,
+                                         barrier: QueueBarrier.shared)
+                        .provider { url, callback in PARMockUserAgent(callback: callback) }
+                    var secondResult: WebAuthResult<AuthorizationCode>?
+                    par.start(requestUri: ValidRequestUri) { _ in }
+                    par.start(requestUri: ValidRequestUri) { secondResult = $0 }
+                    expect(secondResult).toEventually(haveWebAuthError(WebAuthError(code: .transactionActiveAlready)))
+                    TransactionStore.shared.cancel()
+                    QueueBarrier.shared.lower()
+                }
+
+                it("should lower the barrier after cancellation") {
+                    let par = PARWebAuth(clientId: ClientId,
+                                         url: DomainURL,
+                                         storage: TransactionStore.shared,
+                                         barrier: QueueBarrier.shared)
+                        .provider { url, callback in PARMockUserAgent(callback: callback) }
+                    par.start(requestUri: ValidRequestUri) { _ in }
+                    TransactionStore.shared.cancel()
+                    QueueBarrier.shared.lower()
+                    // Should be able to start a new transaction after cancel
+                    var secondResult: WebAuthResult<AuthorizationCode>?
+                    par.start(requestUri: ValidRequestUri) { secondResult = $0 }
+                    expect(secondResult).toEventually(beNil())
+                    TransactionStore.shared.cancel()
+                    QueueBarrier.shared.lower()
+                }
+
+            }
+
+            context("provider") {
+
+                it("should start the supplied provider") {
+                    var isStarted = false
+                    let par = newPARWebAuth()
+                        .provider { url, _ in
+                            isStarted = true
+                            return SpyUserAgent()
+                        }
+                    par.start(requestUri: ValidRequestUri) { _ in }
+                    expect(isStarted).toEventually(beTrue())
+                }
+
+            }
+
         }
 
         // MARK: - Combine API

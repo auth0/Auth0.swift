@@ -394,6 +394,16 @@
 		5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
 		5F93BC0C1CC6B0DE0031519F /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
 		5FA250541D4A85A200C544FA /* WebAuthErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA250531D4A85A200C544FA /* WebAuthErrorSpec.swift */; };
+
+		B2B34BECE984422AB1D5F7EE /* PARWebAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1527B513F34E6BB13AC686 /* PARWebAuthSpec.swift */; };
+		8FD757DB7C054A7BBD73682F /* PARWebAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1527B513F34E6BB13AC686 /* PARWebAuthSpec.swift */; };
+		6ED3CC68DA2B41F8B4F59F29 /* PARWebAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1527B513F34E6BB13AC686 /* PARWebAuthSpec.swift */; };
+		075CB390F6F8410DAB7BB611 /* PARTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F326CAC21BF449259277265A /* PARTransactionSpec.swift */; };
+		0A0F9D0DDA714529BF5462DD /* PARTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F326CAC21BF449259277265A /* PARTransactionSpec.swift */; };
+		F8E941AFF74F4484AFD1CB4A /* PARTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F326CAC21BF449259277265A /* PARTransactionSpec.swift */; };
+		58D3A29816434528AF2E29A3 /* PARUtilsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25F91E5998F74F89849E0653 /* PARUtilsSpec.swift */; };
+		BA91F4BE1DAD42859322CAAE /* PARUtilsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25F91E5998F74F89849E0653 /* PARUtilsSpec.swift */; };
+		FBD598E053C7410BAB05C451 /* PARUtilsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25F91E5998F74F89849E0653 /* PARUtilsSpec.swift */; };
 		5FADB6031CEC0C3300D4BB50 /* UsersSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB6021CEC0C3300D4BB50 /* UsersSpec.swift */; };
 		5FADB6041CEC0C3300D4BB50 /* UsersSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB6021CEC0C3300D4BB50 /* UsersSpec.swift */; };
 		5FADB6061CED27FB00D4BB50 /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB6051CED27FB00D4BB50 /* Users.swift */; };
@@ -1048,6 +1058,10 @@
 		5F74CB3F1CEFD5E600226823 /* JSONObjectPayload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = JSONObjectPayload.swift; path = Auth0/JSONObjectPayload.swift; sourceTree = SOURCE_ROOT; };
 		5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0Spec.swift; sourceTree = "<group>"; };
 		5FA250531D4A85A200C544FA /* WebAuthErrorSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebAuthErrorSpec.swift; path = Auth0Tests/WebAuthErrorSpec.swift; sourceTree = SOURCE_ROOT; };
+
+		FF1527B513F34E6BB13AC686 /* PARWebAuthSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PARWebAuthSpec.swift; path = Auth0Tests/PARWebAuthSpec.swift; sourceTree = SOURCE_ROOT; };
+		F326CAC21BF449259277265A /* PARTransactionSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PARTransactionSpec.swift; path = Auth0Tests/PARTransactionSpec.swift; sourceTree = SOURCE_ROOT; };
+		25F91E5998F74F89849E0653 /* PARUtilsSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PARUtilsSpec.swift; path = Auth0Tests/PARUtilsSpec.swift; sourceTree = SOURCE_ROOT; };
 		5FADB6021CEC0C3300D4BB50 /* UsersSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UsersSpec.swift; path = Auth0Tests/UsersSpec.swift; sourceTree = SOURCE_ROOT; };
 		5FADB6051CED27FB00D4BB50 /* Users.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Users.swift; path = Auth0/Users.swift; sourceTree = SOURCE_ROOT; };
 		5FADB6081CED500900D4BB50 /* ManagementSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ManagementSpec.swift; path = Auth0Tests/ManagementSpec.swift; sourceTree = SOURCE_ROOT; };
@@ -1660,6 +1674,10 @@
 				5CF539262836F6DE0073F623 /* Transactions */,
 				5CF539222836DC360073F623 /* Providers */,
 				5FA250531D4A85A200C544FA /* WebAuthErrorSpec.swift */,
+
+				FF1527B513F34E6BB13AC686 /* PARWebAuthSpec.swift */,
+				F326CAC21BF449259277265A /* PARTransactionSpec.swift */,
+				25F91E5998F74F89849E0653 /* PARUtilsSpec.swift */,
 				5F09C6A61D07532B00727E55 /* ChallengeGeneratorSpec.swift */,
 				5F4A1F971D00AEDF00C72242 /* OAuth2GrantSpec.swift */,
 				5F53F5D61CFFAA4A00476A46 /* WebAuthSpec.swift */,
@@ -2822,6 +2840,9 @@
 				5C1574612DD7D83B00BF9373 /* MyAccountAuthenticationMethodsSpec.swift in Sources */,
 				5FADB6031CEC0C3300D4BB50 /* UsersSpec.swift in Sources */,
 				5F686A771D4AB90900412E3D /* TransactionStoreSpec.swift in Sources */,
+							B2B34BECE984422AB1D5F7EE /* PARWebAuthSpec.swift in Sources */,
+				075CB390F6F8410DAB7BB611 /* PARTransactionSpec.swift in Sources */,
+				58D3A29816434528AF2E29A3 /* PARUtilsSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2887,6 +2908,9 @@
 				62610F6C2EE5B32A006BB7A9 /* SensitiveDataRedactorSpec.swift in Sources */,
 				5F1FBB9B1D8A44C1006B0B85 /* ResponseSpec.swift in Sources */,
 				5CE775A5244FCF3F00D054A0 /* IDTokenValidatorBaseSpec.swift in Sources */,
+							8FD757DB7C054A7BBD73682F /* PARWebAuthSpec.swift in Sources */,
+				0A0F9D0DDA714529BF5462DD /* PARTransactionSpec.swift in Sources */,
+				BA91F4BE1DAD42859322CAAE /* PARUtilsSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3290,6 +3314,9 @@
 				5C505FFE2E283A81005D0757 /* SecureEnclaveKeyStoreSpec.swift in Sources */,
 				C1B3BA502C24BA37004A32A4 /* Auth0Spec.swift in Sources */,
 				5CCDDC492E2A8D7700079840 /* DPoPSpec.swift in Sources */,
+							6ED3CC68DA2B41F8B4F59F29 /* PARWebAuthSpec.swift in Sources */,
+				F8E941AFF74F4484AFD1CB4A /* PARTransactionSpec.swift in Sources */,
+				FBD598E053C7410BAB05C451 /* PARUtilsSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
