@@ -85,6 +85,49 @@ class SensitiveDataRedactorSpec: QuickSpec {
                     expect(result).to(contain("scope"))
                     expect(result).to(contain("openid profile email"))
                 }
+
+                it("should redact nested sensitive fields") {
+                    let json = """
+                    {
+                        "profile": {
+                            "access_token": "nested_access_token"
+                        },
+                        "sessions": [
+                            {
+                                "refresh_token": "nested_refresh_token"
+                            }
+                        ]
+                    }
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).toNot(contain("nested_access_token"))
+                    expect(result).toNot(contain("nested_refresh_token"))
+                }
+
+                it("should preserve JSON arrays") {
+                    let json = """
+                    [
+                        {
+                            "access_token": "array_access_token",
+                            "token_type": "Bearer"
+                        }
+                    ]
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).to(contain("token_type"))
+                    expect(result).to(contain("Bearer"))
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).toNot(contain("array_access_token"))
+                }
                 
                 it("should preserve non-sensitive fields") {
                     let json = """
