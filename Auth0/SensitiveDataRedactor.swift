@@ -17,23 +17,33 @@ struct SensitiveDataRedactor {
     /// - Returns: A JSON string with sensitive fields replaced by `<REDACTED>` if valid JSON, otherwise returns the data decoded as a UTF-8 string, or `nil` if decoding fails.
     static func redact(_ data: Data) -> String? {
         do {
-            // Attempt to parse as JSON
-            var jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            
-            // Redact any sensitive keys present
-            sensitiveKeys.forEach { key in
-                if jsonObject?[key] != nil {
-                    jsonObject?[key] = "<REDACTED>"
-                }
-            }
-            
-            // Convert back to pretty-printed JSON string
-            let redactedData = try JSONSerialization.data(withJSONObject: jsonObject ?? [:], options: [.prettyPrinted])
+            let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+            let redactedObject = Self.redactJSONObject(jsonObject)
+            let redactedData = try JSONSerialization.data(withJSONObject: redactedObject, options: [.prettyPrinted])
             return String(data: redactedData, encoding: .utf8) ?? "<REDACTED>"
             
         } catch {
             // If not JSON, return try converting data to  string
             return String(data: data, encoding: .utf8)
         }
+    }
+
+    private static func redactJSONObject(_ object: Any) -> Any {
+        if var dictionary = object as? [String: Any] {
+            for key in dictionary.keys {
+                if sensitiveKeys.contains(key) {
+                    dictionary[key] = "<REDACTED>"
+                } else if let value = dictionary[key] {
+                    dictionary[key] = redactJSONObject(value)
+                }
+            }
+            return dictionary
+        }
+
+        if let array = object as? [Any] {
+            return array.map(redactJSONObject)
+        }
+
+        return object
     }
 }
