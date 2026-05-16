@@ -5,9 +5,10 @@ import CommonCrypto
 private func getVerifier() -> String {
     let data = Data(count: 32)
     var tempData = data
-    _ = tempData.withUnsafeMutableBytes {
+    let result = tempData.withUnsafeMutableBytes {
         SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
     }
+    precondition(result == errSecSuccess, "Unable to generate a secure PKCE code verifier.")
     return tempData.encodeBase64URLSafe()
 }
 
