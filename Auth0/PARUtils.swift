@@ -1,8 +1,7 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-/// Shared utilities for PAR (Pushed Authorization Request) flows.
-enum PARUtils {
+extension PARWebAuth {
 
     static let requestUriPrefix = "urn:ietf:params:oauth:request_uri:"
 

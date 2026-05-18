@@ -28,7 +28,7 @@ import Combine
 ///
 /// - ``AuthorizationCode``
 /// - ``WebAuthError``
-public class PARWebAuth {
+public final class PARWebAuth {
 
     let clientId: String
     let url: URL
@@ -124,7 +124,7 @@ public class PARWebAuth {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
-        guard PARUtils.isValidRequestUri(requestUri) else {
+        guard Self.isValidRequestUri(requestUri) else {
             barrier.lower()
             return callback(.failure(WebAuthError(code: .invalidRequestUri(requestUri))))
         }
@@ -135,11 +135,11 @@ public class PARWebAuth {
         }
 
         var additionalParameters: [String: String] = [:]
-        if let sst = sessionTransferTokenValue {
-            additionalParameters["session_transfer_token"] = sst
+        if let sessionTransferTokenValue {
+            additionalParameters["session_transfer_token"] = sessionTransferTokenValue
         }
 
-        let authorizeURL = PARUtils.buildAuthorizeURL(
+        let authorizeURL = Self.buildAuthorizeURL(
             baseURL: url,
             clientId: clientId,
             requestUri: requestUri,
