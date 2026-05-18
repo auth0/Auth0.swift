@@ -45,7 +45,6 @@ final class PARTransaction: NSObject, AuthTransaction {
             self.finishUserAgent(with: .success(()))
             let authorizationCode = AuthorizationCode(code: code, state: items["state"])
             self.callback(.success(authorizationCode))
-            return true
         } else {
             let error = WebAuthError(code: .noAuthorizationCode(items))
             self.finishUserAgent(with: .failure(error))

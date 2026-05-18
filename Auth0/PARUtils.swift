@@ -28,14 +28,13 @@ extension PARWebAuth {
                                   additionalParameters: [String: String] = [:]) -> URL {
         let authorizeURL = baseURL.appendingPathComponent("authorize")
         var components = URLComponents(url: authorizeURL, resolvingAgainstBaseURL: true)!
-        var queryItems = [
-            URLQueryItem(name: "client_id", value: clientId),
-            URLQueryItem(name: "request_uri", value: requestUri)
-        ]
-        for (key, value) in additionalParameters {
-            queryItems.append(URLQueryItem(name: key, value: value))
+        var queryItems: [String: String] = [:]
+        queryItems["client_id"] = clientId
+        queryItems["request_uri"] = requestUri
+        additionalParameters.forEach { (key, value) in
+            queryItems[key] = value
         }
-        components.queryItems = queryItems
+        components.queryItems = queryItems.map { URLQueryItem(name: $0.key, value: $0.value) }
         return components.url!
     }
 
