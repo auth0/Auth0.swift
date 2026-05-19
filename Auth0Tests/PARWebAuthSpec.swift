@@ -66,12 +66,11 @@ class PARWebAuthSpec: QuickSpec {
 
         describe("builder methods") {
 
-            it("should return self for chaining") {
-                let par = newPARWebAuth()
-                let result = par
+            it("should support method chaining") {
+                let result = newPARWebAuth()
                     .sessionTransferToken("token")
                     .useEphemeralSession()
-                expect(result) === par
+                expect(result.ephemeralSession) == true
             }
 
             it("should set session transfer token") {
@@ -118,7 +117,7 @@ class PARWebAuthSpec: QuickSpec {
                     var result: WebAuthResult<AuthorizationCode>?
                     let par = newPARWebAuth()
                     par.start(requestUri: InvalidRequestUri) { result = $0 }
-                    expect(result).toNot(beNil())
+                    expect(result).toEventuallyNot(beNil())
                     if case .failure(let error) = result {
                         expect(error) == WebAuthError(code: .invalidRequestUri(InvalidRequestUri))
                     } else {
@@ -130,6 +129,7 @@ class PARWebAuthSpec: QuickSpec {
                     var result: WebAuthResult<AuthorizationCode>?
                     let par = newPARWebAuth()
                     par.start(requestUri: "") { result = $0 }
+                    expect(result).toEventuallyNot(beNil())
                     if case .failure(let error) = result {
                         expect(error) == WebAuthError(code: .invalidRequestUri(""))
                     } else {
@@ -142,6 +142,7 @@ class PARWebAuthSpec: QuickSpec {
                     let par = newPARWebAuth(barrier: barrier)
                     var result: WebAuthResult<AuthorizationCode>?
                     par.start(requestUri: ValidRequestUri) { result = $0 }
+                    expect(result).toEventuallyNot(beNil())
                     if case .failure(let error) = result {
                         expect(error) == WebAuthError.transactionActiveAlready
                     } else {
@@ -152,8 +153,11 @@ class PARWebAuthSpec: QuickSpec {
                 it("should produce a no bundle identifier error when redirect URL is missing") {
                     let expectedError = WebAuthError(code: .noBundleIdentifier)
                     var result: WebAuthResult<AuthorizationCode>?
-                    let par = newPARWebAuth()
-                    par.redirectURL = nil
+                    // Use a URL with no host to make redirectURL return nil
+                    let par = PARWebAuth(clientId: ClientId,
+                                         url: URL(string: "invalid:")!,
+                                         storage: TransactionStore.shared,
+                                         barrier: MockPARBarrier())
                     par.start(requestUri: ValidRequestUri) { result = $0 }
                     expect(result).toEventually(haveWebAuthError(expectedError))
                 }
@@ -214,10 +218,9 @@ class PARWebAuthSpec: QuickSpec {
                             return PARMockUserAgent(callback: callback)
                         }
                     par.start(requestUri: ValidRequestUri) { result = $0 }
-
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     let callbackURL = URL(string: "com.auth0.samples://samples.auth0.com/ios/com.auth0.samples/callback?code=\(Code)")!
                     _ = TransactionStore.shared.resume(callbackURL)
-
                     expect(result).toEventuallyNot(beNil())
                     if case .success(let authCode) = result {
                         expect(authCode.code) == Code
@@ -233,10 +236,9 @@ class PARWebAuthSpec: QuickSpec {
                             return PARMockUserAgent(callback: callback)
                         }
                     par.start(requestUri: ValidRequestUri) { result = $0 }
-
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     let callbackURL = URL(string: "com.auth0.samples://samples.auth0.com/ios/com.auth0.samples/callback?code=\(Code)&state=par-state")!
                     _ = TransactionStore.shared.resume(callbackURL)
-
                     expect(result).toEventuallyNot(beNil())
                     if case .success(let authCode) = result {
                         expect(authCode.code) == Code
@@ -253,10 +255,9 @@ class PARWebAuthSpec: QuickSpec {
                             return PARMockUserAgent(callback: callback)
                         }
                     par.start(requestUri: ValidRequestUri) { result = $0 }
-
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     let callbackURL = URL(string: "com.auth0.samples://samples.auth0.com/ios/com.auth0.samples/callback?error=access_denied&error_description=Unauthorized")!
                     _ = TransactionStore.shared.resume(callbackURL)
-
                     expect(result).toEventuallyNot(beNil())
                     if case .failure(let error) = result {
                         expect(error.cause).toNot(beNil())
@@ -272,10 +273,9 @@ class PARWebAuthSpec: QuickSpec {
                             return PARMockUserAgent(callback: callback)
                         }
                     par.start(requestUri: ValidRequestUri) { result = $0 }
-
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     let callbackURL = URL(string: "com.auth0.samples://samples.auth0.com/ios/com.auth0.samples/callback?state=some-state")!
                     _ = TransactionStore.shared.resume(callbackURL)
-
                     expect(result).toEventuallyNot(beNil())
                     if case .failure(let error) = result {
                         expect(error) == WebAuthError(code: .noAuthorizationCode(["state": "some-state"]))
@@ -294,12 +294,7 @@ class PARWebAuthSpec: QuickSpec {
                             return SpyUserAgent()
                         }
                     par.start(requestUri: ValidRequestUri) { result = $0 }
-                    expect(result).toEventuallyNot(beNil())
-                    if case .failure(let error) = result {
-                        expect(error) == WebAuthError.userCancelled
-                    } else {
-                        fail("Expected userCancelled error")
-                    }
+                    expect(result).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
                 }
             }
 
@@ -313,7 +308,7 @@ class PARWebAuthSpec: QuickSpec {
                     let par = newPARWebAuth()
                         .provider { url, callback in PARMockUserAgent(callback: callback) }
                     par.start(requestUri: ValidRequestUri) { _ in }
-                    expect(TransactionStore.shared.current).toNot(beNil())
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     TransactionStore.shared.cancel()
                 }
 
@@ -322,6 +317,7 @@ class PARWebAuthSpec: QuickSpec {
                     let par = newPARWebAuth()
                         .provider { url, callback in PARMockUserAgent(callback: callback) }
                     par.start(requestUri: ValidRequestUri) { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     TransactionStore.shared.cancel()
                     expect(TransactionStore.shared.current).to(beNil())
                 }
@@ -354,7 +350,9 @@ class PARWebAuthSpec: QuickSpec {
                                          storage: TransactionStore.shared,
                                          barrier: QueueBarrier.shared)
                         .provider { url, callback in PARMockUserAgent(callback: callback) }
-                    par.start(requestUri: ValidRequestUri) { _ in }
+                    var firstResult: WebAuthResult<AuthorizationCode>?
+                    par.start(requestUri: ValidRequestUri) { firstResult = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     TransactionStore.shared.cancel()
                     QueueBarrier.shared.lower()
                     // Should be able to start a new transaction after cancel

@@ -2,6 +2,8 @@
 import Foundation
 import Combine
 
+/// Concrete implementation of ``PARAuth``.
+///
 /// Handles the browser authorization step of a PAR (Pushed Authorization Request) flow.
 ///
 /// Opens the `/authorize` endpoint with a `request_uri` obtained from your backend's PAR endpoint call,
@@ -27,11 +29,13 @@ import Combine
 /// ## See Also
 ///
 /// - ``AuthorizationCode``
+/// - ``PARAuth``
 /// - ``WebAuthError``
-public final class PARWebAuth {
+public struct PARWebAuth: PARAuth, @unchecked Sendable {
 
-    let clientId: String
-    let url: URL
+    public let clientId: String
+    public let url: URL
+    public var telemetry = Telemetry()
     private let storage: TransactionStore
     private let barrier: Barrier
 
@@ -39,7 +43,7 @@ public final class PARWebAuth {
     private var customProvider: WebAuthProvider?
     private(set) var ephemeralSession = false
 
-    lazy var redirectURL: URL? = {
+    var redirectURL: URL? {
         guard let bundleID = Bundle.main.bundleIdentifier, let domain = self.url.host else { return nil }
         let scheme = bundleID
         guard let baseURL = URL(string: "\(scheme)://\(domain)") else { return nil }
@@ -57,7 +61,7 @@ public final class PARWebAuth {
             .appendingPathComponent(platform)
             .appendingPathComponent(bundleID)
             .appendingPathComponent("callback")
-    }()
+    }
 
     /// Creates a new `PARWebAuth` instance.
     ///
@@ -89,8 +93,9 @@ public final class PARWebAuth {
     /// - Parameter token: The session transfer token obtained from ``Authentication/ssoExchange(refreshToken:parameters:headers:)``.
     /// - Returns: The same `PARWebAuth` instance to allow method chaining.
     public func sessionTransferToken(_ token: String) -> Self {
-        self.sessionTransferTokenValue = token
-        return self
+        var copy = self
+        copy.sessionTransferTokenValue = token
+        return copy
     }
 
     /// Specify a custom ``WebAuthProvider`` to handle the browser session.
@@ -98,16 +103,18 @@ public final class PARWebAuth {
     /// - Parameter provider: A custom provider.
     /// - Returns: The same `PARWebAuth` instance to allow method chaining.
     public func provider(_ provider: @escaping WebAuthProvider) -> Self {
-        self.customProvider = provider
-        return self
+        var copy = self
+        copy.customProvider = provider
+        return copy
     }
 
     /// Use a private browser session to avoid storing the session cookie in the shared cookie jar.
     ///
     /// - Returns: The same `PARWebAuth` instance to allow method chaining.
     public func useEphemeralSession() -> Self {
-        self.ephemeralSession = true
-        return self
+        var copy = self
+        copy.ephemeralSession = true
+        return copy
     }
 
     // MARK: - Start (Callback)
@@ -118,8 +125,15 @@ public final class PARWebAuth {
     ///
     /// - Parameters:
     ///   - requestUri: The `request_uri` obtained from the PAR endpoint (must start with `urn:ietf:params:oauth:request_uri:`).
-    ///   - callback: Callback with the authorization code result.
-    public func start(requestUri: String, callback: @escaping (WebAuthResult<AuthorizationCode>) -> Void) {
+    ///   - callback: Callback with the authorization code result. Always called on the main thread.
+    public func start(requestUri: String, callback: @escaping @Sendable @MainActor (WebAuthResult<AuthorizationCode>) -> Void) {
+        Task { @MainActor in
+            self._start(requestUri: requestUri, callback: callback)
+        }
+    }
+
+    @MainActor
+    private func _start(requestUri: String, callback: @escaping @Sendable @MainActor (WebAuthResult<AuthorizationCode>) -> Void) {
         guard barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
@@ -143,7 +157,8 @@ public final class PARWebAuth {
             baseURL: url,
             clientId: clientId,
             requestUri: requestUri,
-            additionalParameters: additionalParameters
+            additionalParameters: additionalParameters,
+            telemetry: telemetry
         )
 
         let provider = self.customProvider ?? WebAuthentication.asProvider(
@@ -159,7 +174,7 @@ public final class PARWebAuth {
             case .success:
                 break // Transaction will handle the callback
             case .failure(let error):
-                callback(.failure(error))
+                Task { @MainActor in callback(.failure(error)) }
             }
         }
 
@@ -185,8 +200,8 @@ public extension PARWebAuth {
     /// - Returns: A publisher that emits an ``AuthorizationCode`` or a ``WebAuthError``.
     func start(requestUri: String) -> AnyPublisher<AuthorizationCode, WebAuthError> {
         return Deferred {
-            Future { [weak self] callback in
-                self?.start(requestUri: requestUri, callback: callback)
+            Future { callback in
+                self.start(requestUri: requestUri, callback: callback)
             }
         }.eraseToAnyPublisher()
     }
@@ -203,12 +218,11 @@ public extension PARWebAuth {
     /// - Parameter requestUri: The `request_uri` obtained from the PAR endpoint.
     /// - Returns: An ``AuthorizationCode`` containing the authorization code.
     /// - Throws: A ``WebAuthError`` if the operation fails.
+    @MainActor
     func start(requestUri: String) async throws -> AuthorizationCode {
         return try await withCheckedThrowingContinuation { continuation in
-            Task { @MainActor in
-                self.start(requestUri: requestUri) { result in
-                    continuation.resume(with: result)
-                }
+            self.start(requestUri: requestUri) { result in
+                continuation.resume(with: result)
             }
         }
     }

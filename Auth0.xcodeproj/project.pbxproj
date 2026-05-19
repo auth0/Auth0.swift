@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		017C2B6A702C46DAA56A665B /* PARWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AF474A3493489D94B0172A /* PARWebAuth.swift */; };
+		F6E5D4C3B2A1 /* PARAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6 /* PARAuth.swift */; };
+		D4C3B2A1F6E5 /* PARAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6 /* PARAuth.swift */; };
+		B2A1F6E5D4C3 /* PARAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6 /* PARAuth.swift */; };
 		0CD5CF64ECCD42468508DE77 /* PARWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AF474A3493489D94B0172A /* PARWebAuth.swift */; };
 		2Z7FPPVSUUJRZC06V5RA8B2B /* BiometricPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */; };
 		45ABAB0DC62040D5BE4C6194 /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5BDA5FD4244027BC13F2E4 /* AuthorizationCode.swift */; };
@@ -936,6 +939,7 @@
 /* Begin PBXFileReference section */
 		0F5BDA5FD4244027BC13F2E4 /* AuthorizationCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationCode.swift; sourceTree = "<group>"; };
 		23AF474A3493489D94B0172A /* PARWebAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PARWebAuth.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6 /* PARAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PARAuth.swift; sourceTree = "<group>"; };
 		5B16D88C1F7141A0009476A5 /* ASProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASProvider.swift; sourceTree = "<group>"; };
 		5B16D8921F714324009476A5 /* WebAuthUserAgent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebAuthUserAgent.swift; path = Auth0/WebAuthUserAgent.swift; sourceTree = SOURCE_ROOT; };
 		5B1748731EF2D3A40060E653 /* Shared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
@@ -1313,6 +1317,7 @@
 				9228F2EB0E384154B9A28063 /* PARUtils.swift */,
 				97AFC84E7B144285A9F0C3AF /* PARTransaction.swift */,
 				23AF474A3493489D94B0172A /* PARWebAuth.swift */,
+				A1B2C3D4E5F6 /* PARAuth.swift */,
 				5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */,
 			);
 			name = Transactions;
@@ -2639,6 +2644,7 @@
 				4CDBDAA7BBC34FCBB2A8B32D /* PARUtils.swift in Sources */,
 				B3F756F9B4A247B3BD6127D7 /* PARTransaction.swift in Sources */,
 				017C2B6A702C46DAA56A665B /* PARWebAuth.swift in Sources */,
+				F6E5D4C3B2A1 /* PARAuth.swift in Sources */,
 				5F3965C21CF67CF000CDE7C0 /* WebAuth.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* TransactionStore.swift in Sources */,
 				5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */,
@@ -2719,6 +2725,7 @@
 				6BC10C2912E94D188B7FB610 /* PARUtils.swift in Sources */,
 				88DFB5E5D9A24EBCB4F7B1C9 /* PARTransaction.swift in Sources */,
 				9B4737A6D35046FD9728D1F8 /* PARWebAuth.swift in Sources */,
+				B2A1F6E5D4C3 /* PARAuth.swift in Sources */,
 				D499DAF92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
 				D499DAFA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
 				D499DAFB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */,
@@ -3232,6 +3239,7 @@
 				539F3B3326294B42A40E4A61 /* PARUtils.swift in Sources */,
 				BA438A8B931B47549AF59C58 /* PARTransaction.swift in Sources */,
 				0CD5CF64ECCD42468508DE77 /* PARWebAuth.swift in Sources */,
+				D4C3B2A1F6E5 /* PARAuth.swift in Sources */,
 				5CDF673A2DD3A8D600A9B513 /* Auth0APIError.swift in Sources */,
 				C1B3BA182C24B6D4004A32A4 /* ClearSessionTransaction.swift in Sources */,
 				C1B3BA192C24B6D4004A32A4 /* MobileWebAuth.swift in Sources */,

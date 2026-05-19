@@ -22,7 +22,7 @@ class PARTransactionSpec: QuickSpec {
                                                   callback: { result = $0 })
                     let url = URL(string: "https://samples.auth0.com/callback?code=\(code)")!
                     expect(transaction.resume(url)) == true
-                    expect(result).toNot(beNil())
+                    expect(result).toEventuallyNot(beNil())
                     if case .success(let authCode) = result {
                         expect(authCode.code) == code
                         expect(authCode.state).to(beNil())
@@ -40,6 +40,7 @@ class PARTransactionSpec: QuickSpec {
                                                   callback: { result = $0 })
                     let url = URL(string: "https://samples.auth0.com/callback?code=\(code)&state=test-state")!
                     expect(transaction.resume(url)) == true
+                    expect(result).toEventuallyNot(beNil())
                     if case .success(let authCode) = result {
                         expect(authCode.code) == code
                         expect(authCode.state) == "test-state"
@@ -60,11 +61,7 @@ class PARTransactionSpec: QuickSpec {
                     expect(transaction.resume(url)) == true
                     expect(userAgent.result).to(haveWebAuthError(expectedError))
                     expect(transaction.userAgent).to(beNil())
-                    if case .failure(let error) = result {
-                        expect(error.cause).toNot(beNil())
-                    } else {
-                        fail("Expected failure result")
-                    }
+                    expect(result).toEventually(haveWebAuthError(expectedError))
                 }
 
                 it("should handle error response without description") {
@@ -74,13 +71,11 @@ class PARTransactionSpec: QuickSpec {
                                                   userAgent: userAgent,
                                                   callback: { result = $0 })
                     let url = URL(string: "https://samples.auth0.com/callback?error=server_error")!
+                    let errorInfo = ["error": "server_error"]
+                    let expectedError = WebAuthError(code: .other, cause: AuthenticationError(info: errorInfo, statusCode: 302))
                     expect(transaction.resume(url)) == true
                     expect(transaction.userAgent).to(beNil())
-                    if case .failure(let error) = result {
-                        expect(error.cause).toNot(beNil())
-                    } else {
-                        fail("Expected failure result")
-                    }
+                    expect(result).toEventually(haveWebAuthError(expectedError))
                 }
 
                 it("should fail when code is missing from callback") {
@@ -90,13 +85,10 @@ class PARTransactionSpec: QuickSpec {
                                                   userAgent: userAgent,
                                                   callback: { result = $0 })
                     let url = URL(string: "https://samples.auth0.com/callback?state=some-state")!
+                    let expectedError = WebAuthError(code: .noAuthorizationCode(["state": "some-state"]))
                     expect(transaction.resume(url)) == true
                     expect(transaction.userAgent).to(beNil())
-                    if case .failure(let error) = result {
-                        expect(error) == WebAuthError(code: .noAuthorizationCode(["state": "some-state"]))
-                    } else {
-                        fail("Expected failure result")
-                    }
+                    expect(result).toEventually(haveWebAuthError(expectedError))
                 }
 
                 it("should fail to handle invalid url") {

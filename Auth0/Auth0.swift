@@ -309,7 +309,7 @@ public func webAuth(clientId: String, domain: String, session: URLSession = .sha
  - Returns: PAR Web Auth client.
  - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
-public func authorizeWithRequestUri(bundle: Bundle = Bundle.main) -> PARWebAuth {
+public func authorizeWithRequestUri(bundle: Bundle = Bundle.main) -> PARAuth {
     let values = plistValues(bundle: bundle)!
     return authorizeWithRequestUri(clientId: values.clientId, domain: values.domain)
 }
@@ -330,7 +330,7 @@ public func authorizeWithRequestUri(bundle: Bundle = Bundle.main) -> PARWebAuth 
    - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
  - Returns: PAR Web Auth client.
  */
-public func authorizeWithRequestUri(clientId: String, domain: String) -> PARWebAuth {
+public func authorizeWithRequestUri(clientId: String, domain: String) -> PARAuth {
     return PARWebAuth(clientId: clientId, url: .httpsURL(from: domain))
 }
 #endif

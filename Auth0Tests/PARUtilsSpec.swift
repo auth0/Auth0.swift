@@ -72,7 +72,9 @@ class PARUtilsSpec: QuickSpec {
                                                      requestUri: requestUri,
                                                      additionalParameters: [:])
                 let components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
-                expect(components.queryItems?.count) == 2
+                // 3 items: client_id, request_uri, auth0Client (telemetry)
+                expect(components.queryItems?.count) == 3
+                expect(components.queryItems).to(containItem(withName: "auth0Client"))
             }
         }
     }

@@ -21,11 +21,13 @@ extension PARWebAuth {
     ///   - clientId: The Auth0 client ID.
     ///   - requestUri: The request_uri from the PAR endpoint response.
     ///   - additionalParameters: Extra query parameters to append (e.g., session_transfer_token).
+    ///   - telemetry: The telemetry instance to append the `auth0Client` query parameter.
     /// - Returns: The fully constructed authorize URL.
     static func buildAuthorizeURL(baseURL: URL,
                                   clientId: String,
                                   requestUri: String,
-                                  additionalParameters: [String: String] = [:]) -> URL {
+                                  additionalParameters: [String: String] = [:],
+                                  telemetry: Telemetry = Telemetry()) -> URL {
         let authorizeURL = baseURL.appendingPathComponent("authorize")
         var components = URLComponents(url: authorizeURL, resolvingAgainstBaseURL: true)!
         var queryItems: [String: String] = [:]
@@ -34,7 +36,8 @@ extension PARWebAuth {
         additionalParameters.forEach { (key, value) in
             queryItems[key] = value
         }
-        components.queryItems = queryItems.map { URLQueryItem(name: $0.key, value: $0.value) }
+        let items = queryItems.map { URLQueryItem(name: $0.key, value: $0.value) }
+        components.queryItems = telemetry.queryItemsWithTelemetry(queryItems: items)
         return components.url!
     }
 

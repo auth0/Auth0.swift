@@ -5,7 +5,7 @@ import Foundation
 /// Parses the redirect URL for the authorization code and optional state.
 final class PARTransaction: NSObject, AuthTransaction {
 
-    typealias FinishTransaction = (WebAuthResult<AuthorizationCode>) -> Void
+    typealias FinishTransaction = @MainActor @Sendable (WebAuthResult<AuthorizationCode>) -> Void
 
     private(set) var userAgent: WebAuthUserAgent?
 
@@ -40,15 +40,15 @@ final class PARTransaction: NSObject, AuthTransaction {
             let cause = AuthenticationError(info: items, statusCode: 302)
             let error = WebAuthError(code: .other, cause: cause)
             self.finishUserAgent(with: .failure(error))
-            self.callback(.failure(error))
+            Task { @MainActor in self.callback(.failure(error)) }
         } else if let code = items["code"] {
             self.finishUserAgent(with: .success(()))
             let authorizationCode = AuthorizationCode(code: code, state: items["state"])
-            self.callback(.success(authorizationCode))
+            Task { @MainActor in self.callback(.success(authorizationCode)) }
         } else {
             let error = WebAuthError(code: .noAuthorizationCode(items))
             self.finishUserAgent(with: .failure(error))
-            self.callback(.failure(error))
+            Task { @MainActor in self.callback(.failure(error)) }
         }
 
         return true

@@ -9,7 +9,7 @@ import Foundation
 /// ## See Also
 ///
 /// - ``PARWebAuth``
-public struct AuthorizationCode {
+public struct AuthorizationCode: Sendable {
 
     /// The authorization code returned by the `/authorize` endpoint.
     public let code: String
