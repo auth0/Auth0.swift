@@ -343,6 +343,11 @@ struct Auth0Authentication: Authentication {
                                 phoneNumber: String?,
                                 username: String?,
                                 name: String?,
+                                givenName: String?,
+                                familyName: String?,
+                                nickname: String?,
+                                picture: String?,
+                                userMetadata: [String: String]?,
                                 connection: String?,
                                 organization: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
         let url = URL(string: "passkey/register", relativeTo: self.url)!
@@ -352,6 +357,10 @@ struct Auth0Authentication: Authentication {
         userProfile["phone_number"] = phoneNumber
         userProfile["username"] = username
         userProfile["name"] = name
+        userProfile["given_name"] = givenName
+        userProfile["family_name"] = familyName
+        userProfile["nickname"] = nickname
+        userProfile["picture"] = picture
 
         var payload: [String: Any] = [
             "client_id": self.clientId,
@@ -359,6 +368,7 @@ struct Auth0Authentication: Authentication {
         ]
         payload["realm"] = connection
         payload["organization"] = organization
+        payload["user_metadata"] = userMetadata
 
         return Request(session: session,
                        url: url,
