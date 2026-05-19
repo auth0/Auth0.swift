@@ -11,6 +11,7 @@ public struct WebAuthError: Auth0Error, Sendable {
         case invalidInvitationURL(String)
         case userCancelled
         case noAuthorizationCode([String: String])
+        case invalidRequestUri(String)
         case pkceNotAllowed
         case idTokenValidationFailed
         case other
@@ -53,6 +54,10 @@ public struct WebAuthError: Auth0Error, Sendable {
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let userCancelled: WebAuthError = .init(code: .userCancelled)
 
+    /// The `request_uri` provided is invalid. It must start with `urn:ietf:params:oauth:request_uri:`.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
+    public static let invalidRequestUri: WebAuthError = .init(code: .invalidRequestUri(""))
+
     /// The Auth0 application does not support authentication with Proof Key for Code Exchange (PKCE).
     /// PKCE support needs to be enabled in the settings page of the [Auth0 application](https://manage.auth0.com/#/applications/),
     /// by setting the **Application Type** to 'Native'.
@@ -91,6 +96,8 @@ public extension WebAuthError {
         case .invalidInvitationURL(let url): return "The invitation URL (\(url)) is missing the 'invitation' and/or"
             + " the 'organization' query parameters."
         case .userCancelled: return "The user cancelled the Web Auth operation."
+        case .invalidRequestUri(let uri): return "The request_uri '\(uri)' is invalid."
+            + " It must start with 'urn:ietf:params:oauth:request_uri:'."
         case .pkceNotAllowed: return "Unable to perform authentication with PKCE."
             + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
             + " 'Application Type' to 'Native'."

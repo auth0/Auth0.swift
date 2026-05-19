@@ -8,6 +8,7 @@
 - [Management API (Users) (iOS / macOS / TVOS / watchOS / visionOS)](#management-api-users-ios--macos--tvos--watchos--visionos)
 - [Logging](#logging)
 - [Advanced Features](#advanced-features)
+  - [Pushed Authorization Requests (PAR)](#pushed-authorization-requests-par)
 
 ---
 
@@ -4646,5 +4647,72 @@ Auth0
 ```
 
 Check how to set up Web Auth in the [Web Auth Configuration](#web-auth-configuration) section.
+
+### Pushed Authorization Requests (PAR)
+
+This feature handles the browser authorization step of a [PAR (RFC 9126)](https://www.rfc-editor.org/rfc/rfc9126.html) flow. It opens the `/authorize` endpoint with a `request_uri` obtained from your backend's PAR endpoint call, and returns the authorization code for your backend to exchange for tokens.
+
+> [!IMPORTANT]
+> Auth0 only supports PAR for **confidential clients**. Since mobile apps are public clients, the `/oauth/par` and `/oauth/token` calls must be made by your backend (BFF - Backend for Frontend). The SDK only handles opening the browser with the `request_uri` and returning the resulting authorization code.
+>
+> Your Auth0 application configured in the SDK should use the **same client_id** as the one your backend uses when calling the `/oauth/par` endpoint.
+
+```swift
+Auth0
+    .authorizeWithRequestUri()
+    .start(requestUri: requestUri) { result in
+        switch result {
+        case .success(let authCode):
+            // Send authCode.code to your BFF for token exchange
+            print("Authorization code: \(authCode.code)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let authCode = try await Auth0
+        .authorizeWithRequestUri()
+        .start(requestUri: requestUri)
+    // Send authCode.code to your BFF for token exchange
+    print("Authorization code: \(authCode.code)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authorizeWithRequestUri()
+    .start(requestUri: requestUri)
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { authCode in
+        // Send authCode.code to your BFF for token exchange
+        print("Authorization code: \(authCode.code)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+You can also pass a session transfer token to enable web SSO by transferring an existing native session to the browser:
+
+```swift
+let authCode = try await Auth0
+    .authorizeWithRequestUri()
+    .sessionTransferToken(token)
+    .start(requestUri: requestUri)
+```
 
 ---
