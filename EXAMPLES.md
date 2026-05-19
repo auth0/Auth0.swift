@@ -1214,11 +1214,18 @@ You need to provide at least one user identifier when requesting the challenge, 
 
 By default, database connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers) for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These user identifiers can be required or optional and must match your Flexible Identifiers configuration.
 
+You can also pass additional user profile properties (`givenName`, `familyName`, `nickname`, `picture`) and `userMetadata`:
+
 ```swift
 Auth0
     .authentication()
     .passkeySignupChallenge(email: "support@auth0.com",
                             name: "John Appleseed",
+                            givenName: "John",
+                            familyName: "Appleseed",
+                            nickname: "johnny",
+                            picture: "https://example.com/photo.png",
+                            userMetadata: ["signup_source": "ios_app"],
                             connection: "Username-Password-Authentication")
     .start { result in
         switch result {
@@ -1239,6 +1246,11 @@ do {
         .authentication()
         .passkeySignupChallenge(email: "support@auth0.com",
                                 name: "John Appleseed",
+                                givenName: "John",
+                                familyName: "Appleseed",
+                                nickname: "johnny",
+                                picture: "https://example.com/photo.png",
+                                userMetadata: ["signup_source": "ios_app"],
                                 connection: "Username-Password-Authentication")
         .start()
     print("Obtained signup challenge: \(signupChallenge)")
@@ -1256,6 +1268,11 @@ Auth0
     .authentication()
     .passkeySignupChallenge(email: "support@auth0.com",
                             name: "John Appleseed",
+                            givenName: "John",
+                            familyName: "Appleseed",
+                            nickname: "johnny",
+                            picture: "https://example.com/photo.png",
+                            userMetadata: ["signup_source": "ios_app"],
                             connection: "Username-Password-Authentication")
     .start()
     .sink(receiveCompletion: { completion in
