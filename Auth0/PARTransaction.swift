@@ -3,7 +3,7 @@ import Foundation
 
 /// Transaction that handles the PAR authorization flow callback.
 /// Parses the redirect URL for the authorization code and optional state.
-final class PARTransaction: NSObject, AuthTransaction {
+final class PARTransaction: AuthTransaction {
 
     typealias FinishTransaction = @MainActor @Sendable (WebAuthResult<AuthorizationCode>) -> Void
 
@@ -18,7 +18,6 @@ final class PARTransaction: NSObject, AuthTransaction {
         self.redirectURL = redirectURL
         self.userAgent = userAgent
         self.callback = callback
-        super.init()
     }
 
     func cancel() {
