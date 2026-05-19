@@ -13,7 +13,7 @@ import Combine
 /// - ``AuthorizationCode``
 /// - ``WebAuthError``
 /// - ``PARWebAuth``
-public protocol PARAuth: Trackable, Sendable {
+public protocol PARAuth: Trackable, Loggable, Sendable {
 
     /// The Auth0 Client ID.
     var clientId: String { get }

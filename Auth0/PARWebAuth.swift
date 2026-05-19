@@ -36,6 +36,7 @@ public struct PARWebAuth: PARAuth, @unchecked Sendable {
     public let clientId: String
     public let url: URL
     public var telemetry = Telemetry()
+    public var logger: Logger?
     private let storage: TransactionStore
     private let barrier: Barrier
 
@@ -186,6 +187,7 @@ public struct PARWebAuth: PARAuth, @unchecked Sendable {
 
         self.storage.store(transaction)
         userAgent.start()
+        logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
 }
