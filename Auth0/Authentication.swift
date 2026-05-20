@@ -718,6 +718,9 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///     .authentication()
     ///     .passkeySignupChallenge(email: "support@auth0.com",
     ///                             name: "John Appleseed",
+    ///                             givenName: "John",
+    ///                             familyName: "Appleseed",
+    ///                             userMetadata: ["signup_source": "ios_app"],
     ///                             connection: "Username-Password-Authentication",
     ///                             organization: "org_aaAA1aa11aAAAA1a")
     ///     .start { result in
@@ -756,11 +759,16 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// passkey credential and the challenge to log the new user in.
     ///
     /// - Parameters:
-    ///   - email:       Email address of the user. Defaults to `nil`.
-    ///   - phoneNumber: Phone number of the user. Defaults to `nil`.
-    ///   - username:    Username of the user. Defaults to `nil`.
-    ///   - name:        Display name of the user. Defaults to `nil`.
-    ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - email:        Email address of the user. Defaults to `nil`.
+    ///   - phoneNumber:  Phone number of the user. Defaults to `nil`.
+    ///   - username:     Username of the user. Defaults to `nil`.
+    ///   - name:         Display name of the user. Defaults to `nil`.
+    ///   - givenName:    First name of the user. Defaults to `nil`.
+    ///   - familyName:   Last name of the user. Defaults to `nil`.
+    ///   - nickname:     Preferred nickname of the user. Defaults to `nil`.
+    ///   - picture:      URL pointing to the user's profile picture. Defaults to `nil`.
+    ///   - userMetadata: Additional user metadata as key-value pairs. Defaults to `nil`.
+    ///   - connection:   Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - organization: Identifier of an organization the user is a member of.
     /// - Returns: A request that will yield a passkey signup challenge.
     ///
@@ -774,6 +782,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                                 phoneNumber: String?,
                                 username: String?,
                                 name: String?,
+                                givenName: String?,
+                                familyName: String?,
+                                nickname: String?,
+                                picture: String?,
+                                userMetadata: [String: String]?,
                                 connection: String?,
                                 organization: String?) -> Request<PasskeySignupChallenge, AuthenticationError>
     #endif
@@ -1259,12 +1272,22 @@ public extension Authentication {
                                 phoneNumber: String? = nil,
                                 username: String? = nil,
                                 name: String? = nil,
+                                givenName: String? = nil,
+                                familyName: String? = nil,
+                                nickname: String? = nil,
+                                picture: String? = nil,
+                                userMetadata: [String: String]? = nil,
                                 connection: String? = nil,
                                 organization: String? = nil) -> Request<PasskeySignupChallenge, AuthenticationError> {
         return self.passkeySignupChallenge(email: email,
                                            phoneNumber: phoneNumber,
                                            username: username,
                                            name: name,
+                                           givenName: givenName,
+                                           familyName: familyName,
+                                           nickname: nickname,
+                                           picture: picture,
+                                           userMetadata: userMetadata,
                                            connection: connection,
                                            organization: organization)
     }
