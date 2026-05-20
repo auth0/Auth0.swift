@@ -203,7 +203,10 @@ public extension PARWebAuth {
     func start(requestUri: String) -> AnyPublisher<AuthorizationCode, WebAuthError> {
         return Deferred {
             Future { callback in
-                self.start(requestUri: requestUri, callback: callback)
+                let box = SendableBox(value: callback)
+                self.start(requestUri: requestUri) { result in
+                    box.value(result)
+                }
             }
         }.eraseToAnyPublisher()
     }

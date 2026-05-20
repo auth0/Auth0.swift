@@ -35,19 +35,20 @@ final class PARTransaction: AuthTransaction {
             result[item.name] = item.value
         }
 
+        let callback = self.callback
         if items["error"] != nil {
             let cause = AuthenticationError(info: items, statusCode: 302)
             let error = WebAuthError(code: .other, cause: cause)
             self.finishUserAgent(with: .failure(error))
-            Task { @MainActor in self.callback(.failure(error)) }
+            Task { @MainActor in callback(.failure(error)) }
         } else if let code = items["code"] {
             self.finishUserAgent(with: .success(()))
             let authorizationCode = AuthorizationCode(code: code, state: items["state"])
-            Task { @MainActor in self.callback(.success(authorizationCode)) }
+            Task { @MainActor in callback(.success(authorizationCode)) }
         } else {
             let error = WebAuthError(code: .noAuthorizationCode(items))
             self.finishUserAgent(with: .failure(error))
-            Task { @MainActor in self.callback(.failure(error)) }
+            Task { @MainActor in callback(.failure(error)) }
         }
 
         return true
