@@ -37,6 +37,34 @@ class PARWebAuthSpec: QuickSpec {
                 expect(par.url) == DomainURL
             }
 
+            it("should use default telemetry when none provided") {
+                let par = PARWebAuth(clientId: ClientId, url: DomainURL)
+                expect(par.telemetry.enabled) == true
+            }
+
+            it("should use injected telemetry in public init") {
+                var customTelemetry = Telemetry()
+                customTelemetry.enabled = false
+                let par = PARWebAuth(clientId: ClientId, url: DomainURL, telemetry: customTelemetry)
+                expect(par.telemetry.enabled) == false
+            }
+
+            it("should use injected telemetry in internal init") {
+                var customTelemetry = Telemetry()
+                customTelemetry.enabled = false
+                let par = PARWebAuth(clientId: ClientId,
+                                     url: DomainURL,
+                                     storage: TransactionStore.shared,
+                                     barrier: MockPARBarrier(),
+                                     telemetry: customTelemetry)
+                expect(par.telemetry.enabled) == false
+            }
+
+            it("should use default barrier in public init") {
+                let par = PARWebAuth(clientId: ClientId, url: DomainURL)
+                expect(par.clientId) == ClientId
+            }
+
             it("should init with client id, url, storage & barrier") {
                 let storage = TransactionStore.shared
                 let barrier = MockPARBarrier()

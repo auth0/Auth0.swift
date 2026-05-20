@@ -31,14 +31,14 @@ import Combine
 /// - ``AuthorizationCode``
 /// - ``PARAuth``
 /// - ``WebAuthError``
-public struct PARWebAuth: PARAuth, @unchecked Sendable {
+struct PARWebAuth: PARAuth, @unchecked Sendable {
 
     public let clientId: String
     public let url: URL
-    public var telemetry = Telemetry()
+    public var telemetry: Telemetry
     public var logger: Logger?
     private let storage: TransactionStore
-    private let barrier: Barrier
+    private var barrier: Barrier
 
     private var sessionTransferTokenValue: String?
     private var customProvider: WebAuthProvider?
@@ -69,21 +69,25 @@ public struct PARWebAuth: PARAuth, @unchecked Sendable {
     /// - Parameters:
     ///   - clientId: The Auth0 client ID.
     ///   - url: The Auth0 domain URL.
-    public init(clientId: String, url: URL) {
+    public init(clientId: String, url: URL, telemetry: Telemetry = Telemetry(),
+                barrier: Barrier = QueueBarrier.shared) {
         self.clientId = clientId
         self.url = url
         self.storage = TransactionStore.shared
-        self.barrier = QueueBarrier.shared
+        self.telemetry = telemetry
+        self.barrier = barrier
     }
 
     init(clientId: String,
          url: URL,
          storage: TransactionStore,
-         barrier: Barrier) {
+         barrier: Barrier = QueueBarrier.shared,
+         telemetry: Telemetry = Telemetry()) {
         self.clientId = clientId
         self.url = url
         self.storage = storage
         self.barrier = barrier
+        self.telemetry = telemetry
     }
 
     // MARK: - Builder Methods
@@ -194,7 +198,7 @@ public struct PARWebAuth: PARAuth, @unchecked Sendable {
 
 // MARK: - Combine
 
-public extension PARWebAuth {
+extension PARWebAuth {
 
     /// Start the PAR authorization flow as a Combine publisher.
     ///
@@ -213,7 +217,7 @@ public extension PARWebAuth {
 // MARK: - Async/Await
 
 #if canImport(_Concurrency)
-public extension PARWebAuth {
+extension PARWebAuth {
 
     /// Start the PAR authorization flow using async/await.
     ///
