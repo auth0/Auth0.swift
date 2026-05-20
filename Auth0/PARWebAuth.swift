@@ -69,7 +69,9 @@ struct PARWebAuth: PARAuth, @unchecked Sendable {
     /// - Parameters:
     ///   - clientId: The Auth0 client ID.
     ///   - url: The Auth0 domain URL.
-    public init(clientId: String, url: URL, telemetry: Telemetry = Telemetry(),
+    public init(clientId: String,
+                url: URL,
+                telemetry: Telemetry = Telemetry(),
                 barrier: Barrier = QueueBarrier.shared) {
         self.clientId = clientId
         self.url = url
