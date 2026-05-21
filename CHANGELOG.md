@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.20.0](https://github.com/auth0/Auth0.swift/tree/2.20.0) (2026-05-21)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.19.0...2.20.0)
+
+**Added**
+- feat: Added additional properties support to passkeys signup API [\#1179](https://github.com/auth0/Auth0.swift/pull/1179) ([NandanPrabhu](https://github.com/NandanPrabhu))
+- feat:Add partial support for PAR auth flow [\#1175](https://github.com/auth0/Auth0.swift/pull/1175) ([pmathew92](https://github.com/pmathew92))
+
 ## [2.19.0](https://github.com/auth0/Auth0.swift/tree/2.19.0) (2026-05-05)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.18.0...2.19.0)
 
