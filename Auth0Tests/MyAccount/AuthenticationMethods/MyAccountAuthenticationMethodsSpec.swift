@@ -706,6 +706,23 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should filter authentication methods by type") {
+                let method: [String: Any] = ["id": "id1", "type": "totp", "name": "TOTP Method", "confirmed": true, "created_at": "2025-07-30T13:08:49.508Z", "usage": ["primary"]]
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET &&
+                    $0.hasQueryParameters(["type": "totp"])
+                }, response: authenticationMethodsListResponse(methods: ["authentication_methods": [method]]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethods(type: .totp).start { result in
+                        expect(result).to(haveAuthenticationMethods(count: 1))
+                        expect(result).to(haveAuthenticationMethodInList(id: "id1"))
+                        done()
+                    }
+                }
+            }
         }
 
         describe("deleteAuthenticationMethod") {
@@ -732,6 +749,56 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiFailureResponse(statusCode: 404))
                 waitUntil(timeout: Timeout) { done in
                     authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("updateAuthenticationMethod") {
+            let endpoint = "\(AuthenticationMethodId)"
+            let createdAt = "2025-07-30T13:08:49.508Z"
+            let usage = ["primary"]
+
+            it("should update authentication method name successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPATCH &&
+                    $0.hasAtLeast(["name": "My TOTP App"])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "totp", name: "My TOTP App", createdAt: createdAt, usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.updateAuthenticationMethod(by: AuthenticationMethodId, name: "My TOTP App").start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should update preferred authentication method successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPATCH &&
+                    $0.hasAtLeast(["preferred_authentication_method": "voice"])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "phone", preferredAuthMethod: "voice", createdAt: createdAt, usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.updateAuthenticationMethod(by: AuthenticationMethodId, preferredAuthenticationMethod: .voice).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to update authentication method") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPATCH
+                }, response: apiFailureResponse(statusCode: 404))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.updateAuthenticationMethod(by: AuthenticationMethodId, name: "New Name").start { result in
                         expect(result).to(beUnsuccessful())
                         done()
                     }

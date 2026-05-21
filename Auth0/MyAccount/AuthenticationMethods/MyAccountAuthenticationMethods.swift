@@ -505,6 +505,46 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Returns: A request that will delete an authentication method associated with an id
     func deleteAuthenticationMethod(by id: String) -> Request<Void, MyAccountError>
 
+    /// Update details of an authentication method by its ID.
+    ///
+    /// Use this to update the friendly name or preferred communication method of an existing authentication method.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `update:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .updateAuthenticationMethod(by: id, name: "My TOTP App")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticationMethod):
+    ///             print("Updated authentication method: \(authenticationMethod)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - id: The ID of the authentication method to update.
+    ///   - name: A new friendly name for the authentication method.
+    ///   - preferredAuthenticationMethod: The preferred communication method for phone authenticators (`sms` or `voice`).
+    /// - Returns: A request that will return the updated authentication method.
+    func updateAuthenticationMethod(by id: String,
+                                    name: String?,
+                                    preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<AuthenticationMethod, MyAccountError>
+
     /// Fetch details of an authentication method associated with an id
     ///
     /// ## Availability
@@ -557,7 +597,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
     ///     .authenticationMethods
-    ///     .getAuthenticationMethods()
+    ///     .getAuthenticationMethods(type: .totp)
     ///     .start { result in
     ///         switch result {
     ///         case .success(let authenticationMethods):
@@ -568,8 +608,9 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///     }
     /// ```
     ///
+    /// - Parameter type: Optional filter to return only authentication methods of the specified type.
     /// - Returns: A request that will return list of authentication methods of an authenticated user
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
+    func getAuthenticationMethods(type: AuthenticationMethodType?) -> Request<[AuthenticationMethod], MyAccountError>
 
     /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
     ///
@@ -619,5 +660,15 @@ public extension MyAccountAuthenticationMethods {
                      preferredAuthenticationMethod: PreferredAuthenticationMethod? = nil) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
         self.enrollPhone(phoneNumber: phoneNumber,
                          preferredAuthenticationMethod: preferredAuthenticationMethod)
+    }
+
+    func getAuthenticationMethods(type: AuthenticationMethodType? = nil) -> Request<[AuthenticationMethod], MyAccountError> {
+        self.getAuthenticationMethods(type: type)
+    }
+
+    func updateAuthenticationMethod(by id: String,
+                                    name: String? = nil,
+                                    preferredAuthenticationMethod: PreferredAuthenticationMethod? = nil) -> Request<AuthenticationMethod, MyAccountError> {
+        self.updateAuthenticationMethod(by: id, name: name, preferredAuthenticationMethod: preferredAuthenticationMethod)
     }
 }

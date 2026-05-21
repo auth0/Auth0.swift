@@ -231,9 +231,31 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError> {
+    func updateAuthenticationMethod(by id: String,
+                                    name: String?,
+                                    preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["name"] = name
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod?.rawValue
         return Request(session: session,
-                       url: url.appending("authentication-methods"),
+                       url: url.appending("authentication-methods").appending(id),
+                       method: "PATCH",
+                       handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func getAuthenticationMethods(type: AuthenticationMethodType?) -> Request<[AuthenticationMethod], MyAccountError> {
+        var requestURL = url.appending("authentication-methods")
+        if let type = type {
+            var components = URLComponents(url: requestURL, resolvingAgainstBaseURL: true)!
+            components.queryItems = [URLQueryItem(name: "type", value: type.rawValue)]
+            requestURL = components.url!
+        }
+        return Request(session: session,
+                       url: requestURL,
                        method: "GET",
                        handle: getAuthMethodsDecodable,
                        headers: defaultHeaders,
