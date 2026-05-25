@@ -706,6 +706,39 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should get authentication methods filtered by type") {
+                let method: [String: Any] = ["id": "id1", "type": "totp", "name": "TOTP Method", "confirmed": true, "created_at": "2025-07-30T13:08:49.508Z", "usage": ["primary"]]
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET &&
+                    $0.hasQueryParameters(["type": "totp"])
+                }, response: authenticationMethodsListResponse(methods: ["authentication_methods": [method]]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethods(type: .totp).start { result in
+                        expect(result).to(haveAuthenticationMethods(count: 1))
+                        expect(result).to(haveAuthenticationMethodInList(id: "id1"))
+                        done()
+                    }
+                }
+            }
+
+            it("should get authentication methods without type filter when type is nil") {
+                let method1: [String: Any] = ["id": "id1", "type": "totp", "name": "TOTP Method", "confirmed": true, "created_at": "2025-07-30T13:08:49.508Z", "usage": ["primary"]]
+                let method2: [String: Any] = ["id": "id2", "type": "email", "name": "Email Method", "confirmed": true, "created_at": "2025-07-30T13:08:49.508Z", "usage": ["secondary"]]
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET
+                }, response: authenticationMethodsListResponse(methods: ["authentication_methods": [method1, method2]]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethods(type: nil).start { result in
+                        expect(result).to(haveAuthenticationMethods(count: 2))
+                        done()
+                    }
+                }
+            }
         }
 
         describe("deleteAuthenticationMethod") {
