@@ -75,7 +75,7 @@ public func myAccount(token: String, session: URLSession = .shared, bundle: Bund
 ///
 /// ## See Also
 /// - ``MyAccountError``
-public protocol MyAccountClient: Trackable, Loggable {
+public protocol MyAccountClient: Trackable, Loggable, SenderConstraining {
 
     /// URL of the My Account API.
     var url: URL { get }
@@ -88,7 +88,7 @@ public protocol MyAccountClient: Trackable, Loggable {
 extension MyAccountClient {
 
     var defaultHeaders: [String: String] {
-        return ["Authorization": "Bearer \(token)"]
+        return baseHeaders(accessToken: token, tokenType: dpop != nil ? "DPoP" : "Bearer")
     }
 
 }

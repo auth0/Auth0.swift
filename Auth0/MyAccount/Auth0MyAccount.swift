@@ -8,6 +8,7 @@ struct Auth0MyAccount: MyAccount {
 
     var telemetry: Telemetry
     var logger: Logger?
+    var dpop: DPoP?
 
     static let apiVersion = "v1"
 
@@ -16,7 +17,8 @@ struct Auth0MyAccount: MyAccount {
                                                    url: self.url,
                                                    session: self.session,
                                                    telemetry: self.telemetry,
-                                                   logger: self.logger)
+                                                   logger: self.logger,
+                                                   dpop: self.dpop)
     }
 
     init(token: String,

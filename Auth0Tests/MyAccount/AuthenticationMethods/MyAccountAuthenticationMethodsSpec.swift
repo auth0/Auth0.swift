@@ -60,6 +60,90 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                                                                       telemetry: telemetry)
                 expect(authMethods.telemetry.info) == telemetryInfo
             }
+
+            it("should init with dpop") {
+                let dpop = DPoP()
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
+                                                                      url: DomainURL,
+                                                                      dpop: dpop)
+                expect(authMethods.dpop).toNot(beNil())
+            }
+        }
+
+        describe("dpop") {
+
+            it("should not have DPoP enabled by default") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
+
+                expect(authMethods.dpop).to(beNil())
+            }
+
+            it("should enable DPoP") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL).useDPoP()
+
+                expect(authMethods.dpop).toNot(beNil())
+            }
+
+            it("should use Bearer authorization header when DPoP is not enabled") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
+                let request = authMethods.getAuthenticationMethods(type: nil)
+
+                expect(request.headers["Authorization"]) == "Bearer \(AccessToken)"
+            }
+
+            it("should use DPoP authorization header when DPoP is enabled") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
+                                                                      url: DomainURL).useDPoP()
+                let request = authMethods.getAuthenticationMethods(type: nil)
+
+                expect(request.headers["Authorization"]) == "DPoP \(AccessToken)"
+            }
+
+            it("should pass DPoP to GET requests") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
+                                                                      url: DomainURL).useDPoP()
+                let request = authMethods.getAuthenticationMethods(type: nil)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should pass DPoP to POST requests") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
+                                                                      url: DomainURL).useDPoP()
+                let request = authMethods.enrollRecoveryCode()
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should pass DPoP to DELETE requests") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
+                                                                      url: DomainURL).useDPoP()
+                let request = authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not pass DPoP to GET requests when not enabled") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
+                let request = authMethods.getAuthenticationMethods(type: nil)
+
+                expect(request.dpop).to(beNil())
+            }
+
+            it("should not pass DPoP to POST requests when not enabled") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
+                let request = authMethods.enrollRecoveryCode()
+
+                expect(request.dpop).to(beNil())
+            }
+
+            it("should not pass DPoP to DELETE requests when not enabled") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
+                let request = authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
 
         #if PASSKEYS_PLATFORM
