@@ -851,5 +851,68 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }
             }
         }
+
+        describe("updateAuthenticationMethod") {
+            let endpoint = "\(AuthenticationMethodId)"
+            let createdAt = "2025-07-30T13:08:49.508Z"
+            let usage = ["secondary"]
+
+            it("should update authentication method with a name") {
+                let name = "My Phone"
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPATCH &&
+                    $0.hasAtLeast(["name": name])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId,
+                                                         type: "phone",
+                                                         name: name,
+                                                         createdAt: createdAt,
+                                                         usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.updateAuthenticationMethod(by: AuthenticationMethodId, name: name).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should update authentication method with preferred authentication method") {
+                let preferredMethod = PreferredAuthenticationMethod.sms
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPATCH &&
+                    $0.hasAtLeast(["preferred_authentication_method": preferredMethod.rawValue])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId,
+                                                         type: "phone",
+                                                         preferredAuthMethod: preferredMethod.rawValue,
+                                                         createdAt: createdAt,
+                                                         usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods
+                        .updateAuthenticationMethod(by: AuthenticationMethodId,
+                                                    preferredAuthenticationMethod: preferredMethod)
+                        .start { result in
+                            expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                            done()
+                        }
+                }
+            }
+
+            it("should fail to update authentication method") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPATCH
+                }, response: apiFailureResponse(statusCode: 400))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.updateAuthenticationMethod(by: AuthenticationMethodId, name: "New Name").start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
     }
 }
