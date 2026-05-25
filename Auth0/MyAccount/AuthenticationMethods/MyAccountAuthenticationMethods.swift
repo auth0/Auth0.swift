@@ -568,8 +568,9 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///     }
     /// ```
     ///
+    /// - Parameter type: Filters results to only authentication methods of this type. Pass `nil` to retrieve all types.
     /// - Returns: A request that will return list of authentication methods of an authenticated user
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
+    func getAuthenticationMethods(type: AuthenticationMethodType?) -> Request<[AuthenticationMethod], MyAccountError>
 
     /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
     ///
@@ -619,5 +620,9 @@ public extension MyAccountAuthenticationMethods {
                      preferredAuthenticationMethod: PreferredAuthenticationMethod? = nil) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
         self.enrollPhone(phoneNumber: phoneNumber,
                          preferredAuthenticationMethod: preferredAuthenticationMethod)
+    }
+
+    func getAuthenticationMethods(type: AuthenticationMethodType? = nil) -> Request<[AuthenticationMethod], MyAccountError> {
+        self.getAuthenticationMethods(type: type)
     }
 }
