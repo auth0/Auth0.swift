@@ -2926,7 +2926,9 @@ Check the [Auth0APIError API documentation](https://auth0.github.io/Auth0.swift/
 - [Enroll a new recovery code](#enroll-a-new-recovery-code-authentication-method)
 - [Get all factors](#get-all-factors)
 - [Get all authentication methods](#get-all-authentication-methods)
+- [Get authentication methods by type](#get-authentication-methods-by-type)
 - [Get an authentication method by id](#get-an-authentication-method-by-id)
+- [Update an authentication method](#update-an-authentication-method)
 - [Delete an authentication method](#delete-an-authentication-method)
 - [My Account API client errors](#my-account-api-client-errors)
 
@@ -3852,6 +3854,66 @@ Auth0
 ```
 </details>
 
+### Get authentication methods by type
+
+**Scopes required:** `read:me:authentication_methods`
+
+Use the `type` parameter to filter results to a specific authentication method type.
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .getAuthenticationMethods(type: .totp)
+    .start { result in
+        switch result {
+        case .success(let authenticationMethods):
+            print("Obtained TOTP authentication methods: \(authenticationMethods)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let authenticationMethods = try await Auth0
+        .myAccount(token: apiCredentials.accessToken)
+        .authenticationMethods
+        .getAuthenticationMethods(type: .totp)
+        .start()
+    print("Obtained TOTP authentication methods: \(authenticationMethods)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .getAuthenticationMethods(type: .totp)
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { authenticationMethods in
+        print("Obtained TOTP authentication methods: \(authenticationMethods)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+The `type` parameter accepts any value from the `AuthenticationMethodType` enum: `.password`, `.passkey`, `.webAuthnPlatform`, `.webAuthnRoaming`, `.totp`, `.phone`, `.email`, `.pushNotification`, or `.recoveryCode`. Pass `nil` (or omit the parameter) to retrieve all types.
+
 ### Get an authentication method by id
 
 **Scopes required:** `read:me:authentication_methods`
@@ -3908,6 +3970,81 @@ Auth0
     .store(in: &cancellables)
 ```
 </details>
+
+### Update an authentication method
+
+**Scopes required:** `update:me:authentication_methods`
+
+Use this method to update mutable properties of an existing authentication method, such as its display name or (for phone methods) the preferred delivery channel.
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .updateAuthenticationMethod(by: id, name: "My Authenticator App")
+    .start { result in
+        switch result {
+        case .success(let authenticationMethod):
+            print("Updated authentication method: \(authenticationMethod)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let authenticationMethod = try await Auth0
+        .myAccount(token: apiCredentials.accessToken)
+        .authenticationMethods
+        .updateAuthenticationMethod(by: id, name: "My Authenticator App")
+        .start()
+    print("Updated authentication method: \(authenticationMethod)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .updateAuthenticationMethod(by: id, name: "My Authenticator App")
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { authenticationMethod in
+        print("Updated authentication method: \(authenticationMethod)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+To update the preferred delivery channel for a phone method:
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .updateAuthenticationMethod(by: id, preferredAuthenticationMethod: .voice)
+    .start { result in
+        switch result {
+        case .success(let authenticationMethod):
+            print("Updated authentication method: \(authenticationMethod)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
 
 ### Delete an authentication method
 

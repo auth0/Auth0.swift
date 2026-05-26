@@ -221,6 +221,22 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
+    func updateAuthenticationMethod(by id: String,
+                                    name: String?,
+                                    preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["name"] = name
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod?.rawValue
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id),
+                       method: "PATCH",
+                       handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
     func deleteAuthenticationMethod(by id: String) -> Request<Void, MyAccountError> {
         return Request(session: session,
                        url: self.url.appending("authentication-methods").appending(id),
@@ -231,11 +247,16 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError> {
+    func getAuthenticationMethods(type: AuthenticationMethodType?) -> Request<[AuthenticationMethod], MyAccountError> {
+        var parameters: [String: Any] = [:]
+        if let type {
+            parameters["type"] = type.rawValue
+        }
         return Request(session: session,
                        url: url.appending("authentication-methods"),
                        method: "GET",
                        handle: getAuthMethodsDecodable,
+                       parameters: parameters,
                        headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)

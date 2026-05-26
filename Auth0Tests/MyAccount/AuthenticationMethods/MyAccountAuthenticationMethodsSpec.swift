@@ -706,6 +706,39 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should get authentication methods filtered by type") {
+                let method: [String: Any] = ["id": "id1", "type": "totp", "name": "TOTP Method", "confirmed": true, "created_at": "2025-07-30T13:08:49.508Z", "usage": ["primary"]]
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET &&
+                    $0.hasQueryParameters(["type": "totp"])
+                }, response: authenticationMethodsListResponse(methods: ["authentication_methods": [method]]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethods(type: .totp).start { result in
+                        expect(result).to(haveAuthenticationMethods(count: 1))
+                        expect(result).to(haveAuthenticationMethodInList(id: "id1"))
+                        done()
+                    }
+                }
+            }
+
+            it("should get authentication methods without type filter when type is nil") {
+                let method1: [String: Any] = ["id": "id1", "type": "totp", "name": "TOTP Method", "confirmed": true, "created_at": "2025-07-30T13:08:49.508Z", "usage": ["primary"]]
+                let method2: [String: Any] = ["id": "id2", "type": "email", "name": "Email Method", "confirmed": true, "created_at": "2025-07-30T13:08:49.508Z", "usage": ["secondary"]]
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET
+                }, response: authenticationMethodsListResponse(methods: ["authentication_methods": [method1, method2]]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethods(type: nil).start { result in
+                        expect(result).to(haveAuthenticationMethods(count: 2))
+                        done()
+                    }
+                }
+            }
         }
 
         describe("deleteAuthenticationMethod") {
@@ -812,6 +845,69 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiFailureResponse(statusCode: 404))
                 waitUntil(timeout: Timeout) { done in
                     authMethods.getAuthenticationMethod(by: AuthenticationMethodId).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("updateAuthenticationMethod") {
+            let endpoint = "\(AuthenticationMethodId)"
+            let createdAt = "2025-07-30T13:08:49.508Z"
+            let usage = ["secondary"]
+
+            it("should update authentication method with a name") {
+                let name = "My Phone"
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPATCH &&
+                    $0.hasAtLeast(["name": name])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId,
+                                                         type: "phone",
+                                                         name: name,
+                                                         createdAt: createdAt,
+                                                         usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.updateAuthenticationMethod(by: AuthenticationMethodId, name: name).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should update authentication method with preferred authentication method") {
+                let preferredMethod = PreferredAuthenticationMethod.sms
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPATCH &&
+                    $0.hasAtLeast(["preferred_authentication_method": preferredMethod.rawValue])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId,
+                                                         type: "phone",
+                                                         preferredAuthMethod: preferredMethod.rawValue,
+                                                         createdAt: createdAt,
+                                                         usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods
+                        .updateAuthenticationMethod(by: AuthenticationMethodId,
+                                                    preferredAuthenticationMethod: preferredMethod)
+                        .start { result in
+                            expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                            done()
+                        }
+                }
+            }
+
+            it("should fail to update authentication method") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPATCH
+                }, response: apiFailureResponse(statusCode: 400))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.updateAuthenticationMethod(by: AuthenticationMethodId, name: "New Name").start { result in
                         expect(result).to(beUnsuccessful())
                         done()
                     }
