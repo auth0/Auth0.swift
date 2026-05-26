@@ -236,6 +236,22 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        dpop: self.dpop)
     }
 
+    func updateAuthenticationMethod(by id: String,
+                                    name: String?,
+                                    preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["name"] = name
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod?.rawValue
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id),
+                       method: "PATCH",
+                       handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
     func deleteAuthenticationMethod(by id: String) -> Request<Void, MyAccountError> {
         return Request(session: session,
                        url: self.url.appending("authentication-methods").appending(id),
