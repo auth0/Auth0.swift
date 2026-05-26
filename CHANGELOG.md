@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.21.0](https://github.com/auth0/Auth0.swift/tree/2.21.0) (2026-05-26)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.20.0...2.21.0)
+
+**Added**
+- feat: Add DPoP support to My Account API client [\#1185](https://github.com/auth0/Auth0.swift/pull/1185) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+- feat: Add update authentication method to My Account API client [\#1186](https://github.com/auth0/Auth0.swift/pull/1186) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+- feat: add type filter support to MyAccount getAuthenticationMethods [\#1184](https://github.com/auth0/Auth0.swift/pull/1184) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
 ## [2.20.0](https://github.com/auth0/Auth0.swift/tree/2.20.0) (2026-05-21)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.19.0...2.20.0)
 
