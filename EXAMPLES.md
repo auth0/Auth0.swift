@@ -2930,6 +2930,7 @@ Check the [Auth0APIError API documentation](https://auth0.github.io/Auth0.swift/
 - [Get an authentication method by id](#get-an-authentication-method-by-id)
 - [Update an authentication method](#update-an-authentication-method)
 - [Delete an authentication method](#delete-an-authentication-method)
+- [Using DPoP](#using-dpop)
 - [My Account API client errors](#my-account-api-client-errors)
 
 > [!NOTE]
@@ -2938,6 +2939,24 @@ Check the [Auth0APIError API documentation](https://auth0.github.io/Auth0.swift/
 Use the Auth0 My Account API to manage the current user's account.
 
 To call the My Account API, you need an access token issued specifically for this API, including any required scopes for the operations you want to perform. See [API credentials [EA]](#api-credentials-ea) to learn how to obtain one.
+
+```swift
+Auth0.myAccount(token: apiCredentials.accessToken)
+```
+
+#### Using DPoP
+
+If your application uses [DPoP (Demonstrating Proof of Possession)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/call-your-api-using-the-authorization-code-flow-with-dpop), you can enable it on the My Account API client:
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .useDPoP()
+```
+
+When DPoP is enabled, the client will automatically:
+- Use the `DPoP` authorization scheme instead of `Bearer`
+- Include a DPoP proof header on every request
 
 ### Enroll a new passkey
 
