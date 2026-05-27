@@ -19,6 +19,22 @@ public struct PasskeySignupChallenge: Sendable {
     /// Signup challenge data.
     public let challengeData: Data
 
+    /// Creates a new ``PasskeySignupChallenge`` instance.
+    ///
+    /// - Parameters:
+    ///   - authenticationSession: Unique identifier of the Auth0 session.
+    ///   - relyingPartyId: Custom domain configured in the Auth0 tenant.
+    ///   - userId: Generated unique identifier of the user.
+    ///   - userName: A user identifier, like the user's email.
+    ///   - challengeData: Signup challenge data.
+    public init(authenticationSession: String, relyingPartyId: String, userId: Data, userName: String, challengeData: Data) {
+        self.authenticationSession = authenticationSession
+        self.relyingPartyId = relyingPartyId
+        self.userId = userId
+        self.userName = userName
+        self.challengeData = challengeData
+    }
+
 }
 
 extension PasskeySignupChallenge: Decodable {
