@@ -22,6 +22,24 @@ public struct PasskeyEnrollmentChallenge {
     /// Enrollment challenge data.
     public let challengeData: Data
 
+    /// Creates a new ``PasskeyEnrollmentChallenge`` instance.
+    ///
+    /// - Parameters:
+    ///   - authenticationMethodId: Unique identifier of the authentication method.
+    ///   - authenticationSession: Unique identifier of the Auth0 session.
+    ///   - relyingPartyId: Custom domain configured in the Auth0 tenant.
+    ///   - userId: Generated unique identifier of the user.
+    ///   - userName: A user identifier, like the user's email.
+    ///   - challengeData: Enrollment challenge data.
+    public init(authenticationMethodId: String, authenticationSession: String, relyingPartyId: String, userId: Data, userName: String, challengeData: Data) {
+        self.authenticationMethodId = authenticationMethodId
+        self.authenticationSession = authenticationSession
+        self.relyingPartyId = relyingPartyId
+        self.userId = userId
+        self.userName = userName
+        self.challengeData = challengeData
+    }
+
 }
 
 extension PasskeyEnrollmentChallenge: Decodable {
