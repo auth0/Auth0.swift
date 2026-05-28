@@ -125,6 +125,48 @@ class UserInfoSpec: QuickSpec {
             }
 
         }
+
+        describe("act claim") {
+
+            it("should be nil when not present") {
+                let userInfo = UserInfo(json: basicProfile())
+                expect(userInfo?.act).to(beNil())
+            }
+
+            it("should parse act claim") {
+                var info = basicProfile()
+                info["act"] = [
+                    "sub": "admin@example.com",
+                    "org": "auth0",
+                    "role": "support"
+                ]
+                let userInfo = UserInfo(json: info)
+                expect(userInfo?.act?.sub) == "admin@example.com"
+                expect(userInfo?.act?.additionalClaims["org"]) == "auth0"
+                expect(userInfo?.act?.additionalClaims["role"]) == "support"
+            }
+
+            it("should parse nested act claim for delegation chains") {
+                var info = basicProfile()
+                info["act"] = [
+                    "sub": "middle-tier@example.com",
+                    "act": [
+                        "sub": "original-actor@example.com"
+                    ]
+                ]
+                let userInfo = UserInfo(json: info)
+                expect(userInfo?.act?.sub) == "middle-tier@example.com"
+                expect(userInfo?.act?.act?.sub) == "original-actor@example.com"
+            }
+
+            it("should not include act in custom claims") {
+                var info = basicProfile()
+                info["act"] = ["sub": "actor@example.com"]
+                let userInfo = UserInfo(json: info)
+                expect(userInfo?.customClaims?["act"]).to(beNil())
+            }
+
+        }
     }
 }
 
