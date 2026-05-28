@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.21.1](https://github.com/auth0/Auth0.swift/tree/2.21.1) (2026-05-28)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.21.0...2.21.1)
+
+**Added**
+- feat: add public memberwise initializers to passkey challenge types [\#1188](https://github.com/auth0/Auth0.swift/pull/1188) ([subhankarmaiti](https://github.com/subhankarmaiti))
+
 ## [2.21.0](https://github.com/auth0/Auth0.swift/tree/2.21.0) (2026-05-26)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.20.0...2.21.0)
 
