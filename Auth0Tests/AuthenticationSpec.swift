@@ -2152,6 +2152,33 @@ class AuthenticationSpec: QuickSpec {
                         }
                 }
             }
+
+            it("should exchange custom token with actor token") {
+                let actor = ActorToken(token: "actor-id-token",
+                                       tokenType: "urn:ietf:params:oauth:token-type:id_token")
+
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) && $0.hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": subjectToken,
+                        "subject_token_type": subjectTokenType,
+                        "scope": defaultScope,
+                        "actor_token": actor.token,
+                        "actor_token_type": actor.tokenType,
+                        "client_id": ClientId
+                    ])
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectToken: subjectToken,
+                                            subjectTokenType: subjectTokenType,
+                                            actorToken: actor)
+                        .start { result in
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                        }
+                }
+            }
         }
         
         describe("jwks") {
