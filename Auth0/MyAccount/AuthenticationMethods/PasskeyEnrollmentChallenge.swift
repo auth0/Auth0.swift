@@ -31,7 +31,12 @@ public struct PasskeyEnrollmentChallenge {
     ///   - userId: Generated unique identifier of the user.
     ///   - userName: A user identifier, like the user's email.
     ///   - challengeData: Enrollment challenge data.
-    public init(authenticationMethodId: String, authenticationSession: String, relyingPartyId: String, userId: Data, userName: String, challengeData: Data) {
+    public init(authenticationMethodId: String,
+                authenticationSession: String,
+                relyingPartyId: String,
+                userId: Data,
+                userName: String,
+                challengeData: Data) {
         self.authenticationMethodId = authenticationMethodId
         self.authenticationSession = authenticationSession
         self.relyingPartyId = relyingPartyId

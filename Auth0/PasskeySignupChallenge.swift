@@ -27,7 +27,11 @@ public struct PasskeySignupChallenge: Sendable {
     ///   - userId: Generated unique identifier of the user.
     ///   - userName: A user identifier, like the user's email.
     ///   - challengeData: Signup challenge data.
-    public init(authenticationSession: String, relyingPartyId: String, userId: Data, userName: String, challengeData: Data) {
+    public init(authenticationSession: String,
+                relyingPartyId: String,
+                userId: Data,
+                userName: String,
+                challengeData: Data) {
         self.authenticationSession = authenticationSession
         self.relyingPartyId = relyingPartyId
         self.userId = userId
