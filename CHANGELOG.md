@@ -1,5 +1,7 @@
 # Change Log
 
+## [Unreleased]
+
 ## [2.21.2](https://github.com/auth0/Auth0.swift/tree/2.21.2) (2026-05-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.21.1...2.21.2)
 
