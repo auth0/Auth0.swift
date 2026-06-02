@@ -249,7 +249,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       telemetry: telemetry)
+                       telemetry: telemetry,
+                       dpop: self.dpop)
     }
 
     func deleteAuthenticationMethod(by id: String) -> Request<Void, MyAccountError> {
