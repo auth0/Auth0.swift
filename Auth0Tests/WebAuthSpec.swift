@@ -90,12 +90,12 @@ class WebAuthSpec: QuickSpec {
                 expect(webAuth.storage).to(be(storage))
             }
 
-            it("should init with client id, url & telemetry") {
+            it("should init with client id, url & auth0ClientInfo") {
                 let telemetryInfo = "info"
-                var telemetry = Telemetry()
-                telemetry.info = telemetryInfo
-                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, telemetry: telemetry)
-                expect(webAuth.telemetry.info) == telemetryInfo
+                var auth0ClientInfo = Auth0ClientInfo()
+                auth0ClientInfo.info = telemetryInfo
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, auth0ClientInfo: auth0ClientInfo)
+                expect(webAuth.auth0ClientInfo.info) == telemetryInfo
             }
 
             it("should init with client id, url & barrier") {
@@ -323,12 +323,18 @@ class WebAuthSpec: QuickSpec {
 
             it("should handle buildAuthorizeURL errors") {
                 let invitationUrl = URL(string: "https://example.com?invalid=query")!
-                let expectedError = WebAuthError(code: .invalidInvitationURL(invitationUrl.absoluteString))
                 let webAuth = newWebAuth().invitationURL(invitationUrl) // Invalid invitation URL
 
-                expect({
-                    _ = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State)
-                }).to(throwError(expectedError))
+                expect {
+                    try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, nonce: Nonce, state: State)
+                }.to(throwError { (error: WebAuthError) in
+                    guard case .unknown(let message) = error.code else {
+                        fail("Expected .unknown error, got \(error)")
+                        return
+                    }
+                    expect(error.cause).to(beNil())
+                    expect(message).to(contain("Invalid invitation URL"))
+                })
             }
 
             it("should include dpop_jkt parameter when DPoP is enabled") {
@@ -567,6 +573,25 @@ class WebAuthSpec: QuickSpec {
 
             }
 
+            context("credentials manager") {
+
+                it("should not have a credentials manager by default") {
+                    expect(newWebAuth().credentialsManager).to(beNil())
+                }
+
+                it("should use a custom credentials manager") {
+                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
+                    let storage = SpyCredentialsStorage()
+                    let customCM = CredentialsManager(authentication: authentication, storage: storage)
+                    let webAuth = newWebAuth().useCredentialsManager(customCM)
+                    expect(webAuth.credentialsManager).toNot(beNil())
+                    // Verify it uses the custom CM by storing and checking the spy
+                    try? webAuth.credentialsManager?.store(credentials: Credentials())
+                    expect(storage.setEntryCallCount).to(equal(1))
+                }
+
+            }
+
         }
 
         #if os(iOS) || os(visionOS)
@@ -581,7 +606,7 @@ class WebAuthSpec: QuickSpec {
 
             it("should start the supplied provider") {
                 var isStarted = false
-                _ = auth.provider({ url, _ in
+                auth = auth.provider({ url, _ in
                     isStarted = true
                     return SpyUserAgent()
                 })
@@ -590,7 +615,7 @@ class WebAuthSpec: QuickSpec {
             }
 
             it("should generate a state") {
-                _ = auth.provider({ url, _ in SpyUserAgent() })
+                auth = auth.provider({ url, _ in SpyUserAgent() })
                 auth.start { _ in }
                 expect(auth.state).toNot(beNil())
             }
@@ -600,43 +625,39 @@ class WebAuthSpec: QuickSpec {
             }
 
             it("should use the supplied state") {
-                _ = auth.provider({ url, _ in SpyUserAgent() })
                 let state = UUID().uuidString
-                auth.state(state).start { _ in }
+                auth = auth.state(state)
                 expect(auth.state) == state
             }
 
             it("should use the state supplied via parameters") {
-                _ = auth.provider({ url, _ in SpyUserAgent() })
                 let state = UUID().uuidString
-                auth.parameters(["state": state]).start { _ in }
+                auth = auth.parameters(["state": state])
                 expect(auth.state) == state
             }
 
             it("should generate a nonce") {
-                _ = auth.provider({ url, _ in SpyUserAgent() })
+                auth = auth.provider({ url, _ in SpyUserAgent() })
                 auth.start { _ in }
                 expect(auth.nonce).toNot(beNil())
             }
 
             it("should use the supplied nonce") {
-                _ = auth.provider({ url, _ in SpyUserAgent() })
                 let nonce = UUID().uuidString
-                auth.nonce(nonce).start { _ in }
+                auth = auth.nonce(nonce)
                 expect(auth.nonce) == nonce
             }
 
             it("should use the nonce supplied via parameters") {
-                _ = auth.provider({ url, _ in SpyUserAgent() })
                 let nonce = UUID().uuidString
-                auth.parameters(["nonce": nonce]).start { _ in }
+                auth = auth.parameters(["nonce": nonce])
                 expect(auth.nonce) == nonce
             }
 
             it("should use the organization and invitation from the invitation URL") {
                 let url = "https://\(Domain)?organization=foo&invitation=bar"
                 var redirectURL: URL?
-                _ = auth.invitationURL(URL(string: url)!).provider({ url, _ in
+                auth = auth.invitationURL(URL(string: url)!).provider({ url, _ in
                     redirectURL = url
                     return SpyUserAgent()
                 })
@@ -647,45 +668,40 @@ class WebAuthSpec: QuickSpec {
 
             it("should produce an invalid invitation URL error when the organization is missing") {
                 let url = "https://\(Domain)?invitation=foo"
-                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
                 var result: WebAuthResult<Credentials>?
-                _ = auth.invitationURL(URL(string: url)!)
+                auth = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveUnknownError(containing: "Invalid invitation URL"))
             }
 
             it("should produce an invalid invitation URL error when the invitation is missing") {
                 let url = "https://\(Domain)?organization=foo"
-                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
                 var result: WebAuthResult<Credentials>?
-                _ = auth.invitationURL(URL(string: url)!)
+                auth = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveUnknownError(containing: "Invalid invitation URL"))
             }
 
             it("should produce an invalid invitation URL error when the organization and invitation are missing") {
                 let url = "https://\(Domain)?foo=bar"
-                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
                 var result: WebAuthResult<Credentials>?
-                _ = auth.invitationURL(URL(string: url)!)
+                auth = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveUnknownError(containing: "Invalid invitation URL"))
             }
 
             it("should produce an invalid invitation URL error when the query parameters are missing") {
-                let expectedError = WebAuthError(code: .invalidInvitationURL(DomainURL.absoluteString))
                 var result: WebAuthResult<Credentials>?
-                _ = auth.invitationURL(DomainURL)
+                auth = auth.invitationURL(DomainURL)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveUnknownError(containing: "Invalid invitation URL"))
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
-                let expectedError = WebAuthError(code: .noBundleIdentifier)
                 var result: WebAuthResult<Credentials>?
-                auth.redirectURL = nil
-                auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                var noHostAuth = Auth0WebAuth(clientId: ClientId, url: URL(string: "https:")!, barrier: MockBarrier())
+                noHostAuth.start { result = $0 }
+                expect(result).toEventually(haveUnknownError(containing: "Unable to retrieve bundle identifier"))
             }
 
             context("transaction") {
@@ -695,16 +711,17 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should store a new transaction") {
-                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.start { _ in }
-                    expect(TransactionStore.shared.current).toNot(beNil())
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     TransactionStore.shared.cancel()
                 }
 
                 it("should cancel the current transaction") {
                     var result: WebAuthResult<Credentials>?
-                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.start { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     TransactionStore.shared.cancel()
                     expect(result).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
@@ -722,7 +739,7 @@ class WebAuthSpec: QuickSpec {
                 it("should raise the barrier") {
                     let expectedError = WebAuthError(code: .transactionActiveAlready)
                     var result: WebAuthResult<Credentials>?
-                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.start { _ in }
                     auth.start { result = $0 }
                     expect(result).toEventually(haveWebAuthError(expectedError))
@@ -731,8 +748,9 @@ class WebAuthSpec: QuickSpec {
                 it("should lower the barrier") {
                     var firstResult: WebAuthResult<Credentials>?
                     var secondResult: WebAuthResult<Credentials>?
-                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.start { firstResult = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     TransactionStore.shared.cancel()
                     expect(firstResult).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     auth.start { secondResult = $0 }
@@ -751,7 +769,7 @@ class WebAuthSpec: QuickSpec {
             
             beforeEach {
                 let url = URL(string: "https://samples.auth0.com")!
-                auth = Auth0WebAuth(clientId: "client123", url: url, telemetry: Telemetry())
+                auth = Auth0WebAuth(clientId: "client123", url: url, auth0ClientInfo: Auth0ClientInfo())
                 QueueBarrier.shared.lower()
                 cancellables = []
             }
@@ -766,8 +784,7 @@ class WebAuthSpec: QuickSpec {
                         completion(.failure(WebAuthError(code: .other)))
                         return SpyUserAgent()
                     }
-                    
-                    auth.start()
+                    .start()
                         .sink(receiveCompletion: { completion in
                             if case .failure(let error) = completion {
                                 expect(error.code).to(equal(.other))
@@ -779,15 +796,14 @@ class WebAuthSpec: QuickSpec {
                         .store(in: &cancellables)
                 }
             }
-            
-            it("clearSession() publishes completion on success") {
+
+            it("logout() publishes completion on success") {
                 waitUntil { done in
                     auth.provider { url, completion in
                         completion(.success(()))
                         return SpyUserAgent()
                     }
-                    
-                    auth.clearSession(federated: false)
+                    .logout(federated: false)
                         .sink(receiveCompletion: { completion in
                             if case .failure(let error) = completion {
                                 fail("Unexpected error: \(error)")
@@ -798,15 +814,14 @@ class WebAuthSpec: QuickSpec {
                         .store(in: &cancellables)
                 }
             }
-            
-            it("clearSession() publishes error on failure") {
+
+            it("logout() publishes error on failure") {
                 waitUntil { done in
                     auth.provider { url, completion in
                         completion(.failure(WebAuthError(code: .other)))
                         return SpyUserAgent()
                     }
-                    
-                    auth.clearSession(federated: false)
+                    .logout(federated: false)
                         .sink(receiveCompletion: { completion in
                             if case .failure(let error) = completion {
                                 expect(error.code).to(equal(.other))
@@ -826,14 +841,14 @@ class WebAuthSpec: QuickSpec {
             beforeEach {
                 let url = URL(string: "https://samples.auth0.com")!
                 QueueBarrier.shared.lower()
-                auth = Auth0WebAuth(clientId: "client123", url: url, telemetry: Telemetry())
+                auth = Auth0WebAuth(clientId: "client123", url: url, auth0ClientInfo: Auth0ClientInfo())
             }
             it("start() async throws on failure") {
-                auth.provider { url, completion in
+                auth = auth.provider { url, completion in
                     completion(.failure(WebAuthError(code: .other)))
                     return SpyUserAgent()
                 }
-                
+
                 waitUntil { done in
                     Task {
                         do {
@@ -848,51 +863,36 @@ class WebAuthSpec: QuickSpec {
                     }
                 }
             }
-            
+
             it("ignores double resume but still surfaces first error") {
-                let dummyCredentials = Credentials(
-                    accessToken: "access",
-                    tokenType: "bearer",
-                    idToken: "id",
-                    refreshToken: "refresh",
-                    expiresIn: Date()
-                )
+                waitUntil(timeout: .seconds(5)) { done in
+                    Task {
+                        do {
+                            _ = try await auth.provider { url, callback in
+                                callback(.failure(WebAuthError(code: .userCancelled)))
+                                // Second call -> ignored by continuation bridge
+                                callback(.failure(WebAuthError(code: .userCancelled)))
+                                return SpyUserAgent()
+                            }.start()
+                            fail("Expected error")
+                        } catch let error as WebAuthError {
+                            expect(error.code) == .userCancelled
+                            done()
+                        }
+                    }
+                }
+            }
 
-                var callbackRef: (WebAuthResult<Void>) -> Void = { _  in }
-                   auth.provider { url, callback in
-                       callbackRef = callback
-                       callbackRef(.failure(WebAuthError(code: .userCancelled)))
-                       // Second call -> ignored by continuation bridge
-                       callbackRef(.failure(WebAuthError(code: .userCancelled)))
-                       return SpyUserAgent()
-                   }
-
-                   waitUntil(timeout: .seconds(5)) { done in
-                       Task {
-                           // First call -> should throw
-                           
-
-                           do {
-                               _ = try await auth.start()
-                               fail("Expected error")
-                           } catch let error as WebAuthError {
-                               expect(error.code) == .userCancelled
-                               done()
-                           }
-                       }
-                   }
-               }
-            
-            it("clearSession() async completes on success") {
-                auth.provider { url, completion in
+            it("logout() async completes on success") {
+                auth = auth.provider { url, completion in
                     completion(.success(()))
                     return SpyUserAgent()
                 }
-                
+
                 waitUntil { done in
                     Task {
                         do {
-                            try await auth.clearSession(federated: false)
+                            try await auth.logout(federated: false)
                             done()
                         } catch {
                             fail("Unexpected error: \(error)")
@@ -900,9 +900,9 @@ class WebAuthSpec: QuickSpec {
                     }
                 }
             }
-            
-            it("clearSession() async throws on failure") {
-                auth.provider { url, completion in
+
+            it("logout() async throws on failure") {
+                auth = auth.provider { url, completion in
                     completion(.failure(WebAuthError(code: .other)))
                     return SpyUserAgent()
                 }
@@ -910,7 +910,7 @@ class WebAuthSpec: QuickSpec {
                 waitUntil { done in
                     Task {
                         do {
-                            try await auth.clearSession(federated: false)
+                            try await auth.logout(federated: false)
                             fail("Should have thrown an error")
                         } catch let error as WebAuthError {
                             expect(error.code).to(equal(.other))
@@ -935,7 +935,7 @@ class WebAuthSpec: QuickSpec {
 
             it("should start the supplied provider") {
                 var isStarted = false
-                _ = auth.provider({ url, _ in
+                auth = auth.provider({ url, _ in
                     isStarted = true
                     return SpyUserAgent()
                 })
@@ -945,29 +945,29 @@ class WebAuthSpec: QuickSpec {
 
             it("should not include the federated parameter by default") {
                 var redirectURL: URL?
-                _ = auth.provider({ url, _ in
+                auth = auth.provider({ url, _ in
                     redirectURL = url
                     return SpyUserAgent()
                 })
-                auth.clearSession() { _ in }
+                auth.logout() { _ in }
                 expect(redirectURL?.query?.contains("federated")).toEventually(beFalse())
             }
 
             it("should include the federated parameter") {
                 var redirectURL: URL?
-                _ = auth.provider({ url, _ in
+                auth = auth.provider({ url, _ in
                     redirectURL = url
                     return SpyUserAgent()
                 })
-                auth.clearSession(federated: true) { _ in }
+                auth.logout(federated: true) { _ in }
                 expect(redirectURL?.query?.contains("federated")).toEventually(beTrue())
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
                 var result: WebAuthResult<Void>?
-                auth.redirectURL = nil
-                auth.clearSession() { result = $0 }
-                expect(result).to(haveWebAuthError(WebAuthError(code: .noBundleIdentifier)))
+                var noHostAuth = Auth0WebAuth(clientId: ClientId, url: URL(string: "https:")!, barrier: MockBarrier())
+                noHostAuth.logout() { result = $0 }
+                expect(result).toEventually(haveUnknownError(containing: "Unable to retrieve bundle identifier"))
             }
 
             context("transaction") {
@@ -980,25 +980,81 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should store a new transaction") {
-                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
-                    auth.clearSession() { _ in }
-                    expect(TransactionStore.shared.current).toNot(beNil())
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout() { _ in }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                 }
 
                 it("should cancel the current transaction") {
-                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
-                    auth.clearSession() { result = $0 }
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     TransactionStore.shared.cancel()
                     expect(result).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
                 it("should resume the current transaction") {
-                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
-                    auth.clearSession() { result = $0 }
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(result).toEventually(beSuccessful())
                     expect(TransactionStore.shared.current).to(beNil())
+                }
+
+            }
+
+            context("credentials manager") {
+
+                it("should clear credentials on successful logout") {
+                    let storage = SpyCredentialsStorage()
+                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
+                    let cm = CredentialsManager(authentication: authentication, storage: storage)
+                    try? cm.store(credentials: Credentials())
+                    storage.deleteEntryCallCount = 0
+
+                    var result: WebAuthResult<Void>?
+                    auth = auth.useCredentialsManager(cm)
+                        .provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
+                    _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
+                    expect(result).toEventually(beSuccessful())
+                    expect(storage.deleteEntryCallCount).to(equal(2))
+                }
+
+                it("should not clear credentials on failed logout") {
+                    let storage = SpyCredentialsStorage()
+                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
+                    let cm = CredentialsManager(authentication: authentication, storage: storage)
+                    try? cm.store(credentials: Credentials())
+                    storage.deleteEntryCallCount = 0
+
+                    var result: WebAuthResult<Void>?
+                    auth = auth.useCredentialsManager(cm)
+                        .provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
+                    TransactionStore.shared.cancel()
+                    expect(result).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
+                    expect(storage.deleteEntryCallCount).to(equal(0))
+                }
+
+                it("should not clear credentials when no credentials manager is set") {
+                    let storage = SpyCredentialsStorage()
+                    let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
+                    let cm = CredentialsManager(authentication: authentication, storage: storage)
+                    try? cm.store(credentials: Credentials())
+                    storage.deleteEntryCallCount = 0
+
+                    var result: WebAuthResult<Void>?
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout() { result = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
+                    _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
+                    expect(result).toEventually(beSuccessful())
+                    expect(storage.deleteEntryCallCount).to(equal(0))
                 }
 
             }
@@ -1013,20 +1069,21 @@ class WebAuthSpec: QuickSpec {
                 it("should raise the barrier") {
                     let expectedError = WebAuthError(code: .transactionActiveAlready)
                     var result: WebAuthResult<Void>?
-                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
-                    auth.clearSession { _ in }
-                    auth.clearSession { result = $0 }
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout { _ in }
+                    auth.logout { result = $0 }
                     expect(result).toEventually(haveWebAuthError(expectedError))
                 }
 
                 it("should lower the barrier") {
                     var firstResult: WebAuthResult<Void>?
                     var secondResult: WebAuthResult<Void>?
-                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
-                    auth.clearSession { firstResult = $0 }
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.logout { firstResult = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     TransactionStore.shared.cancel()
                     expect(firstResult).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
-                    auth.clearSession { secondResult = $0 }
+                    auth.logout { secondResult = $0 }
                     expect(secondResult).toEventually(beNil())
                 }
 
@@ -1034,6 +1091,48 @@ class WebAuthSpec: QuickSpec {
 
         }
         #endif
+
+        describe("main thread callback execution") {
+
+            it("should execute start() callback on main thread on failure") {
+                let webAuth = newWebAuth()
+                    .redirectURL(RedirectURL)
+                    .provider { url, callback in
+                        let agent = MockUserAgent(callback: callback)
+                        DispatchQueue.global().async {
+                            callback(.failure(WebAuthError(code: .userCancelled)))
+                        }
+                        return agent
+                    }
+
+                waitUntil(timeout: .seconds(2)) { done in
+                    webAuth.start { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should execute logout() callback on main thread") {
+                let webAuth = newWebAuth()
+                    .redirectURL(RedirectURL)
+                    .provider { url, callback in
+                        let agent = MockUserAgent(callback: callback)
+                        DispatchQueue.global().async {
+                            callback(.success(()))
+                        }
+                        return agent
+                    }
+
+                waitUntil(timeout: .seconds(2)) { done in
+                    webAuth.logout(federated: false) { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+        }
 
     }
 
@@ -1066,3 +1165,5 @@ class MockUserAgent: WebAuthUserAgent {
     }
 
 }
+
+

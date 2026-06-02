@@ -2,7 +2,7 @@
 import Foundation
 
 /// Keeps track of the current Auth Transaction.
-class TransactionStore {
+class TransactionStore: @unchecked Sendable {
 
     static let shared = TransactionStore()
 
@@ -17,7 +17,7 @@ class TransactionStore {
     func store(_ transaction: AuthTransaction) {
         self.current = transaction
     }
-
+    
     func cancel() {
         self.current?.cancel()
         self.clear()

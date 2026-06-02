@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 
 extension JWK {
@@ -36,4 +35,3 @@ private extension JWK {
     }
 
 }
-#endif

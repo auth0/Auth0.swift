@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Auth0'
-  s.version          = '2.21.2'
+  s.version          = '3.0.0-beta.1'
   s.summary          = "Auth0 SDK for Apple platforms"
   s.description      = <<-DESC
                         Auth0 SDK for iOS, macOS, tvOS, watchOS and visionOS apps.
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.swift_versions   = ['5.0']
 
   s.dependency 'SimpleKeychain', '1.3.0'
-  s.dependency 'JWTDecode', '3.3.0'
+  s.dependency 'JWTDecode', '4.0'
 
   s.ios.deployment_target   = '14.0'
   s.ios.pod_target_xcconfig = {
