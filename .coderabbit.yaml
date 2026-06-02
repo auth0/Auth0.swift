@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+early_access: false
+reviews:
+  profile: "assertive"
+  request_changes_workflow: true
+  high_level_summary: true
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "Auth0/**/*.swift"
+      instructions: |
+        This is library source code for the Auth0.swift SDK targeting Apple platforms.
+
+        Verify the following:
+        - All `public` types, methods, and properties must have DocC comments (`/// ...`).
+        - No force-unwraps (`!`) in library source — use `guard`, `if let`, or `throws`.
+        - No `#if os(iOS)` / `#if os(macOS)` for SDK-level guards — use `#if WEB_AUTH_PLATFORM` or `#if PASSKEYS_PLATFORM`.
+        - New public methods must expose both a completion-handler variant and an `async throws` variant.
+        - Never log `accessToken`, `refreshToken`, `idToken`, or `recoveryCode`.
+        - Every new public API must follow the typed `Result` alias pattern (`AuthenticationResult<T>`, `MyAccountResult<T>`, etc.).
+        - Protocol-backed implementations must be prefixed with `Auth0` (e.g. `Auth0Authentication`).
+        - Error types must end in `Error` and extend the existing error hierarchy.
+        - PKCE must never be disabled — do not add any option or parameter that bypasses it.
+        - DPoP key generation must not be silently downgraded to software keys.
+        - Token storage must use `SimpleKeychain` — never `UserDefaults` or in-memory storage.
+
+    - path: "Auth0Tests/**/*.swift"
+      instructions: |
+        This is the test suite for Auth0.swift, using Quick (BDD) + Nimble.
+
+        Verify the following:
+        - Every spec file must be a `QuickSpec` subclass named `<Subject>Spec`.
+        - Behavior must be organized with nested `describe` / `context` / `it` blocks.
+        - `it` descriptions must use present tense, declarative style: `"should ... when ..."`.
+        - `beforeEach` / `afterEach` must handle all setup and teardown.
+        - `NetworkStub.clearStubs()` must be called in every `afterEach` that registers network stubs.
+        - All network interactions must use `StubURLProtocol` / `NetworkStub` — no real network calls.
+        - Test constants must use `UpperCamelCase` (e.g. `AccessToken`, `ClientId`, `Domain`).
+        - Combine publishers must be tested with Nimble async matchers or `waitUntil`.
+        - Platform-specific tests must be gated with the same `#if WEB_AUTH_PLATFORM` / `#if PASSKEYS_PLATFORM` flags as source.
+        - Do not skip or remove failing tests — fix the underlying issue.
+        - New or changed behavior must have corresponding test coverage.
+
+    - path: "Auth0/DPoP/**/*.swift"
+      instructions: |
+        This is security-sensitive DPoP (Demonstration of Proof-of-Possession) code.
+
+        Extra scrutiny required:
+        - Key generation must prefer the Secure Enclave; never silently fall back to software keys without surfacing a clear error or documented fallback path.
+        - Proof generation must not be bypassable.
+        - Any change to the signing algorithm, key type, or proof structure must be explicitly justified.
+        - Changes here require team approval before merging (flag in review).
+
+    - path: "Auth0/MyAccount/**/*.swift"
+      instructions: |
+        This is the My Account API client.
+
+        Verify the following:
+        - New API methods must expose both a completion-handler variant and an `async throws` variant.
+        - All `public` types and methods must have DocC comments.
+        - Result type must use `MyAccountResult<T>`.
+        - Error handling must use `MyAccountError`.
+
+    - path: "Auth0/MFA/**/*.swift"
+      instructions: |
+        This is the MFA (Multi-Factor Authentication) client.
+
+        Verify the following:
+        - All `public` types and methods must have DocC comments.
+        - No sensitive credential data may be logged.
+        - New methods must expose both a completion-handler variant and an `async throws` variant.
+
+    - path: "CHANGELOG.md"
+      instructions: |
+        Follow the Keep a Changelog format.
+        - New entries must be under the correct heading: Added, Changed, Deprecated, Fixed, Security, or Removed.
+        - Entries must be user-facing descriptions, not commit messages.
+        - Ensure an `[Unreleased]` section exists at the top for in-progress changes.
+
+    - path: "Auth0.podspec"
+      instructions: |
+        Verify that `s.version` matches the version string in `Auth0/Version.swift`.
+        Minimum platform versions must not be lowered without team approval.
+
+    - path: "Package.swift"
+      instructions: |
+        Verify minimum platform versions are consistent with `Auth0.podspec`.
+        New targets or compilation conditions require explicit justification.
+        Do not add new external dependencies without team approval.
+
+    - path: ".github/workflows/**"
+      instructions: |
+        CI workflow changes require explicit justification.
+        Verify that all required checks (unit tests on iOS/macOS/tvOS, SwiftLint, pod lib lint, Swift package tests) remain in place.
+        Do not remove or skip any existing required status checks.
