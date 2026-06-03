@@ -142,7 +142,7 @@ public struct UserInfo: JSONObjectPayload, @unchecked Sendable {
     /// ## See Also
     ///
     /// - ``ActClaim``
-    /// - [RFC 8693: OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693#section-4.1)
+    /// - [RFC 8693: OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693#section-4.4)
     public let act: ActClaim?
 
     /// Any custom claims.

@@ -2222,7 +2222,6 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
-
         describe("renew") {
 
             beforeEach {

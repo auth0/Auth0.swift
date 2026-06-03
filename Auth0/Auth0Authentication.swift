@@ -521,14 +521,12 @@ struct Auth0Authentication: Authentication {
                              audience: String?,
                              scope: String,
                              organization: String?,
-                             actorToken: ActorToken?,
                              parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
         return self.tokenExchange(subjectToken: subjectToken,
                                   subjectTokenType: subjectTokenType,
                                   scope: scope,
                                   audience: audience,
                                   organization: organization,
-                                  actorToken: actorToken,
                                   parameters: parameters)
     }
 
@@ -566,7 +564,6 @@ private extension Auth0Authentication {
                        scope: String,
                        audience: String?,
                        organization: String? = nil,
-                       actorToken: ActorToken? = nil,
                        parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = parameters
         parameters["client_id"] = self.clientId
@@ -576,8 +573,6 @@ private extension Auth0Authentication {
         parameters["audience"] = audience
         parameters["scope"] = includeRequiredScope(in: scope)
         parameters["organization"] = organization
-        parameters["actor_token"] = actorToken?.token
-        parameters["actor_token_type"] = actorToken?.tokenType
 
         let token = URL(string: "oauth/token", relativeTo: self.url)!
         return Request(session: session,

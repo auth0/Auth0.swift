@@ -2179,8 +2179,31 @@ class AuthenticationSpec: QuickSpec {
                         }
                 }
             }
+
+            it("should not include actor token params when actorToken is nil") {
+                NetworkStub.addStub(condition: {
+                    guard $0.isToken(Domain) else { return false }
+                    guard $0.hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": subjectToken,
+                        "subject_token_type": subjectTokenType,
+                        "scope": defaultScope,
+                        "client_id": ClientId
+                    ]) else { return false }
+                    return $0.hasNoneOf(["actor_token", "actor_token_type"])
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectToken: subjectToken,
+                                            subjectTokenType: subjectTokenType)
+                        .start { result in
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                        }
+                }
+            }
         }
-        
+
         describe("jwks") {
 
             it("should fetch the jwks") {

@@ -142,8 +142,27 @@ class UserInfoSpec: QuickSpec {
                 ]
                 let userInfo = UserInfo(json: info)
                 expect(userInfo?.act?.sub) == "admin@example.com"
-                expect(userInfo?.act?.additionalClaims["org"]) == "auth0"
-                expect(userInfo?.act?.additionalClaims["role"]) == "support"
+                expect(userInfo?.act?.additionalClaims["org"] as? String) == "auth0"
+                expect(userInfo?.act?.additionalClaims["role"] as? String) == "support"
+            }
+
+            it("should be nil when act claim has no sub") {
+                var info = basicProfile()
+                info["act"] = ["org": "auth0"]
+                let userInfo = UserInfo(json: info)
+                expect(userInfo?.act).to(beNil())
+            }
+
+            it("should preserve non-string additional claims") {
+                var info = basicProfile()
+                info["act"] = [
+                    "sub": "admin@example.com",
+                    "level": 3,
+                    "active": true
+                ]
+                let userInfo = UserInfo(json: info)
+                expect(userInfo?.act?.additionalClaims["level"] as? Int) == 3
+                expect(userInfo?.act?.additionalClaims["active"] as? Bool) == true
             }
 
             it("should parse nested act claim for delegation chains") {

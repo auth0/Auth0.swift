@@ -4770,7 +4770,10 @@ Auth0
 
 When a token exchange involves an actor token, Auth0 may include an `act` (actor) claim in the resulting ID token. This claim identifies who is acting on behalf of the subject and may be nested to represent delegation chains.
 
-The `act` claim is exposed through the `UserInfo` type via the `ActClaim` class:
+> [!NOTE]
+> The `act` claim is set server-side via an Auth0 Action that calls `api.authentication.setActor()`. Without this Action configured, the ID token will not contain an `act` claim even when an actor token is provided in the request.
+
+The `act` claim is exposed through the `UserInfo` type via the `ActClaim` class. This example uses [JWTDecode.swift](https://github.com/auth0/JWTDecode.swift) to decode the ID token — add it to your project if you haven't already:
 
 ```swift
 import JWTDecode
@@ -4779,12 +4782,12 @@ let jwt = try decode(jwt: credentials.idToken)
 let userInfo = UserInfo(json: jwt.body)
 
 if let act = userInfo?.act {
-    print("Actor: \(act.sub ?? "unknown")")
+    print("Actor: \(act.sub)")
     print("Additional claims: \(act.additionalClaims)")
 
     // Check for delegation chain
     if let innerAct = act.act {
-        print("Original actor: \(innerAct.sub ?? "unknown")")
+        print("Original actor: \(innerAct.sub)")
     }
 }
 ```
@@ -4798,7 +4801,7 @@ You can also access the `act` claim from the Credentials Manager's stored user i
 
 ```swift
 if let act = credentialsManager.user?.act {
-    print("Actor: \(act.sub ?? "unknown")")
+    print("Actor: \(act.sub)")
 }
 ```
 
