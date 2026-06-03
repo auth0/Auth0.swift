@@ -568,8 +568,47 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///     }
     /// ```
     ///
+    /// - Parameter type: Filters results to only authentication methods of this type. Pass `nil` to retrieve all types.
     /// - Returns: A request that will return list of authentication methods of an authenticated user
-    func getAuthenticationMethods() -> any Requestable<[AuthenticationMethod], MyAccountError>
+    func getAuthenticationMethods(type: AuthenticationMethodType?) -> any Requestable<[AuthenticationMethod], MyAccountError>
+
+    /// Update an authentication method associated with an id.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `update:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .updateAuthenticationMethod(by: id, name: name)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticationMethod):
+    ///             print("Updated authentication method: \(authenticationMethod)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - id:                            Id of the authentication method to update.
+    ///   - name:                          The friendly name of the authentication method. Pass `nil` to leave unchanged.
+    ///   - preferredAuthenticationMethod: For phone authenticators, the preferred delivery method (`sms` or `voice`). Pass `nil` to leave unchanged.
+    /// - Returns: A request that will yield the updated authentication method.
+    func updateAuthenticationMethod(by id: String,
+                                    name: String?,
+                                    preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> any Requestable<AuthenticationMethod, MyAccountError>
 
     /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
     ///
@@ -619,5 +658,17 @@ public extension MyAccountAuthenticationMethods {
                      preferredAuthenticationMethod: PreferredAuthenticationMethod? = nil) -> any Requestable<PhoneEnrollmentChallenge, MyAccountError> {
         self.enrollPhone(phoneNumber: phoneNumber,
                          preferredAuthenticationMethod: preferredAuthenticationMethod)
+    }
+
+    func getAuthenticationMethods(type: AuthenticationMethodType? = nil) -> any Requestable<[AuthenticationMethod], MyAccountError> {
+        self.getAuthenticationMethods(type: type)
+    }
+
+    func updateAuthenticationMethod(by id: String,
+                                    name: String? = nil,
+                                    preferredAuthenticationMethod: PreferredAuthenticationMethod? = nil) -> any Requestable<AuthenticationMethod, MyAccountError> {
+        self.updateAuthenticationMethod(by: id,
+                                        name: name,
+                                        preferredAuthenticationMethod: preferredAuthenticationMethod)
     }
 }

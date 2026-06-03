@@ -8,6 +8,7 @@ struct Auth0MyAccount: MyAccount {
 
     var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
+    var dpop: DPoP?
 
     static let apiVersion = "v1"
 
@@ -16,7 +17,8 @@ struct Auth0MyAccount: MyAccount {
                                                    url: self.url,
                                                    session: self.session,
                                                    auth0ClientInfo: self.auth0ClientInfo,
-                                                   logger: self.logger)
+                                                   logger: self.logger,
+                                                   dpop: self.dpop)
     }
 
     init(token: String,

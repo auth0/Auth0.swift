@@ -50,7 +50,7 @@ public let defaultScope = "openid profile email offline_access"
  ```swift
  Auth0.authentication(clientId: "client-id", domain: "samples.us.auth0.com")
  ```
-
+ 
  - Parameters:
    - clientId: Client ID of your Auth0 application.
    - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
@@ -223,6 +223,48 @@ public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main)
  */
 public func webAuth(clientId: String, domain: String, session: URLSession = .shared) -> WebAuth {
     return Auth0WebAuth(clientId: clientId, url: .httpsURL(from: domain), session: session)
+}
+
+/**
+ PAR (Pushed Authorization Request) client for performing the browser authorization step of a PAR flow.
+
+ Uses the `ClientId` and `Domain` values from the `Auth0.plist` file in your main bundle.
+
+ ## Usage
+
+ ```swift
+ let authCode = try await Auth0
+     .authorizeWithRequestUri()
+     .start(requestUri: requestUri)
+ ```
+
+ - Parameter bundle: Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
+ - Returns: PAR Web Auth client.
+ - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
+ */
+public func authorizeWithRequestUri(bundle: Bundle = Bundle.main) -> PARAuth {
+    let values = plistValues(bundle: bundle)!
+    return authorizeWithRequestUri(clientId: values.clientId, domain: values.domain)
+}
+
+/**
+ PAR (Pushed Authorization Request) client for performing the browser authorization step of a PAR flow.
+
+ ## Usage
+
+ ```swift
+ let authCode = try await Auth0
+     .authorizeWithRequestUri(clientId: "client-id", domain: "samples.us.auth0.com")
+     .start(requestUri: requestUri)
+ ```
+
+ - Parameters:
+   - clientId: Client ID of your Auth0 application.
+   - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
+ - Returns: PAR Web Auth client.
+ */
+public func authorizeWithRequestUri(clientId: String, domain: String) -> PARAuth {
+    return PARWebAuth(clientId: clientId, url: .httpsURL(from: domain))
 }
 #endif
 

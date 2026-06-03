@@ -7,17 +7,20 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
     var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
+    var dpop: DPoP?
 
     init(token: String,
          url: URL,
          session: URLSession = .shared,
          auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo(),
-         logger: Logger? = nil) {
+         logger: Logger? = nil,
+         dpop: DPoP? = nil) {
         self.token = token
         self.url = url
         self.session = session
         self.auth0ClientInfo = auth0ClientInfo
         self.logger = logger
+        self.dpop = dpop
     }
 
     // MARK: - Passkey Enrollment
@@ -37,7 +40,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: self.logger,
-                       auth0ClientInfo: self.auth0ClientInfo)
+                       auth0ClientInfo: self.auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -71,7 +75,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: self.logger,
-                       auth0ClientInfo: self.auth0ClientInfo)
+                       auth0ClientInfo: self.auth0ClientInfo,
+                       dpop: self.dpop)
     }
     #endif
 
@@ -85,7 +90,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func enrollTOTP() -> any Requestable<TOTPEnrollmentChallenge, MyAccountError> {
@@ -98,7 +104,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func enrollPushNotification() -> any Requestable<PushEnrollmentChallenge, MyAccountError> {
@@ -111,7 +118,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func enrollEmail(emailAddress: String) -> any Requestable<EmailEnrollmentChallenge, MyAccountError> {
@@ -125,7 +133,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func enrollPhone(phoneNumber: String,
@@ -141,7 +150,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func confirmTOTPEnrollment(id: String,
@@ -157,7 +167,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func confirmEmailEnrollment(id: String,
@@ -173,7 +184,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func confirmPushNotificationEnrollment(id: String,
@@ -188,7 +200,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func confirmPhoneEnrollment(id: String,
@@ -204,7 +217,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func confirmRecoveryCodeEnrollment(id: String,
@@ -218,7 +232,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func deleteAuthenticationMethod(by id: String) -> any Requestable<Void, MyAccountError> {
@@ -228,17 +243,24 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        handle: { @Sendable result, callback in myAccountDecodableNoBody(from: result, callback: callback) },
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
-    func getAuthenticationMethods() -> any Requestable<[AuthenticationMethod], MyAccountError> {
+    func getAuthenticationMethods(type: AuthenticationMethodType?) -> any Requestable<[AuthenticationMethod], MyAccountError> {
+        var parameters: [String: Any] = [:]
+        if let type {
+            parameters["type"] = type.rawValue
+        }
         return Request(session: session,
                        url: url.appending("authentication-methods"),
                        method: "GET",
                        handle: { @Sendable result, callback in getAuthMethodsDecodable(from: result, callback: callback) },
+                       parameters: parameters,
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func getFactors() -> any Requestable<[Factor], MyAccountError> {
@@ -248,7 +270,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        handle: { @Sendable result, callback in getFactorsDecodable(from: result, callback: callback) },
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 
     func getAuthenticationMethod(by id: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
@@ -258,6 +281,24 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        handle: { @Sendable result, callback in myAcccountDecodable(result: result, callback: callback) },
                        headers: defaultHeaders,
                        logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
+    }
+
+    func updateAuthenticationMethod(by id: String,
+                                    name: String?,
+                                    preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> any Requestable<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["name"] = name
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod?.rawValue
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id),
+                       method: "PATCH",
+                       handle: { @Sendable result, callback in myAcccountDecodable(result: result, callback: callback) },
+                       parameters: payload,
+                       headers: defaultHeaders,
+                       logger: logger,
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
     }
 }

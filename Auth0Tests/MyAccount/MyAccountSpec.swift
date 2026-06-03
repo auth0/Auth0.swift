@@ -83,6 +83,36 @@ class MyAccountSpec: QuickSpec {
 
         }
 
+        describe("dpop") {
+
+            it("should not have DPoP enabled by default") {
+                let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+
+                expect(myAccount.dpop).to(beNil())
+            }
+
+            it("should enable DPoP") {
+                let myAccount = Auth0.myAccount(token: Token, domain: Domain).useDPoP()
+
+                expect(myAccount.dpop).toNot(beNil())
+            }
+
+            it("should propagate DPoP to the authentication methods sub-client") {
+                let myAccount = Auth0.myAccount(token: Token, domain: Domain).useDPoP()
+                let authMethods = myAccount.authenticationMethods as! Auth0MyAccountAuthenticationMethods
+
+                expect(authMethods.dpop).toNot(beNil())
+            }
+
+            it("should not propagate DPoP when not enabled") {
+                let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                let authMethods = myAccount.authenticationMethods as! Auth0MyAccountAuthenticationMethods
+
+                expect(authMethods.dpop).to(beNil())
+            }
+
+        }
+
         describe("authentication methods sub-client") {
 
             it("should return authentication methods sub-client") {

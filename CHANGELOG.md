@@ -24,6 +24,33 @@
 - feat: add @Sendable annotations to closure parameters for Swift 6 compliance [\#1128](https://github.com/auth0/Auth0.swift/pull/1128) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
 - feat: Swift 6 strict concurrency compliance for WebAuth Part 1 [\#1123](https://github.com/auth0/Auth0.swift/pull/1123) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
 
+## [2.21.2](https://github.com/auth0/Auth0.swift/tree/2.21.2) (2026-05-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.21.1...2.21.2)
+
+**Fixed**
+- add DPoP parameter  for updateAuthenticationMethod API  and update docs for GA [\#1191](https://github.com/auth0/Auth0.swift/pull/1191) ([subhankarmaiti](https://github.com/subhankarmaiti))
+
+## [2.21.1](https://github.com/auth0/Auth0.swift/tree/2.21.1) (2026-05-28)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.21.0...2.21.1)
+
+**Added**
+- feat: add public memberwise initializers to passkey challenge types [\#1188](https://github.com/auth0/Auth0.swift/pull/1188) ([subhankarmaiti](https://github.com/subhankarmaiti))
+
+## [2.21.0](https://github.com/auth0/Auth0.swift/tree/2.21.0) (2026-05-26)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.20.0...2.21.0)
+
+**Added**
+- feat: Add DPoP support to My Account API client [\#1185](https://github.com/auth0/Auth0.swift/pull/1185) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+- feat: Add update authentication method to My Account API client [\#1186](https://github.com/auth0/Auth0.swift/pull/1186) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+- feat: add type filter support to MyAccount getAuthenticationMethods [\#1184](https://github.com/auth0/Auth0.swift/pull/1184) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
+## [2.20.0](https://github.com/auth0/Auth0.swift/tree/2.20.0) (2026-05-21)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.19.0...2.20.0)
+
+**Added**
+- feat: Added additional properties support to passkeys signup API [\#1179](https://github.com/auth0/Auth0.swift/pull/1179) ([NandanPrabhu](https://github.com/NandanPrabhu))
+- feat:Add partial support for PAR auth flow [\#1175](https://github.com/auth0/Auth0.swift/pull/1175) ([pmathew92](https://github.com/pmathew92))
+
 ## [2.19.0](https://github.com/auth0/Auth0.swift/tree/2.19.0) (2026-05-05)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.18.0...2.19.0)
 

@@ -463,6 +463,107 @@ class AuthenticationSpec: QuickSpec {
 
                 }
 
+                it("should request passkey signup challenge with additional profile fields") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": [
+                                "email": Email,
+                                "given_name": "John",
+                                "family_name": "Doe",
+                                "nickname": "johnny",
+                                "picture": "https://example.com/photo.png"
+                            ]
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: Domain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email,
+                                                    givenName: "John",
+                                                    familyName: "Doe",
+                                                    nickname: "johnny",
+                                                    picture: "https://example.com/photo.png")
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+                }
+
+                it("should request passkey signup challenge with user metadata") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email],
+                            "user_metadata": ["signup_source": "ios_app"]
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: Domain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email,
+                                                    userMetadata: ["signup_source": "ios_app"])
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+                }
+
+                it("should request passkey signup challenge with all fields including user metadata") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "realm": ConnectionName,
+                            "organization": OrganizationId,
+                            "user_profile": [
+                                "email": Email,
+                                "phone_number": Phone,
+                                "username": Username,
+                                "name": Name,
+                                "given_name": "John",
+                                "family_name": "Doe",
+                                "nickname": "johnny",
+                                "picture": "https://example.com/photo.png"
+                            ],
+                            "user_metadata": ["key1": "value1"]
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: Domain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                userDisplayName: Name,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email,
+                                                    phoneNumber: Phone,
+                                                    username: Username,
+                                                    name: Name,
+                                                    givenName: "John",
+                                                    familyName: "Doe",
+                                                    nickname: "johnny",
+                                                    picture: "https://example.com/photo.png",
+                                                    userMetadata: ["key1": "value1"],
+                                                    connection: ConnectionName,
+                                                    organization: OrganizationId)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+                }
+
                 it("should not use DPoP") {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.passkeySignupChallenge(email: Email,

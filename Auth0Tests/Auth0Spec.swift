@@ -51,6 +51,16 @@ class Auth0Spec: QuickSpec {
                 }
 
             }
+
+            context("authorize with request uri") {
+
+                it("should return PAR web auth client with client id & domain") {
+                    let par = Auth0.authorizeWithRequestUri(clientId: ClientId, domain: Domain)
+                    expect(par.clientId) == ClientId
+                    expect(par.url.absoluteString) == "https://\(Domain)/"
+                }
+
+            }
             #endif
 
             #if !SWIFT_PACKAGE
