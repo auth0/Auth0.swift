@@ -139,6 +139,8 @@ public struct UserInfo: JSONObjectPayload, @unchecked Sendable {
     /// When present, represents the entity performing actions on behalf of the subject. The `act` claim may be nested
     /// to represent delegation chains (e.g., `act.act` for multi-hop delegation).
     ///
+    /// An `act` claim without a `sub` is considered invalid and will not be parsed.
+    ///
     /// ## See Also
     ///
     /// - ``ActClaim``
