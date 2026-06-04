@@ -1377,8 +1377,10 @@ public extension Authentication {
                              actorToken: ActorToken?,
                              parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         var parameters = parameters
-        parameters["actor_token"] = actorToken?.token
-        parameters["actor_token_type"] = actorToken?.tokenType
+        if let actorToken {
+            parameters["actor_token"] = actorToken.token
+            parameters["actor_token_type"] = actorToken.tokenType
+        }
         return self.customTokenExchange(subjectToken: subjectToken,
                                         subjectTokenType: subjectTokenType,
                                         audience: audience,
