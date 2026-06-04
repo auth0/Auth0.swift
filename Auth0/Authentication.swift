@@ -1162,7 +1162,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - organization: Identifier of an organization the user is a member of.
        - parameters: Additional parameters to send in the token exchange request (e.g. RFC 8693 optional claims).
      - Returns: A request that will yield Auth0 user's credentials.
-  
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange)
@@ -1316,6 +1316,71 @@ public extension Authentication {
                              scope: String = defaultScope,
                              organization: String? = nil,
                              parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
+        return self.customTokenExchange(subjectToken: subjectToken,
+                                        subjectTokenType: subjectTokenType,
+                                        audience: audience,
+                                        scope: scope,
+                                        organization: organization,
+                                        parameters: parameters)
+    }
+
+    /**
+     Performs a custom token exchange with an actor token, to support delegation and impersonation flows.
+
+     This is a convenience over
+     ``customTokenExchange(subjectToken:subjectTokenType:audience:scope:organization:parameters:)`` that sends an
+     `actor_token` and `actor_token_type`, identifying the party acting on behalf of the subject
+     (per [RFC 8693](https://tools.ietf.org/html/rfc8693)).
+
+     ## Availability
+
+     This feature is currently available in
+     [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+     Please reach out to [Auth0 support](https://support.auth0.com/) to enable for your tenant.
+
+     ## Usage
+
+     ```swift
+     let actor = ActorToken(token: "actor-id-token",
+                            tokenType: "urn:ietf:params:oauth:token-type:id_token")
+
+     Auth0
+         .authentication()
+         .customTokenExchange(subjectToken: "existing-token",
+                              subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                              actorToken: actor)
+         .start { print($0) }
+     ```
+
+     - Parameters:
+       - subjectToken: The security token to be exchanged.
+       - subjectTokenType: URI that identifies the type of the subject token.
+       - audience: API Identifier that your application is requesting access to. Defaults to `nil`.
+       - scope: Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - organization: Identifier of an organization the user is a member of.
+       - actorToken: The acting party's token and type. When provided, Auth0 will not issue a refresh token regardless of whether `offline_access` is in the scope.
+       - parameters: Additional parameters to send in the token exchange request (e.g. RFC 8693 optional claims).
+     - Returns: A request that will yield Auth0 user's credentials.
+
+     ## See Also
+
+     - ``ActorToken``
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange)
+     - [Custom Token Exchange Documentation](https://auth0.com/docs/authenticate/custom-token-exchange)
+     - [RFC 8693: OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693)
+     */
+    func customTokenExchange(subjectToken: String,
+                             subjectTokenType: String,
+                             audience: String? = nil,
+                             scope: String = defaultScope,
+                             organization: String? = nil,
+                             actorToken: ActorToken?,
+                             parameters: [String: any Sendable] = [:]) -> Request<Credentials, AuthenticationError> {
+        var parameters = parameters
+        if let actorToken {
+            parameters["actor_token"] = actorToken.token
+            parameters["actor_token_type"] = actorToken.tokenType
+        }
         return self.customTokenExchange(subjectToken: subjectToken,
                                         subjectTokenType: subjectTokenType,
                                         audience: audience,
