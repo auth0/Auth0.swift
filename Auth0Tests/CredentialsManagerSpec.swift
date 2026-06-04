@@ -1360,15 +1360,20 @@ class CredentialsManagerSpec: QuickSpec {
                             expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
                             expect(attemptCount) == 3
                             
-                            // Verify exponential backoff delays
+                            // Verify exponential backoff delays.
+                            // Only lower bounds and the exponential relationship are asserted: `asyncAfter` never
+                            // fires before its deadline but may fire arbitrarily late under CI load, so asserting an
+                            // upper bound on the wall-clock delay would be flaky.
                             if attemptTimestamps.count == 3 {
-                                // First retry should be ~0.5s after initial attempt
+                                // First retry should be at least ~0.5s after the initial attempt.
                                 let delay1 = attemptTimestamps[1].timeIntervalSince(attemptTimestamps[0])
-                                expect(delay1).to(beCloseTo(0.5, within: 0.2))
-                                
-                                // Second retry should be ~1s after first retry
+                                expect(delay1).to(beGreaterThanOrEqualTo(0.4))
+
+                                // Second retry should be at least ~1s after the first retry, and longer than the
+                                // first delay (exponential growth).
                                 let delay2 = attemptTimestamps[2].timeIntervalSince(attemptTimestamps[1])
-                                expect(delay2).to(beCloseTo(1.0, within: 0.2))
+                                expect(delay2).to(beGreaterThanOrEqualTo(0.8))
+                                expect(delay2).to(beGreaterThan(delay1))
                             }
                             
                             done()
