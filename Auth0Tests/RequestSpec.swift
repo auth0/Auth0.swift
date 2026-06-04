@@ -418,6 +418,34 @@ class RequestSpec: QuickSpec {
 
         }
 
+        describe("callback thread") {
+
+            it("should deliver a successful result on the main thread") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiSuccessResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    Request().start { _ in
+                        expect(Thread.isMainThread) == true
+                        done()
+                    }
+                }
+            }
+
+            it("should deliver a failed result on the main thread") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    Request().start { _ in
+                        expect(Thread.isMainThread) == true
+                        done()
+                    }
+                }
+            }
+
+        }
+
         describe("combine") {
             var cancellables: Set<AnyCancellable> = []
 
