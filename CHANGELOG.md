@@ -1,5 +1,11 @@
 # Change Log
 
+## [3.0.0-beta.2](https://github.com/auth0/Auth0.swift/tree/3.0.0-beta.2) (2026-06-05)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.0-beta.1...3.0.0-beta.2)
+
+**Removed**
+- breaking: Removed deprecated MFA APIs [\#1159](https://github.com/auth0/Auth0.swift/pull/1159) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [3.0.0-beta.1](https://github.com/auth0/Auth0.swift/tree/3.0.0-beta.1) (2026-04-27)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.18.0...3.0.0-beta.1)
 
