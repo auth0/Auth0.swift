@@ -9,6 +9,12 @@ name: Documentation
 on:
   workflow_dispatch:
   workflow_call:
+  # TEMPORARY: lets us deploy-test from a feature branch before docs.yml lands on
+  # the default branch (workflow_dispatch is only listed once it's on master).
+  # Remove this push trigger before merging.
+  push:
+    branches:
+      - feat/versioned-docs
 
 permissions:
   contents: write # peaceiris/actions-gh-pages pushes to the gh-pages branch
