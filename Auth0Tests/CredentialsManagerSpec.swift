@@ -29,7 +29,7 @@ private let Domain = "samples.auth0.com"
 private let SessionTransferAudience = "urn:\(Domain):session_transfer"
 private let ExpiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NzE4NTI0NjMsImV4cCI6MTU0MDIzMDA2MywiYXVkIjoiYXVkaWVuY2UiLCJzdWIiOiIxMjM0NSJ9.Lcz79P1AFAZDI4Yr1teFapFVAmBbdfhGBGbj9dQVeRM"
 private let ValidToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZXN0IiwiaWF0IjoxNTcxOTExNTkyLCJleHAiOjE5MTg5ODAzOTIsImF1ZCI6ImF1ZGllbmNlIiwic3ViIjoic3VifDEyMyJ9.uLNF8IpY6cJTY-RyO3CcqLpCaKGaVekR-DTDoQTlnPk" // Token is valid until 2030
-private let SessionExpiryLeeway = 300
+private let SessionExpiryLeeway = 30
 
 /// Builds an unsigned JWT string containing a `session_expiry` claim.
 /// JWTDecode does not validate signatures, so the signature part can be arbitrary for unit tests.
@@ -988,7 +988,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should return sessionExpired error when session_expiry is within the 300s leeway") {
+            it("should return sessionExpired error when session_expiry is within the 30s leeway") {
                 let almostExpiry = Int(Date().timeIntervalSince1970) + (SessionExpiryLeeway - 1)
                 let idToken = makeIdTokenWithSessionExpiry(almostExpiry)
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))

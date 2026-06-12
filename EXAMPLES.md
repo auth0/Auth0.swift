@@ -666,7 +666,7 @@ let isValid = credentialsManager.isBiometricSessionValid()
 
 Auth0 supports the [IPSIE SL1](https://openid.github.io/ipsie-openid-sl1/draft-openid-ipsie-sl1-profile.html) `session_expiry` claim, which lets an upstream identity provider (e.g. Okta) set a hard ceiling on how long an Auth0-issued session may live. When your connection has this option enabled, Auth0 includes a `session_expiry` Unix timestamp in the ID token it returns to your app after login.
 
-The `CredentialsManager` automatically enforces this ceiling. On every `credentials()` call it reads `session_expiry` from the stored ID token and, once the ceiling has passed (with a 300-second clock-skew leeway), returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant.
+The `CredentialsManager` automatically enforces this ceiling. On every `credentials()` call it reads `session_expiry` from the stored ID token and, once the ceiling has passed (with a 30-second clock-skew leeway), returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant.
 
 #### What `session_expiry` means
 

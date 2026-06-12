@@ -1023,7 +1023,7 @@ public struct CredentialsManager: Sendable {
     /// Checks whether the IPSIE `session_expiry` ceiling has been reached.
     /// First reads from the ID token claims; falls back to the separately stored Keychain value
     /// to preserve the ceiling across refresh token renewals where the new ID token lacks the claim.
-    /// Applies a 300-second leeway to account for clock skew between the device and Auth0.
+    /// Applies a 30-second leeway to account for clock skew between the device and Auth0.
     func hasSessionExpired(idToken: String) -> Bool {
         let sessionExpiry: Int?
 
@@ -1038,7 +1038,7 @@ public struct CredentialsManager: Sendable {
         }
 
         guard let expiry = sessionExpiry else { return false }
-        let leeway: TimeInterval = 300
+        let leeway: TimeInterval = 30
         return Date().timeIntervalSince1970 >= Double(expiry) - leeway
     }
 
