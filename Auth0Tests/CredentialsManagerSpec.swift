@@ -29,6 +29,28 @@ private let Domain = "samples.auth0.com"
 private let SessionTransferAudience = "urn:\(Domain):session_transfer"
 private let ExpiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NzE4NTI0NjMsImV4cCI6MTU0MDIzMDA2MywiYXVkIjoiYXVkaWVuY2UiLCJzdWIiOiIxMjM0NSJ9.Lcz79P1AFAZDI4Yr1teFapFVAmBbdfhGBGbj9dQVeRM"
 private let ValidToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZXN0IiwiaWF0IjoxNTcxOTExNTkyLCJleHAiOjE5MTg5ODAzOTIsImF1ZCI6ImF1ZGllbmNlIiwic3ViIjoic3VifDEyMyJ9.uLNF8IpY6cJTY-RyO3CcqLpCaKGaVekR-DTDoQTlnPk" // Token is valid until 2030
+private let SessionExpiryLeeway = 300
+
+/// Builds an unsigned JWT string containing a `session_expiry` claim.
+/// JWTDecode does not validate signatures, so the signature part can be arbitrary for unit tests.
+private func makeIdTokenWithSessionExpiry(_ sessionExpiry: Int) -> String {
+    let headerJSON = try! JSONSerialization.data(withJSONObject: ["typ": "JWT", "alg": "HS256"])
+    let payloadJSON = try! JSONSerialization.data(withJSONObject: [
+        "iss": "test", "sub": "sub|123", "aud": "audience",
+        "iat": Int(Date().timeIntervalSince1970),
+        "exp": Int(Date().timeIntervalSince1970) + 3600,
+        "session_expiry": sessionExpiry
+    ])
+    let header = headerJSON.base64EncodedString()
+        .replacingOccurrences(of: "+", with: "-")
+        .replacingOccurrences(of: "/", with: "_")
+        .replacingOccurrences(of: "=", with: "")
+    let payload = payloadJSON.base64EncodedString()
+        .replacingOccurrences(of: "+", with: "-")
+        .replacingOccurrences(of: "/", with: "_")
+        .replacingOccurrences(of: "=", with: "")
+    return "\(header).\(payload).fakesig"
+}
 
 class CredentialsManagerSpec: QuickSpec {
 
@@ -932,8 +954,120 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
+        describe("session_expiry enforcement") {
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should return credentials when session_expiry is in the future") {
+                let futureExpiry = Int(Date().timeIntervalSince1970) + 7200
+                let idToken = makeIdTokenWithSessionExpiry(futureExpiry)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should return sessionExpired error when session_expiry is in the past") {
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
+                let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        done()
+                    }
+                }
+            }
+
+            it("should return sessionExpired error when session_expiry is within the 300s leeway") {
+                let almostExpiry = Int(Date().timeIntervalSince1970) + (SessionExpiryLeeway - 1)
+                let idToken = makeIdTokenWithSessionExpiry(almostExpiry)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        done()
+                    }
+                }
+            }
+
+            it("should return credentials when session_expiry is absent from the id token") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should return sessionExpired error instead of attempting token renewal when session is expired") {
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
+                let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        done()
+                    }
+                }
+            }
+
+            it("should preserve session_expiry across a refresh token renewal and enforce it on the next read") {
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
+                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn))
+
+                // Store credentials with a future session_expiry; access token is expired so renewal will trigger
+                let futureExpiry = Int(Date().timeIntervalSince1970) + 7200
+                let idToken = makeIdTokenWithSessionExpiry(futureExpiry)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                // First call: access token expired, renewal triggered; new idToken (NewIdToken) has no session_expiry.
+                // The stored session_expiry should be preserved and session is still valid.
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should not treat a missing session_expiry after renewal as expired") {
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
+                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn))
+
+                // Store credentials with no session_expiry; access token expired so renewal runs
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+        }
+
         describe("concurrent credentials retrieval") {
-            
+
             beforeEach {
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
             }
