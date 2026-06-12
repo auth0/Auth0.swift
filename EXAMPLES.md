@@ -360,6 +360,7 @@ Web Auth will only produce `WebAuthError` error values. You can find the underly
 - [Retrieve stored user information](#retrieve-stored-user-information)
 - [Clear stored credentials](#clear-stored-credentials)
 - [Biometric authentication](#biometric-authentication)
+- [IPSIE session expiry \[EA\]](#ipsie-session-expiry-ea)
 - [Other credentials](#other-credentials)
 - [Credentials Manager errors](#credentials-manager-errors)
 
@@ -658,6 +659,79 @@ let isValid = credentialsManager.isBiometricSessionValid()
 > [!NOTE]
 > Retrieving the user information with `credentialsManager.user` will not be protected by biometric authentication.
 
+### IPSIE session expiry [EA]
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires the `id_token_session_expiry_federated` feature flag and the `id_token_session_expiry_supported` option enabled on your OIDC or Okta enterprise connection.
+
+Auth0 supports the [IPSIE SL1](https://openid.github.io/ipsie-openid-sl1/draft-openid-ipsie-sl1-profile.html) `session_expiry` claim, which lets an upstream identity provider (e.g. Okta) set a hard ceiling on how long an Auth0-issued session may live. When your connection has this option enabled, Auth0 includes a `session_expiry` Unix timestamp in the ID token it returns to your app after login.
+
+The `CredentialsManager` automatically enforces this ceiling. On every `credentials()` call it reads `session_expiry` from the stored ID token and, once the ceiling has passed (with a 300-second clock-skew leeway), returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant.
+
+#### What `session_expiry` means
+
+| Claim | Bounds | SDK behaviour |
+|---|---|---|
+| `exp` | ID token lifetime (minutes) | Already validated on login |
+| `session_expiry` | RP session ceiling (hours / days) | **Enforced by `CredentialsManager`** — returns `.sessionExpired` when reached |
+
+#### Handling the error
+
+When `session_expiry` is reached, `credentials()` returns `CredentialsManagerError.sessionExpired`. Your existing "no credentials" re-login path already handles this — or you can match the case explicitly:
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(CredentialsManagerError.sessionExpired):
+        // Upstream IdP session has ended — send the user back to login
+        Auth0.webAuth().start { _ in }
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await credentialsManager.credentials()
+    print("Obtained credentials: \(credentials)")
+} catch CredentialsManagerError.sessionExpired {
+    // Upstream IdP session has ended — send the user back to login
+    let _ = try? await Auth0.webAuth().start()
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+#### Reading the raw `session_expiry` value
+
+You can inspect the claim directly from the stored ID token for app-level logic (e.g. a countdown timer):
+
+```swift
+import JWTDecode
+
+if let credentials = credentialsManager.user,
+   let jwt = try? decode(jwt: credentialsManager.credentials { _ in }./* ... */ ""),
+   let sessionExpiry = jwt.body["session_expiry"] as? Int {
+    let expiresAt = Date(timeIntervalSince1970: TimeInterval(sessionExpiry))
+    print("Session ceiling: \(expiresAt)")
+}
+```
+
+> [!NOTE]
+> `session_expiry` is preserved across refresh-token renewals by the `CredentialsManager`. Even after the access token is renewed and the new ID token no longer carries the claim, the original ceiling from login continues to be enforced.
+
+> [!IMPORTANT]
+> `session_expiry` is a ceiling computed at login time — it is **not** real-time session revocation. If a user is de-provisioned mid-session, they will not be immediately signed out; that requires back-channel logout / CAEP, which is a separate platform capability.
+
+[Go up ⤴](#examples)
+
 ### Other credentials
 
 #### API credentials [EA]
@@ -827,6 +901,9 @@ credentialsManager.credentials { result in
             break
         case CredentialsManagerError.revokeFailed:
             // Token revocation failed — check error.cause for details
+            break
+        case CredentialsManagerError.sessionExpired:
+            // Upstream IdP session ceiling reached — prompt re-login
             break
         default:
             break

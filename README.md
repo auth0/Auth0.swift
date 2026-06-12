@@ -318,7 +318,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 Explore common use cases and integration patterns for Auth0.swift.
 
 > [!NOTE]
-> **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, custom token exchange, and more. ✨
+> **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, IPSIE session expiry, custom token exchange, and more. ✨
 
 ### Store credentials
 
@@ -356,6 +356,28 @@ do {
 }
 ```
 </details>
+
+### IPSIE session expiry [EA]
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires a specific feature flag and connection option enabled on your Auth0 tenant.
+
+When an enterprise connection (OIDC / Okta) is configured with `id_token_session_expiry_supported: true`, Auth0 emits a `session_expiry` claim in the ID token. The `CredentialsManager` automatically enforces this upstream IdP session ceiling — `credentials()` returns `CredentialsManagerError.sessionExpired` once the ceiling is reached (with a 300-second clock-skew leeway), without attempting a token renewal.
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(CredentialsManagerError.sessionExpired):
+        // Upstream IdP session ended — prompt re-login
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+For a full guide including configuration steps and reading the raw claim value, see the [IPSIE session expiry section in EXAMPLES.md](EXAMPLES.md#ipsie-session-expiry-ea).
 
 ### Clear stored credentials
 
