@@ -103,38 +103,6 @@ Create a `plist` file named `Auth0.plist` in your app bundle with the following 
 </plist>
 ```
 
-#### Configure the Client ID and Domain programmatically
-
-<details>
-  <summary>For Web Auth</summary>
-
-```swift
-Auth0
-    .webAuth(clientId: "YOUR_AUTH0_CLIENT_ID", domain: "YOUR_AUTH0_DOMAIN")
-    // ...
-```
-</details>
-
-<details>
-  <summary>For the Authentication API client</summary>
-
-```swift
-Auth0
-    .authentication(clientId: "YOUR_AUTH0_CLIENT_ID", domain: "YOUR_AUTH0_DOMAIN")
-    // ...
-```
-</details>
-
-<details>
-  <summary>For the Management API client (Users)</summary>
-
-```swift
-Auth0
-    .users(token: credentials.accessToken, domain: "YOUR_AUTH0_DOMAIN")
-    // ...
-```
-</details>
-
 ### Configure Web Auth (iOS / macOS)
 
 #### Configure the callback and logout URLs
