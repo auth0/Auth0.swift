@@ -838,10 +838,6 @@ public struct CredentialsManager: Sendable {
                 complete()
                 return callback(.failure(.noCredentials))
             }
-            guard !self.hasSessionExpired(idToken: credentials.idToken) else {
-                complete()
-                return callback(.failure(.sessionExpired))
-            }
             guard forceRenewal ||
                     self.hasExpired(credentials.expiresIn) ||
                     self.willExpire(credentials.expiresIn, within: minTTL) ||
@@ -853,7 +849,10 @@ public struct CredentialsManager: Sendable {
                 complete()
                 return callback(.failure(.noRefreshToken))
             }
-            
+            guard !self.hasSessionExpired(idToken: credentials.idToken) else {
+                complete()
+                return callback(.failure(.sessionExpired))
+            }
             if let error = self.validateDPoPState(for: credentials) {
                 complete()
                 return callback(.failure(error))

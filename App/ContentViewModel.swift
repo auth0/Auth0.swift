@@ -56,7 +56,7 @@ final class ContentViewModel: ObservableObject {
             let stored = credentialsManager.store(credentials: credentials)
             if stored {
                 isAuthenticated = true
-                print("Access Token: \(credentials.accessToken)")
+                print("Access Token: \(credentials.idToken)")
             } else {
                 errorMessage = "Failed to store credentials"
             }
@@ -103,7 +103,7 @@ final class ContentViewModel: ObservableObject {
         do {
             let credentials = try await credentialsManager.credentials()
             isAuthenticated = true
-            print("Valid credentials found: \(credentials.accessToken)")
+            print("Valid credentials found: \(credentials.idToken)")
         } catch {
             isAuthenticated = false
             print("No valid credentials found")

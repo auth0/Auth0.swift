@@ -974,10 +974,10 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should return sessionExpired error when session_expiry is in the past") {
+            it("should return sessionExpired error when session_expiry is in the past and access token needs renewal") {
                 let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
                 let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
@@ -988,10 +988,10 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should return sessionExpired error when session_expiry is within the 30s leeway") {
+            it("should return sessionExpired error when session_expiry is within the 30s leeway and access token needs renewal") {
                 let almostExpiry = Int(Date().timeIntervalSince1970) + (SessionExpiryLeeway - 1)
                 let idToken = makeIdTokenWithSessionExpiry(almostExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
