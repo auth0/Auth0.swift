@@ -1028,18 +1028,15 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should preserve session_expiry across a refresh token renewal and enforce it on the next read") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn))
-
-                // Store credentials with a future session_expiry; access token is expired so renewal will trigger
+            it("should succeed after renewal when new id token contains a future session_expiry") {
                 let futureExpiry = Int(Date().timeIntervalSince1970) + 7200
-                let idToken = makeIdTokenWithSessionExpiry(futureExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                let newIdToken = makeIdTokenWithSessionExpiry(futureExpiry)
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
+                                    response: authResponse(accessToken: NewAccessToken, idToken: newIdToken, refreshToken: nil, expiresIn: ExpiresIn))
+
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
 
-                // First call: access token expired, renewal triggered; new idToken (NewIdToken) has no session_expiry.
-                // The stored session_expiry should be preserved and session is still valid.
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
                         expect(result).to(beSuccessful())
@@ -1048,11 +1045,10 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should not treat a missing session_expiry after renewal as expired") {
+            it("should succeed after renewal when new id token has no session_expiry claim") {
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
                                     response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn))
 
-                // Store credentials with no session_expiry; access token expired so renewal runs
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
 

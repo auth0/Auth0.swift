@@ -724,9 +724,6 @@ if let credentials = credentialsManager.user,
 }
 ```
 
-> [!NOTE]
-> `session_expiry` is preserved across refresh-token renewals by the `CredentialsManager`. Even after the access token is renewed and the new ID token no longer carries the claim, the original ceiling from login continues to be enforced.
-
 > [!IMPORTANT]
 > `session_expiry` is a ceiling computed at login time — it is **not** real-time session revocation. If a user is de-provisioned mid-session, they will not be immediately signed out; that requires back-channel logout / CAEP, which is a separate platform capability.
 

@@ -35,7 +35,6 @@ public struct CredentialsManager: Sendable {
 
     private let storeKey: String
     private let dpopThumbprintKey: String
-    private let sessionExpiryKey: String
     private let authentication: Authentication
     private let maxRetries: Int
     #if WEB_AUTH_PLATFORM
@@ -69,7 +68,6 @@ public struct CredentialsManager: Sendable {
                 maxRetries: Int = 0) {
         self.storeKey = storeKey
         self.dpopThumbprintKey = dpopThumbprintKey
-        self.sessionExpiryKey = "\(storeKey)_session_expiry"
         self.authentication = authentication
         self.sendableStorage = SendableBox(value: storage)
         self.maxRetries = max(0, maxRetries)
@@ -153,7 +151,6 @@ public struct CredentialsManager: Sendable {
             return false
         }
         saveDPoPThumbprint(for: credentials)
-        saveSessionExpiry(for: credentials)
         return true
     }
 
@@ -174,7 +171,6 @@ public struct CredentialsManager: Sendable {
         #endif
         let result = self.storage.deleteEntry(forKey: self.storeKey)
         _ = self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
-        _ = self.storage.deleteEntry(forKey: self.sessionExpiryKey)
         return result
     }
 
@@ -762,17 +758,6 @@ public struct CredentialsManager: Sendable {
         return nil
     }
 
-    private func saveSessionExpiry(for credentials: Credentials) {
-        guard let jwt = try? decode(jwt: credentials.idToken),
-              let sessionExpiry = jwt.body["session_expiry"] as? Int else {
-            // Only remove stored value if the new idToken was issued with session_expiry context
-            // (i.e., don't wipe a stored ceiling just because the refresh response lacks the claim)
-            return
-        }
-        let data = withUnsafeBytes(of: sessionExpiry) { Data($0) }
-        _ = self.storage.setEntry(data, forKey: self.sessionExpiryKey)
-    }
-
     private func saveDPoPThumbprint(for credentials: Credentials) {
         // token type must be DPoP and authentication must have non nil dpop property
         guard credentials.tokenType.caseInsensitiveCompare("DPoP") == .orderedSame ||
@@ -1020,25 +1005,15 @@ public struct CredentialsManager: Sendable {
     }
 
     /// Checks whether the IPSIE `session_expiry` ceiling has been reached.
-    /// First reads from the ID token claims; falls back to the separately stored Keychain value
-    /// to preserve the ceiling across refresh token renewals where the new ID token lacks the claim.
+    /// Reads `session_expiry` from the ID token claims only.
     /// Applies a 30-second leeway to account for clock skew between the device and Auth0.
     func hasSessionExpired(idToken: String) -> Bool {
-        let sessionExpiry: Int?
-
-        if let jwt = try? decode(jwt: idToken),
-           let claimValue = jwt.body["session_expiry"] as? Int {
-            sessionExpiry = claimValue
-        } else if let data = self.storage.getEntry(forKey: self.sessionExpiryKey),
-                  data.count == MemoryLayout<Int>.size {
-            sessionExpiry = data.withUnsafeBytes { $0.load(as: Int.self) }
-        } else {
+        guard let jwt = try? decode(jwt: idToken),
+              let sessionExpiry = jwt.body["session_expiry"] as? Int else {
             return false
         }
-
-        guard let expiry = sessionExpiry else { return false }
         let leeway: TimeInterval = 30
-        return Date().timeIntervalSince1970 >= Double(expiry) - leeway
+        return Date().timeIntervalSince1970 >= Double(sessionExpiry) - leeway
     }
 
     func hasScopeChanged(from lastScope: String?, to newScope: String?, ignoreOpenid: Bool = false) -> Bool {
