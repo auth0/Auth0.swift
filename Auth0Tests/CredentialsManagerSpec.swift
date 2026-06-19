@@ -974,7 +974,22 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should return sessionExpired error when session_expiry is in the past and access token needs renewal") {
+            it("should return sessionExpired error when session_expiry is in the past even with a valid access token") {
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
+                let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
+                // Access token is still valid — session check must fire before the validity early-return
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        done()
+                    }
+                }
+            }
+
+            it("should return sessionExpired error when session_expiry is in the past and access token is also expired") {
                 let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
                 let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
@@ -988,10 +1003,10 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should return sessionExpired error when session_expiry is within the 30s leeway and access token needs renewal") {
+            it("should return sessionExpired error when session_expiry is within the 30s leeway") {
                 let almostExpiry = Int(Date().timeIntervalSince1970) + (SessionExpiryLeeway - 1)
                 let idToken = makeIdTokenWithSessionExpiry(almostExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
@@ -1014,15 +1029,29 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should return sessionExpired error instead of attempting token renewal when session is expired") {
-                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
-                let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+            it("should fail open and return credentials when session_expiry is zero") {
+                let idToken = makeIdTokenWithSessionExpiry(0)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail open and return credentials when session_expiry is a millisecond timestamp") {
+                // A ms-precision timestamp (13 digits) looks ~year 33658 in seconds; must be rejected
+                let msTimestamp = Int(Date().timeIntervalSince1970) * 1000
+                let idToken = makeIdTokenWithSessionExpiry(msTimestamp)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }

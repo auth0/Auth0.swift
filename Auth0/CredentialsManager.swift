@@ -823,6 +823,10 @@ public struct CredentialsManager: Sendable {
                 complete()
                 return callback(.failure(.noCredentials))
             }
+            guard !self.hasSessionExpired(idToken: credentials.idToken) else {
+                complete()
+                return callback(.failure(.sessionExpired))
+            }
             guard forceRenewal ||
                     self.hasExpired(credentials.expiresIn) ||
                     self.willExpire(credentials.expiresIn, within: minTTL) ||
@@ -833,10 +837,6 @@ public struct CredentialsManager: Sendable {
             guard let refreshToken = credentials.refreshToken else {
                 complete()
                 return callback(.failure(.noRefreshToken))
-            }
-            guard !self.hasSessionExpired(idToken: credentials.idToken) else {
-                complete()
-                return callback(.failure(.sessionExpired))
             }
             if let error = self.validateDPoPState(for: credentials) {
                 complete()
@@ -1007,9 +1007,14 @@ public struct CredentialsManager: Sendable {
     /// Checks whether the IPSIE `session_expiry` ceiling has been reached.
     /// Reads `session_expiry` from the ID token claims only.
     /// Applies a 30-second leeway to account for clock skew between the device and Auth0.
+    /// Values outside (0, 10_000_000_000) are rejected and treated as absent (fail-open) to guard
+    /// against millisecond timestamps and other malformed inputs silently disabling enforcement.
     func hasSessionExpired(idToken: String) -> Bool {
         guard let jwt = try? decode(jwt: idToken),
-              let sessionExpiry = jwt.body["session_expiry"] as? Int else {
+              let rawValue = jwt.body["session_expiry"],
+              let sessionExpiry = rawValue as? Int,
+              sessionExpiry > 0,
+              sessionExpiry < 10_000_000_000 else {
             return false
         }
         let leeway: TimeInterval = 30

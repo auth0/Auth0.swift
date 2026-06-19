@@ -666,7 +666,7 @@ let isValid = credentialsManager.isBiometricSessionValid()
 
 Auth0 supports the [IPSIE SL1](https://openid.github.io/ipsie-openid-sl1/draft-openid-ipsie-sl1-profile.html) `session_expiry` claim, which lets an upstream identity provider (e.g. Okta) set a hard ceiling on how long an Auth0-issued session may live. When your connection has this option enabled, Auth0 includes a `session_expiry` Unix timestamp in the ID token it returns to your app after login.
 
-The `CredentialsManager` automatically enforces this ceiling. On every `credentials()` call it reads `session_expiry` from the stored ID token and, once the ceiling has passed (with a 30-second clock-skew leeway), returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant.
+The `CredentialsManager.credentials()` method enforces this ceiling on every call. It reads `session_expiry` from the stored ID token and, once the ceiling has passed (with a 30-second clock-skew leeway), returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant. Note that `ssoCredentials()` and `apiCredentials()` do not currently enforce this ceiling.
 
 #### What `session_expiry` means
 
@@ -716,9 +716,10 @@ You can inspect the claim directly from the stored ID token for app-level logic 
 ```swift
 import JWTDecode
 
-if let credentials = credentialsManager.user,
-   let jwt = try? decode(jwt: credentialsManager.credentials { _ in }./* ... */ ""),
-   let sessionExpiry = jwt.body["session_expiry"] as? Int {
+credentialsManager.credentials { result in
+    guard case .success(let credentials) = result,
+          let jwt = try? decode(jwt: credentials.idToken),
+          let sessionExpiry = jwt.body["session_expiry"] as? Int else { return }
     let expiresAt = Date(timeIntervalSince1970: TimeInterval(sessionExpiry))
     print("Session ceiling: \(expiresAt)")
 }
