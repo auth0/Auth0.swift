@@ -1182,6 +1182,14 @@ If you encounter issues during migration:
 - [GitHub Issues](https://github.com/auth0/Auth0.swift/issues) - Report bugs or ask questions
 - [Auth0 Community](https://community.auth0.com/) - Community support
 
+## Skill for Coding Agents
+
+If you use coding agents such as Claude Code or Cursor, we highly recommend adding the Auth0.swift migration skill to your repository:
+
+```
+npx skills add auth0/agent-skills --skill auth0-swift-major-migration
+```
+
 ### MFA methods on Authentication protocol
 
 **Change:** The following deprecated MFA methods have been removed from the `Authentication` protocol:

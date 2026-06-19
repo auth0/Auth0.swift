@@ -15,6 +15,11 @@
 > We'd love for you to try it out and share your feedback! Please [open an issue](https://github.com/auth0/Auth0.swift/issues) if you encounter any problems or have suggestions.
 >
 > 📚 [Migration Guide](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.1/V3_MIGRATION_GUIDE.md) &nbsp;•&nbsp; 📦 [v3 Changelog](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.1/CHANGELOG.md)
+>
+> **Skill for Coding Agents:** If you use coding agents such as Claude Code or Cursor, add the Auth0.swift migration skill to automate the upgrade:
+> ```
+> npx skills add auth0/agent-skills --skill auth0-swift-major-migration
+> ```
 
 ## Documentation
 
