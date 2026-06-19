@@ -18,7 +18,7 @@
 >
 > **Skill for Coding Agents:** If you use coding agents such as Claude Code or Cursor, add the Auth0.swift migration skill to automate the upgrade:
 > ```
-> npx skills add auth0/agent-skills
+> npx skills add auth0/agent-skills --skill auth0-swift-major-migration
 > ```
 
 ## Documentation
