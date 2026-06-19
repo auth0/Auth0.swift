@@ -1187,7 +1187,7 @@ If you encounter issues during migration:
 If you use coding agents such as Claude Code or Cursor, we highly recommend adding the Auth0.swift migration skill to your repository:
 
 ```
-npx skills add auth0-swift-major-migration
+npx skills add auth0/agent-skills
 ```
 
 ### MFA methods on Authentication protocol
