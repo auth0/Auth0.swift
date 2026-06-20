@@ -35,16 +35,16 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
     let auth0ClientInfo: Auth0ClientInfo
     let dpop: DPoP?
 
-    init(session: URLSession,
-         url: URL,
-         method: String,
-         requestValidator: [RequestValidator] = [],
-         handle: @escaping @Sendable (Result<ResponseValue, E>, @Sendable (Result<T, E>) -> Void) -> Void,
-         parameters: [String: Any] = [:],
-         headers: [String: String] = [:],
-         logger: Logger?,
-         auth0ClientInfo: Auth0ClientInfo,
-         dpop: DPoP? = nil) {
+    package init(session: URLSession,
+                 url: URL,
+                 method: String,
+                 requestValidator: [RequestValidator] = [],
+                 handle: @escaping @Sendable (Result<ResponseValue, E>, @Sendable (Result<T, E>) -> Void) -> Void,
+                 parameters: [String: Any] = [:],
+                 headers: [String: String] = [:],
+                 logger: Logger?,
+                 auth0ClientInfo: Auth0ClientInfo,
+                 dpop: DPoP? = nil) {
         self.session = session
         self.url = url
         self.method = method

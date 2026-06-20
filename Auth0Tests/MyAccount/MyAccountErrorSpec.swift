@@ -3,6 +3,9 @@ import Quick
 import Nimble
 
 @testable import Auth0
+#if SWIFT_PACKAGE
+@testable import Auth0MyAccount
+#endif
 
 class MyAccountErrorSpec: QuickSpec {
 

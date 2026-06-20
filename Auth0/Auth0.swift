@@ -11,10 +11,6 @@ import UIKit
  */
 public typealias AuthenticationResult<T> = Result<T, AuthenticationError>
 
-/**
- `Result` wrapper for My Account API operations.
- */
-public typealias MyAccountResult<T> = Result<T, MyAccountError>
 
 #if WEB_AUTH_PLATFORM
 /**
@@ -268,7 +264,7 @@ public func authorizeWithRequestUri(clientId: String, domain: String) -> PARAuth
 }
 #endif
 
-func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
+package func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
     guard let path = bundle.path(forResource: "Auth0", ofType: "plist"),
           let values = NSDictionary(contentsOfFile: path) as? [String: Any] else {
             Auth0Log.shared.error(.configuration, "Missing Auth0.plist file with 'ClientId' and 'Domain' entries in main bundle!")
