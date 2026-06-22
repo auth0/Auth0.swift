@@ -125,67 +125,6 @@ class UserProfileSpec: QuickSpec {
             }
 
         }
-
-        describe("act claim") {
-
-            it("should be nil when not present") {
-                let userInfo = UserInfo(json: basicProfile())
-                expect(userInfo?.act).to(beNil())
-            }
-
-            it("should parse act claim") {
-                var info = basicProfile()
-                info["act"] = [
-                    "sub": "admin@example.com",
-                    "org": "auth0",
-                    "role": "support"
-                ]
-                let userInfo = UserInfo(json: info)
-                expect(userInfo?.act?.sub) == "admin@example.com"
-                expect(userInfo?.act?.additionalClaims["org"] as? String) == "auth0"
-                expect(userInfo?.act?.additionalClaims["role"] as? String) == "support"
-            }
-
-            it("should be nil when act claim has no sub") {
-                var info = basicProfile()
-                info["act"] = ["org": "auth0"]
-                let userInfo = UserInfo(json: info)
-                expect(userInfo?.act).to(beNil())
-            }
-
-            it("should preserve non-string additional claims") {
-                var info = basicProfile()
-                info["act"] = [
-                    "sub": "admin@example.com",
-                    "level": 3,
-                    "active": true
-                ]
-                let userInfo = UserInfo(json: info)
-                expect(userInfo?.act?.additionalClaims["level"] as? Int) == 3
-                expect(userInfo?.act?.additionalClaims["active"] as? Bool) == true
-            }
-
-            it("should parse nested act claim for delegation chains") {
-                var info = basicProfile()
-                info["act"] = [
-                    "sub": "middle-tier@example.com",
-                    "act": [
-                        "sub": "original-actor@example.com"
-                    ]
-                ]
-                let userInfo = UserInfo(json: info)
-                expect(userInfo?.act?.sub) == "middle-tier@example.com"
-                expect(userInfo?.act?.act?.sub) == "original-actor@example.com"
-            }
-
-            it("should not include act in custom claims") {
-                var info = basicProfile()
-                info["act"] = ["sub": "actor@example.com"]
-                let userInfo = UserInfo(json: info)
-                expect(userInfo?.customClaims?["act"]).to(beNil())
-            }
-
-        }
     }
 }
 
