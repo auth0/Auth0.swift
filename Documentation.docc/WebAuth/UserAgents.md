@@ -48,7 +48,7 @@ Auth0
 - The session cookie will not be persisted. As soon as the `ASWebAuthenticationSession` window closes, the cookie will be gone. This is akin to using a desktop browser in incognito mode.
 - Any features that rely on the persistence of cookies –like SSO, or "Remember this device"– **will not work**.
 - No consent alert box will be shown, as the session cookie won't be placed in a shared cookie jar.
-- There will be no need to call `clearSession()`. What `clearSession()` does is remove the persisted session cookie. Now there will be no session cookie to remove, so it won't do anything. To log the user out, just delete any stored credentials –for example, by calling the `clear()` method of the Credentials Manager.
+- There will be no need to call `logout()`. What `logout()` does is remove the persisted session cookie. Now there will be no session cookie to remove, so it won't do anything. To log the user out, just delete any stored credentials –for example, by calling the `clear()` method of the Credentials Manager.
 
 #### You want this if...
 

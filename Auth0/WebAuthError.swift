@@ -8,12 +8,13 @@ public struct WebAuthError: Auth0Error, Sendable {
         case webViewFailure(String)
         case noBundleIdentifier
         case transactionActiveAlready
-        case invalidInvitationURL(String)
         case userCancelled
+        case authenticationFailed
+        case codeExchangeFailed
         case noAuthorizationCode([String: String])
         case invalidRequestUri(String)
-        case pkceNotAllowed
         case idTokenValidationFailed
+        case credentialsManagerError
         case other
         case unknown(String)
     }
@@ -46,31 +47,35 @@ public struct WebAuthError: Auth0Error, Sendable {
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let transactionActiveAlready: WebAuthError = .init(code: .transactionActiveAlready)
 
-    /// The invitation URL is missing the `invitation` and/or the `organization` query parameters.
-    /// This error does not include a ``Auth0Error/cause-9wuyi``.
-    public static let invalidInvitationURL: WebAuthError = .init(code: .invalidInvitationURL(""))
-
     /// The user cancelled the Web Auth operation.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let userCancelled: WebAuthError = .init(code: .userCancelled)
 
-    /// The `request_uri` provided is invalid. It must start with `urn:ietf:params:oauth:request_uri:`.
-    /// This error does not include a ``Auth0Error/cause-9wuyi``.
-    public static let invalidRequestUri: WebAuthError = .init(code: .invalidRequestUri(""))
+    /// The callback URL contains an error returned by the authorization server.
+    /// This occurs when authentication fails on the server side.
+    /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let authenticationFailed: WebAuthError = .init(code: .authenticationFailed)
 
-    /// The Auth0 application does not support authentication with Proof Key for Code Exchange (PKCE).
-    /// PKCE support needs to be enabled in the settings page of the [Auth0 application](https://manage.auth0.com/#/applications/),
-    /// by setting the **Application Type** to 'Native'.
-    /// This error does not include a ``Auth0Error/cause-9wuyi``.
-    public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
+    /// The authorization code exchange request failed.
+    /// This occurs when the SDK cannot exchange the authorization code for tokens.
+    /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let codeExchangeFailed: WebAuthError = .init(code: .codeExchangeFailed)
 
     /// The callback URL is missing the `code` query parameter.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let noAuthorizationCode: WebAuthError = .init(code: .noAuthorizationCode([:]))
 
+    /// The `request_uri` provided is invalid. It must start with `urn:ietf:params:oauth:request_uri:`.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
+    public static let invalidRequestUri: WebAuthError = .init(code: .invalidRequestUri(""))
+
     /// The ID token validation performed after authentication failed.
     /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
+
+    /// The credentials manager failed to store or clear credentials.
+    /// The underlying ``CredentialsManagerError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let credentialsManagerError: WebAuthError = .init(code: .credentialsManagerError)
 
     /// An unexpected error occurred, and an `Error` value is available.
     /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
@@ -93,17 +98,15 @@ public extension WebAuthError {
             + " or it could not be used to build a valid URL."
         case .transactionActiveAlready: return "Failed to start this transaction, as there is an active transaction at the"
             + " moment."
-        case .invalidInvitationURL(let url): return "The invitation URL (\(url)) is missing the 'invitation' and/or"
-            + " the 'organization' query parameters."
         case .userCancelled: return "The user cancelled the Web Auth operation."
-        case .invalidRequestUri(let uri): return "The request_uri '\(uri)' is invalid."
-            + " It must start with 'urn:ietf:params:oauth:request_uri:'."
-        case .pkceNotAllowed: return "Unable to perform authentication with PKCE."
-            + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
-            + " 'Application Type' to 'Native'."
+        case .authenticationFailed: return "The authentication request failed."
+        case .codeExchangeFailed: return "The authorization code exchange failed."
         case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
             + " query parameters (\(values))."
+        case .invalidRequestUri(let uri): return "The request_uri '\(uri)' is invalid."
+            + " It must start with 'urn:ietf:params:oauth:request_uri:'."
         case .idTokenValidationFailed: return "The ID token validation performed after authentication failed."
+        case .credentialsManagerError: return "The credentials manager failed to store or clear credentials."
         case .other: return "An unexpected error occurred."
         case .unknown(let message): return message
         }

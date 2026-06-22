@@ -1,7 +1,7 @@
 import Foundation
 
 /// Generates and sets the `Auth0-Client` header.
-public struct Telemetry: Sendable {
+public struct Auth0ClientInfo: Sendable {
 
     static let NameKey = "name"
     static let VersionKey = "version"
@@ -17,21 +17,21 @@ public struct Telemetry: Sendable {
         return self.enabled ? self.info : nil
     }
 
-    /// Initializer that generates a base64url-encoded value with telemetry data.
+    /// Initializer that generates a base64url-encoded value with client info data.
     public init() {
-        self.info = Telemetry.generateValue()
+        self.info = Auth0ClientInfo.generateValue()
     }
 
     mutating func wrapped(inLibrary name: String, version: String) {
-        let info = Telemetry.versionInformation()
-        var env = Telemetry.generateEnviroment()
-        env[Telemetry.WrappedVersion] = info[Telemetry.VersionKey] as? String
+        let info = Auth0ClientInfo.versionInformation()
+        var env = Auth0ClientInfo.generateEnviroment()
+        env[Auth0ClientInfo.WrappedVersion] = info[Auth0ClientInfo.VersionKey] as? String
         let wrapped: [String: Any] = [
-            Telemetry.NameKey: name,
-            Telemetry.VersionKey: version,
-            Telemetry.EnvironmentKey: env
+            Auth0ClientInfo.NameKey: name,
+            Auth0ClientInfo.VersionKey: version,
+            Auth0ClientInfo.EnvironmentKey: env
         ]
-        self.info = Telemetry.generateValue(fromInfo: wrapped)
+        self.info = Auth0ClientInfo.generateValue(fromInfo: wrapped)
     }
 
     func addTelemetryHeader(request: NSMutableURLRequest) {
@@ -52,22 +52,22 @@ public struct Telemetry: Sendable {
 
     static func versionInformation() -> [String: Any] {
         let dict: [String: Any] = [
-            Telemetry.NameKey: Telemetry.LibraryName,
-            Telemetry.VersionKey: version,
-            Telemetry.EnvironmentKey: Telemetry.generateEnviroment()
+            Auth0ClientInfo.NameKey: Auth0ClientInfo.LibraryName,
+            Auth0ClientInfo.VersionKey: version,
+            Auth0ClientInfo.EnvironmentKey: Auth0ClientInfo.generateEnviroment()
         ]
         return dict
     }
 
     static func generateEnviroment() -> [String: String] {
-        let platform = Telemetry.osInfo()
-        let env = [ "swift": Telemetry.swiftVersion(),
+        let platform = Auth0ClientInfo.osInfo()
+        let env = [ "swift": Auth0ClientInfo.swiftVersion(),
                     platform.0: platform.1
         ]
         return env
     }
 
-    static func generateValue(fromInfo info: [String: Any] = Telemetry.versionInformation()) -> String? {
+    static func generateValue(fromInfo info: [String: Any] = Auth0ClientInfo.versionInformation()) -> String? {
         let data = try? JSONSerialization.data(withJSONObject: info, options: [])
         return data?.a0_encodeBase64URLSafe()
     }
@@ -100,8 +100,8 @@ public struct Telemetry: Sendable {
 /// A type that can send the `Auth0-Client` header on every request to Auth0.
 public protocol Trackable {
 
-    /// The ``Telemetry`` instance.
-    var telemetry: Telemetry { get set }
+    /// The ``Auth0ClientInfo`` instance.
+    var auth0ClientInfo: Auth0ClientInfo { get set }
 
 }
 
@@ -111,10 +111,10 @@ public extension Trackable {
      Turn on/off sending the `Auth0-Client` header on every request to Auth0.
      By default we collect our libraries and SDKs versions to help us evaluate usage.
      
-     - Parameter enabled: Flag to turn telemetry on/off.
+     - Parameter enabled: Flag to turn the `Auth0-Client` header on/off.
      */
     mutating func tracking(enabled: Bool) {
-        self.telemetry.enabled = enabled
+        self.auth0ClientInfo.enabled = enabled
     }
 
     /**
@@ -124,7 +124,7 @@ public extension Trackable {
      - Parameter version: Version of library or framework.
      */
     mutating func using(inLibrary name: String, version: String) {
-        self.telemetry.wrapped(inLibrary: name, version: version)
+        self.auth0ClientInfo.wrapped(inLibrary: name, version: version)
     }
 
 }

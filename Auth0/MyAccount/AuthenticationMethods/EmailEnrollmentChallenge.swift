@@ -1,5 +1,5 @@
 /// A Email enrollment challenge.
-public struct EmailEnrollmentChallenge {
+public struct EmailEnrollmentChallenge: Sendable {
 
     /// The unique identifier for the authentication method.
     public let authenticationId: String

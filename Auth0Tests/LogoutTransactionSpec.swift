@@ -4,13 +4,13 @@ import Nimble
 
 @testable import Auth0
 
-class ClearSessionTransactionSpec: QuickSpec {
+class LogoutTransactionSpec: QuickSpec {
 
     override class func spec() {
-        var transaction: ClearSessionTransaction!
+        var transaction: LogoutTransaction!
 
         beforeEach {
-            transaction = ClearSessionTransaction(userAgent: SpyUserAgent())
+            transaction = LogoutTransaction(userAgent: SpyUserAgent())
         }
 
         describe("code exchange") {

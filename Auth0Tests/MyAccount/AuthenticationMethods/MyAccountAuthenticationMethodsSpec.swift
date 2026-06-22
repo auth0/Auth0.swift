@@ -51,14 +51,14 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 expect(authMethods.session).to(be(session))
             }
 
-            it("should init with token, url, and telemetry") {
+            it("should init with token, url, and auth0ClientInfo") {
                 let telemetryInfo = "info"
-                var telemetry = Telemetry()
-                telemetry.info = telemetryInfo
+                var auth0ClientInfo = Auth0ClientInfo()
+                auth0ClientInfo.info = telemetryInfo
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
                                                                       url: DomainURL,
-                                                                      telemetry: telemetry)
-                expect(authMethods.telemetry.info) == telemetryInfo
+                                                                      auth0ClientInfo: auth0ClientInfo)
+                expect(authMethods.auth0ClientInfo.info) == telemetryInfo
             }
 
             it("should init with dpop") {
@@ -88,7 +88,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
                 let request = authMethods.getAuthenticationMethods(type: nil)
 
-                expect(request.headers["Authorization"]) == "Bearer \(AccessToken)"
+                expect((request as? Request<[AuthenticationMethod], MyAccountError>)?.headers["Authorization"]) == "Bearer \(AccessToken)"
             }
 
             it("should use DPoP authorization header when DPoP is enabled") {
@@ -96,7 +96,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                                                                       url: DomainURL).useDPoP()
                 let request = authMethods.getAuthenticationMethods(type: nil)
 
-                expect(request.headers["Authorization"]) == "DPoP \(AccessToken)"
+                expect((request as? Request<[AuthenticationMethod], MyAccountError>)?.headers["Authorization"]) == "DPoP \(AccessToken)"
             }
 
             it("should pass DPoP to GET requests") {
@@ -104,7 +104,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                                                                       url: DomainURL).useDPoP()
                 let request = authMethods.getAuthenticationMethods(type: nil)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? Request<[AuthenticationMethod], MyAccountError>)?.dpop).toNot(beNil())
             }
 
             it("should pass DPoP to POST requests") {
@@ -112,7 +112,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                                                                       url: DomainURL).useDPoP()
                 let request = authMethods.enrollRecoveryCode()
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? Request<RecoveryCodeEnrollmentChallenge, MyAccountError>)?.dpop).toNot(beNil())
             }
 
             it("should pass DPoP to DELETE requests") {
@@ -120,28 +120,28 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                                                                       url: DomainURL).useDPoP()
                 let request = authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? Request<Void, MyAccountError>)?.dpop).toNot(beNil())
             }
 
             it("should not pass DPoP to GET requests when not enabled") {
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
                 let request = authMethods.getAuthenticationMethods(type: nil)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<[AuthenticationMethod], MyAccountError>)?.dpop).to(beNil())
             }
 
             it("should not pass DPoP to POST requests when not enabled") {
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
                 let request = authMethods.enrollRecoveryCode()
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<RecoveryCodeEnrollmentChallenge, MyAccountError>)?.dpop).to(beNil())
             }
 
             it("should not pass DPoP to DELETE requests when not enabled") {
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
                 let request = authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Void, MyAccountError>)?.dpop).to(beNil())
             }
 
         }

@@ -4,43 +4,43 @@ import Nimble
 
 @testable import Auth0
 
-class TelemetrySpec: QuickSpec {
+class Auth0ClientInfoSpec: QuickSpec {
 
     override class func spec() {
 
-        var telemetry: Telemetry!
+        var auth0ClientInfo: Auth0ClientInfo!
 
         beforeEach {
-            telemetry = Telemetry()
+            auth0ClientInfo = Auth0ClientInfo()
         }
 
         it("should be enabled by default") {
-            expect(telemetry.enabled) == true
+            expect(auth0ClientInfo.enabled) == true
         }
 
         it("should have a default value") {
-            expect(telemetry.value).toNot(beEmpty())
+            expect(auth0ClientInfo.value).toNot(beEmpty())
         }
 
         it("should have a valid base64 value") {
-            expect(telemetry.value).to(beURLSafeBase64())
+            expect(auth0ClientInfo.value).to(beURLSafeBase64())
         }
 
         it("should have nil value when disabled") {
-            telemetry.enabled = false
-            expect(telemetry.value).to(beNil())
+            auth0ClientInfo.enabled = false
+            expect(auth0ClientInfo.value).to(beNil())
         }
 
-        it("should have a valid base64 value after re-enabling telemetry") {
-            telemetry.enabled = false
-            telemetry.enabled = true
-            expect(telemetry.value).to(beURLSafeBase64())
+        it("should have a valid base64 value after re-enabling auth0ClientInfo") {
+            auth0ClientInfo.enabled = false
+            auth0ClientInfo.enabled = true
+            expect(auth0ClientInfo.value).to(beURLSafeBase64())
         }
 
         describe("versionInformation") {
 
             var subject: [String: Any] {
-                return Telemetry.versionInformation()
+                return Auth0ClientInfo.versionInformation()
             }
 
             it("should return lib name") {
@@ -68,19 +68,19 @@ class TelemetrySpec: QuickSpec {
 
         describe("wrapping") {
 
-            var telemetry = Telemetry()
-            let version = Telemetry.versionInformation()["version"]!
+            var auth0ClientInfo = Auth0ClientInfo()
+            let version = Auth0ClientInfo.versionInformation()["version"]!
 
             beforeEach {
-                telemetry.wrapped(inLibrary: "Lock.iOS", version: "1.0.0-alpha.4")
+                auth0ClientInfo.wrapped(inLibrary: "Lock.iOS", version: "1.0.0-alpha.4")
             }
 
             it("should have a valid base64 value") {
-                expect(telemetry.value).to(beURLSafeBase64())
+                expect(auth0ClientInfo.value).to(beURLSafeBase64())
             }
 
             it("should have correct info") {
-                let value = telemetry.value!
+                let value = auth0ClientInfo.value!
                     .replacingOccurrences(of: "-", with: "+")
                     .replacingOccurrences(of: "_", with: "/")
                 let paddedLength: Int
@@ -115,56 +115,56 @@ class TelemetrySpec: QuickSpec {
 
         }
 
-        describe("telemetry header") {
+        describe("auth0ClientInfo header") {
 
-            it("should set telemetry header") {
-                let telemetry = Telemetry()
+            it("should set auth0ClientInfo header") {
+                let auth0ClientInfo = Auth0ClientInfo()
                 let request = NSMutableURLRequest()
-                telemetry.addTelemetryHeader(request: request)
-                expect(request.value(forHTTPHeaderField: "Auth0-Client")) == telemetry.value
+                auth0ClientInfo.addTelemetryHeader(request: request)
+                expect(request.value(forHTTPHeaderField: "Auth0-Client")) == auth0ClientInfo.value
             }
 
-            it("should not set telemetry header when disabled") {
-                var telemetry = Telemetry()
+            it("should not set auth0ClientInfo header when disabled") {
+                var auth0ClientInfo = Auth0ClientInfo()
                 let request = NSMutableURLRequest()
-                telemetry.enabled = false
-                telemetry.addTelemetryHeader(request: request)
+                auth0ClientInfo.enabled = false
+                auth0ClientInfo.addTelemetryHeader(request: request)
                 expect(request.value(forHTTPHeaderField: "Auth0-Client")).to(beNil())
             }
 
         }
 
-        describe("telemetry query item") {
+        describe("auth0ClientInfo query item") {
 
-            var telemetry: Telemetry!
+            var auth0ClientInfo: Auth0ClientInfo!
 
             beforeEach {
-                telemetry = Telemetry()
+                auth0ClientInfo = Auth0ClientInfo()
             }
 
-            it("should set telemetry header") {
-                let items = telemetry.queryItemsWithTelemetry(queryItems: [])
-                expect(items.first) == URLQueryItem(name: "auth0Client", value: telemetry.value)
+            it("should set auth0ClientInfo header") {
+                let items = auth0ClientInfo.queryItemsWithTelemetry(queryItems: [])
+                expect(items.first) == URLQueryItem(name: "auth0Client", value: auth0ClientInfo.value)
             }
 
-            it("should not set telemetry header when disabled") {
-                telemetry.enabled = false
-                let items = telemetry.queryItemsWithTelemetry(queryItems: [])
+            it("should not set auth0ClientInfo header when disabled") {
+                auth0ClientInfo.enabled = false
+                let items = auth0ClientInfo.queryItemsWithTelemetry(queryItems: [])
                 expect(items).to(beEmpty())
             }
 
             it("should keep items already in list when adding item") {
                 let item = URLQueryItem(name: "key", value: "value")
-                let items = telemetry.queryItemsWithTelemetry(queryItems: [item])
-                expect(items).to(contain(URLQueryItem(name: "auth0Client", value: telemetry.value)))
+                let items = auth0ClientInfo.queryItemsWithTelemetry(queryItems: [item])
+                expect(items).to(contain(URLQueryItem(name: "auth0Client", value: auth0ClientInfo.value)))
                 expect(items).to(contain(item))
             }
 
-            it("should keep items already in list when skipping telemetry") {
-                telemetry.enabled = false
+            it("should keep items already in list when skipping auth0ClientInfo") {
+                auth0ClientInfo.enabled = false
                 let item = URLQueryItem(name: "key", value: "value")
-                let items = telemetry.queryItemsWithTelemetry(queryItems: [item])
-                expect(items).toNot(contain(URLQueryItem(name: "auth0Client", value: telemetry.value)))
+                let items = auth0ClientInfo.queryItemsWithTelemetry(queryItems: [item])
+                expect(items).toNot(contain(URLQueryItem(name: "auth0Client", value: auth0ClientInfo.value)))
                 expect(items).to(contain(item))
             }
 
@@ -172,26 +172,26 @@ class TelemetrySpec: QuickSpec {
 
         describe("trackable") {
             struct MockTrackable: Trackable {
-                var telemetry: Telemetry
+                var auth0ClientInfo: Auth0ClientInfo
             }
 
             var trackable: Trackable!
 
             beforeEach {
-                trackable = MockTrackable(telemetry: telemetry)
+                trackable = MockTrackable(auth0ClientInfo: auth0ClientInfo)
             }
 
-            it("should toggle telemetry") {
+            it("should toggle auth0ClientInfo") {
                 trackable.tracking(enabled: false)
-                expect(trackable.telemetry.enabled) == false
+                expect(trackable.auth0ClientInfo.enabled) == false
                 trackable.tracking(enabled: true)
-                expect(trackable.telemetry.enabled) == true
+                expect(trackable.auth0ClientInfo.enabled) == true
             }
 
             it("should mark it as used inside other library") {
-                let info = trackable.telemetry.info
+                let info = trackable.auth0ClientInfo.info
                 trackable.using(inLibrary: "Lock.swift", version: "2.0.0-alpha.0")
-                expect(trackable.telemetry.info) != info
+                expect(trackable.auth0ClientInfo.info) != info
             }
         }
 

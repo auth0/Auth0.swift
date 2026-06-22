@@ -7,23 +7,23 @@ import JWTDecode
 
 fileprivate let BasicProfileJWT = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHwxMjM0NTY3ODkiLCJuYW1lIjoic3VwcG9ydCIsIm5pY2tuYW1lIjoic3VwIiwicGljdHVyZSI6Imh0dHBzOi8vYXV0aDAuY29tL3BpY3R1cmUiLCJ1cGRhdGVkX2F0IjoiMTQ0MDAwNDY4MSJ9.TppFbhhG2or0Ygtig_7wvMWj5pj1nibZQKlhp6YA0NnEmAU5oj9KxkL9BGCAjIUQcImO3Suiur27qNRDvTY7yG61kUfVFYmcdCcYZ3tuS2glA2Ofwjv-gkgkORFaggqwT4jaZ19MViHtW71AjH-l8Q9HbbCfD3pCI-M-95oSs7sPssXw3vOMbC_iMm-0TPzwSs32rc2Rmpni3T-rjthb7ZjYxpm2RUPvlpUMev0nb_E3QbLG-ct8jWwvDAjZbTgCYBkw0pmp57T4VBQ8acTQGvOi1lryrJ6kK9O9a_h9Yxf1t4HhBhfMW6p7fXNLVMYo5su3NFqW1KMVgUW7jNzKwA"
 
-class UserInfoSpec: QuickSpec {
+class UserProfileSpec: QuickSpec {
     override class func spec() {
 
         describe("init from json") {
 
             it("should fail with no json") {
-                let userInfo = UserInfo(json: [:])
+                let userInfo = UserProfile(json: [:])
                 expect(userInfo).to(beNil())
             }
 
             it("should fail with no subject claim") {
-                let userInfo = UserInfo(json: ["name":Support])
+                let userInfo = UserProfile(json: ["name":Support])
                 expect(userInfo).to(beNil())
             }
 
             it("should only contain sub") {
-                let userInfo = UserInfo(json: ["sub": Sub])
+                let userInfo = UserProfile(json: ["sub": Sub])
                 expect(userInfo?.sub) == Sub
                 expect(userInfo?.name).to(beNil())
                 expect(userInfo?.givenName).to(beNil())
@@ -48,7 +48,7 @@ class UserInfoSpec: QuickSpec {
             }
 
             it("should build with basic profile") {
-                let userInfo = UserInfo(json: basicProfile())
+                let userInfo = UserProfile(json: basicProfile())
                 expect(userInfo?.sub) == Sub
                 expect(userInfo?.name) == Support
                 expect(userInfo?.nickname) == Nickname
@@ -67,7 +67,7 @@ class UserInfoSpec: QuickSpec {
                 ]
                 optional.forEach { key, value in info[key] = value }
                 
-                let userInfo = UserInfo(json: info)
+                let userInfo = UserProfile(json: info)
                 expect(userInfo?.sub) == Sub
                 expect(userInfo?.name) == Support
                 expect(userInfo?.nickname) == Nickname
@@ -87,19 +87,19 @@ class UserInfoSpec: QuickSpec {
                     "zoneinfo": ZoneEST
                 ]
                 optional.forEach { key, value in info[key] = value }
-                let userInfo = UserInfo(json: info)
+                let userInfo = UserProfile(json: info)
                 expect(userInfo?.locale?.identifier) == Locale(identifier: LocaleUS).identifier
                 expect(userInfo?.zoneinfo?.identifier) == TimeZone(identifier: ZoneEST)!.identifier
             }
 
             it("should build with ISO updated_at") {
-                let userInfo = UserInfo(json: basicProfile(updatedAt: UpdatedAt))
+                let userInfo = UserProfile(json: basicProfile(updatedAt: UpdatedAt))
                 expect(userInfo?.updatedAt?.timeIntervalSince1970) == UpdatedAtTimestamp
             }
 
             it("should build from jwt body") {
                 let jwt = try! decode(jwt: BasicProfileJWT)
-                let userInfo = UserInfo(json: jwt.body)
+                let userInfo = UserProfile(json: jwt.body)
                 expect(userInfo?.sub) == Sub
                 expect(userInfo?.name) == Support
                 expect(userInfo?.nickname) == Nickname
@@ -119,7 +119,7 @@ class UserInfoSpec: QuickSpec {
                     "user_active": true
                 ]
                 optional.forEach { key, value in info[key] = value }
-                let userInfo = UserInfo(json: info)
+                let userInfo = UserProfile(json: info)
                 expect(userInfo?.customClaims?.count) == 2
                 expect(userInfo?.customClaims?["sub"]).to(beNil())
             }
