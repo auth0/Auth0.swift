@@ -4137,6 +4137,8 @@ See the [API documentation](https://auth0.github.io/Auth0.swift/documentation/au
 
 ## Management API (Users) (iOS / macOS / tvOS / watchOS / visionOS)
 
+> **Deprecated in v2.18.0** — The Management API client (`Auth0.users(token:)`) is deprecated and will be removed in the next major version. For user profile management, expose API endpoints in your backend that call the Management API, then call those from your app.
+
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/users)**
 
 - [Retrieve user metadata](#retrieve-user-metadata)
