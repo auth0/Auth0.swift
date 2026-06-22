@@ -49,7 +49,7 @@
       });
   }
 
-  function buildSelect(versions, currentVersion, context) {
+  function buildSelect(versions, currentVersion) {
     var container = document.createElement("div");
     container.className = "nav-menu-setting version-container";
 
@@ -81,7 +81,7 @@
     }
 
     select.addEventListener("change", function () {
-      navigateToVersion(select.value, context, select);
+      navigateToVersion(select.value, select);
     });
 
     container.appendChild(select);
@@ -90,8 +90,11 @@
 
   // Navigate to the same doc path under the chosen version, HEAD-probing first
   // and falling back to that version's landing page when the path is absent.
-  function navigateToVersion(targetVersion, context, select) {
-    if (targetVersion === context.version) {
+  // The location context is recomputed here (not captured at build time) so
+  // that switching after client-side navigation resolves the current path.
+  function navigateToVersion(targetVersion, select) {
+    var context = parseLocation();
+    if (!context || targetVersion === context.version) {
       return;
     }
     var base = context.root + "/" + targetVersion + "/";
@@ -131,7 +134,7 @@
     if (!settings || document.getElementById(SELECTOR_ID)) {
       return Boolean(document.getElementById(SELECTOR_ID));
     }
-    var control = buildSelect(versions, context.version, context);
+    var control = buildSelect(versions, context.version);
     var languageToggle = settings.querySelector(".language-container");
     if (languageToggle) {
       settings.insertBefore(control, languageToggle);

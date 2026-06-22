@@ -24,6 +24,9 @@ final class SemVerTests: XCTestCase {
     func testRejectsMalformed() {
         XCTAssertNil(SemVer("1.2"))
         XCTAssertNil(SemVer("x.y.z"))
+        XCTAssertNil(SemVer("1.0.0-"))
+        XCTAssertNil(SemVer("1.0.0-alpha..1"))
+        XCTAssertNil(SemVer("01.2.3"))
     }
 
     func testStableOutranksPrerelease() {

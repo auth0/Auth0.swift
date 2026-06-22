@@ -35,9 +35,9 @@ struct SemVer: Comparable, Equatable, CustomStringConvertible {
         let coreAndPre = string.split(separator: "-", maxSplits: 1, omittingEmptySubsequences: false)
         let coreParts = coreAndPre[0].split(separator: ".", omittingEmptySubsequences: false)
         guard coreParts.count == 3,
-              let major = Int(coreParts[0]),
-              let minor = Int(coreParts[1]),
-              let patch = Int(coreParts[2]) else {
+              let major = SemVer.parseCoreIdentifier(coreParts[0]),
+              let minor = SemVer.parseCoreIdentifier(coreParts[1]),
+              let patch = SemVer.parseCoreIdentifier(coreParts[2]) else {
             return nil
         }
         self.major = major
@@ -45,11 +45,26 @@ struct SemVer: Comparable, Equatable, CustomStringConvertible {
         self.patch = patch
 
         if coreAndPre.count == 2 {
-            let identifiers = coreAndPre[1].split(separator: ".").map(String.init)
-            self.prerelease = identifiers.isEmpty ? nil : identifiers
+            let identifiers = coreAndPre[1]
+                .split(separator: ".", omittingEmptySubsequences: false)
+                .map(String.init)
+            // A hyphen with no/empty identifiers (e.g. "1.0.0-" or
+            // "1.0.0-alpha..1") is malformed per SemVer.
+            guard !identifiers.isEmpty, identifiers.allSatisfy({ !$0.isEmpty }) else {
+                return nil
+            }
+            self.prerelease = identifiers
         } else {
             self.prerelease = nil
         }
+    }
+
+    /// Parses a core (MAJOR/MINOR/PATCH) identifier: digits only, no leading
+    /// zeros (per SemVer), so `01` is rejected while `0` is accepted.
+    private static func parseCoreIdentifier(_ raw: Substring) -> Int? {
+        guard !raw.isEmpty, raw.allSatisfy(\.isNumber) else { return nil }
+        if raw.count > 1 && raw.first == "0" { return nil }
+        return Int(raw)
     }
 
     static func == (lhs: SemVer, rhs: SemVer) -> Bool {

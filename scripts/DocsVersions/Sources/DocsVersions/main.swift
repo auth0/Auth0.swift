@@ -42,7 +42,11 @@ let newBuild = URL(fileURLWithPath: newBuildPath, isDirectory: true)
 
 print("📦 Publishing documentation for v\(current)")
 
-try? fileManager.createDirectory(at: siteRoot, withIntermediateDirectories: true)
+do {
+    try fileManager.createDirectory(at: siteRoot, withIntermediateDirectories: true)
+} catch {
+    fail("Could not create site root directory at \(siteRoot.path): \(error)")
+}
 
 // MARK: 1. Overwrite the current version's folder
 
@@ -62,7 +66,10 @@ print("✅ Placed new build at \(versionFolderName)/")
 // MARK: 2. Inject the version-selector script into the new version's HTML
 
 let scriptTag = "<script defer src=\"/\(basePath)/version-selector.js\"></script>"
-let injectedCount = injectScript(scriptTag, intoHTMLUnder: versionFolder)
+let injectedCount = try injectScript(scriptTag, intoHTMLUnder: versionFolder)
+guard injectedCount > 0 else {
+    fail("No HTML files were updated with version-selector.js under \(versionFolder.path)")
+}
 print("🔧 Injected version selector into \(injectedCount) HTML file(s)")
 
 // MARK: 3. Apply retention policy and prune
@@ -125,19 +132,18 @@ func existingVersionFolders(in root: URL) -> [SemVer] {
 /// Injects `scriptTag` immediately before `</head>` in every `.html` file under
 /// `folder`. Skips files that already contain the tag. Returns the count modified.
 @discardableResult
-func injectScript(_ scriptTag: String, intoHTMLUnder folder: URL) -> Int {
+func injectScript(_ scriptTag: String, intoHTMLUnder folder: URL) throws -> Int {
     guard let enumerator = fileManager.enumerator(at: folder, includingPropertiesForKeys: nil) else {
         return 0
     }
     var count = 0
     for case let url as URL in enumerator where url.pathExtension == "html" {
-        guard var html = try? String(contentsOf: url, encoding: .utf8) else { continue }
+        var html = try String(contentsOf: url, encoding: .utf8)
         if html.contains(scriptTag) { continue }
         guard let range = html.range(of: "</head>") else { continue }
         html.replaceSubrange(range, with: scriptTag + "</head>")
-        if (try? html.write(to: url, atomically: true, encoding: .utf8)) != nil {
-            count += 1
-        }
+        try html.write(to: url, atomically: true, encoding: .utf8)
+        count += 1
     }
     return count
 }

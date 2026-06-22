@@ -6,6 +6,12 @@ on:
       - closed
   workflow_dispatch:
 
+# Serialize releases so a manual dispatch and a merged-PR trigger cannot race
+# between the tag-existence check and the publish steps.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -26,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
 
@@ -40,16 +46,21 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          version=$(awk -F'"' '/let version/ {print $2}' Auth0/Version.swift)
+          version=$(awk -F'"' '/^[[:space:]]*let[[:space:]]+version[[:space:]]*=/ {print $2; exit}' Auth0/Version.swift)
+          if [[ -z "$version" ]]; then
+            echo "::error::Could not read version from Auth0/Version.swift"
+            exit 1
+          fi
           echo "version=$version" >> $GITHUB_OUTPUT
 
-      # Detect a pre-release (beta/alpha) version so we can tag the GitHub
-      # Release accordingly. CocoaPods treats semver pre-release versions as
-      # pre-releases automatically, so no special pod tag is required.
+      # Detect a pre-release version so we can tag the GitHub Release
+      # accordingly. Any SemVer pre-release uses a hyphen separator (e.g.
+      # 1.0.0-beta.1, 2.0.0-rc.1). CocoaPods treats semver pre-release versions
+      # as pre-releases automatically, so no special pod tag is required.
       - name: Get prerelease flag
         id: get_prerelease
         run: |
-          if [[ "${VERSION}" == *"beta"* || "${VERSION}" == *"alpha"* ]]; then
+          if [[ "${VERSION}" == *-* ]]; then
             echo "prerelease=true" >> $GITHUB_OUTPUT
           else
             echo "prerelease=false" >> $GITHUB_OUTPUT
