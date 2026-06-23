@@ -272,6 +272,7 @@ Keep a Changelog format. Update `CHANGELOG.md` for every user-facing change unde
 - Follow the existing error hierarchy — use or extend typed error structs (`AuthenticationError`, `WebAuthError`, etc.).
 - Run `swiftlint lint` and resolve all warnings before submitting.
 - Use `StubURLProtocol` / `NetworkStub` for all network interactions in tests.
+- Update `README.md` and `EXAMPLES.md` in the same PR when changing the public API, configuration options, or supported integration patterns.
 
 ### ⚠️ Ask First
 
@@ -369,3 +370,39 @@ Keep a Changelog format. Update `CHANGELOG.md` for every user-facing change unde
 - [Contributing Guide](https://github.com/auth0/Auth0.swift/blob/master/CONTRIBUTING.md)
 - [SimpleKeychain](https://github.com/auth0/SimpleKeychain)
 - [JWTDecode.swift](https://github.com/auth0/JWTDecode.swift)
+
+---
+
+## Docs Update Rules
+
+> Treat documentation as a first-class deliverable. A PR that adds or changes public API, configuration, or integration patterns is **not complete** until the relevant docs are updated in the same PR.
+
+### Tracked Docs
+
+| File | Covers | Status |
+|------|--------|--------|
+| `README.md` | Installation (SPM/CocoaPods/Carthage), quick-start, configuration (`Auth0.plist`), callback URL setup, Web Auth setup | ✅ current |
+| `EXAMPLES.md` | Web Auth, Credentials Manager, Authentication API, MFA, My Account API, Management API, DPoP, Logging — runnable code samples per feature | ✅ current |
+
+### When You Change Code, Update These Docs
+
+| When this changes | Update |
+|-------------------|--------|
+| Public API added to `Authentication`, `WebAuth`, `CredentialsManager`, `MFAClient`, or `MyAccount` protocols | `EXAMPLES.md` — add a usage sample under the relevant section |
+| Public API removed or renamed in any protocol | `README.md` + `EXAMPLES.md` — remove or update every reference to the old symbol |
+| Installation requirements change (new platform minimum, new Xcode requirement, new package version) | `README.md` — Requirements and Installation sections; also update the `~> X.Y` version pin in all three package manager snippets |
+| `Auth0.plist` keys or SDK initialisation options change | `README.md` — Configure the SDK section |
+| Callback / logout URL setup changes | `README.md` — Configure Web Auth section |
+| New integration pattern supported (e.g., new grant type, new provider, new EA feature) | `EXAMPLES.md` — add a new section with a runnable example |
+| DPoP behaviour changes (key generation, nonce handling, logout) | `EXAMPLES.md` — DPoP section |
+| My Account API methods added, removed, or promoted from EA to GA | `EXAMPLES.md` — My Account API section; update EA callout if promoted |
+| Biometric auth options or `CredentialsManager` init signature changes | `EXAMPLES.md` — Credentials Manager / Biometric authentication section |
+
+### Drift Status (as of last scan)
+
+Both tracked docs are current against the public API surface at v2.22.0. No stale symbols detected.
+
+- `README.md` — installation snippets reference `~> 2.22` ✅, platform requirements match `Package.swift` ✅
+- `EXAMPLES.md` — `updateAuthenticationMethod` (added 2.21.0) ✅, `getAuthenticationMethods(type:)` filter ✅, DPoP on My Account API ✅
+
+> If you are adding a feature and the drift status above is out of date, run a manual check: search `EXAMPLES.md` for every new public symbol and confirm a usage example exists.
