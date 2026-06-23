@@ -530,6 +530,65 @@ struct Auth0Authentication: Authentication {
                                   parameters: parameters)
     }
 
+    // MARK: - Passwordless OTP (Database Connections)
+
+    func challenge(email: String, connection: String, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError> {
+        let url = URL(string: "otp/challenge", relativeTo: self.url)!
+        let payload: [String: Any] = [
+            "email": email,
+            "connection": connection,
+            "allow_signup": allowSignup,
+            "client_id": self.clientId
+        ]
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: authenticationDecodable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
+    }
+
+    func challenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError> {
+        let url = URL(string: "otp/challenge", relativeTo: self.url)!
+        let payload: [String: Any] = [
+            "phone_number": phoneNumber,
+            "connection": connection,
+            "delivery_method": deliveryMethod.rawValue,
+            "allow_signup": allowSignup,
+            "client_id": self.clientId
+        ]
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: authenticationDecodable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
+    }
+
+    func login(authSession: String, otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+        let url = URL(string: "oauth/token", relativeTo: self.url)!
+        var payload: [String: Any] = [
+            "grant_type": "http://auth0.com/oauth/grant-type/passwordless/otp",
+            "auth_session": authSession,
+            "otp": otp,
+            "client_id": self.clientId
+        ]
+        payload["audience"] = audience
+        payload["scope"] = includeRequiredScope(in: scope)
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: authenticationDecodable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
+    }
+
 }
 
 // MARK: - Private Methods
