@@ -1921,7 +1921,8 @@ class AuthenticationSpec: QuickSpec {
                         $0.hasAtLeast(["phone_number": Phone,
                                        "connection": ConnectionName,
                                        "client_id": ClientId,
-                                       "delivery_method": "text"])
+                                       "delivery_method": "text"]) &&
+                        ($0.payload?["allow_signup"] as? Bool) == false
                     }, response: passwordlessChallengeResponse(authSession: AuthSession))
                     waitUntil(timeout: Timeout) { done in
                         auth.challenge(phoneNumber: Phone, connection: ConnectionName).start { result in
@@ -1994,7 +1995,8 @@ class AuthenticationSpec: QuickSpec {
                         $0.isToken(Domain) &&
                         $0.hasAtLeast(["auth_session": AuthSession,
                                        "otp": OTP,
-                                       "audience": Audience])
+                                       "audience": Audience,
+                                       "scope": Scope])
                     }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(authSession: AuthSession, otp: OTP, audience: Audience, scope: Scope).start { result in
