@@ -1207,7 +1207,8 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - Parameters:
        - email:       Email address of the user to send the OTP to.
-       - connection:  Name of the database connection.
+       - connection:  Name of the database connection. Defaults to `"Username-Password-Authentication"`, which is the
+                      built-in database connection created for every Auth0 tenant.
        - allowSignup: Whether to allow user signup if the email is not registered. Defaults to `false`.
      - Returns: A request that will yield a ``PasswordlessChallenge`` containing the `authSession` token.
 
@@ -1247,7 +1248,8 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - Parameters:
        - phoneNumber:     Phone number of the user (E.164 format, e.g. `+12025550135`).
-       - connection:      Name of the database connection.
+       - connection:      Name of the database connection. Defaults to `"Username-Password-Authentication"`, which is the
+                          built-in database connection created for every Auth0 tenant.
        - deliveryMethod:  How the OTP should be delivered. Defaults to ``DeliveryMethod/text``.
        - allowSignup:     Whether to allow user signup if the phone number is not registered. Defaults to `false`.
      - Returns: A request that will yield a ``PasswordlessChallenge`` containing the `authSession` token.
@@ -1429,11 +1431,11 @@ public extension Authentication {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
     }
 
-    func challenge(email: String, connection: String, allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
+    func challenge(email: String, connection: String = "Username-Password-Authentication", allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
         return self.challenge(email: email, connection: connection, allowSignup: allowSignup)
     }
 
-    func challenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod = .text, allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
+    func challenge(phoneNumber: String, connection: String = "Username-Password-Authentication", deliveryMethod: DeliveryMethod = .text, allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
         return self.challenge(phoneNumber: phoneNumber, connection: connection, deliveryMethod: deliveryMethod, allowSignup: allowSignup)
     }
 
