@@ -1836,7 +1836,7 @@ class AuthenticationSpec: QuickSpec {
                         ($0.payload?["allow_signup"] as? Bool) == false
                     }, response: passwordlessChallengeResponse(authSession: AuthSession))
                     waitUntil(timeout: Timeout) { done in
-                        auth.challenge(email: SupportAtAuth0, connection: ConnectionName).start { result in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1852,7 +1852,7 @@ class AuthenticationSpec: QuickSpec {
                         ($0.payload?["allow_signup"] as? Bool) == true
                     }, response: passwordlessChallengeResponse(authSession: AuthSession))
                     waitUntil(timeout: Timeout) { done in
-                        auth.challenge(email: SupportAtAuth0, connection: ConnectionName, allowSignup: true).start { result in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName, allowSignup: true).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1863,7 +1863,7 @@ class AuthenticationSpec: QuickSpec {
                     NetworkStub.addStub(condition: { $0.isOTPChallenge(Domain) },
                                         response: passwordlessChallengeResponse(authSession: AuthSession))
                     waitUntil(timeout: Timeout) { done in
-                        auth.challenge(email: SupportAtAuth0, connection: ConnectionName).start { result in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName).start { result in
                             if case .success(let challenge) = result {
                                 expect(challenge.authSession).to(equal(AuthSession))
                             } else {
@@ -1878,7 +1878,7 @@ class AuthenticationSpec: QuickSpec {
                     NetworkStub.addStub(condition: { $0.isOTPChallenge(Domain) },
                                         response: authFailure(error: "invalid_connection", description: "Unknown connection"))
                     waitUntil(timeout: Timeout) { done in
-                        auth.challenge(email: SupportAtAuth0, connection: ConnectionName).start { result in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName).start { result in
                             expect(result).to(haveAuthenticationError(code: "invalid_connection", description: "Unknown connection"))
                             done()
                         }
@@ -1887,12 +1887,12 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should use DPoP when it is enabled") {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
-                    let request = auth.challenge(email: SupportAtAuth0, connection: ConnectionName)
+                    let request = auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName)
                     expect(request.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
-                    let request = auth.challenge(email: SupportAtAuth0, connection: ConnectionName)
+                    let request = auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName)
                     expect(request.dpop).to(beNil())
                 }
 
@@ -1904,7 +1904,7 @@ class AuthenticationSpec: QuickSpec {
                         return passwordlessChallengeResponse(authSession: AuthSession)(request)
                     })
                     waitUntil(timeout: Timeout) { done in
-                        auth.challenge(email: SupportAtAuth0, connection: ConnectionName).start { _ in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName).start { _ in
                             expect(capturedHeaders["Auth0-Client"]).toNot(beNil())
                             done()
                         }
@@ -1925,7 +1925,7 @@ class AuthenticationSpec: QuickSpec {
                         ($0.payload?["allow_signup"] as? Bool) == false
                     }, response: passwordlessChallengeResponse(authSession: AuthSession))
                     waitUntil(timeout: Timeout) { done in
-                        auth.challenge(phoneNumber: Phone, connection: ConnectionName).start { result in
+                        auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1941,7 +1941,7 @@ class AuthenticationSpec: QuickSpec {
                                        "delivery_method": "voice"])
                     }, response: passwordlessChallengeResponse(authSession: AuthSession))
                     waitUntil(timeout: Timeout) { done in
-                        auth.challenge(phoneNumber: Phone, connection: ConnectionName, deliveryMethod: .voice).start { result in
+                        auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName, deliveryMethod: .voice).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1952,7 +1952,7 @@ class AuthenticationSpec: QuickSpec {
                     NetworkStub.addStub(condition: { $0.isOTPChallenge(Domain) },
                                         response: authFailure(error: "invalid_request", description: "Missing phone_number"))
                     waitUntil(timeout: Timeout) { done in
-                        auth.challenge(phoneNumber: Phone, connection: ConnectionName).start { result in
+                        auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName).start { result in
                             expect(result).to(haveAuthenticationError(code: "invalid_request", description: "Missing phone_number"))
                             done()
                         }
@@ -1961,12 +1961,12 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should use DPoP when it is enabled") {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
-                    let request = auth.challenge(phoneNumber: Phone, connection: ConnectionName)
+                    let request = auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName)
                     expect(request.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
-                    let request = auth.challenge(phoneNumber: Phone, connection: ConnectionName)
+                    let request = auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName)
                     expect(request.dpop).to(beNil())
                 }
 
@@ -1983,7 +1983,7 @@ class AuthenticationSpec: QuickSpec {
                                        "client_id": ClientId])
                     }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(authSession: AuthSession, otp: OTP).start { result in
+                        auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession)).start { result in
                             expect(result).to(haveCredentials(AccessToken, IdToken))
                             done()
                         }
@@ -1999,7 +1999,7 @@ class AuthenticationSpec: QuickSpec {
                                        "scope": Scope])
                     }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(authSession: AuthSession, otp: OTP, audience: Audience, scope: Scope).start { result in
+                        auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession), audience: Audience, scope: Scope).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -2011,7 +2011,7 @@ class AuthenticationSpec: QuickSpec {
                         $0.isToken(Domain) && $0.hasNoneOf(["audience"])
                     }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(authSession: AuthSession, otp: OTP).start { result in
+                        auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession)).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -2022,7 +2022,7 @@ class AuthenticationSpec: QuickSpec {
                     NetworkStub.addStub(condition: { $0.isToken(Domain) },
                                         response: authFailure(error: "invalid_grant", description: "Invalid OTP"))
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(authSession: AuthSession, otp: OTP).start { result in
+                        auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession)).start { result in
                             expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid OTP"))
                             done()
                         }
@@ -2031,12 +2031,12 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should use DPoP when it is enabled") {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
-                    let request = auth.login(authSession: AuthSession, otp: OTP)
+                    let request = auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession))
                     expect(request.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
-                    let request = auth.login(authSession: AuthSession, otp: OTP)
+                    let request = auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession))
                     expect(request.dpop).to(beNil())
                 }
 

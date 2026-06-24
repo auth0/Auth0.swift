@@ -532,7 +532,7 @@ struct Auth0Authentication: Authentication {
 
     // MARK: - Passwordless OTP (Database Connections)
 
-    func challenge(email: String, connection: String, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError> {
+    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError> {
         let url = URL(string: "otp/challenge", relativeTo: self.url)!
         let payload: [String: Any] = [
             "email": email,
@@ -550,7 +550,7 @@ struct Auth0Authentication: Authentication {
                        dpop: self.dpop)
     }
 
-    func challenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError> {
+    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError> {
         let url = URL(string: "otp/challenge", relativeTo: self.url)!
         let payload: [String: Any] = [
             "phone_number": phoneNumber,
@@ -569,11 +569,11 @@ struct Auth0Authentication: Authentication {
                        dpop: self.dpop)
     }
 
-    func login(authSession: String, otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "grant_type": "http://auth0.com/oauth/grant-type/passwordless/otp",
-            "auth_session": authSession,
+            "auth_session": challenge.authSession,
             "otp": otp,
             "client_id": self.clientId
         ]

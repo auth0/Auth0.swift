@@ -1193,11 +1193,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      ```swift
      Auth0
          .authentication()
-         .challenge(email: "support@auth0.com", connection: "my-db-connection")
+         .passwordlessChallenge(email: "support@auth0.com", connection: "my-db-connection")
          .start { result in
              switch result {
              case .success(let challenge):
-                 // Pass challenge.authSession and the user-entered OTP to login(authSession:otp:)
+                 // Pass the challenge and the user-entered OTP to login(otp:challenge:)
                  print("Challenge issued")
              case .failure(let error):
                  print("Failed with: \(error)")
@@ -1214,10 +1214,10 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      ## See Also
 
-     - ``login(authSession:otp:audience:scope:)``
+     - ``login(otp:challenge:audience:scope:)``
      - ``PasswordlessChallenge``
      */
-    func challenge(email: String, connection: String, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError>
+    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError>
 
     /**
      Requests a one-time password (OTP) for a database connection user identified by phone number.
@@ -1234,11 +1234,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      ```swift
      Auth0
          .authentication()
-         .challenge(phoneNumber: "+12025550135", connection: "my-db-connection")
+         .passwordlessChallenge(phoneNumber: "+12025550135", connection: "my-db-connection")
          .start { result in
              switch result {
              case .success(let challenge):
-                 // Pass challenge.authSession and the user-entered OTP to login(authSession:otp:)
+                 // Pass the challenge and the user-entered OTP to login(otp:challenge:)
                  print("Challenge issued")
              case .failure(let error):
                  print("Failed with: \(error)")
@@ -1256,11 +1256,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      ## See Also
 
-     - ``login(authSession:otp:audience:scope:)``
+     - ``login(otp:challenge:audience:scope:)``
      - ``PasswordlessChallenge``
      - ``DeliveryMethod``
      */
-    func challenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError>
+    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError>
 
     /**
      Exchanges an `authSession` token and OTP code for user credentials. This is the second and final step
@@ -1277,7 +1277,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      ```swift
      Auth0
          .authentication()
-         .login(authSession: challenge.authSession, otp: "123456")
+         .login(otp: "123456", challenge: challenge)
          .start { result in
              switch result {
              case .success(let credentials):
@@ -1289,9 +1289,9 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      ```
 
      - Parameters:
-       - authSession: The opaque session token returned by ``challenge(email:connection:allowSignup:)``
-                      or ``challenge(phoneNumber:connection:deliveryMethod:allowSignup:)``.
        - otp:         The one-time password entered by the user.
+       - challenge:   The ``PasswordlessChallenge`` returned by ``passwordlessChallenge(email:connection:allowSignup:)``
+                      or ``passwordlessChallenge(phoneNumber:connection:deliveryMethod:allowSignup:)``.
        - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
        - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
@@ -1300,11 +1300,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      ## See Also
 
-     - ``challenge(email:connection:allowSignup:)``
-     - ``challenge(phoneNumber:connection:deliveryMethod:allowSignup:)``
+     - ``passwordlessChallenge(email:connection:allowSignup:)``
+     - ``passwordlessChallenge(phoneNumber:connection:deliveryMethod:allowSignup:)``
      - ``PasswordlessChallenge``
      */
-    func login(authSession: String, otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 }
 
 public extension Authentication {
@@ -1434,21 +1434,21 @@ public extension Authentication {
     /// Requests a passwordless OTP challenge for a database connection user identified by email address.
     ///
     /// Defaults `connection` to `"Username-Password-Authentication"`, the built-in database connection on every Auth0 tenant.
-    /// For full parameter documentation see ``challenge(email:connection:allowSignup:)``.
-    func challenge(email: String, connection: String = "Username-Password-Authentication", allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
-        return self.challenge(email: email, connection: connection, allowSignup: allowSignup)
+    /// For full parameter documentation see ``passwordlessChallenge(email:connection:allowSignup:)``.
+    func passwordlessChallenge(email: String, connection: String = "Username-Password-Authentication", allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
+        return self.passwordlessChallenge(email: email, connection: connection, allowSignup: allowSignup)
     }
 
     /// Requests a passwordless OTP challenge for a database connection user identified by phone number.
     ///
     /// Defaults `connection` to `"Username-Password-Authentication"` and `deliveryMethod` to ``DeliveryMethod/text``.
-    /// For full parameter documentation see ``challenge(phoneNumber:connection:deliveryMethod:allowSignup:)``.
-    func challenge(phoneNumber: String, connection: String = "Username-Password-Authentication", deliveryMethod: DeliveryMethod = .text, allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
-        return self.challenge(phoneNumber: phoneNumber, connection: connection, deliveryMethod: deliveryMethod, allowSignup: allowSignup)
+    /// For full parameter documentation see ``passwordlessChallenge(phoneNumber:connection:deliveryMethod:allowSignup:)``.
+    func passwordlessChallenge(phoneNumber: String, connection: String = "Username-Password-Authentication", deliveryMethod: DeliveryMethod = .text, allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
+        return self.passwordlessChallenge(phoneNumber: phoneNumber, connection: connection, deliveryMethod: deliveryMethod, allowSignup: allowSignup)
     }
 
-    func login(authSession: String, otp: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(authSession: authSession, otp: otp, audience: audience, scope: scope)
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+        return self.login(otp: otp, challenge: challenge, audience: audience, scope: scope)
     }
 
     func userInfo(withAccessToken accessToken: String,
