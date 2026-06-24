@@ -1431,10 +1431,18 @@ public extension Authentication {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
     }
 
+    /// Requests a passwordless OTP challenge for a database connection user identified by email address.
+    ///
+    /// Defaults `connection` to `"Username-Password-Authentication"`, the built-in database connection on every Auth0 tenant.
+    /// For full parameter documentation see ``challenge(email:connection:allowSignup:)``.
     func challenge(email: String, connection: String = "Username-Password-Authentication", allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
         return self.challenge(email: email, connection: connection, allowSignup: allowSignup)
     }
 
+    /// Requests a passwordless OTP challenge for a database connection user identified by phone number.
+    ///
+    /// Defaults `connection` to `"Username-Password-Authentication"` and `deliveryMethod` to ``DeliveryMethod/text``.
+    /// For full parameter documentation see ``challenge(phoneNumber:connection:deliveryMethod:allowSignup:)``.
     func challenge(phoneNumber: String, connection: String = "Username-Password-Authentication", deliveryMethod: DeliveryMethod = .text, allowSignup: Bool = false) -> Request<PasswordlessChallenge, AuthenticationError> {
         return self.challenge(phoneNumber: phoneNumber, connection: connection, deliveryMethod: deliveryMethod, allowSignup: allowSignup)
     }
