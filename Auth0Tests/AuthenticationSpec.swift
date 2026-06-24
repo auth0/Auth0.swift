@@ -1896,6 +1896,21 @@ class AuthenticationSpec: QuickSpec {
                     expect(request.dpop).to(beNil())
                 }
 
+                it("should include the Auth0-Client telemetry header on challenge requests") {
+                    var capturedHeaders: [String: String] = [:]
+                    NetworkStub.addStub(condition: { $0.isOTPChallenge(Domain) },
+                                        response: { request in
+                        capturedHeaders = request.allHTTPHeaderFields ?? [:]
+                        return passwordlessChallengeResponse(authSession: AuthSession)(request)
+                    })
+                    waitUntil(timeout: Timeout) { done in
+                        auth.challenge(email: SupportAtAuth0, connection: ConnectionName).start { _ in
+                            expect(capturedHeaders["Auth0-Client"]).toNot(beNil())
+                            done()
+                        }
+                    }
+                }
+
             }
 
             context("challenge with phone number") {

@@ -885,6 +885,7 @@ credentialsManager.credentials { result in
 - [Log in with passkey [EA]](#log-in-with-passkey-ea)
 - [Sign up with passkey [EA]](#sign-up-with-passkey-ea)
 - [Passwordless login](#passwordless-login)
+- [Passwordless login with a database connection [EA]](#passwordless-login-with-a-database-connection-ea)
 - [Retrieve user information](#retrieve-user-information)
 - [Renew credentials](#renew-credentials)
 - [Get SSO credentials](#get-sso-credentials)
@@ -1501,6 +1502,105 @@ Auth0
 
 > [!NOTE]
 > Use `login(phoneNumber:code:)` if the code was sent to the user's phone number.
+
+### Passwordless login with a database connection [EA]
+
+> [!IMPORTANT]
+> Passwordless login for database connections is currently in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+This flow lets users authenticate with a one-time code sent over email or SMS/voice against a **database connection** that has `email_otp` or `phone_otp` enabled. It is distinct from the `/passwordless/start` flow above, which uses dedicated passwordless connections.
+
+#### 1. Issue an OTP challenge
+
+Send a one-time code to the user's email. For privacy, the server **always responds successfully regardless of whether the user exists**.
+
+```swift
+Auth0
+    .authentication()
+    .challenge(email: "user@example.com", connection: "Username-Password-Authentication")
+    .start { result in
+        switch result {
+        case .success(let challenge):
+            // Store challenge.authSession and prompt the user for the code
+            print("Auth session: \(challenge.authSession)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let challenge = try await Auth0
+        .authentication()
+        .challenge(email: "user@example.com", connection: "Username-Password-Authentication")
+        .start()
+    // Store challenge.authSession and prompt the user for the code
+} catch {
+    print("Failed with: \(error)")
+}
+```
+
+</details>
+
+To send the code via SMS or voice instead, use `challenge(phoneNumber:connection:deliveryMethod:)` against a connection with `phone_otp` enabled:
+
+```swift
+Auth0
+    .authentication()
+    .challenge(phoneNumber: "+15555550123",
+               connection: "Username-Password-Authentication",
+               deliveryMethod: .text)
+    .start { result in
+        switch result {
+        case .success(let challenge):
+            print("Auth session: \(challenge.authSession)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+#### 2. Verify the code and log in
+
+Exchange the `authSession` from step 1 together with the code the user received for `Credentials`. If DPoP is enabled, a DPoP proof is attached automatically to this token request.
+
+```swift
+Auth0
+    .authentication()
+    .login(authSession: challenge.authSession, otp: "123456")
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(authSession: challenge.authSession, otp: "123456")
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+
+</details>
+
+> [!NOTE]
+> The default scope used is `openid profile email`. Regardless of the scopes set to the request, the `openid` scope is always enforced.
 
 ### Retrieve user information
 
