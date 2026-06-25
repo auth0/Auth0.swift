@@ -1518,29 +1518,38 @@ To send the code via SMS or voice instead, use `challenge(phoneNumber:connection
 
 #### 2. Verify the code and log in
 
-Exchange the `authSession` from step 1 together with the code the user received for `Credentials`. If DPoP is enabled, a DPoP proof is attached automatically to this token request.
+Pass the `PasswordlessChallenge` from step 1 together with the code the user received to exchange for `Credentials`. If DPoP is enabled, a DPoP proof is attached automatically to this token request.
 
-#### Full flow
+**Step 1 — issue the challenge:**
 
 ```swift
+// Store the challenge to use in step 2
+var passwordlessChallenge: PasswordlessChallenge?
+
 Auth0
     .authentication()
     .challenge(email: "user@example.com", connection: "Username-Password-Authentication")
     .start { result in
         switch result {
         case .success(let challenge):
-            // Prompt the user for the OTP they received, then pass challenge.authSession to login
-            Auth0
-                .authentication()
-                .login(authSession: challenge.authSession, otp: userEnteredOTP)
-                .start { result in
-                    switch result {
-                    case .success(let credentials):
-                        print("Obtained credentials: \(credentials)")
-                    case .failure(let error):
-                        print("Failed with: \(error)")
-                    }
-                }
+            passwordlessChallenge = challenge
+            // Prompt the user for the OTP they received
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+**Step 2 — verify the OTP:**
+
+```swift
+Auth0
+    .authentication()
+    .login(otp: userEnteredOTP, challenge: passwordlessChallenge)
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -1556,10 +1565,10 @@ do {
         .authentication()
         .challenge(email: "user@example.com", connection: "Username-Password-Authentication")
         .start()
-    // Prompt the user for the OTP they received, then pass challenge.authSession to login
+    // Prompt the user for the OTP they received, then pass the challenge to login
     let credentials = try await Auth0
         .authentication()
-        .login(authSession: challenge.authSession, otp: userEnteredOTP)
+        .login(otp: userEnteredOTP, challenge: challenge)
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
