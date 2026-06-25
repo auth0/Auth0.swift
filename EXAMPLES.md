@@ -4137,6 +4137,9 @@ See the [API documentation](https://auth0.github.io/Auth0.swift/documentation/au
 
 ## Management API (Users) (iOS / macOS / tvOS / watchOS / visionOS)
 
+> [!WARNING]
+> **Deprecated in v2.18.0** — `Auth0.users(token:)` will be removed in the next major version.
+
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/users)**
 
 - [Retrieve user metadata](#retrieve-user-metadata)
