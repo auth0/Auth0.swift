@@ -186,6 +186,10 @@ func jwksResponse(kid: String? = Kid) -> RequestResponse {
     return apiSuccessResponse(json: jwks)
 }
 
+func passwordlessChallengeResponse(authSession: String = "test-auth-session") -> RequestResponse {
+    return apiSuccessResponse(json: ["auth_session": authSession])
+}
+
 func multifactorChallengeResponse(challengeType: String, oobCode: String? = nil, bindingMethod: String? = nil) -> RequestResponse {
     var json: [String: Any] = ["challenge_type": challengeType]
     json["oob_code"] = oobCode
