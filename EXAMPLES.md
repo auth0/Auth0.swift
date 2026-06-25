@@ -1514,6 +1514,14 @@ This flow lets users authenticate with a one-time code sent over email or SMS/vo
 
 Send a one-time code to the user's email. For privacy, the server **always responds successfully regardless of whether the user exists**.
 
+To send the code via SMS or voice instead, use `challenge(phoneNumber:connection:deliveryMethod:)` against a connection with `phone_otp` enabled.
+
+#### 2. Verify the code and log in
+
+Exchange the `authSession` from step 1 together with the code the user received for `Credentials`. If DPoP is enabled, a DPoP proof is attached automatically to this token request.
+
+#### Full flow
+
 ```swift
 Auth0
     .authentication()
@@ -1521,8 +1529,18 @@ Auth0
     .start { result in
         switch result {
         case .success(let challenge):
-            // Store challenge.authSession and prompt the user for the code
-            print("Auth session: \(challenge.authSession)")
+            // Prompt the user for the OTP they received, then pass challenge.authSession to login
+            Auth0
+                .authentication()
+                .login(authSession: challenge.authSession, otp: userEnteredOTP)
+                .start { result in
+                    switch result {
+                    case .success(let credentials):
+                        print("Obtained credentials: \(credentials)")
+                    case .failure(let error):
+                        print("Failed with: \(error)")
+                    }
+                }
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -1538,58 +1556,10 @@ do {
         .authentication()
         .challenge(email: "user@example.com", connection: "Username-Password-Authentication")
         .start()
-    // Store challenge.authSession and prompt the user for the code
-} catch {
-    print("Failed with: \(error)")
-}
-```
-
-</details>
-
-To send the code via SMS or voice instead, use `challenge(phoneNumber:connection:deliveryMethod:)` against a connection with `phone_otp` enabled:
-
-```swift
-Auth0
-    .authentication()
-    .challenge(phoneNumber: "+15555550123",
-               connection: "Username-Password-Authentication",
-               deliveryMethod: .text)
-    .start { result in
-        switch result {
-        case .success(let challenge):
-            print("Auth session: \(challenge.authSession)")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }
-```
-
-#### 2. Verify the code and log in
-
-Exchange the `authSession` from step 1 together with the code the user received for `Credentials`. If DPoP is enabled, a DPoP proof is attached automatically to this token request.
-
-```swift
-Auth0
-    .authentication()
-    .login(authSession: challenge.authSession, otp: "123456")
-    .start { result in
-        switch result {
-        case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }
-```
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
+    // Prompt the user for the OTP they received, then pass challenge.authSession to login
     let credentials = try await Auth0
         .authentication()
-        .login(authSession: challenge.authSession, otp: "123456")
+        .login(authSession: challenge.authSession, otp: userEnteredOTP)
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
