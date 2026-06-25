@@ -1512,9 +1512,11 @@ This flow lets users authenticate with a one-time code sent over email or SMS/vo
 
 #### 1. Issue an OTP challenge
 
-Send a one-time code to the user's email. For privacy, the server **always responds successfully regardless of whether the user exists**.
+Send a one-time code to the user's email. For privacy, the server **always responds successfully regardless of whether the user exists**. On success, save the returned `PasswordlessChallenge` for step 2.
 
-To send the code via SMS or voice instead, use `challenge(phoneNumber:connection:deliveryMethod:)` against a connection with `phone_otp` enabled.
+To send the code via SMS or voice instead, use `passwordlessChallenge(phoneNumber:deliveryMethod:)` against a connection with `phone_otp` enabled.
+
+Both methods accept an optional `allowSignup` parameter (defaults to `false`) that controls whether a new user is created if one does not yet exist.
 
 #### 2. Verify the code and log in
 
@@ -1523,12 +1525,13 @@ Pass the `PasswordlessChallenge` from step 1 together with the code the user rec
 **Step 1 — issue the challenge:**
 
 ```swift
-// Store the challenge to use in step 2
+// Keep this reference until the user enters the code
 var passwordlessChallenge: PasswordlessChallenge?
 
 Auth0
     .authentication()
-    .challenge(email: "user@example.com", connection: "Username-Password-Authentication")
+    .passwordlessChallenge(email: "user@example.com",
+                           connection: "your-db-connection") // defaults to "Username-Password-Authentication"
     .start { result in
         switch result {
         case .success(let challenge):
@@ -1543,9 +1546,11 @@ Auth0
 **Step 2 — verify the OTP:**
 
 ```swift
+guard let challenge = passwordlessChallenge else { return }
+
 Auth0
     .authentication()
-    .login(otp: userEnteredOTP, challenge: passwordlessChallenge)
+    .login(otp: userEnteredOTP, challenge: challenge)
     .start { result in
         switch result {
         case .success(let credentials):
@@ -1561,11 +1566,13 @@ Auth0
 
 ```swift
 do {
+    // Step 1: issue the challenge and keep it
     let challenge = try await Auth0
         .authentication()
-        .challenge(email: "user@example.com", connection: "Username-Password-Authentication")
+        .passwordlessChallenge(email: "user@example.com",
+                               connection: "your-db-connection") // defaults to "Username-Password-Authentication"
         .start()
-    // Prompt the user for the OTP they received, then pass the challenge to login
+    // Step 2: once the user enters the code, pass the saved challenge back to log in
     let credentials = try await Auth0
         .authentication()
         .login(otp: userEnteredOTP, challenge: challenge)
