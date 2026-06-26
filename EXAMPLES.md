@@ -666,7 +666,9 @@ let isValid = credentialsManager.isBiometricSessionValid()
 
 Auth0 supports the [IPSIE SL1](https://openid.github.io/ipsie-openid-sl1/draft-openid-ipsie-sl1-profile.html) `session_expiry` claim, which lets an upstream identity provider (e.g. Okta) set a hard ceiling on how long an Auth0-issued session may live. When your connection has this option enabled, Auth0 includes a `session_expiry` Unix timestamp in the ID token it returns to your app after login.
 
-The `CredentialsManager.credentials()` method enforces this ceiling on every call. It reads `session_expiry` from the stored ID token and, once the ceiling has passed (with a 30-second clock-skew leeway), returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant. Note that `ssoCredentials()` and `apiCredentials()` do not currently enforce this ceiling.
+The `CredentialsManager` enforces this ceiling on every retrieval — `credentials()`, `ssoCredentials()`, and `apiCredentials()`. Once the ceiling has passed (with a 30-second clock-skew leeway), the call clears the stored credentials and returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant. `hasValid()` also reports `false` once the ceiling is reached.
+
+The ceiling is **pinned at the initial login**: it is read from the first ID token and persisted to the Keychain, so it survives refreshes whose ID token does not re-emit the claim and a refresh can never extend the session past it. `clear()` removes the persisted ceiling so it does not leak past logout.
 
 #### What `session_expiry` means
 
@@ -709,21 +711,21 @@ do {
 ```
 </details>
 
-#### Reading the raw `session_expiry` value
+#### Reading the `session_expiry` value
 
-You can inspect the claim directly from the stored ID token for app-level logic (e.g. a countdown timer):
+`Credentials` exposes the ceiling via the `sessionExpiresAt` property (Unix seconds, or `nil` when the connection does not emit the claim), which you can use for app-level logic such as a countdown timer:
 
 ```swift
-import JWTDecode
-
 credentialsManager.credentials { result in
     guard case .success(let credentials) = result,
-          let jwt = try? decode(jwt: credentials.idToken),
-          let sessionExpiry = jwt.body["session_expiry"] as? Int else { return }
+          let sessionExpiry = credentials.sessionExpiresAt else { return }
     let expiresAt = Date(timeIntervalSince1970: TimeInterval(sessionExpiry))
     print("Session ceiling: \(expiresAt)")
 }
 ```
+
+> [!NOTE]
+> `sessionExpiresAt` is decoded on demand from the current ID token. After a refresh whose new ID token omits the claim, this property returns `nil` even though the Credentials Manager still enforces the ceiling pinned at the initial login.
 
 > [!IMPORTANT]
 > `session_expiry` is a ceiling computed at login time — it is **not** real-time session revocation. If a user is de-provisioned mid-session, they will not be immediately signed out; that requires back-channel logout / CAEP, which is a separate platform capability.

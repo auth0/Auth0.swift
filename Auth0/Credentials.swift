@@ -1,4 +1,5 @@
 import Foundation
+import JWTDecode
 
 private struct _A0Credentials {
     let accessToken: String
@@ -68,6 +69,31 @@ public final class Credentials: NSObject, Sendable {
     ///
     /// - [MFA Recovery Codes](https://auth0.com/docs/secure/multi-factor-authentication/configure-recovery-codes-for-mfa)
     public let recoveryCode: String?
+
+    /// The absolute session-expiry ceiling, in **Unix seconds**, asserted by the upstream identity
+    /// provider via the IPSIE `session_expiry` claim, or `nil` when the connection does not emit it.
+    ///
+    /// This is a session-level ceiling that is independent of ``expiresIn`` (the access-token expiry):
+    /// it usually sits much further out and caps how long the local session may live, regardless of
+    /// access-token renewals. A `nil` value means there is no such ceiling.
+    ///
+    /// The value is decoded on demand from ``idToken``. A value that is not a plausible Unix-seconds
+    /// timestamp (outside `(0, 10_000_000_000)`) is treated as "no ceiling" and returns `nil`.
+    ///
+    /// - Important: The ``CredentialsManager`` enforces this ceiling using the value pinned at the
+    /// initial login. After a refresh whose new ID token omits the claim, this property returns `nil`
+    /// even though the Credentials Manager still enforces the pinned ceiling.
+    public var sessionExpiresAt: Int? {
+        guard let jwt = try? decode(jwt: self.idToken),
+              let rawValue = jwt.body["session_expiry"] as? NSNumber else {
+            return nil
+        }
+        let sessionExpiry = rawValue.intValue
+        guard sessionExpiry > 0, sessionExpiry < 10_000_000_000 else {
+            return nil
+        }
+        return sessionExpiry
+    }
 
     /// Custom description that redacts the tokens with `<REDACTED>`.
     public override var description: String {

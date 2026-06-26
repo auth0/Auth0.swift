@@ -362,7 +362,7 @@ do {
 > [!NOTE]
 > This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires a specific feature flag and connection option enabled on your Auth0 tenant.
 
-When an enterprise connection (OIDC / Okta) is configured with `id_token_session_expiry_supported: true`, Auth0 emits a `session_expiry` claim in the ID token. The `CredentialsManager` automatically enforces this upstream IdP session ceiling — `credentials()` returns `CredentialsManagerError.sessionExpired` once the ceiling is reached (with a 30-second clock-skew leeway), without attempting a token renewal.
+When an enterprise connection (OIDC / Okta) is configured with `id_token_session_expiry_supported: true`, Auth0 emits a `session_expiry` claim in the ID token. The `CredentialsManager` automatically enforces this upstream IdP session ceiling — `credentials()`, `ssoCredentials()`, and `apiCredentials()` clear the stored credentials and return `CredentialsManagerError.sessionExpired` once the ceiling is reached (with a 30-second clock-skew leeway), without attempting a token renewal. The ceiling is pinned at the initial login and persisted, so it survives refreshes.
 
 ```swift
 credentialsManager.credentials { result in

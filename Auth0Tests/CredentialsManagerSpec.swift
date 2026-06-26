@@ -34,6 +34,15 @@ private let SessionExpiryLeeway = 30
 /// Builds an unsigned JWT string containing a `session_expiry` claim.
 /// JWTDecode does not validate signatures, so the signature part can be arbitrary for unit tests.
 private func makeIdTokenWithSessionExpiry(_ sessionExpiry: Int) -> String {
+    return makeIdToken(sessionExpiry: sessionExpiry)
+}
+
+/// Builds an unsigned JWT string containing a fractional (Double) `session_expiry` claim.
+private func makeIdTokenWithFractionalSessionExpiry(_ sessionExpiry: Double) -> String {
+    return makeIdToken(sessionExpiry: sessionExpiry)
+}
+
+private func makeIdToken(sessionExpiry: Any) -> String {
     let headerJSON = try! JSONSerialization.data(withJSONObject: ["typ": "JWT", "alg": "HS256"])
     let payloadJSON = try! JSONSerialization.data(withJSONObject: [
         "iss": "test", "sub": "sub|123", "aud": "audience",
@@ -1087,6 +1096,121 @@ class CredentialsManagerSpec: QuickSpec {
                         done()
                     }
                 }
+            }
+
+            it("should honor a fractional session_expiry value by truncating it") {
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
+                // Build a token with a fractional session_expiry; it must be truncated, not dropped.
+                let idToken = makeIdTokenWithFractionalSessionExpiry(Double(pastExpiry) + 0.75)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        done()
+                    }
+                }
+            }
+
+            it("should clear stored credentials when the session ceiling is reached") {
+                let store = SimpleKeychain(service: "test_session_expiry_clear")
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
+                let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        // Stored credentials and the pinned ceiling must be cleared.
+                        expect(fetchCredentials(from: store)).to(beNil())
+                        expect { try store.data(forKey: "session_expiry") }.to(throwError(SimpleKeychainError.itemNotFound))
+                        done()
+                    }
+                }
+            }
+
+            it("should persist the pinned ceiling and not raise it when a later session_expiry is re-emitted on renewal") {
+                let store = SimpleKeychain(service: "test_session_expiry_pin")
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+                // Pinned ceiling from the initial login is already in the past.
+                let pinnedPast = Int(Date().timeIntervalSince1970) - 100
+                let initialIdToken = makeIdTokenWithSessionExpiry(pinnedPast)
+                // The renewal would re-emit a later ceiling; it must NOT raise the pinned value.
+                let laterIdToken = makeIdTokenWithSessionExpiry(Int(Date().timeIntervalSince1970) + 7200)
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
+                                    response: authResponse(accessToken: NewAccessToken, idToken: laterIdToken, refreshToken: nil, expiresIn: ExpiresIn))
+
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: initialIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        // Enforcement honors the pinned value, so the refresh-token grant is never used.
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        done()
+                    }
+                }
+            }
+
+            it("should use the stored ceiling when a refreshed id token omits the claim") {
+                let store = SimpleKeychain(service: "test_session_expiry_fallback")
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+                // Persist a past ceiling via the initial login token.
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 100
+                let pinnedIdToken = makeIdTokenWithSessionExpiry(pastExpiry)
+                _ = credentialsManager.store(credentials: Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: pinnedIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn)))
+                // Now overwrite the stored credentials with a token that omits the claim, leaving the
+                // pinned ceiling intact (store() never overwrites an already-pinned value).
+                _ = credentialsManager.store(credentials: Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn)))
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        done()
+                    }
+                }
+            }
+
+            it("should return sessionExpired from ssoCredentials when the ceiling is reached") {
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
+                let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                // No stub is registered: the refresh-token grant must never be exchanged past the ceiling.
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.ssoCredentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        done()
+                    }
+                }
+            }
+
+            it("should return sessionExpired from apiCredentials when the ceiling is reached") {
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
+                let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                // No stub is registered: the refresh-token grant must never be exchanged past the ceiling.
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.apiCredentials(forAudience: Audience) { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        done()
+                    }
+                }
+            }
+
+            it("should report no valid credentials from hasValid when the ceiling is reached") {
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
+                let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                expect(credentialsManager.hasValid()).to(beFalse())
             }
 
         }
