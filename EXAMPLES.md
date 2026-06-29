@@ -662,7 +662,7 @@ let isValid = credentialsManager.isBiometricSessionValid()
 ### IPSIE session expiry [EA]
 
 > [!NOTE]
-> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires the `id_token_session_expiry_federated` feature flag and the `id_token_session_expiry_supported` option enabled on your OIDC or Okta enterprise connection.
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires session-expiry enforcement enabled on your OIDC or Okta enterprise connection in the Auth0 Dashboard.
 
 Auth0 supports the [IPSIE SL1](https://openid.github.io/ipsie-openid-sl1/draft-openid-ipsie-sl1-profile.html) `session_expiry` claim, which lets an upstream identity provider (e.g. Okta) set a hard ceiling on how long an Auth0-issued session may live. When your connection has this option enabled, Auth0 includes a `session_expiry` Unix timestamp in the ID token it returns to your app after login.
 
@@ -710,6 +710,9 @@ do {
 }
 ```
 </details>
+
+> [!NOTE]
+> **Upgrading existing apps.** Sessions stored before the `session_expiry` option was enabled on your connection carry no ceiling and behave exactly as before — `.sessionExpired` is never returned for them. Once the option is turned on, `credentials()` can return `.sessionExpired` for a user who is already logged in, as soon as their ceiling passes. Any code that assumed a stored session stays usable until the access token expires now has this additional failure path to handle. Treat it the same way you would `CredentialsManagerError.noCredentials`: clear the local session and redirect the user to log in again.
 
 #### Reading the `session_expiry` value
 

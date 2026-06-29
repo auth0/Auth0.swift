@@ -143,6 +143,12 @@ public struct CredentialsManager: Sendable {
     /// let didStore = credentialsManager.store(credentials: credentials)
     /// ```
     ///
+    /// - Note: This method pins two session-scoped values on the first call: the DPoP thumbprint and the
+    /// IPSIE `session_expiry` ceiling. Both are tied to the current user session and are only cleared by
+    /// ``clear()``. If you store credentials for a different user without calling ``clear()`` first (an
+    /// account switch that skips logout), those pinned values from the previous session remain in effect.
+    /// Always call ``clear()`` before storing credentials for a new user.
+    ///
     /// - Parameter credentials: ``Credentials`` instance to store.
     /// - Returns: If the credentials were stored.
     public func store(credentials: Credentials) -> Bool {

@@ -360,9 +360,9 @@ do {
 ### IPSIE session expiry [EA]
 
 > [!NOTE]
-> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires a specific feature flag and connection option enabled on your Auth0 tenant.
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires session-expiry enforcement enabled on your OIDC or Okta enterprise connection in the Auth0 Dashboard.
 
-When an enterprise connection (OIDC / Okta) is configured with `id_token_session_expiry_supported: true`, Auth0 emits a `session_expiry` claim in the ID token. The `CredentialsManager` automatically enforces this upstream IdP session ceiling — `credentials()`, `ssoCredentials()`, and `apiCredentials()` clear the stored credentials and return `CredentialsManagerError.sessionExpired` once the ceiling is reached (with a 30-second clock-skew leeway), without attempting a token renewal. The ceiling is pinned at the initial login: the value from the first ID token is persisted to the Keychain and never updated by a refresh-token grant. `clear()` removes it on logout.
+When an enterprise connection (OIDC / Okta) is configured with session-expiry enforcement enabled, Auth0 emits a `session_expiry` claim in the ID token. The `CredentialsManager` automatically enforces this upstream IdP session ceiling — `credentials()`, `ssoCredentials()`, and `apiCredentials()` clear the stored credentials and return `CredentialsManagerError.sessionExpired` once the ceiling is reached (with a 30-second clock-skew leeway), without attempting a token renewal. The ceiling is pinned at the initial login: the value from the first ID token is persisted to the Keychain and never updated by a refresh-token grant. `clear()` removes it on logout.
 
 ```swift
 credentialsManager.credentials { result in
