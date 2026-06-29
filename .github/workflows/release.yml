@@ -11,9 +11,6 @@ concurrency:
   group: release
   cancel-in-progress: false
 
-permissions:
-  contents: write
-
 jobs:
   # Build and deploy the versioned API documentation for a release. The actual
   # build/deploy logic lives in docs.yml so it can also be dispatched manually

@@ -27,8 +27,9 @@ Given a fresh DocC build and a gh-pages working copy, it:
    site root so the default docs serve from a **version-less URL** (the historical
    canonical URL). Prereleases omit this and leave the root serving the last stable.
 6. Writes the site root: `versions.json` (+ `stable` pointer), `version-selector.js`,
-   `.nojekyll`, and — only when no stable content owns the root yet — an `index.html`
-   redirect to the newest stable version.
+   `.nojekyll`, and always rewrites `index.html` (overwriting DocC's own loader stub).
+   When stable content owns the root it redirects to `documentation/auth0/`; otherwise
+   (no stable published yet) it redirects into the newest version's `/v<version>/` folder.
 
 ## Root-mirror model
 

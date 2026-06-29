@@ -246,7 +246,7 @@ func clearRootDocContent(in root: URL) throws {
     // folder (`v…`) and the shared site files. Everything else at the root is
     // the previous stable's DocC output and is replaced wholesale.
     let preserved: Set<String> = ["versions.json", "version-selector.js", ".nojekyll"]
-    let entries = (try? fileManager.contentsOfDirectory(atPath: root.path)) ?? []
+    let entries = try fileManager.contentsOfDirectory(atPath: root.path)
     for name in entries {
         if name.hasPrefix("v") || preserved.contains(name) { continue }
         try remove(root.appendingPathComponent(name))
