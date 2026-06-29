@@ -5,14 +5,18 @@ import Foundation
 /// Folds a freshly-built DocC static site into a versioned GitHub Pages layout.
 ///
 /// Usage:
-///   DocsVersions --site-root <dir> --new-build <dir> [--version X.Y.Z]
-///                [--version-file <path>] [--base-path Auth0.swift]
+///   DocsVersions --site-root <dir> --new-build <dir> [--new-build-root <dir>]
+///                [--version X.Y.Z] [--version-file <path>] [--base-path Auth0.swift]
 ///
-/// - `--site-root`     The gh-pages working copy to update in place (created if missing).
-/// - `--new-build`     The freshly transformed static site to fold in as `v<version>/`.
-/// - `--version`       The version being published. If omitted, read from `--version-file`.
-/// - `--version-file`  Path to `Auth0/Version.swift` (default: `Auth0/Version.swift`).
-/// - `--base-path`     The Pages base path used for the root asset URL (default: `Auth0.swift`).
+/// - `--site-root`       The gh-pages working copy to update in place (created if missing).
+/// - `--new-build`       The freshly transformed static site to fold in as `v<version>/`.
+/// - `--new-build-root`  Optional. A second transform of the same version built with the bare
+///                       base path, served directly at the site root so the default docs use a
+///                       version-less URL. Provided only for stable releases; when present the
+///                       previous stable's root content is replaced by it.
+/// - `--version`         The version being published. If omitted, read from `--version-file`.
+/// - `--version-file`    Path to `Auth0/Version.swift` (default: `Auth0/Version.swift`).
+/// - `--base-path`       The Pages base path used for the root asset URL (default: `Auth0.swift`).
 
 let arguments = CommandLineArguments(CommandLine.arguments)
 let fileManager = FileManager.default
@@ -23,6 +27,7 @@ guard let siteRootPath = arguments["--site-root"] else {
 guard let newBuildPath = arguments["--new-build"] else {
     fail("Missing required --new-build <dir>")
 }
+let newBuildRootPath = arguments["--new-build-root"]
 let basePath = arguments["--base-path"] ?? "Auth0.swift"
 let versionFile = arguments["--version-file"] ?? "Auth0/Version.swift"
 
@@ -85,18 +90,54 @@ for version in existing where !keepSet.contains(version.description) {
 }
 print("📚 Keeping \(keep.count) version(s): \(keep.map { "v\($0)" }.joined(separator: ", "))")
 
-// MARK: 4. Write root metadata, selector script, redirect, .nojekyll
+// MARK: 4. Mirror the stable version at the site root
 
+// A stable release ships a second build transformed with the bare base path so
+// the default docs serve from the site root (version-less URL = the historical
+// canonical URL). Prereleases never carry this, so the root keeps serving the
+// last stable. The root is a disposable mirror; each version's own /v<x>/ folder
+// remains the source of truth.
+if let newBuildRootPath {
+    let newBuildRoot = URL(fileURLWithPath: newBuildRootPath, isDirectory: true)
+    guard fileManager.fileExists(atPath: newBuildRoot.path) else {
+        fail("Root build directory does not exist: \(newBuildRoot.path)")
+    }
+    print("🏠 Replacing root content with v\(current)")
+    try clearRootDocContent(in: siteRoot)
+    try moveContents(of: newBuildRoot, into: siteRoot)
+    let rootInjected = try injectScript(scriptTag, intoHTMLUnder: siteRoot)
+    print("🔧 Injected version selector into \(rootInjected) root HTML file(s)")
+}
+
+// MARK: 5. Write root metadata, selector script, redirect, .nojekyll
+
+// The dropdown defaults to the newest stable release so visitors are not
+// dropped onto prerelease docs. Fall back to the newest overall version only
+// when nothing stable has been published yet.
 let newestStable = keep.first { !$0.isPrerelease }
-let stable = newestStable ?? keep[0]            // fall back if only prereleases exist
-let redirectTarget = keep[0]                    // newest overall
+let stable = newestStable ?? keep[0]
 
 try writeVersionsJSON(keep: keep, stable: stable, at: siteRoot)
 try copyVersionSelector(to: siteRoot)
-try writeRootRedirect(to: redirectTarget, basePath: basePath, at: siteRoot)
 try writeNoJekyll(at: siteRoot)
 
-print("🎉 Done. Root redirects to v\(redirectTarget); stable is v\(stable).")
+// The bare site root (e.g. /Auth0.swift/) must land on a working doc page. DocC's
+// own top-level index.html is an SPA loader stub hardcoded to baseUrl "/", so its
+// asset URLs (/js, /css) 404 under the /<base-path>/ prefix — leaving the page
+// blank. We always overwrite it with our own redirect to a fully base-path-scoped
+// landing page. When stable content owns the root, the version-less
+// documentation/auth0/ (which bakes the correct base path) is canonical; otherwise
+// redirect into the stable version's /v<version>/ folder.
+let rootHasStableContent = fileManager.fileExists(
+    atPath: siteRoot.appendingPathComponent("documentation", isDirectory: true).path
+)
+if rootHasStableContent {
+    try writeRootRedirect(toDocPath: "documentation/auth0/", basePath: basePath, at: siteRoot)
+    print("🎉 Done. Stable v\(stable) served at root.")
+} else {
+    try writeRootRedirect(toDocPath: "v\(stable)/documentation/auth0/", basePath: basePath, at: siteRoot)
+    print("🎉 Done. Root redirects to stable v\(stable).")
+}
 
 // MARK: - Steps
 
@@ -167,16 +208,20 @@ func copyVersionSelector(to root: URL) throws {
     try fileManager.copyItem(at: source, to: destination)
 }
 
-func writeRootRedirect(to version: SemVer, basePath: String, at root: URL) throws {
+/// Writes the site-root `index.html`, overwriting DocC's baseUrl-"/" loader stub
+/// with a redirect to a base-path-scoped landing page. `docPath` is relative to
+/// the site root (e.g. `documentation/auth0/` for root-served stable, or
+/// `v<version>/documentation/auth0/` when redirecting into a version folder).
+func writeRootRedirect(toDocPath docPath: String, basePath: String, at root: URL) throws {
     let html = """
     <!DOCTYPE html>
     <html>
       <head>
-        <meta http-equiv="refresh" content="0; url=v\(version)/documentation/auth0/" />
-        <link rel="canonical" href="/\(basePath)/v\(version)/documentation/auth0/" />
+        <meta http-equiv="refresh" content="0; url=\(docPath)" />
+        <link rel="canonical" href="/\(basePath)/\(docPath)" />
       </head>
       <body>
-        <a href="v\(version)/documentation/auth0/">Redirect to the latest documentation</a>
+        <a href="\(docPath)">Redirect to the latest documentation</a>
       </body>
     </html>
 
@@ -192,6 +237,31 @@ func writeNoJekyll(at root: URL) throws {
 }
 
 // MARK: - File helpers
+
+/// Removes the previous stable's DocC content from the site root, leaving the
+/// `v<version>/` aliases and shared site files (`versions.json`,
+/// `version-selector.js`, `.nojekyll`) untouched.
+func clearRootDocContent(in root: URL) throws {
+    // Top-level entries the root mirror must never delete: every version alias
+    // folder (`v…`) and the shared site files. Everything else at the root is
+    // the previous stable's DocC output and is replaced wholesale.
+    let preserved: Set<String> = ["versions.json", "version-selector.js", ".nojekyll"]
+    let entries = (try? fileManager.contentsOfDirectory(atPath: root.path)) ?? []
+    for name in entries {
+        if name.hasPrefix("v") || preserved.contains(name) { continue }
+        try remove(root.appendingPathComponent(name))
+    }
+}
+
+/// Moves every top-level entry of `source` into `destination`, replacing any
+/// existing entry of the same name.
+func moveContents(of source: URL, into destination: URL) throws {
+    let entries = try fileManager.contentsOfDirectory(atPath: source.path)
+    for name in entries {
+        try move(source.appendingPathComponent(name),
+                 to: destination.appendingPathComponent(name))
+    }
+}
 
 func move(_ source: URL, to destination: URL) throws {
     if fileManager.fileExists(atPath: destination.path) { try remove(destination) }

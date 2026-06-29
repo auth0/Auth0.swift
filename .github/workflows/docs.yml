@@ -77,11 +77,18 @@ jobs:
 
       # Folds docs_build/ into gh-pages/ as v<version>/, applies the retention
       # policy, and regenerates versions.json + version-selector.js + redirect.
+      # A stable release also produces docs_build_root/ (bare base path), which
+      # is served at the site root; prereleases omit it and leave root untouched.
       - name: Update versioned documentation layout
         run: |
+          ROOT_ARGS=()
+          if [ -d "$GITHUB_WORKSPACE/docs_build_root" ]; then
+            ROOT_ARGS=(--new-build-root "$GITHUB_WORKSPACE/docs_build_root")
+          fi
           swift run --package-path scripts/DocsVersions DocsVersions \
             --site-root "$GITHUB_WORKSPACE/gh-pages" \
-            --new-build "$GITHUB_WORKSPACE/docs_build"
+            --new-build "$GITHUB_WORKSPACE/docs_build" \
+            "${ROOT_ARGS[@]}"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.0.0

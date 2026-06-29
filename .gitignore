@@ -107,3 +107,4 @@ vendor/bundle
 docs/
 docs.archive/
 docs_build/
+docs_build_root/
