@@ -32,7 +32,7 @@
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)
   + [Authentication API Client](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)
   + [MFA API Client](https://auth0.github.io/Auth0.swift/documentation/auth0/mfaclient)
-  + [Management API Client (Users)](https://auth0.github.io/Auth0.swift/documentation/auth0/users)
+  + [Management API Client (Users)](https://auth0.github.io/Auth0.swift/documentation/auth0/users) *(deprecated in v2.18.0 — will be removed in the next major version)*
 - [**FAQ**](FAQ.md) - answers some common questions about Auth0.swift.
 - [**Auth0 Documentation**](https://auth0.com/docs) - explore our docs site and learn more about Auth0.
 
