@@ -80,16 +80,18 @@ print("📚 Keeping \(keep.count) version(s): \(keep.map { "v\($0)" }.joined(sep
 
 // MARK: 4. Write root metadata, selector script, redirect, .nojekyll
 
+// The root always lands on the newest stable release so visitors are not
+// dropped onto prerelease docs by default. Fall back to the newest overall
+// version only when nothing stable has been published yet.
 let newestStable = keep.first { !$0.isPrerelease }
-let stable = newestStable ?? keep[0]            // fall back if only prereleases exist
-let redirectTarget = keep[0]                    // newest overall
+let stable = newestStable ?? keep[0]
 
 try writeVersionsJSON(keep: keep, stable: stable, at: siteRoot)
 try copyVersionSelector(to: siteRoot)
-try writeRootRedirect(to: redirectTarget, basePath: basePath, at: siteRoot)
+try writeRootRedirect(to: stable, basePath: basePath, at: siteRoot)
 try writeNoJekyll(at: siteRoot)
 
-print("🎉 Done. Root redirects to v\(redirectTarget); stable is v\(stable).")
+print("🎉 Done. Root redirects to stable v\(stable).")
 
 // MARK: - Steps
 
