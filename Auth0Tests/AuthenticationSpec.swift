@@ -1817,7 +1817,233 @@ class AuthenticationSpec: QuickSpec {
 
             }
         }
-        
+
+        describe("passwordless db challenge") {
+            let AuthSession = "test-auth-session"
+
+            afterEach {
+                NetworkStub.clearStubs()
+            }
+
+            context("challenge with email") {
+
+                it("should request challenge with default allowSignup false") {
+                    NetworkStub.addStub(condition: {
+                        $0.isOTPChallenge(Domain) &&
+                        $0.hasAtLeast(["email": SupportAtAuth0,
+                                       "connection": ConnectionName,
+                                       "client_id": ClientId]) &&
+                        ($0.payload?["allow_signup"] as? Bool) == false
+                    }, response: passwordlessChallengeResponse(authSession: AuthSession))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+
+                it("should send allow_signup true when specified") {
+                    NetworkStub.addStub(condition: {
+                        $0.isOTPChallenge(Domain) &&
+                        $0.hasAtLeast(["email": SupportAtAuth0,
+                                       "connection": ConnectionName,
+                                       "client_id": ClientId]) &&
+                        ($0.payload?["allow_signup"] as? Bool) == true
+                    }, response: passwordlessChallengeResponse(authSession: AuthSession))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName, allowSignup: true).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+
+                it("should return the auth session from the response") {
+                    NetworkStub.addStub(condition: { $0.isOTPChallenge(Domain) },
+                                        response: passwordlessChallengeResponse(authSession: AuthSession))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName).start { result in
+                            if case .success(let challenge) = result {
+                                expect(challenge.authSession).to(equal(AuthSession))
+                            } else {
+                                fail("Expected success but got failure")
+                            }
+                            done()
+                        }
+                    }
+                }
+
+                it("should fail on invalid_connection") {
+                    NetworkStub.addStub(condition: { $0.isOTPChallenge(Domain) },
+                                        response: authFailure(error: "invalid_connection", description: "Unknown connection"))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName).start { result in
+                            expect(result).to(haveAuthenticationError(code: "invalid_connection", description: "Unknown connection"))
+                            done()
+                        }
+                    }
+                }
+
+                it("should use DPoP when it is enabled") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName)
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should not use DPoP when it is not enabled") {
+                    let request = auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName)
+                    expect(request.dpop).to(beNil())
+                }
+
+                it("should include the Auth0-Client telemetry header on challenge requests") {
+                    var capturedHeaders: [String: String] = [:]
+                    NetworkStub.addStub(condition: { $0.isOTPChallenge(Domain) },
+                                        response: { request in
+                        capturedHeaders = request.allHTTPHeaderFields ?? [:]
+                        return passwordlessChallengeResponse(authSession: AuthSession)(request)
+                    })
+                    waitUntil(timeout: Timeout) { done in
+                        auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName).start { _ in
+                            expect(capturedHeaders["Auth0-Client"]).toNot(beNil())
+                            done()
+                        }
+                    }
+                }
+
+            }
+
+            context("challenge with phone number") {
+
+                it("should request challenge with default delivery method text") {
+                    NetworkStub.addStub(condition: {
+                        $0.isOTPChallenge(Domain) &&
+                        $0.hasAtLeast(["phone_number": Phone,
+                                       "connection": ConnectionName,
+                                       "client_id": ClientId,
+                                       "delivery_method": "text"]) &&
+                        ($0.payload?["allow_signup"] as? Bool) == false
+                    }, response: passwordlessChallengeResponse(authSession: AuthSession))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+
+                it("should send delivery_method voice when specified") {
+                    NetworkStub.addStub(condition: {
+                        $0.isOTPChallenge(Domain) &&
+                        $0.hasAtLeast(["phone_number": Phone,
+                                       "connection": ConnectionName,
+                                       "client_id": ClientId,
+                                       "delivery_method": "voice"])
+                    }, response: passwordlessChallengeResponse(authSession: AuthSession))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName, deliveryMethod: .voice).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+
+                it("should fail on invalid_request") {
+                    NetworkStub.addStub(condition: { $0.isOTPChallenge(Domain) },
+                                        response: authFailure(error: "invalid_request", description: "Missing phone_number"))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName).start { result in
+                            expect(result).to(haveAuthenticationError(code: "invalid_request", description: "Missing phone_number"))
+                            done()
+                        }
+                    }
+                }
+
+                it("should use DPoP when it is enabled") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName)
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should not use DPoP when it is not enabled") {
+                    let request = auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName)
+                    expect(request.dpop).to(beNil())
+                }
+
+            }
+
+            context("login with auth session and OTP") {
+
+                it("should exchange auth session and OTP for credentials") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast(["auth_session": AuthSession,
+                                       "otp": OTP,
+                                       "grant_type": PasswordlessGrantType,
+                                       "client_id": ClientId])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession)).start { result in
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should include audience and scope when provided") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast(["auth_session": AuthSession,
+                                       "otp": OTP,
+                                       "audience": Audience,
+                                       "scope": Scope])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession), audience: Audience, scope: Scope).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+
+                it("should not include audience by default") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) && $0.hasNoneOf(["audience"])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession)).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+
+                it("should fail on invalid_grant") {
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) },
+                                        response: authFailure(error: "invalid_grant", description: "Invalid OTP"))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession)).start { result in
+                            expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid OTP"))
+                            done()
+                        }
+                    }
+                }
+
+                it("should use DPoP when it is enabled") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession))
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should not use DPoP when it is not enabled") {
+                    let request = auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession))
+                    expect(request.dpop).to(beNil())
+                }
+
+            }
+
+        }
+
         describe("user information") {
             
             it("should return user information") {

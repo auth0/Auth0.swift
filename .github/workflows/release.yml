@@ -12,9 +12,6 @@ concurrency:
   group: release
   cancel-in-progress: false
 
-permissions:
-  contents: write
-
 env:
   ruby: '3.3.1'
   xcode: '16.1'
