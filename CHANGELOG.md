@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.23.0](https://github.com/auth0/Auth0.swift/tree/2.23.0) (2026-06-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.22.0...2.23.0)
+
+**Added**
+- feat: add passwordless OTP for database connections [\#1218](https://github.com/auth0/Auth0.swift/pull/1218) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+- chore: update v3 beta banner to 3.0.0-beta.2 [\#1204](https://github.com/auth0/Auth0.swift/pull/1204) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
 ## [2.22.0](https://github.com/auth0/Auth0.swift/tree/2.22.0) (2026-06-05)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.21.2...2.22.0)
 
