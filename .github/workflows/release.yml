@@ -6,19 +6,101 @@ on:
       - closed
   workflow_dispatch:
 
-# Serialize releases so a manual dispatch and a merged-PR trigger cannot race.
+# Serialize releases so a manual dispatch and a merged-PR trigger cannot race
+# between the tag-existence check and the publish steps.
 concurrency:
   group: release
   cancel-in-progress: false
 
+env:
+  ruby: '3.3.1'
+  xcode: '16.1'
+
 jobs:
-  # Build and deploy the versioned API documentation for a release. The actual
-  # build/deploy logic lives in docs.yml so it can also be dispatched manually
-  # against any branch to preview a deployment. Tag creation and the CocoaPods
-  # publish are handled separately.
-  publish-docs:
-    name: Build and deploy versioned API documentation
+  release:
+    name: Tag, publish to CocoaPods, and create GitHub Release
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release/'))
+    runs-on: macos-14
+    environment: release
+
+    permissions:
+      contents: write
+
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      prerelease: ${{ steps.get_prerelease.outputs.prerelease }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment
+        uses: ./.github/actions/setup
+        with:
+          ruby: ${{ env.ruby }}
+          xcode: ${{ env.xcode }}
+
+      # Read the version from the single source of truth.
+      - name: Get version
+        id: get_version
+        run: |
+          version=$(awk -F'"' '/^[[:space:]]*let[[:space:]]+version[[:space:]]*=/ {print $2; exit}' Auth0/Version.swift)
+          if [[ -z "$version" ]]; then
+            echo "::error::Could not read version from Auth0/Version.swift"
+            exit 1
+          fi
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      # Detect a pre-release version so we can tag the GitHub Release
+      # accordingly. Any SemVer pre-release uses a hyphen separator (e.g.
+      # 1.0.0-beta.1, 2.0.0-rc.1). CocoaPods treats semver pre-release versions
+      # as pre-releases automatically, so no special pod tag is required.
+      - name: Get prerelease flag
+        id: get_prerelease
+        run: |
+          if [[ "${VERSION}" == *-* ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
+
+      # Abort if the tag already exists to avoid re-publishing a release.
+      - name: Check tag does not already exist
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${VERSION}" >/dev/null 2>&1; then
+            echo "::error::Tag ${VERSION} already exists. Aborting release."
+            exit 1
+          fi
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
+
+      # Tags the release, pushes the tag, creates the GitHub Release from the
+      # CHANGELOG, lints the podspec, and pushes the pod to CocoaPods trunk.
+      - name: Run release lane
+        run: bundle exec fastlane release
+        env:
+          AUTH0_SHIPPER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
+      # The shipper plugin always creates a non-prerelease GitHub Release; mark
+      # it as a pre-release when the version is a beta/alpha.
+      - name: Mark GitHub Release as pre-release
+        if: steps.get_prerelease.outputs.prerelease == 'true'
+        run: gh release edit "${VERSION}" --prerelease
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Build and deploy the versioned API documentation after a successful
+  # release. The actual build/deploy logic lives in docs.yml so it can also be
+  # dispatched manually against any branch to preview a deployment.
+  publish-docs:
+    needs: release
+    if: success()
     uses: ./.github/workflows/docs.yml
     permissions:
       contents: write
