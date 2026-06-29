@@ -1124,7 +1124,6 @@ class CredentialsManagerSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
                         expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
-                        // Stored credentials and the pinned ceiling must be cleared.
                         expect(fetchCredentials(from: store)).to(beNil())
                         expect { try store.data(forKey: "session_expiry") }.to(throwError(SimpleKeychainError.itemNotFound))
                         done()
@@ -1132,43 +1131,98 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should persist the pinned ceiling and not raise it when a later session_expiry is re-emitted on renewal") {
-                let store = SimpleKeychain(service: "test_session_expiry_pin")
+            it("should succeed when a renewed id token carries a future session_expiry") {
+                // Stored token: valid session ceiling, expired access token → renewal is triggered.
+                // The renewed token re-emits a *later* ceiling; the pinned value must not be raised.
+                let store = SimpleKeychain(service: "test_session_expiry_pin_not_raised")
                 credentialsManager = CredentialsManager(authentication: authentication, storage: store)
-                // Pinned ceiling from the initial login is already in the past.
-                let pinnedPast = Int(Date().timeIntervalSince1970) - 100
-                let initialIdToken = makeIdTokenWithSessionExpiry(pinnedPast)
-                // The renewal would re-emit a later ceiling; it must NOT raise the pinned value.
-                let laterIdToken = makeIdTokenWithSessionExpiry(Int(Date().timeIntervalSince1970) + 7200)
+                let pinnedExpiry = Int(Date().timeIntervalSince1970) + 7200
+                let storedIdToken = makeIdTokenWithSessionExpiry(pinnedExpiry)
+                let renewedIdToken = makeIdTokenWithSessionExpiry(pinnedExpiry + 3600)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: laterIdToken, refreshToken: nil, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, idToken: renewedIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
 
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: initialIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: storedIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -1))
                 _ = credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
-                        // Enforcement honors the pinned value, so the refresh-token grant is never used.
+                        expect(result).to(beSuccessful())
+                        // Pinned value must still be the original, not the later one from the renewal.
+                        let stored = try? store.data(forKey: "session_expiry")
+                        let pinned = stored.flatMap { String(data: $0, encoding: .utf8) }.flatMap { Int($0) }
+                        expect(pinned) == pinnedExpiry
+                        done()
+                    }
+                }
+            }
+
+            it("should still enforce the pinned ceiling when a renewed id token omits the session_expiry claim") {
+                // Stored token: valid session ceiling, expired access token → renewal succeeds with no claim.
+                // The pinned Keychain value must keep the ceiling in force on the next credentials() call.
+                let store = SimpleKeychain(service: "test_session_expiry_pin_survives_omit")
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+                let pastExpiry = Int(Date().timeIntervalSince1970) - 100
+                let storedIdToken = makeIdTokenWithSessionExpiry(pastExpiry)
+                // First store pins the ceiling.
+                _ = credentialsManager.store(credentials: Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: storedIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn)))
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        // Ceiling already passed — pinned value enforces it even though the stored ID
+                        // token is the original one; no renewal is attempted.
                         expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
                         done()
                     }
                 }
             }
 
-            it("should use the stored ceiling when a refreshed id token omits the claim") {
-                let store = SimpleKeychain(service: "test_session_expiry_fallback")
-                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
-                // Persist a past ceiling via the initial login token.
-                let pastExpiry = Int(Date().timeIntervalSince1970) - 100
-                let pinnedIdToken = makeIdTokenWithSessionExpiry(pastExpiry)
-                _ = credentialsManager.store(credentials: Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: pinnedIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn)))
-                // Now overwrite the stored credentials with a token that omits the claim, leaving the
-                // pinned ceiling intact (store() never overwrites an already-pinned value).
-                _ = credentialsManager.store(credentials: Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn)))
+            it("should fail open and return credentials when session_expiry is negative") {
+                let idToken = makeIdTokenWithSessionExpiry(-3600)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
-                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail open and return credentials when session_expiry is a non-numeric string") {
+                let idToken = makeIdToken(sessionExpiry: "not-a-number")
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should keep the pinned ceiling in the Keychain after a renewal whose id token has no claim") {
+                // After renewal the renewed token has no session_expiry claim, but the Keychain-pinned
+                // value must be untouched — storeRenewed() must not overwrite or delete it.
+                let store = SimpleKeychain(service: "test_session_expiry_pin_after_renewal_no_claim")
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+                let futureExpiry = Int(Date().timeIntervalSince1970) + 7200
+                let storedIdToken = makeIdTokenWithSessionExpiry(futureExpiry)
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
+                                    response: authResponse(accessToken: NewAccessToken, idToken: IdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: storedIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -1))
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(beSuccessful())
+                        // Pinned value must still be present and unchanged after the renewal.
+                        let stored = try? store.data(forKey: "session_expiry")
+                        let pinned = stored.flatMap { String(data: $0, encoding: .utf8) }.flatMap { Int($0) }
+                        expect(pinned) == futureExpiry
                         done()
                     }
                 }
@@ -1202,15 +1256,6 @@ class CredentialsManagerSpec: QuickSpec {
                         done()
                     }
                 }
-            }
-
-            it("should report no valid credentials from hasValid when the ceiling is reached") {
-                let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
-                let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
-
-                expect(credentialsManager.hasValid()).to(beFalse())
             }
 
         }

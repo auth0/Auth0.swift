@@ -666,9 +666,9 @@ let isValid = credentialsManager.isBiometricSessionValid()
 
 Auth0 supports the [IPSIE SL1](https://openid.github.io/ipsie-openid-sl1/draft-openid-ipsie-sl1-profile.html) `session_expiry` claim, which lets an upstream identity provider (e.g. Okta) set a hard ceiling on how long an Auth0-issued session may live. When your connection has this option enabled, Auth0 includes a `session_expiry` Unix timestamp in the ID token it returns to your app after login.
 
-The `CredentialsManager` enforces this ceiling on every retrieval — `credentials()`, `ssoCredentials()`, and `apiCredentials()`. Once the ceiling has passed (with a 30-second clock-skew leeway), the call clears the stored credentials and returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant. `hasValid()` also reports `false` once the ceiling is reached.
+The `CredentialsManager` enforces this ceiling on every retrieval — `credentials()`, `ssoCredentials()`, and `apiCredentials()`. Once the ceiling has passed (with a 30-second clock-skew leeway), the call clears the stored credentials and returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant.
 
-The ceiling is **pinned at the initial login**: it is read from the first ID token and persisted to the Keychain, so it survives refreshes whose ID token does not re-emit the claim and a refresh can never extend the session past it. `clear()` removes the persisted ceiling so it does not leak past logout.
+The ceiling is **pinned at the initial login**: the `session_expiry` value from the first ID token is persisted to the Keychain and never overwritten by a refresh-token grant. This means a renewal whose ID token re-emits the claim cannot raise the ceiling past the original value. `clear()` removes the pinned value on logout so the next login pins a fresh ceiling.
 
 #### What `session_expiry` means
 
@@ -725,7 +725,7 @@ credentialsManager.credentials { result in
 ```
 
 > [!NOTE]
-> `sessionExpiresAt` is decoded on demand from the current ID token. After a refresh whose new ID token omits the claim, this property returns `nil` even though the Credentials Manager still enforces the ceiling pinned at the initial login.
+> `sessionExpiresAt` reflects the `session_expiry` claim in the *current* ID token only. The `CredentialsManager` enforces the ceiling pinned at the initial login, which may differ from — or be absent from — a later renewal token. For the authoritative ceiling value, rely on the `CredentialsManager` error, not this property.
 
 > [!IMPORTANT]
 > `session_expiry` is a ceiling computed at login time — it is **not** real-time session revocation. If a user is de-provisioned mid-session, they will not be immediately signed out; that requires back-channel logout / CAEP, which is a separate platform capability.

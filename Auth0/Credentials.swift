@@ -11,6 +11,24 @@ private struct _A0Credentials {
     let recoveryCode: String?
 }
 
+/// Decodes the IPSIE `session_expiry` claim from a JWT string.
+///
+/// Returns the Unix-seconds timestamp as an `Int`, or `nil` when the token is absent, unparseable,
+/// does not carry the claim, or carries a value outside `(0, 10_000_000_000)`.
+/// The upper bound rejects timestamps expressed in milliseconds (13-digit values produced by
+/// `Date.now()` in JavaScript) which would silently disable the ceiling if accepted.
+/// The claim is read as `NSNumber` so a fractional value is truncated rather than dropped.
+func parseSessionExpiry(fromIdToken idToken: String?) -> Int? {
+    guard let idToken = idToken,
+          let jwt = try? decode(jwt: idToken),
+          let rawValue = jwt.body["session_expiry"] as? NSNumber else {
+        return nil
+    }
+    let value = rawValue.intValue
+    guard value > 0, value < 10_000_000_000 else { return nil }
+    return value
+}
+
 /// User's credentials obtained from Auth0.
 @objc(A0Credentials)
 public final class Credentials: NSObject, Sendable {
@@ -80,19 +98,13 @@ public final class Credentials: NSObject, Sendable {
     /// The value is decoded on demand from ``idToken``. A value that is not a plausible Unix-seconds
     /// timestamp (outside `(0, 10_000_000_000)`) is treated as "no ceiling" and returns `nil`.
     ///
-    /// - Important: The ``CredentialsManager`` enforces this ceiling using the value pinned at the
-    /// initial login. After a refresh whose new ID token omits the claim, this property returns `nil`
-    /// even though the Credentials Manager still enforces the pinned ceiling.
+    /// - Important: The ``CredentialsManager`` enforces this ceiling using the value pinned to the
+    /// Keychain at the initial login. The pinned value is never updated by a refresh-token grant, so
+    /// even if a renewal returns an ID token that omits or lowers the claim, the original ceiling
+    /// remains in effect. This property reflects the *current* ID token only — use
+    /// ``CredentialsManager`` for authoritative enforcement.
     public var sessionExpiresAt: Int? {
-        guard let jwt = try? decode(jwt: self.idToken),
-              let rawValue = jwt.body["session_expiry"] as? NSNumber else {
-            return nil
-        }
-        let sessionExpiry = rawValue.intValue
-        guard sessionExpiry > 0, sessionExpiry < 10_000_000_000 else {
-            return nil
-        }
-        return sessionExpiry
+        return parseSessionExpiry(fromIdToken: self.idToken)
     }
 
     /// Custom description that redacts the tokens with `<REDACTED>`.
