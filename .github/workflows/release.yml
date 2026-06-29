@@ -23,6 +23,9 @@ jobs:
     runs-on: macos-14
     environment: release
 
+    permissions:
+      contents: write
+
     outputs:
       version: ${{ steps.get_version.outputs.version }}
       prerelease: ${{ steps.get_prerelease.outputs.prerelease }}
