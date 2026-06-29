@@ -114,17 +114,21 @@ try writeVersionsJSON(keep: keep, stable: stable, at: siteRoot)
 try copyVersionSelector(to: siteRoot)
 try writeNoJekyll(at: siteRoot)
 
-// When a stable version is served at the root (its DocC content is present),
-// that content owns the root and we must not overwrite it with a redirect.
-// Otherwise (prerelease-only / first deploy) write a redirect so the root is
-// not blank.
+// The bare site root (e.g. /Auth0.swift/) must land on a working doc page. DocC's
+// own top-level index.html is an SPA loader stub hardcoded to baseUrl "/", so its
+// asset URLs (/js, /css) 404 under the /<base-path>/ prefix — leaving the page
+// blank. We always overwrite it with our own redirect to a fully base-path-scoped
+// landing page. When stable content owns the root, the version-less
+// documentation/auth0/ (which bakes the correct base path) is canonical; otherwise
+// redirect into the stable version's /v<version>/ folder.
 let rootHasStableContent = fileManager.fileExists(
     atPath: siteRoot.appendingPathComponent("documentation", isDirectory: true).path
 )
 if rootHasStableContent {
+    try writeRootRedirect(toDocPath: "documentation/auth0/", basePath: basePath, at: siteRoot)
     print("🎉 Done. Stable v\(stable) served at root.")
 } else {
-    try writeRootRedirect(to: stable, basePath: basePath, at: siteRoot)
+    try writeRootRedirect(toDocPath: "v\(stable)/documentation/auth0/", basePath: basePath, at: siteRoot)
     print("🎉 Done. Root redirects to stable v\(stable).")
 }
 
@@ -198,16 +202,20 @@ func copyVersionSelector(to root: URL) throws {
     try fileManager.copyItem(at: source, to: destination)
 }
 
-func writeRootRedirect(to version: SemVer, basePath: String, at root: URL) throws {
+/// Writes the site-root `index.html`, overwriting DocC's baseUrl-"/" loader stub
+/// with a redirect to a base-path-scoped landing page. `docPath` is relative to
+/// the site root (e.g. `documentation/auth0/` for root-served stable, or
+/// `v<version>/documentation/auth0/` when redirecting into a version folder).
+func writeRootRedirect(toDocPath docPath: String, basePath: String, at root: URL) throws {
     let html = """
     <!DOCTYPE html>
     <html>
       <head>
-        <meta http-equiv="refresh" content="0; url=v\(version)/documentation/auth0/" />
-        <link rel="canonical" href="/\(basePath)/v\(version)/documentation/auth0/" />
+        <meta http-equiv="refresh" content="0; url=\(docPath)" />
+        <link rel="canonical" href="/\(basePath)/\(docPath)" />
       </head>
       <body>
-        <a href="v\(version)/documentation/auth0/">Redirect to the latest documentation</a>
+        <a href="\(docPath)">Redirect to the latest documentation</a>
       </body>
     </html>
 
