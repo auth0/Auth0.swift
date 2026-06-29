@@ -1,0 +1,24 @@
+name: Release
+
+on:
+  pull_request:
+    types:
+      - closed
+  workflow_dispatch:
+
+# Serialize releases so a manual dispatch and a merged-PR trigger cannot race.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  # Build and deploy the versioned API documentation for a release. The actual
+  # build/deploy logic lives in docs.yml so it can also be dispatched manually
+  # against any branch to preview a deployment. Tag creation and the CocoaPods
+  # publish are handled separately.
+  publish-docs:
+    name: Build and deploy versioned API documentation
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release/'))
+    uses: ./.github/workflows/docs.yml
+    permissions:
+      contents: write
