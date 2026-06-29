@@ -23,8 +23,28 @@ Given a fresh DocC build and a gh-pages working copy, it:
 4. Applies a **keep-two-major-lines** retention policy (mirrors react-native-auth0):
    - stable release → keep the two most recent stable majors (highest patch each);
    - prerelease → keep the prerelease plus the latest earlier stable major.
-5. Writes the site root: `versions.json` (+ `stable` pointer), `version-selector.js`,
-   an `index.html` redirect to the newest version, and `.nojekyll`.
+5. For a stable release (`--new-build-root` provided), mirrors that version at the
+   site root so the default docs serve from a **version-less URL** (the historical
+   canonical URL). Prereleases omit this and leave the root serving the last stable.
+6. Writes the site root: `versions.json` (+ `stable` pointer), `version-selector.js`,
+   `.nojekyll`, and — only when no stable content owns the root yet — an `index.html`
+   redirect to the newest stable version.
+
+## Root-mirror model
+
+The default stable version is served **directly at the site root** (e.g.
+`/Auth0.swift/documentation/auth0/`), while every version — including the stable one —
+is also addressable under its `/v<version>/` folder. DocC bakes **absolute** asset
+paths at transform time, so the same archive is transformed twice for a stable release:
+once with the version base path (`Auth0.swift/v<version>` → `--new-build`) and once with
+the bare base path (`Auth0.swift` → `--new-build-root`).
+
+The root is a **disposable mirror** of the current stable, rebuilt on each stable
+release; the `/v<version>/` folders are the source of truth. When folding in a stable
+release, the tool clears the previous stable's root DocC content (preserving every
+`v*/` alias plus the shared `versions.json`, `version-selector.js`, and `.nojekyll`),
+then lays down the new stable's root copy. Prereleases never take over the root, so the
+last stable keeps serving the default docs even while a beta is published under its alias.
 
 ## Usage
 
@@ -32,21 +52,31 @@ Given a fresh DocC build and a gh-pages working copy, it:
 swift run --package-path scripts/DocsVersions DocsVersions \
   --site-root <gh-pages working copy> \
   --new-build <freshly transformed DocC static site> \
+  [--new-build-root <root-base-path transform, stable releases only>] \
   [--version X.Y.Z] \
   [--version-file Auth0/Version.swift] \
   [--base-path Auth0.swift]
 ```
 
 The DocC build that feeds `--new-build` must be transformed with a version-scoped
-hosting base path so each folder is self-contained:
+hosting base path so each folder is self-contained. A stable release additionally
+feeds `--new-build-root` with a second transform of the same archive built with the
+bare base path, which is served at the site root:
 
 ```bash
+# Versioned alias (always)
 docc process-archive transform-for-static-hosting <archive> \
   --hosting-base-path Auth0.swift/v<version> \
   --output-path <new-build dir>
+
+# Root mirror (stable releases only) → pass as --new-build-root
+docc process-archive transform-for-static-hosting <archive> \
+  --hosting-base-path Auth0.swift \
+  --output-path <new-build-root dir>
 ```
 
-In this repo, `bundle exec fastlane build_docs` produces that build into `docs_build/`.
+In this repo, `bundle exec fastlane build_docs` produces the versioned build into
+`docs_build/` and, for a stable release, the root build into `docs_build_root/`.
 
 ## Tests
 
