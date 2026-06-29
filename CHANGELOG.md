@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.23.0](https://github.com/auth0/Auth0.swift/tree/2.23.0) (2026-06-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.22.0...2.23.0)
+
+**Added**
+- feat: add passwordless OTP for database connections [\#1218](https://github.com/auth0/Auth0.swift/pull/1218) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
+**Changed**
+- docs: add Docs Update Rules section to AGENTS.md [\#1216](https://github.com/auth0/Auth0.swift/pull/1216) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
 ## [2.22.0](https://github.com/auth0/Auth0.swift/tree/2.22.0) (2026-06-05)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.21.2...2.22.0)
 
