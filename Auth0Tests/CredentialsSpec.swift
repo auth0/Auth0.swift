@@ -222,5 +222,48 @@ class CredentialsSpec: QuickSpec {
 
         }
 
+        describe("session expiry") {
+
+            it("should read session_expiry from the id token") {
+                let sessionExpiry = 1_700_000_000
+                let credentials = Credentials(idToken: idTokenWithSessionExpiry(sessionExpiry))
+                expect(credentials.sessionExpiresAt) == Date(timeIntervalSince1970: TimeInterval(sessionExpiry))
+            }
+
+            it("should be nil when the claim is absent") {
+                let credentials = Credentials(idToken: idTokenWithSessionExpiry(nil))
+                expect(credentials.sessionExpiresAt).to(beNil())
+            }
+
+            it("should be nil when the id token is not a valid jwt") {
+                let credentials = Credentials(idToken: "not-a-jwt")
+                expect(credentials.sessionExpiresAt).to(beNil())
+            }
+
+            it("should be nil when the value is implausibly large (milliseconds)") {
+                let credentials = Credentials(idToken: idTokenWithSessionExpiry(1_700_000_000_000))
+                expect(credentials.sessionExpiresAt).to(beNil())
+            }
+
+        }
+
     }
+}
+
+/// Builds an unsigned JWT containing (or omitting) a `session_expiry` claim. JWTDecode does not
+/// validate signatures, so the signature can be arbitrary for unit tests.
+private func idTokenWithSessionExpiry(_ sessionExpiry: Int?) -> String {
+    var payload: [String: Any] = ["iss": "test", "sub": "sub|123", "aud": "audience"]
+    if let sessionExpiry = sessionExpiry {
+        payload["session_expiry"] = sessionExpiry
+    }
+    let headerJSON = try! JSONSerialization.data(withJSONObject: ["typ": "JWT", "alg": "HS256"])
+    let payloadJSON = try! JSONSerialization.data(withJSONObject: payload)
+    func encode(_ data: Data) -> String {
+        return data.base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+    }
+    return "\(encode(headerJSON)).\(encode(payloadJSON)).fakesig"
 }

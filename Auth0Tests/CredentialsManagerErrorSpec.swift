@@ -171,6 +171,13 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for session expired") {
+                let message = "The upstream IdP session has expired. The session_expiry claim in the ID token indicates"
+                    + " the session ceiling set by the upstream identity provider has been reached."
+                let error = CredentialsManagerError(code: .sessionExpired)
+                expect(error.localizedDescription) == message
+            }
+
         }
 
         describe("DPoP error equality and pattern matching") {
@@ -209,6 +216,24 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(CredentialsManagerError.dpopKeyMissing) != CredentialsManagerError.dpopNotConfigured
                 expect(CredentialsManagerError.dpopKeyMissing) != CredentialsManagerError.dpopKeyMismatch
                 expect(CredentialsManagerError.dpopNotConfigured) != CredentialsManagerError.dpopKeyMismatch
+            }
+
+        }
+
+        describe("sessionExpired error equality and pattern matching") {
+
+            it("sessionExpired should be equal by code") {
+                let error = CredentialsManagerError(code: .sessionExpired)
+                expect(error) == CredentialsManagerError.sessionExpired
+            }
+
+            it("sessionExpired should pattern match by code") {
+                let error = CredentialsManagerError(code: .sessionExpired)
+                expect(error ~= CredentialsManagerError.sessionExpired) == true
+            }
+
+            it("sessionExpired should not equal noCredentials") {
+                expect(CredentialsManagerError.sessionExpired) != CredentialsManagerError.noCredentials
             }
 
         }

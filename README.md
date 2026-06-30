@@ -318,7 +318,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 Explore common use cases and integration patterns for Auth0.swift.
 
 > [!NOTE]
-> **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, custom token exchange, and more. ✨
+> **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, IPSIE session expiry, custom token exchange, and more. ✨
 
 ### Store credentials
 
@@ -356,6 +356,28 @@ do {
 }
 ```
 </details>
+
+### IPSIE session expiry [EA]
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires session-expiry enforcement enabled on your OIDC or Okta enterprise connection in the Auth0 Dashboard.
+
+When an enterprise connection (OIDC / Okta) is configured with session-expiry enforcement enabled, Auth0 emits a `session_expiry` claim in the ID token. The `CredentialsManager` automatically enforces this upstream IdP session ceiling — `credentials()`, `ssoCredentials()`, and `apiCredentials()` clear the stored credentials and return `CredentialsManagerError.sessionExpired` once the ceiling is reached (with a 30-second clock-skew leeway), without attempting a token renewal. The ceiling is pinned at the initial login: the value from the first ID token is persisted to the Keychain and never updated by a refresh-token grant. `clear()` removes it on logout.
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(CredentialsManagerError.sessionExpired):
+        // Upstream IdP session ended — prompt re-login
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+For a full guide including configuration steps and reading the raw claim value, see the [IPSIE session expiry section in EXAMPLES.md](EXAMPLES.md#ipsie-session-expiry-ea).
 
 ### Clear stored credentials
 
