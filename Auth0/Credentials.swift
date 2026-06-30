@@ -17,14 +17,14 @@ private struct _A0Credentials {
 /// does not carry the claim, or carries a value outside `(0, 10_000_000_000)`.
 /// The upper bound rejects timestamps expressed in milliseconds (13-digit values produced by
 /// `Date.now()` in JavaScript) which would silently disable the ceiling if accepted.
-/// The claim is read as `NSNumber` so a fractional value is truncated rather than dropped.
+/// The claim is read as `Double` so a fractional value is truncated rather than dropped.
 func parseSessionExpiry(fromIdToken idToken: String?) -> Int? {
     guard let idToken = idToken,
           let jwt = try? decode(jwt: idToken),
-          let rawValue = jwt.body["session_expiry"] as? NSNumber else {
+          let rawValue = jwt.body["session_expiry"] as? Double else {
         return nil
     }
-    let value = rawValue.intValue
+    let value = Int(rawValue)
     guard value > 0, value < 10_000_000_000 else { return nil }
     return value
 }
@@ -88,21 +88,11 @@ public final class Credentials: NSObject, Sendable {
     /// - [MFA Recovery Codes](https://auth0.com/docs/secure/multi-factor-authentication/configure-recovery-codes-for-mfa)
     public let recoveryCode: String?
 
-    /// The absolute session-expiry ceiling, in **Unix seconds**, asserted by the upstream identity
-    /// provider via the IPSIE `session_expiry` claim, or `nil` when the connection does not emit it.
+    /// Unix-seconds timestamp of the IPSIE `session_expiry` ceiling, or `nil` when the claim is absent
+    /// or outside the valid range `(0, 10_000_000_000)`.
     ///
-    /// This is a session-level ceiling that is independent of ``expiresIn`` (the access-token expiry):
-    /// it usually sits much further out and caps how long the local session may live, regardless of
-    /// access-token renewals. A `nil` value means there is no such ceiling.
-    ///
-    /// The value is decoded on demand from ``idToken``. A value that is not a plausible Unix-seconds
-    /// timestamp (outside `(0, 10_000_000_000)`) is treated as "no ceiling" and returns `nil`.
-    ///
-    /// - Important: The ``CredentialsManager`` enforces this ceiling using the value pinned to the
-    /// Keychain at the initial login. The pinned value is never updated by a refresh-token grant, so
-    /// even if a renewal returns an ID token that omits or lowers the claim, the original ceiling
-    /// remains in effect. This property reflects the *current* ID token only — use
-    /// ``CredentialsManager`` for authoritative enforcement.
+    /// - Important: Reflects the *current* ID token only. ``CredentialsManager`` enforces the ceiling
+    /// using the value pinned to the Keychain at initial login, which survives refresh-token renewals.
     public var sessionExpiresAt: Int? {
         return parseSessionExpiry(fromIdToken: self.idToken)
     }
