@@ -174,6 +174,12 @@ public struct CredentialsManager: Sendable {
     /// ```
     ///
     /// - Returns: If the credentials were removed.
+    ///
+    /// - Note: Audience-scoped API credentials stored via ``apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)``
+    /// are **not** removed by this method — use ``clear(forAudience:scope:)`` for each audience.
+    /// When `.sessionExpired` is returned, the main credentials and pinned session ceiling are cleared
+    /// automatically, but any still-valid cached API credentials for a given audience will continue to
+    /// be served until their own TTL lapses.
     public func clear() -> Bool {
         #if WEB_AUTH_PLATFORM
         self.biometricSession.lock.lock()
@@ -411,6 +417,10 @@ public struct CredentialsManager: Sendable {
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        guard !self.hasSessionExpired(idToken: nil) else {
+            _ = self.clear()
+            return callback(.failure(.sessionExpired))
+        }
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
                 let error = CredentialsManagerError(code: .biometricsFailed,
