@@ -1050,17 +1050,13 @@ public struct CredentialsManager: Sendable {
     /// session is treated as expired slightly *before* the wall-clock ceiling, never after.
     private static let sessionExpiryLeeway: TimeInterval = 30
 
-    func sessionExpiry(fromIdToken idToken: String?) -> Int? {
-        return parseSessionExpiry(fromIdToken: idToken)
-    }
-
     /// Writes the `session_expiry` ceiling to the Keychain on the first login.
     ///
     /// Only writes when no ceiling is already pinned, so calling `store(credentials:)` on a renewal
     /// grant is safe — the existing pinned value is preserved.
     private func pinSessionExpiry(for credentials: Credentials) {
         guard pinnedSessionExpiry() == nil,
-              let expiry = self.sessionExpiry(fromIdToken: credentials.idToken) else { return }
+              let expiry = Credentials.parseSessionExpiry(fromIdToken: credentials.idToken) else { return }
         _ = self.storage.setEntry(Data(String(expiry).utf8), forKey: self.sessionExpiryKey)
     }
 
@@ -1080,7 +1076,7 @@ public struct CredentialsManager: Sendable {
     /// sessions stored before the pinning feature existed. When neither source provides a value the
     /// session is not expired (fail-open). A 30-second negative leeway is applied.
     func hasSessionExpired(idToken: String?) -> Bool {
-        guard let sessionExpiry = pinnedSessionExpiry() ?? self.sessionExpiry(fromIdToken: idToken) else {
+        guard let sessionExpiry = pinnedSessionExpiry() ?? Credentials.parseSessionExpiry(fromIdToken: idToken) else {
             return false
         }
         return Date().timeIntervalSince1970 + CredentialsManager.sessionExpiryLeeway >= Double(sessionExpiry)
