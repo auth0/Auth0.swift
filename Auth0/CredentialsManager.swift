@@ -1046,8 +1046,8 @@ public struct CredentialsManager: Sendable {
         return expiresIn < Date()
     }
 
-    /// Negative clock-skew leeway (seconds) applied when checking the `session_expiry` ceiling, so the
-    /// session is treated as expired slightly *before* the wall-clock ceiling, never after.
+    /// Grace period (seconds): the session is treated as expired this many seconds before the
+    /// wall-clock ceiling, ensuring it is never extended past the upstream IdP boundary.
     private static let sessionExpiryLeeway: TimeInterval = 30
 
     /// Writes the `session_expiry` ceiling to the Keychain on the first login.

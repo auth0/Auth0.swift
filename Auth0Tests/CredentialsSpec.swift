@@ -227,7 +227,7 @@ class CredentialsSpec: QuickSpec {
             it("should read session_expiry from the id token") {
                 let sessionExpiry = 1_700_000_000
                 let credentials = Credentials(idToken: idTokenWithSessionExpiry(sessionExpiry))
-                expect(credentials.sessionExpiresAt) == sessionExpiry
+                expect(credentials.sessionExpiresAt) == Date(timeIntervalSince1970: TimeInterval(sessionExpiry))
             }
 
             it("should be nil when the claim is absent") {

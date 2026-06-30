@@ -70,13 +70,14 @@ public final class Credentials: NSObject, Sendable {
     /// - [MFA Recovery Codes](https://auth0.com/docs/secure/multi-factor-authentication/configure-recovery-codes-for-mfa)
     public let recoveryCode: String?
 
-    /// Unix-seconds timestamp of the IPSIE `session_expiry` ceiling, or `nil` when the claim is absent
-    /// or outside the valid range `(0, 10_000_000_000)`.
+    /// The date at which the IPSIE `session_expiry` ceiling is reached, or `nil` when the claim is
+    /// absent or outside the valid range `(0, 10_000_000_000)`.
     ///
     /// - Important: Reflects the *current* ID token only. ``CredentialsManager`` enforces the ceiling
     /// using the value pinned to the Keychain at initial login, which survives refresh-token renewals.
-    public var sessionExpiresAt: Int? {
-        return Credentials.parseSessionExpiry(fromIdToken: self.idToken)
+    public var sessionExpiresAt: Date? {
+        guard let seconds = Credentials.parseSessionExpiry(fromIdToken: self.idToken) else { return nil }
+        return Date(timeIntervalSince1970: TimeInterval(seconds))
     }
 
     /// Decodes the IPSIE `session_expiry` claim from a JWT string.

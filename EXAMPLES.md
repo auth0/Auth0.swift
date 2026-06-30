@@ -716,14 +716,13 @@ do {
 
 #### Reading the `session_expiry` value
 
-`Credentials` exposes the ceiling via the `sessionExpiresAt` property (Unix seconds, or `nil` when the connection does not emit the claim), which you can use for app-level logic such as a countdown timer:
+`Credentials` exposes the ceiling via the `sessionExpiresAt` property (`Date`, or `nil` when the connection does not emit the claim), which you can use for app-level logic such as a countdown timer:
 
 ```swift
 credentialsManager.credentials { result in
     guard case .success(let credentials) = result,
-          let sessionExpiry = credentials.sessionExpiresAt else { return }
-    let expiresAt = Date(timeIntervalSince1970: TimeInterval(sessionExpiry))
-    print("Session ceiling: \(expiresAt)")
+          let sessionExpiresAt = credentials.sessionExpiresAt else { return }
+    print("Session ceiling: \(sessionExpiresAt)")
 }
 ```
 
