@@ -25,6 +25,7 @@ jobs:
 
     permissions:
       contents: write
+      pull-requests: read
 
     outputs:
       version: ${{ steps.get_version.outputs.version }}
@@ -78,22 +79,33 @@ jobs:
         env:
           VERSION: ${{ steps.get_version.outputs.version }}
 
-      # Tags the release, pushes the tag, creates the GitHub Release from the
-      # CHANGELOG, lints the podspec, and pushes the pod to CocoaPods trunk.
+      # Pull the release notes from the body of the PR on the release/ branch.
+      - name: Get release notes
+        id: get_release_notes
+        uses: ./.github/actions/get-release-notes
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: ${{ steps.get_version.outputs.version }}
+          repo_owner: ${{ github.repository_owner }}
+          repo_name: ${{ github.event.repository.name }}
+
+      # Tags the release, pushes the tag, lints the podspec, and pushes the pod
+      # to CocoaPods trunk.
       - name: Run release lane
         run: bundle exec fastlane release
         env:
-          AUTH0_SHIPPER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
 
-      # The shipper plugin always creates a non-prerelease GitHub Release; mark
-      # it as a pre-release when the version is a beta/alpha.
-      - name: Mark GitHub Release as pre-release
-        if: steps.get_prerelease.outputs.prerelease == 'true'
-        run: gh release edit "${VERSION}" --prerelease
-        env:
-          VERSION: ${{ steps.get_version.outputs.version }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Create the GitHub Release from the pushed tag.
+      - name: Create GitHub Release
+        uses: ./.github/actions/release-create
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ steps.get_version.outputs.version }}
+          tag: ${{ steps.get_version.outputs.version }}
+          commit: ${{ github.sha }}
+          body: ${{ steps.get_release_notes.outputs.release-notes }}
+          prerelease: ${{ steps.get_prerelease.outputs.prerelease }}
 
   # Build and deploy the versioned API documentation after a successful
   # release. The actual build/deploy logic lives in docs.yml so it can also be
