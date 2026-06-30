@@ -183,8 +183,6 @@ GEM
       xcodeproj (>= 1.13.0, < 2.0.0)
       xcpretty (~> 0.4.1)
       xcpretty-travis-formatter (>= 0.0.3, < 2.0.0)
-    fastlane-plugin-auth0_shipper (0.4.1)
-      semantic (~> 1.5)
     fastlane-sirp (1.1.0)
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-darwin)
@@ -283,7 +281,6 @@ GEM
     rubyzip (2.4.1)
     securerandom (0.4.1)
     security (0.1.5)
-    semantic (1.6.1)
     signet (0.22.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
@@ -335,7 +332,6 @@ PLATFORMS
 DEPENDENCIES
   cocoapods
   fastlane
-  fastlane-plugin-auth0_shipper
   multi_json
   slather
 
