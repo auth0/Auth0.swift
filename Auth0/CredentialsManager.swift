@@ -60,18 +60,18 @@ public struct CredentialsManager: Sendable {
     ///   - authentication: Auth0 Authentication API client.
     ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to 'credentials'.
     ///   - dpopThumprintKey: Key used to store dpop thumbprint. Defaults to 'dpop_thumbprint'.
-    ///   - sessionExpiryKey: Key used to store the pinned IPSIE `session_expiry` ceiling. Defaults to 'session_expiry'.
+    ///   - sessionExpiryKey: Key used to store the pinned IPSIE `session_expiry` ceiling. Defaults to `'\(storeKey)_session_expiry'` so each store's ceiling is namespaced and isolated when multiple instances share the same storage. Pass an explicit value only when you need a fixed key for migration or cross-instance sharing.
     ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `SimpleKeychain` instance.
     ///   - maxRetries:     Maximum number of retry attempts for credential renewal on transient errors. Defaults to 0.
     public init(authentication: Authentication,
                 storeKey: String = "credentials",
                 dpopThumbprintKey: String = "dpop_thumbprint",
-                sessionExpiryKey: String = "session_expiry",
+                sessionExpiryKey: String? = nil,
                 storage: CredentialsStorage = SimpleKeychain(),
                 maxRetries: Int = 0) {
         self.storeKey = storeKey
         self.dpopThumbprintKey = dpopThumbprintKey
-        self.sessionExpiryKey = sessionExpiryKey
+        self.sessionExpiryKey = sessionExpiryKey ?? "\(storeKey)_session_expiry"
         self.authentication = authentication
         self.sendableStorage = SendableBox(value: storage)
         self.maxRetries = max(0, maxRetries)
@@ -977,8 +977,8 @@ public struct CredentialsManager: Sendable {
         SynchronizationBarrier.shared.execute { complete in
             // IPSIE session_expiry: enforce the upstream-IdP session ceiling before serving cached
             // API credentials or exchanging the refresh token, so the session is never extended past
-            // it. The ceiling is read from the value pinned at login (with the stored ID token as a
-            // fallback); past it we clear and surface the dedicated error.
+            // it. The ceiling is read from the stored ID token; past it we clear and surface the
+            // dedicated error.
             if self.hasSessionExpired(idToken: self.retrieveCredentials()?.idToken) {
                 _ = self.clear()
                 complete()

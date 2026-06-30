@@ -1125,7 +1125,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentialsManager.credentials { result in
                         expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .sessionExpired)))
                         expect(fetchCredentials(from: store)).to(beNil())
-                        expect { try store.data(forKey: "session_expiry") }.to(throwError(SimpleKeychainError.itemNotFound))
+                        expect { try store.data(forKey: "credentials_session_expiry") }.to(throwError(SimpleKeychainError.itemNotFound))
                         done()
                     }
                 }
@@ -1149,7 +1149,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentialsManager.credentials { result in
                         expect(result).to(beSuccessful())
                         // Pinned value must still be the original, not the later one from the renewal.
-                        let stored = try? store.data(forKey: "session_expiry")
+                        let stored = try? store.data(forKey: "credentials_session_expiry")
                         let pinned = stored.flatMap { String(data: $0, encoding: .utf8) }.flatMap { Int($0) }
                         expect(pinned) == pinnedExpiry
                         done()
@@ -1220,7 +1220,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentialsManager.credentials { result in
                         expect(result).to(beSuccessful())
                         // Pinned value must still be present and unchanged after the renewal.
-                        let stored = try? store.data(forKey: "session_expiry")
+                        let stored = try? store.data(forKey: "credentials_session_expiry")
                         let pinned = stored.flatMap { String(data: $0, encoding: .utf8) }.flatMap { Int($0) }
                         expect(pinned) == futureExpiry
                         done()
