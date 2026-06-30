@@ -73,6 +73,14 @@ final class RetentionTests: XCTestCase {
         XCTAssertEqual(keep.map { $0.description }, ["3.0.0-beta.2", "2.22.0"])
     }
 
+    func testPrereleaseKeepsSameMajorStable() {
+        let keep = Retention.versionsToKeep(
+            current: SemVer("2.24.0-beta.1")!,
+            existing: versions("2.23.0", "2.22.0")
+        )
+        XCTAssertEqual(keep.map { $0.description }, ["2.24.0-beta.1", "2.23.0"])
+    }
+
     func testPrereleaseWithNoEarlierStableKeepsOnlyItself() {
         let keep = Retention.versionsToKeep(
             current: SemVer("1.0.0-alpha.1")!,
