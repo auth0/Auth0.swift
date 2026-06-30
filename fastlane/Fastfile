@@ -2,12 +2,13 @@ default_platform :ios
 
 platform :ios do
   desc "Tags the release and pushes the Podspec to CocoaPods"
+  # The GitHub Release is created by the workflow via softprops/action-gh-release;
+  # auth0_shipper's publish_release authenticates the Releases API with Basic auth,
+  # which GitHub Actions' GITHUB_TOKEN does not accept (returns 404).
   lane :release do
     perform_release target: 'Auth0.iOS'
-    publish_release(
-    repository: 'Auth0.swift',
-    pod_lint_allow_warnings: true
-  )
+    pod_lib_lint(allow_warnings: true)
+    pod_push(allow_warnings: true)
   end
 
   desc 'Generate versioned API documentation into a temporary build directory'
