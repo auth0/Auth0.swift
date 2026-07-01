@@ -20,9 +20,16 @@ Given a fresh DocC build and a gh-pages working copy, it:
 1. Reads the version from `Auth0/Version.swift` (or `--version`).
 2. Replaces `v<version>/` with the new build (always overwrites the current version).
 3. Injects `<script defer src="/<base-path>/version-selector.js"></script>` into every page.
-4. Applies a **keep-two-major-lines** retention policy (mirrors react-native-auth0):
-   - stable release → keep the two most recent stable majors (highest patch each);
-   - prerelease → keep the prerelease plus the latest earlier stable major.
+4. Applies a **keep-two-major-lines** retention policy:
+   - **latest major** → its latest release; if that major has a stable, its betas
+     are dropped (stable wins), otherwise its latest prerelease is kept (so a live
+     next-major preview like `3.0.0-beta.2` survives while a lower-major stable ships);
+   - **previous major** → its latest stable release.
+
+   The current release is always among the newest, so it is always kept. When the
+   current release is a prerelease, the latest stable below it is additionally
+   retained even if it shares the current major (e.g. `2.24.0-beta.1` keeps `2.23.0`),
+   so the stable users rely on stays live during a preview.
 5. For a stable release (`--new-build-root` provided), mirrors that version at the
    site root so the default docs serve from a **version-less URL** (the historical
    canonical URL). Prereleases omit this and leave the root serving the last stable.
