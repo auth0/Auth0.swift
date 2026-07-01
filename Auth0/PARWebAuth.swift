@@ -31,14 +31,14 @@ import Combine
 /// - ``AuthorizationCode``
 /// - ``PARAuth``
 /// - ``WebAuthError``
-struct PARWebAuth: PARAuth, @unchecked Sendable {
+struct PARWebAuth: PARAuth, Sendable {
 
     public let clientId: String
     public let url: URL
-    public var telemetry: Telemetry
+    public var auth0ClientInfo: Auth0ClientInfo
     public var logger: Logger?
     private let storage: TransactionStore
-    private var barrier: Barrier
+    private let barrier: Barrier
 
     private var sessionTransferTokenValue: String?
     private var customProvider: WebAuthProvider?
@@ -71,12 +71,12 @@ struct PARWebAuth: PARAuth, @unchecked Sendable {
     ///   - url: The Auth0 domain URL.
     public init(clientId: String,
                 url: URL,
-                telemetry: Telemetry = Telemetry(),
+                auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo(),
                 barrier: Barrier = QueueBarrier.shared) {
         self.clientId = clientId
         self.url = url
         self.storage = TransactionStore.shared
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
         self.barrier = barrier
     }
 
@@ -84,12 +84,12 @@ struct PARWebAuth: PARAuth, @unchecked Sendable {
          url: URL,
          storage: TransactionStore,
          barrier: Barrier = QueueBarrier.shared,
-         telemetry: Telemetry = Telemetry()) {
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo()) {
         self.clientId = clientId
         self.url = url
         self.storage = storage
         self.barrier = barrier
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
     }
 
     // MARK: - Builder Methods
@@ -165,7 +165,7 @@ struct PARWebAuth: PARAuth, @unchecked Sendable {
             clientId: clientId,
             requestUri: requestUri,
             additionalParameters: additionalParameters,
-            telemetry: telemetry
+            auth0ClientInfo: auth0ClientInfo
         )
 
         let provider = self.customProvider ?? WebAuthentication.asProvider(

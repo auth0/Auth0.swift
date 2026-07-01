@@ -62,266 +62,16 @@ class AuthenticationSpec: QuickSpec {
                 expect(authentication.session).to(be(session))
             }
             
-            it("should init with client id, url & telemetry") {
+            it("should init with client id, url & auth0ClientInfo") {
                 let telemetryInfo = "info"
-                var telemetry = Telemetry()
-                telemetry.info = telemetryInfo
-                let authentication = Auth0Authentication(clientId: ClientId, url: DomainURL, telemetry: telemetry)
-                expect(authentication.telemetry.info) == telemetryInfo
+                var auth0ClientInfo = Auth0ClientInfo()
+                auth0ClientInfo.info = telemetryInfo
+                let authentication = Auth0Authentication(clientId: ClientId, url: DomainURL, auth0ClientInfo: auth0ClientInfo)
+                expect(authentication.auth0ClientInfo.info) == telemetryInfo
             }
             
         }
         
-        describe("login MFA OTP") {
-            
-            beforeEach {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["otp": OTP, "mfa_token": MFAToken])
-                }, response:  authResponse(accessToken: AccessToken, idToken: IdToken))
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["otp": OTP, "mfa_token": "bad_token"])
-                }, response: authFailure(code: "invalid_grant", description: "Malformed mfa_token"))
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["otp": "bad_otp", "mfa_token": MFAToken])
-                }, response: authFailure(code: "invalid_grant", description: "Invalid otp_code."))
-            }
-            
-            it("should login with otp and mfa tokens") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withOTP: OTP, mfaToken: MFAToken).start { result in
-                        expect(result).to(haveCredentials())
-                        done()
-                    }
-                }
-            }
-
-            it("should fail login with bad otp") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withOTP: "bad_otp", mfaToken: MFAToken).start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid otp_code."))
-                        done()
-                    }
-                }
-            }
-
-            it("should fail login with invalid mfa") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withOTP: OTP, mfaToken: "bad_token").start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
-                        done()
-                    }
-                }
-            }
-
-            it("should use DPoP when it is enabled") {
-                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
-                let request = auth.login(withOTP: OTP, mfaToken: MFAToken)
-
-                expect(request.dpop).toNot(beNil())
-            }
-
-            it("should not use DPoP when it is not enabled") {
-                let request = auth.login(withOTP: OTP, mfaToken: MFAToken)
-
-                expect(request.dpop).to(beNil())
-            }
-
-        }
-        
-        describe("login MFA OOB") {
-            
-            beforeEach {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["oob_code": OOB, "mfa_token": MFAToken])
-                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["oob_code": OOB, "mfa_token": MFAToken, "binding_code": BindingCode])
-                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["oob_code": "bad_oob", "mfa_token": MFAToken])
-                }, response: authFailure(code: "invalid_grant", description: "Invalid oob_code."))
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["oob_code": OOB, "mfa_token": "bad_token"])
-                }, response: authFailure(code: "invalid_grant", description: "Malformed mfa_token"))
-            }
-            
-            it("should login with oob code and mfa tokens with default parameters") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withOOBCode: OOB, mfaToken: MFAToken).start { result in
-                        expect(result).to(haveCredentials())
-                        done()
-                    }
-                }
-            }
-            
-            it("should login with oob code and mfa tokens with binding code") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withOOBCode: OOB, mfaToken: MFAToken, bindingCode: BindingCode).start { result in
-                        expect(result).to(haveCredentials())
-                        done()
-                    }
-                }
-            }
-            
-            it("should fail login with bad oob code") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withOOBCode: "bad_oob", mfaToken: MFAToken, bindingCode: nil).start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid oob_code."))
-                        done()
-                    }
-                }
-            }
-            
-            it("should fail login with invalid mfa") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withOOBCode: OOB, mfaToken: "bad_token", bindingCode: nil).start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
-                        done()
-                    }
-                }
-            }
-
-            it("should use DPoP when it is enabled") {
-                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
-                let request = auth.login(withOOBCode: OOB, mfaToken: MFAToken)
-
-                expect(request.dpop).toNot(beNil())
-            }
-
-            it("should not use DPoP when it is not enabled") {
-                let request = auth.login(withOOBCode: OOB, mfaToken: MFAToken)
-
-                expect(request.dpop).to(beNil())
-            }
-
-        }
-        
-        describe("login MFA recovery code") {
-            
-            beforeEach {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["recovery_code": RecoveryCode, "mfa_token": MFAToken]) }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["recovery_code": "bad_recovery", "mfa_token": MFAToken]) }, response: authFailure(code: "invalid_grant", description: "Invalid recovery_code."))
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["recovery_code": RecoveryCode, "mfa_token": "bad_token"]) }, response: authFailure(code: "invalid_grant", description: "Malformed mfa_token"))
-            }
-            
-            it("should login with recovery code and mfa tokens") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withRecoveryCode: RecoveryCode, mfaToken: MFAToken).start { result in
-                        expect(result).to(haveCredentials())
-                        done()
-                    }
-                }
-            }
-            
-            it("should fail login with bad recovery code") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withRecoveryCode: "bad_recovery", mfaToken: MFAToken).start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid recovery_code."))
-                        done()
-                    }
-                }
-            }
-            
-            it("should fail login with invalid mfa") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withRecoveryCode: RecoveryCode, mfaToken: "bad_token").start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
-                        done()
-                    }
-                }
-            }
-
-            it("should use DPoP when it is enabled") {
-                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
-                let request = auth.login(withRecoveryCode: RecoveryCode, mfaToken: MFAToken)
-
-                expect(request.dpop).toNot(beNil())
-            }
-
-            it("should not use DPoP when it is not enabled") {
-                let request = auth.login(withRecoveryCode: RecoveryCode, mfaToken: MFAToken)
-
-                expect(request.dpop).to(beNil())
-            }
-
-        }
-        
-        // MARK:- MFA Challenge
-        
-        describe("MFA challenge") {
-            
-            beforeEach {
-                NetworkStub.addStub(condition: {
-                    $0.isMultifactorChallenge(Domain) && $0.hasAtLeast([
-                        "mfa_token": MFAToken,
-                        "client_id": ClientId
-                    ]) && $0.hasNoneOf(["challenge_type", "authenticator_id"])
-                }, response: multifactorChallengeResponse(challengeType: "oob"))
-                
-                NetworkStub.addStub(condition: {
-                    $0.isMultifactorChallenge(Domain) && $0.hasAtLeast([
-                        "mfa_token": MFAToken,
-                        "client_id": ClientId,
-                        "challenge_type": "oob otp"
-                    ])
-                }, response: multifactorChallengeResponse(challengeType: "oob"))
-                
-                NetworkStub.addStub(condition: {
-                    $0.isMultifactorChallenge(Domain) && $0.hasAtLeast([
-                        "mfa_token": MFAToken,
-                        "client_id": ClientId,
-                        "authenticator_id": AuthenticatorId
-                    ])
-                }, response: multifactorChallengeResponse(challengeType: "oob"))
-                
-                NetworkStub.addStub(condition: {
-                    $0.isMultifactorChallenge(Domain) && $0.hasAtLeast([
-                        "mfa_token": MFAToken,
-                        "client_id": ClientId,
-                        "challenge_type": "oob otp",
-                        "authenticator_id": AuthenticatorId
-                    ])
-                }, response: multifactorChallengeResponse(challengeType: "oob"))
-            }
-            
-            it("should request MFA challenge with default parameters") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.multifactorChallenge(mfaToken: MFAToken).start { result in
-                        expect(result).to(beSuccessful())
-                        done()
-                    }
-                }
-            }
-            
-            it("should request MFA challenge with challenge types") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes).start { result in
-                        expect(result).to(beSuccessful())
-                        done()
-                    }
-                }
-            }
-            
-            it("should request MFA challenge with authenticator id") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.multifactorChallenge(mfaToken: MFAToken, authenticatorId: AuthenticatorId).start { result in
-                        expect(result).to(beSuccessful())
-                        done()
-                    }
-                }
-            }
-            
-            it("should request MFA challenge with all parameters") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes, authenticatorId: AuthenticatorId).start { result in
-                        expect(result).to(beSuccessful())
-                        done()
-                    }
-                }
-            }
-
-            it("should not use DPoP") {
-                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
-                let request = auth.multifactorChallenge(mfaToken: MFAToken)
-
-                expect(request.dpop).to(beNil())
-            }
-
-        }
-
         // MARK: - Passkeys
 
         #if PASSKEYS_PLATFORM
@@ -441,7 +191,7 @@ class AuthenticationSpec: QuickSpec {
                                              audience: Audience,
                                              scope: Scope)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
@@ -451,7 +201,7 @@ class AuthenticationSpec: QuickSpec {
                                              audience: Audience,
                                              scope: Scope)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -497,7 +247,7 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.passkeyLoginChallenge(connection: ConnectionName)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? Request<PasskeyLoginChallenge, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -599,7 +349,7 @@ class AuthenticationSpec: QuickSpec {
                                              audience: Audience,
                                              scope: Scope)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
@@ -609,7 +359,7 @@ class AuthenticationSpec: QuickSpec {
                                              audience: Audience,
                                              scope: Scope)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -822,7 +572,7 @@ class AuthenticationSpec: QuickSpec {
                                                               name: Name,
                                                               connection: ConnectionName)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? Request<PasskeySignupChallenge, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -933,13 +683,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.renew(withRefreshToken: refreshToken)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.renew(withRefreshToken: refreshToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1149,13 +899,13 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(appleAuthorizationCode: validCode)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.login(appleAuthorizationCode: validCode)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -1244,13 +994,13 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -1287,7 +1037,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.revoke(refreshToken: refreshToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Void, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1370,13 +1120,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm")
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm")
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1449,13 +1199,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1480,6 +1230,17 @@ class AuthenticationSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     auth.signup(email: SupportAtAuth0, username: Support, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCreatedUser(SupportAtAuth0, username: Support))
+                        done()
+                    }
+                }
+            }
+            
+            it("should create a user with default connection") {
+                NetworkStub.clearStubs()
+                NetworkStub.addStub(condition: { $0.isSignUp(Domain) && $0.hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": "Username-Password-Authentication", "client_id": ClientId])}, response: createdUser(email: SupportAtAuth0))
+                waitUntil(timeout: Timeout) { done in
+                    auth.signup(email: SupportAtAuth0, password: ValidPassword).start { result in
+                        expect(result).to(haveCreatedUser(SupportAtAuth0))
                         done()
                     }
                 }
@@ -1544,7 +1305,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.signup(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<DatabaseUser, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1577,7 +1338,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Void, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -1618,7 +1379,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.startPasswordless(email: SupportAtAuth0)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Void, AuthenticationError>)?.dpop).to(beNil())
             }
 
             context("passwordless login") {
@@ -1687,13 +1448,13 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(email: SupportAtAuth0, code: OTP)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.login(email: SupportAtAuth0, code: OTP)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -1735,7 +1496,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.startPasswordless(phoneNumber: Phone)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<Void, AuthenticationError>)?.dpop).to(beNil())
             }
 
             context("passwordless login") {
@@ -1806,13 +1567,13 @@ class AuthenticationSpec: QuickSpec {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(phoneNumber: Phone, code: OTP)
 
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.login(phoneNumber: Phone, code: OTP)
 
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -2070,13 +1831,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.userInfo(withAccessToken: AccessToken)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? Request<UserProfile, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.userInfo(withAccessToken: AccessToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<UserProfile, AuthenticationError>)?.dpop).to(beNil())
             }
 
             context("token type") {
@@ -2155,13 +1916,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -2241,13 +2002,13 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.ssoExchange(withRefreshToken: RefreshToken)
 
-                expect(request.dpop).toNot(beNil())
+                expect((request as? TokenRequest<SSOCredentials, AuthenticationError>)?.dpop).toNot(beNil())
             }
 
             it("should not use DPoP when it is not enabled") {
                 let request = auth.ssoExchange(withRefreshToken: RefreshToken)
 
-                expect(request.dpop).to(beNil())
+                expect((request as? TokenRequest<SSOCredentials, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }
@@ -2456,7 +2217,7 @@ class AuthenticationSpec: QuickSpec {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.jwks()
 
-                expect(request.dpop).to(beNil())
+                expect((request as? Request<JWKS, AuthenticationError>)?.dpop).to(beNil())
             }
 
         }

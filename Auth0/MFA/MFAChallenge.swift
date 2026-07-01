@@ -21,7 +21,7 @@ import Foundation
  - [MFA API Documentation](https://auth0.com/docs/api/authentication#multi-factor-authentication)
  - [Authenticate Using ROPG Flow with MFA](https://auth0.com/docs/secure/multi-factor-authentication/authenticate-using-ropg-flow-with-mfa)
  */
-public struct MFAChallenge: Decodable {
+public struct MFAChallenge: Decodable, Sendable {
     
     /// The type of MFA challenge issued.
     ///
