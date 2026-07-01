@@ -1,16 +1,18 @@
 import Foundation
 
-/// Decides which documentation versions to keep, mirroring the policy used by
-/// react-native-auth0's `manage-doc-versions.js`.
+/// Decides which documentation versions to keep.
 ///
-/// At most two major version lines are retained at any time:
-/// - When the current release is **stable**, keep the highest patch of each of
-///   the two most recent stable majors.
-/// - When the current release is a **prerelease** (alpha/beta), keep the current
-///   prerelease plus the newest stable version below it. That stable may share
-///   the current major (e.g. `2.23.0` while cutting `2.24.0-beta.1`) or belong to
-///   an earlier major (e.g. `2.23.0` while cutting `3.0.0-beta.1`); either way the
-///   stable users currently rely on is never dropped while a prerelease is live.
+/// Two major version lines are retained:
+/// - the **latest major** — represented by its latest release, whether beta or
+///   stable. If that major has a stable, its betas are dropped (stable wins);
+///   otherwise its latest prerelease is kept, so a live next-major preview (e.g.
+///   `3.0.0-beta.2`) survives while a lower-major stable ships.
+/// - the **previous major** — represented by its latest stable release.
+///
+/// Because the current release is always among the newest, it is always kept.
+/// When the current release is a **prerelease**, the latest stable below it is
+/// additionally retained even if it shares the current major (e.g. `2.24.0-beta.1`
+/// keeps `2.23.0`), so the stable users rely on stays live during a preview.
 enum Retention {
     /// - Parameters:
     ///   - current: The version being released.
@@ -25,25 +27,28 @@ enum Retention {
             .sorted(by: >)
 
         if current.isPrerelease {
-            // Keep the current prerelease + newest stable below it (same major or
-            // earlier). `all` is sorted descending and a stable outranks its own
-            // prerelease, so the first stable < current is the one users rely on.
-            let latestStableBelow = all.first {
-                !$0.isPrerelease && $0 < current
-            }
-            return [current] + (latestStableBelow.map { [$0] } ?? [])
+            // Keep the current prerelease + the newest stable below it, so the
+            // stable release users currently rely on stays live while a preview
+            // is published — whether that stable shares the current major (e.g.
+            // 2.24.0-beta.1 over 2.23.0) or an earlier one (3.0.0-beta.1 over
+            // 2.23.0).
+            let previousStable = all.first { !$0.isPrerelease && $0 < current }
+            return [current] + (previousStable.map { [$0] } ?? [])
         } else {
-            // Keep the highest version of each of the two most recent stable majors.
-            let stable = all.filter { !$0.isPrerelease }
-            var majorsSeen = [Int]()
-            var kept = [SemVer]()
-            for version in stable {
-                if majorsSeen.contains(version.major) { continue }
-                majorsSeen.append(version.major)
-                kept.append(version)  // first seen per major is the highest (sorted desc)
-                if majorsSeen.count == 2 { break }
+            // Keep the current release plus one representative of the next most
+            // recent *other* major line. `all` is sorted descending, so the
+            // first version whose major differs from `current` identifies that
+            // major. Represent it by its latest stable when one exists, otherwise
+            // its latest prerelease — so a live next-major preview (e.g.
+            // 3.0.0-beta.2 while cutting a 2.x stable) is retained, and once that
+            // major has a stable its betas are dropped.
+            var kept = [current]
+            if let otherMajor = all.first(where: { $0.major != current.major })?.major {
+                let inMajor = all.filter { $0.major == otherMajor }
+                let representative = inMajor.first { !$0.isPrerelease } ?? inMajor[0]
+                kept.append(representative)
             }
-            return kept
+            return kept.sorted(by: >)
         }
     }
 }
