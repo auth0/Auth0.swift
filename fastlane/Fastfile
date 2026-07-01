@@ -1,3 +1,5 @@
+require 'timeout'
+
 default_platform :ios
 
 platform :ios do
@@ -19,7 +21,12 @@ platform :ios do
     sleep_seconds = 15
     published = false
     max_attempts.times do |attempt|
-      trunk_info = sh("pod trunk info Auth0", log: false, error_callback: ->(_) {})
+      trunk_info = begin
+        Timeout.timeout(30) { sh("pod trunk info Auth0", log: false, error_callback: ->(e) { UI.message("pod trunk info failed: #{e.message}") }) }
+      rescue Timeout::Error
+        UI.message("pod trunk info timed out after 30s")
+        nil
+      end
       if trunk_info&.lines&.any? { |line| line.match?(/(?<![.\d])#{Regexp.escape(version)}(?![.\d-])/) }
         published = true
         break
