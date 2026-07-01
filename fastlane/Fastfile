@@ -13,12 +13,26 @@ platform :ios do
     pod_lib_lint(allow_warnings: true)
     pod_push(allow_warnings: true)
     # pod trunk push can return a server error even when the publish succeeds.
-    # Verify by querying trunk directly and fail loudly if the version is missing.
-    trunk_info = sh("pod trunk info Auth0", log: false)
-    if trunk_info.include?(version)
+    # Trunk info can lag after a successful push, so retry with backoff before
+    # failing loudly.
+    max_attempts = 5
+    sleep_seconds = 15
+    published = false
+    max_attempts.times do |attempt|
+      trunk_info = sh("pod trunk info Auth0", log: false, error_callback: ->(_) {})
+      if trunk_info&.lines&.any? { |line| line.match?(/(?<![.\d])#{Regexp.escape(version)}(?![.\d-])/) }
+        published = true
+        break
+      end
+      if attempt < max_attempts - 1
+        UI.message("Auth0 #{version} not yet visible on trunk (attempt #{attempt + 1}/#{max_attempts}), retrying in #{sleep_seconds}s...")
+        sleep(sleep_seconds)
+      end
+    end
+    if published
       UI.success "Auth0 #{version} is published on CocoaPods trunk ✓"
     else
-      UI.user_error!("pod trunk push reported an error and Auth0 #{version} was NOT found on trunk. Manual intervention required.")
+      UI.user_error!("pod trunk push reported an error and Auth0 #{version} was NOT found on trunk after #{max_attempts} attempts. Manual intervention required.")
     end
   end
 
