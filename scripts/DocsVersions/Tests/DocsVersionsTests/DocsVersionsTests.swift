@@ -49,28 +49,71 @@ final class RetentionTests: XCTestCase {
         raw.compactMap(SemVer.init)
     }
 
-    func testStableKeepsTwoMostRecentMajors() {
+    func testStableKeepsPreviousMajorStable() {
+        // Current major (3) → current release; previous major (2) → its latest
+        // stable. Older majors (1) fall outside the two-line window.
         let keep = Retention.versionsToKeep(
-            current: SemVer("3.1.0")!,
-            existing: versions("3.0.0", "2.22.0", "2.21.2", "1.36.0")
+            current: SemVer("3.0.0")!,
+            existing: versions("2.22.0", "2.21.2", "1.36.0")
         )
-        XCTAssertEqual(keep.map { $0.description }, ["3.1.0", "2.22.0"])
+        XCTAssertEqual(keep.map { $0.description }, ["3.0.0", "2.22.0"])
     }
 
-    func testStableUsesHighestPatchPerMajor() {
+    func testStableDropsOldCurrentMajorVersions() {
+        // Publishing within the current major drops that major's older versions;
+        // with no other major present only the current release remains.
         let keep = Retention.versionsToKeep(
-            current: SemVer("2.22.0")!,
-            existing: versions("2.21.2", "2.21.1", "1.36.0", "1.35.0")
+            current: SemVer("2.24.0")!,
+            existing: versions("2.23.0", "2.22.0")
         )
-        XCTAssertEqual(keep.map { $0.description }, ["2.22.0", "1.36.0"])
+        XCTAssertEqual(keep.map { $0.description }, ["2.24.0"])
+    }
+
+    func testStableKeepsLiveNextMajorBeta() {
+        // Latest major (3) is a live beta with no stable yet → keep the beta.
+        // Previous major (2) → its latest stable.
+        let keep = Retention.versionsToKeep(
+            current: SemVer("2.24.0")!,
+            existing: versions("3.0.0-beta.2", "3.0.0-beta.1", "2.23.0")
+        )
+        XCTAssertEqual(keep.map { $0.description }, ["3.0.0-beta.2", "2.24.0"])
+    }
+
+    func testStablePatchKeepsLiveNextMajorBetaAndDropsOldCurrentMajor() {
+        // Releasing 2.25.0 while a 3.0.0 beta is live: current major (2) collapses
+        // to 2.25.0 (2.24.0 dropped), next major (3) keeps its live beta.
+        let keep = Retention.versionsToKeep(
+            current: SemVer("2.25.0")!,
+            existing: versions("3.0.0-beta.2", "2.24.0")
+        )
+        XCTAssertEqual(keep.map { $0.description }, ["3.0.0-beta.2", "2.25.0"])
+    }
+
+    func testStablePromotionDropsOwnBetaAndKeepsPreviousMajorStable() {
+        // Promoting the 3.0.0 beta to stable: the beta is an old version of the
+        // current major (3) and is dropped (stable wins); previous major (2)
+        // keeps its latest stable.
+        let keep = Retention.versionsToKeep(
+            current: SemVer("3.0.0")!,
+            existing: versions("3.0.0-beta.2", "2.24.0")
+        )
+        XCTAssertEqual(keep.map { $0.description }, ["3.0.0", "2.24.0"])
+    }
+
+    func testStableWithNoOtherMajorKeepsOnlyItself() {
+        let keep = Retention.versionsToKeep(
+            current: SemVer("1.0.0")!,
+            existing: versions("1.0.0-beta.1")
+        )
+        XCTAssertEqual(keep.map { $0.description }, ["1.0.0"])
     }
 
     func testPrereleaseKeepsCurrentPlusEarlierStableMajor() {
         let keep = Retention.versionsToKeep(
             current: SemVer("3.0.0-beta.2")!,
-            existing: versions("3.0.0-beta.1", "2.22.0", "2.21.2")
+            existing: versions("3.0.0-beta.1", "2.23.0", "2.22.0")
         )
-        XCTAssertEqual(keep.map { $0.description }, ["3.0.0-beta.2", "2.22.0"])
+        XCTAssertEqual(keep.map { $0.description }, ["3.0.0-beta.2", "2.23.0"])
     }
 
     func testPrereleaseKeepsSameMajorStable() {

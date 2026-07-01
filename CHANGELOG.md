@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.24.0](https://github.com/auth0/Auth0.swift/tree/2.24.0) (2026-07-01)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.23.0...2.24.0)
+
+**Added**
+- feat: IPSIE session_expiry enforcement in CredentialsManager [EA] [\#1208](https://github.com/auth0/Auth0.swift/pull/1208) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [2.23.0](https://github.com/auth0/Auth0.swift/tree/2.23.0) (2026-06-30)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.22.0...2.23.0)
 
