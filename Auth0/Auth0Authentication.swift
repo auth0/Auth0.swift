@@ -455,7 +455,7 @@ struct Auth0Authentication: Authentication {
 
     // MARK: - Passwordless OTP (Database Connections)
 
-    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError> {
+    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
         let url = URL(string: "otp/challenge", relativeTo: self.url)!
         let payload: [String: Any] = [
             "email": email,
@@ -463,17 +463,17 @@ struct Auth0Authentication: Authentication {
             "allow_signup": allowSignup,
             "client_id": self.clientId
         ]
-        return Request(session: session,
-                       url: url,
-                       method: "POST",
-                       handle: authenticationDecodable,
-                       parameters: payload,
-                       logger: self.logger,
-                       auth0ClientInfo: self.auth0ClientInfo,
-                       dpop: self.dpop)
+        return Request<PasswordlessChallenge, AuthenticationError>(session: session,
+                                                                   url: url,
+                                                                   method: "POST",
+                                                                   handle: authenticationDecodable,
+                                                                   parameters: payload,
+                                                                   logger: self.logger,
+                                                                   auth0ClientInfo: self.auth0ClientInfo,
+                                                                   dpop: self.dpop)
     }
 
-    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> Request<PasswordlessChallenge, AuthenticationError> {
+    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
         let url = URL(string: "otp/challenge", relativeTo: self.url)!
         let payload: [String: Any] = [
             "phone_number": phoneNumber,
@@ -482,17 +482,17 @@ struct Auth0Authentication: Authentication {
             "allow_signup": allowSignup,
             "client_id": self.clientId
         ]
-        return Request(session: session,
-                       url: url,
-                       method: "POST",
-                       handle: authenticationDecodable,
-                       parameters: payload,
-                       logger: self.logger,
-                       auth0ClientInfo: self.auth0ClientInfo,
-                       dpop: self.dpop)
+        return Request<PasswordlessChallenge, AuthenticationError>(session: session,
+                                                                   url: url,
+                                                                   method: "POST",
+                                                                   handle: authenticationDecodable,
+                                                                   parameters: payload,
+                                                                   logger: self.logger,
+                                                                   auth0ClientInfo: self.auth0ClientInfo,
+                                                                   dpop: self.dpop)
     }
 
-    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "grant_type": "http://auth0.com/oauth/grant-type/passwordless/otp",
@@ -502,14 +502,15 @@ struct Auth0Authentication: Authentication {
         ]
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
-        return Request(session: session,
-                       url: url,
-                       method: "POST",
-                       handle: authenticationDecodable,
-                       parameters: payload,
-                       logger: self.logger,
-                       auth0ClientInfo: self.auth0ClientInfo,
-                       dpop: self.dpop)
+        return TokenRequest(request: Request<Credentials, AuthenticationError>(session: session,
+                                                                               url: url,
+                                                                               method: "POST",
+                                                                               handle: authenticationDecodable,
+                                                                               parameters: payload,
+                                                                               logger: self.logger,
+                                                                               auth0ClientInfo: self.auth0ClientInfo,
+                                                                               dpop: self.dpop),
+                            authentication: self)
     }
 
 }
