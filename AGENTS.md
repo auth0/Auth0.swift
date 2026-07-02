@@ -84,6 +84,7 @@ xcodebuild test -project Auth0.xcodeproj \
 - Test constants use `UPPER_CAMEL_CASE` names (e.g., `AccessToken`, `ClientId`, `Domain`).
 - Combine publishers are tested with Nimble async matchers or `waitUntil`.
 - Platform-specific tests are gated with `#if WEB_AUTH_PLATFORM` and `#if PASSKEYS_PLATFORM`.
+- Test both presence **and absence** of request parameters: when a param is optional, add a case asserting it is **not** sent when `nil`, not just that it is present when set. `hasAllOf` / `hasAtLeast` only check for presence, so absence needs its own assertion.
 
 ### Mocking & Test Utilities
 
@@ -224,6 +225,9 @@ func getCredentials(completion: @escaping (Any?, Error?) -> Void) {
 - **Result type aliases:** Each subsystem has a typed result alias — `AuthenticationResult<T>`, `WebAuthResult<T>`, `CredentialsManagerResult<T>`, `MyAccountResult<T>`.
 - **Dual API (callback + async/await):** Every public method exposes both a completion handler variant and a Swift concurrency (`async throws`) variant.
 - **Sendable / thread safety:** `CredentialsManager` is `Sendable`; concurrent methods use `NSLock` internally. Document thread-safety limits in DocC comments.
+- **Explicit `Sendable` on public models:** Conform public model/response types to `Sendable` explicitly (matching `Credentials`, `PasskeySignupChallenge`) rather than relying on module-boundary inference. Never reach for `@unchecked Sendable` — if a stored dictionary is the blocker, type it as `[String: any Sendable]` instead of `[String: Any]`.
+- **API parameter ordering:** The primary noun being acted on comes first; supporting inputs follow. Match the existing passkey APIs — e.g. `login(otp:challenge:audience:scope:)`, mirroring `login(passkey:challenge:...)`.
+- **DocC disambiguation suffixes:** Don't add symbol disambiguation hashes to DocC links preemptively. Add them only when a symbol genuinely has multiple overloads that require disambiguation.
 
 ---
 
@@ -283,6 +287,7 @@ Keep a Changelog format. Update `CHANGELOG.md` for every user-facing change unde
 - Modifying security-sensitive code: DPoP key generation, PKCE, token storage, biometric auth.
 - Deprecating or removing any public API.
 - Changes to `Package.swift` target structure (adding targets, changing paths, new compilation conditions).
+- Adding a parameter to an existing public protocol requirement — provide a default implementation via a protocol extension so existing custom conformers keep compiling, and call out the change in the changelog.
 
 ### 🚫 Never Do
 
@@ -296,6 +301,7 @@ Keep a Changelog format. Update `CHANGELOG.md` for every user-facing change unde
 - Remove or skip failing tests instead of fixing them.
 - Break backward API compatibility without a major version bump and explicit team approval.
 - Write `public` types or methods without DocC documentation comments.
+- Reference internal-only information (feature-flag names, internal tooling, or unreleased infrastructure) in public docs such as `README.md` and `EXAMPLES.md`.
 
 ---
 
