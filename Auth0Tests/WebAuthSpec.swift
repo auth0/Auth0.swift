@@ -1021,7 +1021,7 @@ class WebAuthSpec: QuickSpec {
                     expect(TransactionStore.shared.current).toEventuallyNot(beNil())
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(result).toEventually(beSuccessful())
-                    expect(storage.deleteEntryCallCount).to(equal(2))
+                    expect(storage.deleteEntryCallCount).to(equal(3))
                 }
 
                 it("should not clear credentials on failed logout") {

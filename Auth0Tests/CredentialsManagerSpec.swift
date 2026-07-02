@@ -1243,14 +1243,14 @@ class CredentialsManagerSpec: QuickSpec {
         describe("session_expiry enforcement") {
 
             afterEach {
-                _ = credentialsManager.clear()
+                try? credentialsManager.clear()
             }
 
             it("should return credentials when session_expiry is in the future") {
                 let futureExpiry = Int(Date().timeIntervalSince1970) + 7200
                 let idToken = makeIdTokenWithSessionExpiry(futureExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1264,8 +1264,8 @@ class CredentialsManagerSpec: QuickSpec {
                 let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
                 let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
                 // Access token is still valid — session check must fire before the validity early-return
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1278,8 +1278,8 @@ class CredentialsManagerSpec: QuickSpec {
             it("should return sessionExpired error when session_expiry is in the past and access token is also expired") {
                 let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
                 let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: -ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1292,8 +1292,8 @@ class CredentialsManagerSpec: QuickSpec {
             it("should return sessionExpired error when session_expiry is within the 30s leeway") {
                 let almostExpiry = Int(Date().timeIntervalSince1970) + (SessionExpiryLeeway - 1)
                 let idToken = makeIdTokenWithSessionExpiry(almostExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1304,8 +1304,8 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             it("should return credentials when session_expiry is absent from the id token") {
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1317,8 +1317,8 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should fail open and return credentials when session_expiry is zero") {
                 let idToken = makeIdTokenWithSessionExpiry(0)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1332,8 +1332,8 @@ class CredentialsManagerSpec: QuickSpec {
                 // A ms-precision timestamp (13 digits) looks ~year 33658 in seconds; must be rejected
                 let msTimestamp = Int(Date().timeIntervalSince1970) * 1000
                 let idToken = makeIdTokenWithSessionExpiry(msTimestamp)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1347,10 +1347,10 @@ class CredentialsManagerSpec: QuickSpec {
                 let futureExpiry = Int(Date().timeIntervalSince1970) + 7200
                 let newIdToken = makeIdTokenWithSessionExpiry(futureExpiry)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: newIdToken, refreshToken: nil, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, idToken: newIdToken, refreshToken: nil, expiresAt: ExpiresIn))
 
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: -ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1362,10 +1362,10 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should succeed after renewal when new id token has no session_expiry claim") {
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresAt: ExpiresIn))
 
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: -ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1379,8 +1379,8 @@ class CredentialsManagerSpec: QuickSpec {
                 let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
                 // Build a token with a fractional session_expiry; it must be truncated, not dropped.
                 let idToken = makeIdTokenWithFractionalSessionExpiry(Double(pastExpiry) + 0.75)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1395,8 +1395,8 @@ class CredentialsManagerSpec: QuickSpec {
                 credentialsManager = CredentialsManager(authentication: authentication, storage: store)
                 let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
                 let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1417,10 +1417,10 @@ class CredentialsManagerSpec: QuickSpec {
                 let storedIdToken = makeIdTokenWithSessionExpiry(pinnedExpiry)
                 let renewedIdToken = makeIdTokenWithSessionExpiry(pinnedExpiry + 3600)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: renewedIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, idToken: renewedIdToken, refreshToken: NewRefreshToken, expiresAt: ExpiresIn))
 
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: storedIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -1))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: storedIdToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: -1))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1442,7 +1442,7 @@ class CredentialsManagerSpec: QuickSpec {
                 let pastExpiry = Int(Date().timeIntervalSince1970) - 100
                 let storedIdToken = makeIdTokenWithSessionExpiry(pastExpiry)
                 // First store pins the ceiling.
-                _ = credentialsManager.store(credentials: Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: storedIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn)))
+                try! credentialsManager.store(credentials: Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: storedIdToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn)))
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1456,8 +1456,8 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should fail open and return credentials when session_expiry is negative") {
                 let idToken = makeIdTokenWithSessionExpiry(-3600)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1469,8 +1469,8 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should fail open and return credentials when session_expiry is a non-numeric string") {
                 let idToken = makeIdToken(sessionExpiry: "not-a-number")
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1488,10 +1488,10 @@ class CredentialsManagerSpec: QuickSpec {
                 let futureExpiry = Int(Date().timeIntervalSince1970) + 7200
                 let storedIdToken = makeIdTokenWithSessionExpiry(futureExpiry)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: IdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresAt: ExpiresIn))
 
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: storedIdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -1))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: storedIdToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: -1))
+                try! credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials { result in
@@ -1508,8 +1508,8 @@ class CredentialsManagerSpec: QuickSpec {
             it("should return sessionExpired from ssoCredentials when the ceiling is reached") {
                 let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
                 let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 // No stub is registered: the refresh-token grant must never be exchanged past the ceiling.
                 waitUntil(timeout: Timeout) { done in
@@ -1523,8 +1523,8 @@ class CredentialsManagerSpec: QuickSpec {
             it("should return sessionExpired from apiCredentials when the ceiling is reached") {
                 let pastExpiry = Int(Date().timeIntervalSince1970) - 3600
                 let idToken = makeIdTokenWithSessionExpiry(pastExpiry)
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: idToken, refreshToken: RefreshToken, expiresAt: Date(timeIntervalSinceNow: ExpiresIn))
+                try! credentialsManager.store(credentials: credentials)
 
                 // No stub is registered: the refresh-token grant must never be exchanged past the ceiling.
                 waitUntil(timeout: Timeout) { done in

@@ -1649,12 +1649,12 @@ class AuthenticationSpec: QuickSpec {
                 it("should use DPoP when it is enabled") {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName)
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? Request<PasswordlessChallenge, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.passwordlessChallenge(email: SupportAtAuth0, connection: ConnectionName)
-                    expect(request.dpop).to(beNil())
+                    expect((request as? Request<PasswordlessChallenge, AuthenticationError>)?.dpop).to(beNil())
                 }
 
                 it("should include the Auth0-Client telemetry header on challenge requests") {
@@ -1723,12 +1723,12 @@ class AuthenticationSpec: QuickSpec {
                 it("should use DPoP when it is enabled") {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName)
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? Request<PasswordlessChallenge, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.passwordlessChallenge(phoneNumber: Phone, connection: ConnectionName)
-                    expect(request.dpop).to(beNil())
+                    expect((request as? Request<PasswordlessChallenge, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }
@@ -1793,12 +1793,12 @@ class AuthenticationSpec: QuickSpec {
                 it("should use DPoP when it is enabled") {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession))
-                    expect(request.dpop).toNot(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).toNot(beNil())
                 }
 
                 it("should not use DPoP when it is not enabled") {
                     let request = auth.login(otp: OTP, challenge: PasswordlessChallenge(authSession: AuthSession))
-                    expect(request.dpop).to(beNil())
+                    expect((request as? TokenRequest<Credentials, AuthenticationError>)?.dpop).to(beNil())
                 }
 
             }

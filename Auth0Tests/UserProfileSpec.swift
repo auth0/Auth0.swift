@@ -129,7 +129,7 @@ class UserProfileSpec: QuickSpec {
         describe("act claim") {
 
             it("should be nil when not present") {
-                let userInfo = UserInfo(json: basicProfile())
+                let userInfo = UserProfile(json: basicProfile())
                 expect(userInfo?.act).to(beNil())
             }
 
@@ -140,7 +140,7 @@ class UserProfileSpec: QuickSpec {
                     "org": "auth0",
                     "role": "support"
                 ]
-                let userInfo = UserInfo(json: info)
+                let userInfo = UserProfile(json: info)
                 expect(userInfo?.act?.sub) == "admin@example.com"
                 expect(userInfo?.act?.additionalClaims["org"] as? String) == "auth0"
                 expect(userInfo?.act?.additionalClaims["role"] as? String) == "support"
@@ -149,7 +149,7 @@ class UserProfileSpec: QuickSpec {
             it("should be nil when act claim has no sub") {
                 var info = basicProfile()
                 info["act"] = ["org": "auth0"]
-                let userInfo = UserInfo(json: info)
+                let userInfo = UserProfile(json: info)
                 expect(userInfo?.act).to(beNil())
             }
 
@@ -160,7 +160,7 @@ class UserProfileSpec: QuickSpec {
                     "level": 3,
                     "active": true
                 ]
-                let userInfo = UserInfo(json: info)
+                let userInfo = UserProfile(json: info)
                 expect(userInfo?.act?.additionalClaims["level"] as? Int) == 3
                 expect(userInfo?.act?.additionalClaims["active"] as? Bool) == true
             }
@@ -173,7 +173,7 @@ class UserProfileSpec: QuickSpec {
                         "sub": "original-actor@example.com"
                     ]
                 ]
-                let userInfo = UserInfo(json: info)
+                let userInfo = UserProfile(json: info)
                 expect(userInfo?.act?.sub) == "middle-tier@example.com"
                 expect(userInfo?.act?.act?.sub) == "original-actor@example.com"
             }
@@ -181,7 +181,7 @@ class UserProfileSpec: QuickSpec {
             it("should not include act in custom claims") {
                 var info = basicProfile()
                 info["act"] = ["sub": "actor@example.com"]
-                let userInfo = UserInfo(json: info)
+                let userInfo = UserProfile(json: info)
                 expect(userInfo?.customClaims?["act"]).to(beNil())
             }
 

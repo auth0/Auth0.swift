@@ -164,6 +164,7 @@ public struct CredentialsManager: Sendable {
                                                     requiringSecureCoding: true)
         try self.storage.setEntry(data, forKey: self.storeKey)
         try? saveDPoPThumbprint(for: credentials)
+        pinSessionExpiry(for: credentials)
     }
 
     /// Clears credentials stored in the Keychain.
@@ -183,6 +184,7 @@ public struct CredentialsManager: Sendable {
         #endif
         try self.storage.deleteEntry(forKey: self.storeKey)
         try? self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+        try? self.storage.deleteEntry(forKey: self.sessionExpiryKey)
     }
 
     /// Clears API credentials stored in the Keychain for a given audience value.
@@ -882,6 +884,11 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noCredentials))
                 }
+                guard !self.hasSessionExpired(idToken: credentials.idToken) else {
+                    try? self.clear()
+                    complete()
+                    return callback(.failure(.sessionExpired))
+                }
                 guard forceRenewal ||
                         self.hasExpired(credentials.expiresAt) ||
                         self.willExpire(credentials.expiresAt, within: minTTL) ||
@@ -965,6 +972,11 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noCredentials))
                 }
+                guard !self.hasSessionExpired(idToken: credentials.idToken) else {
+                    try? self.clear()
+                    complete()
+                    return callback(.failure(.sessionExpired))
+                }
                 guard let refreshToken = credentials.refreshToken else {
                     complete()
                     return callback(.failure(.noRefreshToken))
@@ -1021,10 +1033,14 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.success(apiCredentials))
                 }
-                }
                 guard let currentCredentials = try self.retrieveCredentials() else {
                     complete()
                     return callback(.failure(.noCredentials))
+                }
+                guard !self.hasSessionExpired(idToken: currentCredentials.idToken) else {
+                    try? self.clear()
+                    complete()
+                    return callback(.failure(.sessionExpired))
                 }
                 guard let refreshToken = currentCredentials.refreshToken else {
                     complete()
@@ -1093,12 +1109,12 @@ public struct CredentialsManager: Sendable {
     private func pinSessionExpiry(for credentials: Credentials) {
         guard pinnedSessionExpiry() == nil,
               let expiry = Credentials.parseSessionExpiry(fromIdToken: credentials.idToken) else { return }
-        _ = self.storage.setEntry(Data(String(expiry).utf8), forKey: self.sessionExpiryKey)
+        try? self.storage.setEntry(Data(String(expiry).utf8), forKey: self.sessionExpiryKey)
     }
 
     /// Returns the `session_expiry` ceiling (Unix seconds) pinned at login, or `nil` if nothing is stored.
     private func pinnedSessionExpiry() -> Int? {
-        guard let data = self.storage.getEntry(forKey: self.sessionExpiryKey),
+        guard let data = try? self.storage.getEntry(forKey: self.sessionExpiryKey),
               let string = String(data: data, encoding: .utf8),
               let value = Int(string),
               value > 0 else { return nil }
