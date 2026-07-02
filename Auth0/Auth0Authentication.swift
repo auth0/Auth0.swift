@@ -453,6 +453,66 @@ struct Auth0Authentication: Authentication {
                              authentication: self)
     }
 
+    // MARK: - Passwordless OTP (Database Connections)
+
+    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
+        let url = URL(string: "otp/challenge", relativeTo: self.url)!
+        let payload: [String: Any] = [
+            "email": email,
+            "connection": connection,
+            "allow_signup": allowSignup,
+            "client_id": self.clientId
+        ]
+        return Request<PasswordlessChallenge, AuthenticationError>(session: session,
+                                                                   url: url,
+                                                                   method: "POST",
+                                                                   handle: authenticationDecodable,
+                                                                   parameters: payload,
+                                                                   logger: self.logger,
+                                                                   auth0ClientInfo: self.auth0ClientInfo,
+                                                                   dpop: self.dpop)
+    }
+
+    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
+        let url = URL(string: "otp/challenge", relativeTo: self.url)!
+        let payload: [String: Any] = [
+            "phone_number": phoneNumber,
+            "connection": connection,
+            "delivery_method": deliveryMethod.rawValue,
+            "allow_signup": allowSignup,
+            "client_id": self.clientId
+        ]
+        return Request<PasswordlessChallenge, AuthenticationError>(session: session,
+                                                                   url: url,
+                                                                   method: "POST",
+                                                                   handle: authenticationDecodable,
+                                                                   parameters: payload,
+                                                                   logger: self.logger,
+                                                                   auth0ClientInfo: self.auth0ClientInfo,
+                                                                   dpop: self.dpop)
+    }
+
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        let url = URL(string: "oauth/token", relativeTo: self.url)!
+        var payload: [String: Any] = [
+            "grant_type": "http://auth0.com/oauth/grant-type/passwordless/otp",
+            "auth_session": challenge.authSession,
+            "otp": otp,
+            "client_id": self.clientId
+        ]
+        payload["audience"] = audience
+        payload["scope"] = includeRequiredScope(in: scope)
+        return TokenRequest(request: Request<Credentials, AuthenticationError>(session: session,
+                                                                               url: url,
+                                                                               method: "POST",
+                                                                               handle: authenticationDecodable,
+                                                                               parameters: payload,
+                                                                               logger: self.logger,
+                                                                               auth0ClientInfo: self.auth0ClientInfo,
+                                                                               dpop: self.dpop),
+                            authentication: self)
+    }
+
 }
 
 // MARK: - Private Methods

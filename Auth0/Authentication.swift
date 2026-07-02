@@ -1040,7 +1040,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - organization: Identifier of an organization the user is a member of.
        - parameters: Additional parameters to send in the token exchange request (e.g. RFC 8693 optional claims).
      - Returns: A request that will yield Auth0 user's credentials.
-  
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange)
@@ -1052,7 +1052,137 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                              audience: String?,
                              scope: String,
                              organization: String?,
-                             parameters: [String: Any])-> any TokenRequestable<Credentials, AuthenticationError>
+                             parameters: [String: Any]) -> any TokenRequestable<Credentials, AuthenticationError>
+
+    // MARK: - Passwordless OTP (Database Connections)
+
+    /**
+     Requests a one-time password (OTP) for a database connection user identified by email address.
+     This is the first step of the passwordless OTP flow for database connections.
+
+     ## Availability
+
+     This feature is currently available in
+     [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+     Please reach out to Auth0 support to get it enabled for your tenant.
+
+     ## Usage
+
+     ```swift
+     Auth0
+         .authentication()
+         .passwordlessChallenge(email: "support@auth0.com", connection: "my-db-connection")
+         .start { result in
+             switch result {
+             case .success(let challenge):
+                 // Pass the challenge and the user-entered OTP to login(otp:challenge:)
+                 print("Challenge issued")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
+     - Parameters:
+       - email:       Email address of the user to send the OTP to.
+       - connection:  Name of the database connection. Defaults to `"Username-Password-Authentication"`, which is the
+                      built-in database connection created for every Auth0 tenant.
+       - allowSignup: Whether to allow user signup if the email is not registered. Defaults to `false`.
+     - Returns: A request that will yield a ``PasswordlessChallenge`` containing the `authSession` token.
+
+     ## See Also
+
+     - ``login(otp:challenge:audience:scope:)``
+     - ``PasswordlessChallenge``
+     */
+    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError>
+
+    /**
+     Requests a one-time password (OTP) for a database connection user identified by phone number.
+     This is the first step of the passwordless OTP flow for database connections.
+
+     ## Availability
+
+     This feature is currently available in
+     [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+     Please reach out to Auth0 support to get it enabled for your tenant.
+
+     ## Usage
+
+     ```swift
+     Auth0
+         .authentication()
+         .passwordlessChallenge(phoneNumber: "+12025550135", connection: "my-db-connection")
+         .start { result in
+             switch result {
+             case .success(let challenge):
+                 // Pass the challenge and the user-entered OTP to login(otp:challenge:)
+                 print("Challenge issued")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
+     - Parameters:
+       - phoneNumber:     Phone number of the user (E.164 format, e.g. `+12025550135`).
+       - connection:      Name of the database connection. Defaults to `"Username-Password-Authentication"`, which is the
+                          built-in database connection created for every Auth0 tenant.
+       - deliveryMethod:  How the OTP should be delivered. Defaults to ``DeliveryMethod/text``.
+       - allowSignup:     Whether to allow user signup if the phone number is not registered. Defaults to `false`.
+     - Returns: A request that will yield a ``PasswordlessChallenge`` containing the `authSession` token.
+
+     ## See Also
+
+     - ``login(otp:challenge:audience:scope:)``
+     - ``PasswordlessChallenge``
+     - ``DeliveryMethod``
+     */
+    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError>
+
+    /**
+     Exchanges an `authSession` token and OTP code for user credentials. This is the second and final step
+     of the passwordless OTP flow for database connections.
+
+     ## Availability
+
+     This feature is currently available in
+     [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+     Please reach out to Auth0 support to get it enabled for your tenant.
+
+     ## Usage
+
+     ```swift
+     Auth0
+         .authentication()
+         .login(otp: "123456", challenge: challenge)
+         .start { result in
+             switch result {
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
+     - Parameters:
+       - otp:         The one-time password entered by the user.
+       - challenge:   The ``PasswordlessChallenge`` returned by ``passwordlessChallenge(email:connection:allowSignup:)``
+                      or ``passwordlessChallenge(phoneNumber:connection:deliveryMethod:allowSignup:)``.
+       - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
+       - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
+     - Returns: A request that will yield Auth0 user's credentials.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check
+     [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+
+     ## See Also
+
+     - ``passwordlessChallenge(email:connection:allowSignup:)``
+     - ``passwordlessChallenge(phoneNumber:connection:deliveryMethod:allowSignup:)``
+     - ``PasswordlessChallenge``
+     */
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError>
 }
 
 public extension Authentication {
@@ -1169,6 +1299,26 @@ public extension Authentication {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
     }
 
+    /// Requests a passwordless OTP challenge for a database connection user identified by email address.
+    ///
+    /// Defaults `connection` to `"Username-Password-Authentication"`, the built-in database connection on every Auth0 tenant.
+    /// For full parameter documentation see ``passwordlessChallenge(email:connection:allowSignup:)``.
+    func passwordlessChallenge(email: String, connection: String = "Username-Password-Authentication", allowSignup: Bool = false) -> any TokenRequestable<PasswordlessChallenge, AuthenticationError> {
+        return self.passwordlessChallenge(email: email, connection: connection, allowSignup: allowSignup)
+    }
+
+    /// Requests a passwordless OTP challenge for a database connection user identified by phone number.
+    ///
+    /// Defaults `connection` to `"Username-Password-Authentication"` and `deliveryMethod` to ``DeliveryMethod/text``.
+    /// For full parameter documentation see ``passwordlessChallenge(phoneNumber:connection:deliveryMethod:allowSignup:)``.
+    func passwordlessChallenge(phoneNumber: String, connection: String = "Username-Password-Authentication", deliveryMethod: DeliveryMethod = .text, allowSignup: Bool = false) -> any TokenRequestable<PasswordlessChallenge, AuthenticationError> {
+        return self.passwordlessChallenge(phoneNumber: phoneNumber, connection: connection, deliveryMethod: deliveryMethod, allowSignup: allowSignup)
+    }
+
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String? = nil, scope: String = defaultScope) -> any TokenRequestable<Credentials, AuthenticationError> {
+        return self.login(otp: otp, challenge: challenge, audience: audience, scope: scope)
+    }
+
     func userInfo(withAccessToken accessToken: String,
                   tokenType: String = "Bearer") -> any Requestable<UserProfile, AuthenticationError> {
         self.userInfo(withAccessToken: accessToken, tokenType: tokenType)
@@ -1184,6 +1334,71 @@ public extension Authentication {
                              scope: String = defaultScope,
                              organization: String? = nil,
                              parameters: [String: Any] = [:]) -> any TokenRequestable<Credentials, AuthenticationError> {
+        return self.customTokenExchange(subjectToken: subjectToken,
+                                        subjectTokenType: subjectTokenType,
+                                        audience: audience,
+                                        scope: scope,
+                                        organization: organization,
+                                        parameters: parameters)
+    }
+
+    /**
+     Performs a custom token exchange with an actor token, to support delegation and impersonation flows.
+
+     This is a convenience over
+     ``customTokenExchange(subjectToken:subjectTokenType:audience:scope:organization:parameters:)`` that sends an
+     `actor_token` and `actor_token_type`, identifying the party acting on behalf of the subject
+     (per [RFC 8693](https://tools.ietf.org/html/rfc8693)).
+
+     ## Availability
+
+     This feature is currently available in
+     [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+     Please reach out to [Auth0 support](https://support.auth0.com/) to enable for your tenant.
+
+     ## Usage
+
+     ```swift
+     let actor = ActorToken(token: "actor-id-token",
+                            tokenType: "urn:ietf:params:oauth:token-type:id_token")
+
+     Auth0
+         .authentication()
+         .customTokenExchange(subjectToken: "existing-token",
+                              subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                              actorToken: actor)
+         .start { print($0) }
+     ```
+
+     - Parameters:
+       - subjectToken: The security token to be exchanged.
+       - subjectTokenType: URI that identifies the type of the subject token.
+       - audience: API Identifier that your application is requesting access to. Defaults to `nil`.
+       - scope: Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - organization: Identifier of an organization the user is a member of.
+       - actorToken: The acting party's token and type. When provided, Auth0 will not issue a refresh token regardless of whether `offline_access` is in the scope.
+       - parameters: Additional parameters to send in the token exchange request (e.g. RFC 8693 optional claims).
+     - Returns: A request that will yield Auth0 user's credentials.
+
+     ## See Also
+
+     - ``ActorToken``
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange)
+     - [Custom Token Exchange Documentation](https://auth0.com/docs/authenticate/custom-token-exchange)
+     - [RFC 8693: OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693)
+     */
+    func customTokenExchange(subjectToken: String,
+                             subjectTokenType: String,
+                             audience: String? = nil,
+                             scope: String = defaultScope,
+                             organization: String? = nil,
+                             actorToken: ActorToken?,
+                             parameters: [String: any Sendable] = [:]) -> any TokenRequestable<Credentials, AuthenticationError> {
+        var parameters = parameters
+        if let actorToken {
+            parameters["actor_token"] = actorToken.token
+            parameters["actor_token_type"] = actorToken.tokenType
+        }
         return self.customTokenExchange(subjectToken: subjectToken,
                                         subjectTokenType: subjectTokenType,
                                         audience: audience,

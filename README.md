@@ -10,16 +10,17 @@
 
 > [!IMPORTANT]
 > **🚀 v3 Beta Available**
-> A new major version [`3.0.0-beta.1`](https://github.com/auth0/Auth0.swift/releases/tag/3.0.0-beta.1) of Auth0.swift is now available in beta. It includes breaking changes and improvements over v2.
+> A new major version [`3.0.0-beta.2`](https://github.com/auth0/Auth0.swift/releases/tag/3.0.0-beta.2) of Auth0.swift is now available in beta. It includes breaking changes and improvements over v2.
 >
 > We'd love for you to try it out and share your feedback! Please [open an issue](https://github.com/auth0/Auth0.swift/issues) if you encounter any problems or have suggestions.
 >
-> 📚 [Migration Guide](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.1/V3_MIGRATION_GUIDE.md) &nbsp;•&nbsp; 📦 [v3 Changelog](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.1/CHANGELOG.md)
+> 📚 [Migration Guide](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.2/V3_MIGRATION_GUIDE.md) &nbsp;•&nbsp; 📦 [v3 Changelog](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.2/CHANGELOG.md) &nbsp;•&nbsp; 🤖 [Migration Skill](https://github.com/auth0/agent-skills/tree/main/plugins/auth0/skills/auth0-swift-major-migration)
 >
 > **Skill for Coding Agents:** If you use coding agents such as Claude Code or Cursor, add the Auth0.swift migration skill to automate the upgrade:
 > ```
 > npx skills add auth0/agent-skills --skill auth0-swift-major-migration
 > ```
+>
 
 ## Documentation
 
@@ -66,7 +67,7 @@ Then, select the dependency rule and press **Add Package**.
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 3.0.0-beta.1'
+pod 'Auth0', '~> 3.0.0-beta.2'
 ```
 
 Then, run `pod install`.
@@ -76,7 +77,7 @@ Then, run `pod install`.
 Add the following line to your `Cartfile`:
 
 ```text
-github "auth0/Auth0.swift" ~> 3.0.0-beta.1
+github "auth0/Auth0.swift" ~> 3.0.0-beta.2
 ```
 
 Then, run `carthage bootstrap --use-xcframeworks`.
@@ -128,6 +129,7 @@ Auth0
     // ...
 ```
 </details>
+
 
 ### Configure Web Auth (iOS / macOS)
 
@@ -341,7 +343,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 Explore common use cases and integration patterns for Auth0.swift.
 
 > [!NOTE]
-> **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, and more. ✨
+> **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, IPSIE session expiry, custom token exchange, and more. ✨
 
 ### Store credentials
 
@@ -383,6 +385,28 @@ do {
 }
 ```
 </details>
+
+### IPSIE session expiry [EA]
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires session-expiry enforcement enabled on your OIDC or Okta enterprise connection in the Auth0 Dashboard.
+
+When an enterprise connection (OIDC / Okta) is configured with session-expiry enforcement enabled, Auth0 emits a `session_expiry` claim in the ID token. The `CredentialsManager` automatically enforces this upstream IdP session ceiling — `credentials()`, `ssoCredentials()`, and `apiCredentials()` clear the stored credentials and return `CredentialsManagerError.sessionExpired` once the ceiling is reached (with a 30-second clock-skew leeway), without attempting a token renewal. The ceiling is pinned at the initial login: the value from the first ID token is persisted to the Keychain and never updated by a refresh-token grant. `clear()` removes it on logout.
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(CredentialsManagerError.sessionExpired):
+        // Upstream IdP session ended — prompt re-login
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+For a full guide including configuration steps and reading the raw claim value, see the [IPSIE session expiry section in EXAMPLES.md](EXAMPLES.md#ipsie-session-expiry-ea).
 
 ### Clear stored credentials
 

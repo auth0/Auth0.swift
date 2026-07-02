@@ -559,6 +559,10 @@ extension URLRequest {
     func isPasswordless(_ domain: String) -> Bool {
         return isMethodPOST && isHost(domain) && isPath("/passwordless/start")
     }
+
+    func isOTPChallenge(_ domain: String) -> Bool {
+        return isMethodPOST && isHost(domain) && isPath("/otp/challenge")
+    }
     
     func isUserInfo(_ domain: String) -> Bool {
         return isMethodGET && isHost(domain) && isPath("/userinfo")

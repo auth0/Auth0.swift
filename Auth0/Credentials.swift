@@ -1,4 +1,5 @@
 import Foundation
+import JWTDecode
 
 private struct _A0Credentials {
     let accessToken: String
@@ -68,6 +69,34 @@ public final class Credentials: NSObject, Sendable {
     ///
     /// - [MFA Recovery Codes](https://auth0.com/docs/secure/multi-factor-authentication/configure-recovery-codes-for-mfa)
     public let recoveryCode: String?
+
+    /// The date at which the IPSIE `session_expiry` ceiling is reached, or `nil` when the claim is
+    /// absent or outside the valid range `(0, 10_000_000_000)`.
+    ///
+    /// - Important: Reflects the *current* ID token only. ``CredentialsManager`` enforces the ceiling
+    /// using the value pinned to the Keychain at initial login, which survives refresh-token renewals.
+    public var sessionExpiresAt: Date? {
+        guard let seconds = Credentials.parseSessionExpiry(fromIdToken: self.idToken) else { return nil }
+        return Date(timeIntervalSince1970: TimeInterval(seconds))
+    }
+
+    /// Decodes the IPSIE `session_expiry` claim from a JWT string.
+    ///
+    /// Returns the Unix-seconds timestamp as an `Int`, or `nil` when the token is absent, unparseable,
+    /// does not carry the claim, or carries a value outside `(0, 10_000_000_000)`.
+    /// The upper bound rejects timestamps expressed in milliseconds (13-digit values produced by
+    /// `Date.now()` in JavaScript) which would silently disable the ceiling if accepted.
+    /// The claim is read as `Double` so a fractional value is truncated rather than dropped.
+    static func parseSessionExpiry(fromIdToken idToken: String?) -> Int? {
+        guard let idToken = idToken,
+              let jwt = try? decode(jwt: idToken),
+              let rawValue = jwt.body["session_expiry"] as? Double else {
+            return nil
+        }
+        let value = Int(rawValue)
+        guard value > 0, value < 10_000_000_000 else { return nil }
+        return value
+    }
 
     /// Custom description that redacts the tokens with `<REDACTED>`.
     public override var description: String {

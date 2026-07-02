@@ -1,0 +1,99 @@
+name: Documentation
+
+# Builds the versioned DocC site for whatever ref is checked out and folds it
+# into the gh-pages branch (retention + versions.json + root redirect handled by
+# the DocsVersions tool). Can be:
+#   - dispatched manually against any branch (e.g. develop/v3.0) to preview a
+#     deployment without cutting a release;
+#   - called from release.yml after a successful release.
+on:
+  workflow_dispatch:
+  workflow_call:
+
+# Serialize deployments so concurrent manual/release runs cannot publish from
+# stale snapshots and overwrite each other's gh-pages updates.
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+env:
+  ruby: '3.3.1'
+  xcode: '16.1'
+
+jobs:
+  publish-docs:
+    name: Build and deploy versioned API documentation
+    runs-on: macos-14
+    permissions:
+      contents: write # peaceiris/actions-gh-pages pushes to the gh-pages branch
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment
+        uses: ./.github/actions/setup
+        with:
+          ruby: ${{ env.ruby }}
+          xcode: ${{ env.xcode }}
+
+      - name: Bootstrap Carthage dependencies
+        run: carthage bootstrap --use-xcframeworks --no-use-binaries --cache-builds
+
+      # Produces the freshly built static site into docs_build/ with a
+      # version-scoped hosting base path (/Auth0.swift/v<version>/).
+      - name: Build documentation
+        run: bundle exec fastlane build_docs
+
+      # Detect whether gh-pages already exists so we can distinguish the
+      # first-deploy case from a genuine checkout failure (which must fail loud).
+      - name: Check whether gh-pages exists
+        id: gh_pages_exists
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Check out the current gh-pages content so the tool can fold the new
+      # version into the existing versioned layout. Skipped on the first deploy
+      # (branch does not exist yet); a real failure here is not masked.
+      - name: Checkout existing gh-pages
+        if: steps.gh_pages_exists.outputs.exists == 'true'
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      # Ensure the working dir exists (first deploy) and drop the nested .git
+      # left by the checkout so it is not published into the branch.
+      - name: Prepare gh-pages working directory
+        run: |
+          mkdir -p gh-pages
+          rm -rf gh-pages/.git
+
+      # Folds docs_build/ into gh-pages/ as v<version>/, applies the retention
+      # policy, and regenerates versions.json + version-selector.js + redirect.
+      # A stable release also produces docs_build_root/ (bare base path), which
+      # is served at the site root; prereleases omit it and leave root untouched.
+      - name: Update versioned documentation layout
+        run: |
+          ROOT_ARGS=()
+          if [ -d "$GITHUB_WORKSPACE/docs_build_root" ]; then
+            ROOT_ARGS=(--new-build-root "$GITHUB_WORKSPACE/docs_build_root")
+          fi
+          swift run --package-path scripts/DocsVersions DocsVersions \
+            --site-root "$GITHUB_WORKSPACE/gh-pages" \
+            --new-build "$GITHUB_WORKSPACE/docs_build" \
+            "${ROOT_ARGS[@]}"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./gh-pages
+          keep_files: false
