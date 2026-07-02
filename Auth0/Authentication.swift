@@ -1393,7 +1393,7 @@ public extension Authentication {
                              scope: String = defaultScope,
                              organization: String? = nil,
                              actorToken: ActorToken?,
-                             parameters: [String: any Sendable] = [:]) -> Request<Credentials, AuthenticationError> {
+                             parameters: [String: any Sendable] = [:]) -> any TokenRequestable<Credentials, AuthenticationError> {
         var parameters = parameters
         if let actorToken {
             parameters["actor_token"] = actorToken.token

@@ -469,7 +469,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -488,7 +488,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
@@ -508,7 +508,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 
