@@ -158,26 +158,17 @@ See [docs/pitfalls.md](docs/pitfalls.md) for platform gotchas (conditional-compi
 
 ### Tracked Docs
 
-| Doc | Status | Covers |
-|-----|--------|--------|
-| `README.md` | ✅ current | Install (SPM/CocoaPods/Carthage), quick-start, config, Web Auth, support policy |
-| `EXAMPLES.md` | ✅ current | Web Auth, Credentials Manager, Authentication/MFA/My Account/Management APIs, DPoP, logging |
-| `V2_MIGRATION_GUIDE.md` | ✅ current | v1 → v2 breaking changes |
+| Doc | Covers |
+|-----|--------|
+| `README.md` | Install (SPM/CocoaPods/Carthage), quick-start, config, Web Auth, support policy |
+| `EXAMPLES.md` | Web Auth, Credentials Manager, Authentication/MFA/My Account/Management APIs, DPoP, logging |
+| `V2_MIGRATION_GUIDE.md` | v1 → v2 breaking changes |
 
-### When You Change Code, Update These Docs
+### When You Change Code, Update Docs
 
-| When this changes | Update |
-|-------------------|--------|
-| Public API on `Authentication`/`WebAuth`/`Users`/`CredentialsManager`/`MFAClient`/`MyAccount` | `README.md` (usage), `EXAMPLES.md` (affected samples) |
-| Public API removed or renamed | `README.md` + `EXAMPLES.md` — update every reference to the old symbol |
-| Installation requirements (platform min, Xcode, package version) | `README.md` (Requirements/Installation; bump version pins in all three package managers) |
-| `Auth0.plist` keys / SDK init options | `README.md` (Configure the SDK) |
-| New integration pattern (grant type, provider, EA feature) | `EXAMPLES.md` (new section) |
-| Any breaking change | `V2_MIGRATION_GUIDE.md` |
+When you change the public API, configuration, or supported integration patterns, update the affected docs **in the same PR** — do not defer.
 
-### Drift Status
-
-All tracked docs are current.
+See the `docs-agent` (`.claude/agents/docs-agent.md`) for the full code-to-docs mapping (which symbol/change maps to which doc).
 
 ---
 
