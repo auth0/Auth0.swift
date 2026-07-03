@@ -23,7 +23,7 @@ import Foundation
 ///
 /// - [RFC 8693: OAuth 2.0 Token Exchange - act Claim](https://tools.ietf.org/html/rfc8693#section-4.4)
 /// - [Custom Token Exchange Documentation](https://auth0.com/docs/authenticate/custom-token-exchange)
-public final class ActClaim: @unchecked Sendable {
+public final class ActClaim: Sendable {
 
     /// The subject identifier of the acting party.
     ///
@@ -38,23 +38,23 @@ public final class ActClaim: @unchecked Sendable {
     ///
     /// Values are preserved as-is, including non-string JSON values (numbers, booleans, objects, arrays), so that
     /// custom claims set via `api.authentication.setActor()` are not lost.
-    public let additionalClaims: [String: Any]
+    public let additionalClaims: [String: any Sendable]
 
     /// Creates a new `ActClaim` from a JSON dictionary.
     ///
     /// - Parameter json: A dictionary representing the `act` claim from a decoded JWT.
     /// - Returns: An `ActClaim` instance, or `nil` if the dictionary does not contain a `sub` claim.
-    public init?(json: [String: Any]) {
+    public init?(json: [String: any Sendable]) {
         guard let sub = json["sub"] as? String else { return nil }
         self.sub = sub
 
-        if let nestedAct = json["act"] as? [String: Any] {
+        if let nestedAct = json["act"] as? [String: any Sendable] {
             self.act = ActClaim(json: nestedAct)
         } else {
             self.act = nil
         }
 
-        var additional: [String: Any] = [:]
+        var additional: [String: any Sendable] = [:]
         for (key, value) in json where key != "sub" && key != "act" {
             additional[key] = value
         }
