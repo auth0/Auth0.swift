@@ -750,6 +750,7 @@ Auth0
 - [Retrieve stored user information](#retrieve-stored-user-information)
 - [Clear stored credentials](#clear-stored-credentials)
 - [Biometric authentication](#biometric-authentication)
+- [IPSIE session expiry \[EA\]](#ipsie-session-expiry-ea)
 - [Other credentials](#other-credentials)
 - [Credentials Manager errors](#credentials-manager-errors)
 
@@ -1082,6 +1083,81 @@ let isValid = credentialsManager.isBiometricSessionValid()
 > [!NOTE]
 > Retrieving the user information with `credentialsManager.userProfile()` will not be protected by biometric authentication.
 
+### IPSIE session expiry [EA]
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). It requires session-expiry enforcement enabled on your OIDC or Okta enterprise connection in the Auth0 Dashboard.
+
+Auth0 supports the [IPSIE SL1](https://openid.github.io/ipsie-openid-sl1/draft-openid-ipsie-sl1-profile.html) `session_expiry` claim, which lets an upstream identity provider (e.g. Okta) set a hard ceiling on how long an Auth0-issued session may live. When your connection has this option enabled, Auth0 includes a `session_expiry` Unix timestamp in the ID token it returns to your app after login.
+
+The `CredentialsManager` enforces this ceiling on every retrieval — `credentials()`, `ssoCredentials()`, and `apiCredentials()`. Once the ceiling has passed (with a 30-second clock-skew leeway), the call clears the stored credentials and returns a `CredentialsManagerError.sessionExpired` error instead of attempting a token renewal. No code changes are needed to opt in — the enforcement is transparent once the connection option is active on your tenant.
+
+The ceiling is **pinned at the initial login**: the `session_expiry` value from the first ID token is persisted to the Keychain and never overwritten by a refresh-token grant. This means a renewal whose ID token re-emits the claim cannot raise the ceiling past the original value. `clear()` removes the pinned value on logout so the next login pins a fresh ceiling.
+
+#### What `session_expiry` means
+
+| Claim | Bounds | SDK behaviour |
+|---|---|---|
+| `exp` | ID token lifetime (minutes) | Already validated on login |
+| `session_expiry` | RP session ceiling (hours / days) | **Enforced by `CredentialsManager`** — returns `.sessionExpired` when reached |
+
+#### Handling the error
+
+When `session_expiry` is reached, `credentials()` returns `CredentialsManagerError.sessionExpired`. Your existing "no credentials" re-login path already handles this — or you can match the case explicitly:
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(CredentialsManagerError.sessionExpired):
+        // Upstream IdP session has ended — send the user back to login
+        Auth0.webAuth().start { _ in }
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await credentialsManager.credentials()
+    print("Obtained credentials: \(credentials)")
+} catch CredentialsManagerError.sessionExpired {
+    // Upstream IdP session has ended — send the user back to login
+    let _ = try? await Auth0.webAuth().start()
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+> [!NOTE]
+> **Upgrading existing apps.** Sessions stored before the `session_expiry` option was enabled on your connection carry no ceiling and behave exactly as before — `.sessionExpired` is never returned for them. Once the option is turned on, `credentials()` can return `.sessionExpired` for a user who is already logged in, as soon as their ceiling passes. Any code that assumed a stored session stays usable until the access token expires now has this additional failure path to handle. Treat it the same way you would `CredentialsManagerError.noCredentials`: clear the local session and redirect the user to log in again.
+
+#### Reading the `session_expiry` value
+
+`Credentials` exposes the ceiling via the `sessionExpiresAt` property (`Date`, or `nil` when the connection does not emit the claim), which you can use for app-level logic such as a countdown timer:
+
+```swift
+credentialsManager.credentials { result in
+    guard case .success(let credentials) = result,
+          let sessionExpiresAt = credentials.sessionExpiresAt else { return }
+    print("Session ceiling: \(sessionExpiresAt)")
+}
+```
+
+> [!NOTE]
+> `sessionExpiresAt` reflects the `session_expiry` claim in the *current* ID token only. The `CredentialsManager` enforces the ceiling pinned at the initial login, which may differ from — or be absent from — a later renewal token. For the authoritative ceiling value, rely on the `CredentialsManager` error, not this property.
+
+> [!IMPORTANT]
+> `session_expiry` is a ceiling computed at login time — it is **not** real-time session revocation. If a user is de-provisioned mid-session, they will not be immediately signed out; that requires back-channel logout / CAEP, which is a separate platform capability.
+
+[Go up ⤴](#examples)
+
 ### Other credentials
 
 #### API credentials [EA]
@@ -1255,6 +1331,9 @@ credentialsManager.credentials { result in
         case CredentialsManagerError.revokeFailed:
             // Token revocation failed — check error.cause for details
             break
+        case CredentialsManagerError.sessionExpired:
+            // Upstream IdP session ceiling reached — prompt re-login
+            break
         default:
             break
         }
@@ -1340,6 +1419,7 @@ credentialsManager.credentials { result in
 - [Log in with passkey [EA]](#log-in-with-passkey-ea)
 - [Sign up with passkey [EA]](#sign-up-with-passkey-ea)
 - [Passwordless login](#passwordless-login)
+- [Passwordless login with a database connection [EA]](#passwordless-login-with-a-database-connection-ea)
 - [Retrieve user information](#retrieve-user-information)
 - [Renew credentials](#renew-credentials)
 - [Get SSO credentials](#get-sso-credentials)
@@ -1959,6 +2039,91 @@ Auth0
 
 > [!NOTE]
 > Use `login(phoneNumber:code:)` if the code was sent to the user's phone number.
+
+### Passwordless login with a database connection [EA]
+
+> [!IMPORTANT]
+> Passwordless login for database connections is currently in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+This flow lets users authenticate with a one-time code sent over email or SMS/voice against a **database connection** that has `email_otp` or `phone_otp` enabled. It is distinct from the `/passwordless/start` flow above, which uses dedicated passwordless connections.
+
+#### 1. Issue an OTP challenge
+
+Send a one-time code to the user's email. For privacy, the server **always responds successfully regardless of whether the user exists**. On success, save the returned `PasswordlessChallenge` for step 2.
+
+To send the code via SMS or voice instead, use `passwordlessChallenge(phoneNumber:deliveryMethod:)` against a connection with `phone_otp` enabled.
+
+Both methods accept an optional `allowSignup` parameter (defaults to `false`) that controls whether a new user is created if one does not yet exist.
+
+#### 2. Verify the code and log in
+
+Pass the `PasswordlessChallenge` from step 1 together with the code the user received to exchange for `Credentials`. If DPoP is enabled, a DPoP proof is attached automatically to this token request.
+
+**Step 1 — issue the challenge:**
+
+```swift
+// Keep this reference until the user enters the code
+var passwordlessChallenge: PasswordlessChallenge?
+
+Auth0
+    .authentication()
+    .passwordlessChallenge(email: "user@example.com",
+                           connection: "your-db-connection") // defaults to "Username-Password-Authentication"
+    .start { result in
+        switch result {
+        case .success(let challenge):
+            passwordlessChallenge = challenge
+            // Prompt the user for the OTP they received
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+**Step 2 — verify the OTP:**
+
+```swift
+guard let challenge = passwordlessChallenge else { return }
+
+Auth0
+    .authentication()
+    .login(otp: userEnteredOTP, challenge: challenge)
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    // Step 1: issue the challenge and keep it
+    let challenge = try await Auth0
+        .authentication()
+        .passwordlessChallenge(email: "user@example.com",
+                               connection: "your-db-connection") // defaults to "Username-Password-Authentication"
+        .start()
+    // Step 2: once the user enters the code, pass the saved challenge back to log in
+    let credentials = try await Auth0
+        .authentication()
+        .login(otp: userEnteredOTP, challenge: challenge)
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+
+</details>
+
+> [!NOTE]
+> The default scope used is `openid profile email`. Regardless of the scopes set to the request, the `openid` scope is always enforced.
 
 ### Retrieve user information
 
@@ -4544,6 +4709,8 @@ Use these filter expressions directly in the console search bar:
 - [Native social login](#native-social-login)
 - [Organizations](#organizations)
 - [Custom Token Exchange](#custom-token-exchange)
+  - [Delegation and impersonation with actor tokens](#delegation-and-impersonation-with-actor-tokens)
+  - [Reading the `act` claim from the ID token](#reading-the-act-claim-from-the-id-token)
 - [Bot detection](#bot-detection)
 
 ### Native social login
@@ -4669,6 +4836,7 @@ Auth0
 - Get Auth0 tokens for another audience
 - Integrate an external identity provider 
 - Migrate to Auth0
+- Delegation and impersonation (using actor tokens)
 
 > [!NOTE]
 > This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
@@ -4682,7 +4850,7 @@ Auth0
                          subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
                          audience: "https://example.com/api",
                          scope: "openid profile email",
-                         organization: "org_id)
+                         organization: "org_id")
     .start { result in
         switch result {
         case .success(let credentials):
@@ -4690,6 +4858,7 @@ Auth0
         case .failure(let error):
             print("Failed with: \(error)")
         }
+    }
 ```
 
 <details>
@@ -4718,11 +4887,11 @@ do {
 ```swift
 Auth0
     .authentication()
-     .customTokenExchange(subjectToken: "existing-token",
-                          subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
-                          audience: "https://example.com/api",
-                          scope: "openid profile email",
-                          organization: "org_id")
+    .customTokenExchange(subjectToken: "existing-token",
+                         subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                         audience: "https://example.com/api",
+                         scope: "openid profile email",
+                         organization: "org_id")
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -4734,6 +4903,118 @@ Auth0
     .store(in: &cancellables)
 ```
 </details>
+
+#### Delegation and impersonation with actor tokens
+
+You can perform a token exchange with an actor token to support delegation and impersonation flows (per [RFC 8693](https://tools.ietf.org/html/rfc8693)). The actor token identifies the party that is acting on behalf of the subject.
+
+Use the `ActorToken` struct to bundle the actor token and its type together:
+
+```swift
+let actor = ActorToken(token: "actor-id-token",
+                       tokenType: "urn:ietf:params:oauth:token-type:id_token")
+
+Auth0
+    .authentication()
+    .customTokenExchange(subjectToken: "subject-token",
+                         subjectTokenType: "urn:ietf:params:oauth:token-type:id_token",
+                         actorToken: actor)
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+let actor = ActorToken(token: "actor-id-token",
+                       tokenType: "urn:ietf:params:oauth:token-type:id_token")
+
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .customTokenExchange(subjectToken: "subject-token",
+                             subjectTokenType: "urn:ietf:params:oauth:token-type:id_token",
+                             actorToken: actor)
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+let actor = ActorToken(token: "actor-id-token",
+                       tokenType: "urn:ietf:params:oauth:token-type:id_token")
+
+Auth0
+    .authentication()
+    .customTokenExchange(subjectToken: "subject-token",
+                         subjectTokenType: "urn:ietf:params:oauth:token-type:id_token",
+                         actorToken: actor)
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+> [!NOTE]
+> When an actor token is provided, Auth0 will not issue a refresh token regardless of whether `offline_access` is in the scope.
+
+#### Reading the `act` claim from the ID token
+
+When a token exchange involves an actor token, Auth0 may include an `act` (actor) claim in the resulting ID token. This claim identifies who is acting on behalf of the subject and may be nested to represent delegation chains.
+
+> [!NOTE]
+> The `act` claim is set server-side via an Auth0 Action that calls `api.authentication.setActor()`. Without this Action configured, the ID token will not contain an `act` claim even when an actor token is provided in the request.
+
+The `act` claim is exposed through the `UserInfo` type via the `ActClaim` class. This example uses [JWTDecode.swift](https://github.com/auth0/JWTDecode.swift) to decode the ID token — add it to your project if you haven't already:
+
+```swift
+import JWTDecode
+
+let jwt = try decode(jwt: credentials.idToken)
+let userInfo = UserInfo(json: jwt.body)
+
+if let act = userInfo?.act {
+    print("Actor: \(act.sub)")
+    print("Additional claims: \(act.additionalClaims)")
+
+    // Check for delegation chain
+    if let innerAct = act.act {
+        print("Original actor: \(innerAct.sub)")
+    }
+}
+```
+
+The `ActClaim` class provides:
+- `sub`: The subject identifier of the acting party.
+- `act`: A nested `ActClaim` for delegation chains (e.g., `act.act` for multi-hop delegation).
+- `additionalClaims`: Any extra claims beyond `sub` and `act` (e.g., `org`, `role`).
+
+You can also access the `act` claim from the Credentials Manager's stored user information:
+
+```swift
+if let act = credentialsManager.user?.act {
+    print("Actor: \(act.sub)")
+}
+```
 
 ### Organizations
 

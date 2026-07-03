@@ -7,8 +7,9 @@ Auth0.swift v3 is a Swift 6-ready release with improved error handling, predicta
 - **Guaranteed main-thread delivery:** All callback, Combine, and async/await variants deliver results on the main thread — no more `DispatchQueue.main.async` boilerplate.
 - **Updated defaults:** Scope now includes `offline_access`, `minTTL` defaults to 60 seconds, and `signup` defaults the `connection` to `"Username-Password-Authentication"`.
 - **Renamed APIs** for consistency with the Android, Flutter, and React Native Auth0 SDKs.
-- **New APIs:** Multi-window Web Auth support, `clearAll()`, automatic credentials management, and ID token validation.
+- **New APIs:** Multi-window Web Auth support, `clearAll()`, automatic credentials management, ID token validation, passwordless OTP for database connections, custom token exchange with actor tokens, and IPSIE `session_expiry` enforcement.
 - **Removed APIs:** The Management API client and the deprecated MFA methods on the `Authentication` protocol have been removed.
+- **New `Authentication` protocol requirements:** Custom `Authentication` conformances (mocks, test doubles) must implement three new passwordless OTP methods.
 
 - This guide covers every breaking change and the steps to migrate. Review it fully before upgrading.
 
@@ -36,9 +37,11 @@ Auth0.swift v3 is a Swift 6-ready release with improved error handling, predicta
   + [Automatic credentials management in Web Auth](#automatic-credentials-management-in-web-auth)
   + [Credentials Manager clearAll](#credentials-manager-clearall)
   + [CredentialsStorage deleteAllEntries](#credentialsstorage-deleteallentries)
+  + [Additional new APIs](#additional-new-apis)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
+  + [New required methods on the Authentication protocol](#new-required-methods-on-the-authentication-protocol)
   + [Request to Requestable](#request-to-requestable)
   + [ID Token Validation](#id-token-validation)
 - [**Removed APIs**](#removed-apis)
@@ -975,6 +978,14 @@ class MyCustomCredentialStorage: CredentialsStorage {
 
 **Impact:** If you have a custom `CredentialsStorage` implementation and use `clearAll()`, you must implement the `deleteAllEntries()` method. If you don't use `clearAll()`, no changes are needed — the default implementation will only trigger an assertion if called. The default `SimpleKeychain`-based storage already provides this implementation.
 
+### Additional new APIs
+
+The following additive features were also included in this release. They require no migration — see the linked guides for usage:
+
+- **Passwordless OTP for database connections [EA]:** `passwordlessChallenge(email:connection:allowSignup:)`, `passwordlessChallenge(phoneNumber:connection:deliveryMethod:allowSignup:)`, and `login(otp:challenge:audience:scope:)` on `Authentication`. If you have a custom `Authentication` conformance, see [New required methods on the Authentication protocol](#new-required-methods-on-the-authentication-protocol). Usage: [EXAMPLES.md](EXAMPLES.md#passwordless-login-with-a-database-connection-ea).
+- **Custom token exchange with actor tokens [EA]:** `customTokenExchange(subjectToken:subjectTokenType:audience:scope:organization:actorToken:parameters:)` convenience overload on `Authentication`, plus the new `ActorToken` and `ActClaim` types, for delegation and impersonation flows. Usage: [EXAMPLES.md](EXAMPLES.md#custom-token-exchange).
+- **IPSIE `session_expiry` enforcement [EA]:** `CredentialsManager` now enforces an upstream IdP session ceiling when your enterprise connection emits a `session_expiry` claim, via the new `CredentialsManagerError.sessionExpired` error and `Credentials.sessionExpiresAt` property. Usage: [EXAMPLES.md](EXAMPLES.md#ipsie-session-expiry-ea).
+
 ---
 
 ## API Changes
@@ -1026,6 +1037,51 @@ The `expiresIn` property on `Credentials`, `APICredentials`, and `SSOCredentials
 **`Telemetry` → `Auth0ClientInfo`**
 
 The `Telemetry` struct has been renamed to `Auth0ClientInfo`, and the `telemetry` property on `Trackable` conforming types has been renamed to `auth0ClientInfo`.
+
+### New required methods on the Authentication protocol
+
+> [!IMPORTANT]
+> This section only affects you if your app has a **custom type conforming to `Authentication`** (for example, a mock or test double). If you only call `Auth0.authentication()`, no action is required.
+
+**Change:** Three new methods have been added as requirements to the `Authentication` protocol, supporting the passwordless OTP flow for database connections:
+
+```swift
+func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError>
+func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError>
+func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError>
+```
+
+**Impact:** Any custom type conforming to `Authentication` — for example a mock `Authentication` implementation used in unit tests — will fail to compile until it implements these three methods. Auth0's own `Auth0Authentication` implementation already conforms; this only affects custom conformances.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v3 beta.1/beta.2 - compiles
+class MockAuthentication: Authentication {
+    // ... existing method implementations
+}
+
+// v3 (this release) - add the three new methods
+class MockAuthentication: Authentication {
+    // ... existing method implementations
+
+    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
+        fatalError("not implemented")
+    }
+
+    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
+        fatalError("not implemented")
+    }
+
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("not implemented")
+    }
+}
+```
+</details>
+
+**Reason:** The passwordless OTP flow for database connections (see [EXAMPLES.md](EXAMPLES.md#passwordless-login-with-a-database-connection-ea)) is exposed on the `Authentication` protocol, consistent with every other authentication flow in the SDK.
 
 ### Request to Requestable
 

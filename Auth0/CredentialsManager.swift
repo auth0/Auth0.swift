@@ -35,6 +35,7 @@ public struct CredentialsManager: Sendable {
 
     private let storeKey: String
     private let dpopThumbprintKey: String
+    private let sessionExpiryKey: String
     private let authentication: Authentication
     private let maxRetries: Int
     #if WEB_AUTH_PLATFORM
@@ -59,15 +60,18 @@ public struct CredentialsManager: Sendable {
     ///   - authentication: Auth0 Authentication API client.
     ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to 'credentials'.
     ///   - dpopThumprintKey: Key used to store dpop thumbprint. Defaults to 'dpop_thumbprint'.
+    ///   - sessionExpiryKey: Key used to store the pinned IPSIE `session_expiry` ceiling. Defaults to `'\(storeKey)_session_expiry'` so each store's ceiling is namespaced and isolated when multiple instances share the same storage. Pass an explicit value only when you need a fixed key for migration or cross-instance sharing.
     ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `SimpleKeychain` instance.
     ///   - maxRetries:     Maximum number of retry attempts for credential renewal on transient errors. Defaults to 0.
     public init(authentication: Authentication,
                 storeKey: String = "credentials",
                 dpopThumbprintKey: String = "dpop_thumbprint",
+                sessionExpiryKey: String? = nil,
                 storage: CredentialsStorage = SimpleKeychain(),
                 maxRetries: Int = 0) {
         self.storeKey = storeKey
         self.dpopThumbprintKey = dpopThumbprintKey
+        self.sessionExpiryKey = sessionExpiryKey ?? "\(storeKey)_session_expiry"
         self.authentication = authentication
         self.sendableStorage = SendableBox(value: storage)
         self.maxRetries = max(0, maxRetries)
@@ -147,6 +151,12 @@ public struct CredentialsManager: Sendable {
     /// let didStore = credentialsManager.store(credentials: credentials)
     /// ```
     ///
+    /// - Note: This method pins two session-scoped values on the first call: the DPoP thumbprint and the
+    /// IPSIE `session_expiry` ceiling. Both are tied to the current user session and are only cleared by
+    /// ``clear()``. If you store credentials for a different user without calling ``clear()`` first (an
+    /// account switch that skips logout), those pinned values from the previous session remain in effect.
+    /// Always call ``clear()`` before storing credentials for a new user.
+    ///
     /// - Parameter credentials: ``Credentials`` instance to store.
     /// - Returns: If the credentials were stored.
     public func store(credentials: Credentials) throws {
@@ -154,6 +164,7 @@ public struct CredentialsManager: Sendable {
                                                     requiringSecureCoding: true)
         try self.storage.setEntry(data, forKey: self.storeKey)
         try? saveDPoPThumbprint(for: credentials)
+        pinSessionExpiry(for: credentials)
     }
 
     /// Clears credentials stored in the Keychain.
@@ -173,6 +184,7 @@ public struct CredentialsManager: Sendable {
         #endif
         try self.storage.deleteEntry(forKey: self.storeKey)
         try? self.storage.deleteEntry(forKey: self.dpopThumbprintKey)
+        try? self.storage.deleteEntry(forKey: self.sessionExpiryKey)
     }
 
     /// Clears API credentials stored in the Keychain for a given audience value.
@@ -447,6 +459,7 @@ public struct CredentialsManager: Sendable {
         let mainThreadCallback: @Sendable (CredentialsManagerResult<Credentials>) -> Void = { result in
             Task { @MainActor in callback(result) }
         }
+
 
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
@@ -871,6 +884,11 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noCredentials))
                 }
+                guard !self.hasSessionExpired(idToken: credentials.idToken) else {
+                    try? self.clear()
+                    complete()
+                    return callback(.failure(.sessionExpired))
+                }
                 guard forceRenewal ||
                         self.hasExpired(credentials.expiresAt) ||
                         self.willExpire(credentials.expiresAt, within: minTTL) ||
@@ -882,7 +900,7 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noRefreshToken))
                 }
-                
+
                 try self.validateDPoPState(for: credentials)
 
                 self.authentication
@@ -954,6 +972,11 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noCredentials))
                 }
+                guard !self.hasSessionExpired(idToken: credentials.idToken) else {
+                    try? self.clear()
+                    complete()
+                    return callback(.failure(.sessionExpired))
+                }
                 guard let refreshToken = credentials.refreshToken else {
                     complete()
                     return callback(.failure(.noRefreshToken))
@@ -1014,6 +1037,11 @@ public struct CredentialsManager: Sendable {
                     complete()
                     return callback(.failure(.noCredentials))
                 }
+                guard !self.hasSessionExpired(idToken: currentCredentials.idToken) else {
+                    try? self.clear()
+                    complete()
+                    return callback(.failure(.sessionExpired))
+                }
                 guard let refreshToken = currentCredentials.refreshToken else {
                     complete()
                     return callback(.failure(.noRefreshToken))
@@ -1068,6 +1096,42 @@ public struct CredentialsManager: Sendable {
 
     func hasExpired(_ expiresAt: Date) -> Bool {
         return expiresAt < Date()
+    }
+
+    /// Grace period (seconds): the session is treated as expired this many seconds before the
+    /// wall-clock ceiling, ensuring it is never extended past the upstream IdP boundary.
+    private static let sessionExpiryLeeway: TimeInterval = 30
+
+    /// Writes the `session_expiry` ceiling to the Keychain on the first login.
+    ///
+    /// Only writes when no ceiling is already pinned, so calling `store(credentials:)` on a renewal
+    /// grant is safe — the existing pinned value is preserved.
+    private func pinSessionExpiry(for credentials: Credentials) {
+        guard pinnedSessionExpiry() == nil,
+              let expiry = Credentials.parseSessionExpiry(fromIdToken: credentials.idToken) else { return }
+        try? self.storage.setEntry(Data(String(expiry).utf8), forKey: self.sessionExpiryKey)
+    }
+
+    /// Returns the `session_expiry` ceiling (Unix seconds) pinned at login, or `nil` if nothing is stored.
+    private func pinnedSessionExpiry() -> Int? {
+        guard let data = try? self.storage.getEntry(forKey: self.sessionExpiryKey),
+              let string = String(data: data, encoding: .utf8),
+              let value = Int(string),
+              value > 0 else { return nil }
+        return value
+    }
+
+    /// Checks whether the upstream-IdP session ceiling has been reached.
+    ///
+    /// Resolves the ceiling from the Keychain-pinned value first (set at initial login, never updated on
+    /// refresh). Falls back to the live ID token claim only when nothing is pinned yet — this covers
+    /// sessions stored before the pinning feature existed. When neither source provides a value the
+    /// session is not expired (fail-open). A 30-second negative leeway is applied.
+    func hasSessionExpired(idToken: String?) -> Bool {
+        guard let sessionExpiry = pinnedSessionExpiry() ?? Credentials.parseSessionExpiry(fromIdToken: idToken) else {
+            return false
+        }
+        return Date().timeIntervalSince1970 + CredentialsManager.sessionExpiryLeeway >= Double(sessionExpiry)
     }
 
     func hasScopeChanged(from lastScope: String?, to newScope: String?, ignoreOpenid: Bool = false) -> Bool {

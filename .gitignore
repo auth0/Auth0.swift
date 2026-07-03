@@ -104,4 +104,7 @@ fastlane/test_output
 vendor/bundle
 
 # Documentation generation
+docs/
 docs.archive/
+docs_build/
+docs_build_root/

@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
 
@@ -35,7 +35,7 @@ jobs:
           echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Run RL Scanner
-        uses: auth0/devsecops-tooling/.github/actions/rl-scan@main
+        uses: auth0/devsecops-tooling/.github/actions/rl-scan@e29f26478db18ff0bcbe4bc447a8fbd54fbeec9e # main on 2026-06-09, TODO: use a release instead
         with:
           artifact-name: "auth0-swift"
           artifact-path: "${{ github.workspace }}/auth0-swift.zip"

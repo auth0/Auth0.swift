@@ -8,6 +8,7 @@ import Foundation
 ///
 /// - [Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims)
 public struct UserProfile: JSONObjectPayload, @unchecked Sendable {
+    
 
     /// The list of public claims.
     public static let publicClaims = [
@@ -30,7 +31,8 @@ public struct UserProfile: JSONObjectPayload, @unchecked Sendable {
         "phone_number",
         "phone_number_verified",
         "address",
-        "updated_at"
+        "updated_at",
+        "act"
     ]
 
     // MARK: - Claims
@@ -133,6 +135,19 @@ public struct UserProfile: JSONObjectPayload, @unchecked Sendable {
     /// - Requires: The `profile` scope.
     public let updatedAt: Date?
 
+    /// The acting party in a token exchange delegation chain.
+    ///
+    /// When present, represents the entity performing actions on behalf of the subject. The `act` claim may be nested
+    /// to represent delegation chains (e.g., `act.act` for multi-hop delegation).
+    ///
+    /// An `act` claim without a `sub` is considered invalid and will not be parsed.
+    ///
+    /// ## See Also
+    ///
+    /// - ``ActClaim``
+    /// - [RFC 8693: OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693#section-4.4)
+    public let act: ActClaim?
+
     /// Any custom claims.
     public let customClaims: [String: Any]?
 
@@ -183,6 +198,11 @@ public extension UserProfile {
             updatedAt = date(from: dateString)
         }
 
+        var act: ActClaim?
+        if let actJson = json["act"] as? [String: Any] {
+            act = ActClaim(json: actJson)
+        }
+
         var customClaims = json
         UserProfile.publicClaims.forEach { customClaims.removeValue(forKey: $0) }
 
@@ -206,6 +226,7 @@ public extension UserProfile {
                   phoneNumberVerified: phoneNumberVerified,
                   address: address,
                   updatedAt: updatedAt,
+                  act: act,
                   customClaims: customClaims)
     }
 

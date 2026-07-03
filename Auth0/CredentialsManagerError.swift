@@ -18,6 +18,7 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
         case dpopKeyMissing
         case dpopKeyMismatch
         case dpopNotConfigured
+        case sessionExpired
     }
 
     let code: Code
@@ -99,6 +100,12 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
     /// Stored credentials are cleared automatically when this error is returned.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let dpopKeyMismatch: CredentialsManagerError = .init(code: .dpopKeyMismatch)
+
+    /// The upstream IdP session has expired. The `session_expiry` claim in the ID token indicates
+    /// the maximum lifetime of the session established by the upstream identity provider. Once this
+    /// ceiling is reached, credentials must be refreshed by prompting the user to log in again.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
+    public static let sessionExpired: CredentialsManagerError = .init(code: .sessionExpired)
 }
 
 // MARK: - Error Messages
@@ -128,6 +135,9 @@ public extension CredentialsManagerError {
         case .dpopNotConfigured:
             return "The stored credentials are DPoP-bound but the Authentication client used by this"
             + " CredentialsManager was not configured with DPoP via .useDPoP()."
+        case .sessionExpired:
+            return "The upstream IdP session has expired. The session_expiry claim in the ID token indicates"
+            + " the session ceiling set by the upstream identity provider has been reached."
         }
     }
 
