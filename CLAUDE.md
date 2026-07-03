@@ -152,14 +152,6 @@ See [docs/pitfalls.md](docs/pitfalls.md) for platform gotchas (conditional-compi
 
 ---
 
-## External References
-
-- [README](https://github.com/auth0/Auth0.swift/blob/master/README.md) · [EXAMPLES](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md) · [V2_MIGRATION_GUIDE](https://github.com/auth0/Auth0.swift/blob/master/V2_MIGRATION_GUIDE.md)
-- [API Documentation (DocC)](https://auth0.github.io/Auth0.swift/documentation/auth0/) · [iOS Quickstart](https://auth0.com/docs/quickstart/native/ios-swift)
-- [SimpleKeychain](https://github.com/auth0/SimpleKeychain) · [JWTDecode.swift](https://github.com/auth0/JWTDecode.swift)
-
----
-
 ## Docs Update Rules
 
 > A PR that changes public API, configuration, or supported patterns is **not complete** until the relevant docs are updated in the same PR.
@@ -186,3 +178,11 @@ See [docs/pitfalls.md](docs/pitfalls.md) for platform gotchas (conditional-compi
 ### Drift Status
 
 All tracked docs are current.
+
+---
+
+## External References
+
+- [README](https://github.com/auth0/Auth0.swift/blob/master/README.md) · [EXAMPLES](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md) · [V2_MIGRATION_GUIDE](https://github.com/auth0/Auth0.swift/blob/master/V2_MIGRATION_GUIDE.md)
+- [API Documentation (DocC)](https://auth0.github.io/Auth0.swift/documentation/auth0/) · [iOS Quickstart](https://auth0.com/docs/quickstart/native/ios-swift)
+- [SimpleKeychain](https://github.com/auth0/SimpleKeychain) · [JWTDecode.swift](https://github.com/auth0/JWTDecode.swift)
