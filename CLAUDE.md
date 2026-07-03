@@ -15,7 +15,7 @@ You are a Swift SDK engineer working on Auth0.swift, the Auth0 authentication SD
 - **Language:** Swift 5.0+ (`Package.swift` uses `swift-tools-version:6.0`, language mode v5)
 - **Distribution:** Swift Package Manager (primary), CocoaPods (`Auth0.podspec`), Carthage (`Cartfile`)
 - **Min platforms:** iOS 14, macOS 11, tvOS 14, watchOS 7, visionOS 1
-- **Core deps:** SimpleKeychain 1.3.0, JWTDecode 3.3.0 · **Test deps:** Quick, Nimble
+- **Core deps:** SimpleKeychain 1.3.0, JWTDecode 3.3.0 · **Test deps:** Quick, Nimble — see [docs/dependencies.md](docs/dependencies.md) for the full list (read when auditing or changing dependencies)
 
 ---
 
@@ -41,7 +41,7 @@ See [docs/commands.md](docs/commands.md) for the full command reference (per-sch
 - **Framework:** Quick (BDD `describe`/`context`/`it`) + Nimble (matchers)
 - **Location:** `Auth0Tests/`, specs named `<Subject>Spec.swift` (`QuickSpec` subclasses)
 - **Coverage:** Slather → Codecov (iOS scheme only, in CI); target >80%
-- All tests are **unit tests** — no live tenant or credentials required.
+- The default `swift test` suite is **unit-only** — no live tenant or credentials required.
 
 ### Conventions (must-follow — prevents flaky/networked tests)
 - **Never make real network requests.** Use `StubURLProtocol` + `NetworkStub`; call `NetworkStub.clearStubs()` in every `afterEach`.
@@ -130,12 +130,6 @@ Dominant patterns: public **protocol** + package-internal concrete type; fluent 
 - **Token logging:** never log tokens or `Credentials` contents.
 - **DPoP:** keys generated in the Secure Enclave where available (`Auth0/DPoP/`); do not silently downgrade to software keys.
 - **ID tokens:** validated (signature + claims) in `IDTokenValidator*.swift` — do not bypass validation.
-
----
-
-## Dependencies
-
-See [docs/dependencies.md](docs/dependencies.md) for the full core/test/dev dependency list with versions. **Read only when auditing or changing dependencies.**
 
 ---
 
