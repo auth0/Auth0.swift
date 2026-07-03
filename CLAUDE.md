@@ -140,7 +140,7 @@ See [docs/dependencies.md](docs/dependencies.md) for the full core/test/dev depe
 
 ## Release Process
 
-Version source of truth: `Auth0/Version.swift` (currently 2.24.0), kept in sync with `Auth0.podspec`. Release runs via `bundle exec fastlane release` (tags, `pod lib lint`, `pod trunk push` with retry) driven by `.github/workflows/release.yml`; DocC site published by `docs.yml`.
+Version source of truth: `Auth0/Version.swift`, kept in sync with `Auth0.podspec` `s.version`. Release runs via `bundle exec fastlane release` (tags, `pod lib lint`, `pod trunk push` with retry) driven by `.github/workflows/release.yml`; DocC site published by `docs.yml`.
 
 See [docs/releasing.md](docs/releasing.md) for the full runbook. **Read only when cutting a release.**
 
