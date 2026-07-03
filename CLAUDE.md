@@ -103,7 +103,7 @@ Dominant patterns: public **protocol** + package-internal concrete type; fluent 
 - Keep `Auth0/Version.swift` and `Auth0.podspec` `s.version` in sync
 - Update `README.md` and `EXAMPLES.md` in the same PR when changing the public API, configuration options, or supported integration patterns
 - Update `V2_MIGRATION_GUIDE.md` in the same PR when making a breaking change
-- When adding a new feature/public API, ensure requests to Auth0 carry the `Auth0-Client` header via the existing `Auth0/Telemetry.swift` mechanism (base64url `{name,version,env}`) — don't hand-roll a new one, and preserve the `tracking(enabled:)` opt-out
+- When adding a **new request path to Auth0** (not every feature — most ride on the shared transport), route it through the existing `Auth0/Telemetry.swift` mechanism so it carries the `Auth0-Client` header (base64url `{name,version,env}`) — don't create a separate HTTP client, and preserve the `tracking(enabled:)` opt-out
 
 ### ⚠️ Ask First
 - Adding/bumping dependencies (affects SPM, CocoaPods, and Carthage)
