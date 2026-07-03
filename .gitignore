@@ -105,7 +105,6 @@ vendor/bundle
 
 # Documentation generation
 docs/
-!docs/agents/
 docs.archive/
 docs_build/
 docs_build_root/
