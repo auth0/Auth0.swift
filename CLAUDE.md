@@ -96,6 +96,7 @@ Dominant patterns: public **protocol** + package-internal concrete type; fluent 
 ## Boundaries
 
 ### ✅ Always Do
+- Make surgical changes — touch only what the request requires. Don't refactor, reformat, or "improve" adjacent code that isn't broken; match the existing style. Every changed line should trace directly to the request.
 - Run `swift test` and `swiftlint lint` before committing
 - Add Quick/Nimble specs for new behavior; add DocC comments to all `public` API
 - Expose both a completion-handler and an `async throws` API for new public methods
