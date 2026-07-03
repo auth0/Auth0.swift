@@ -199,7 +199,7 @@ public extension UserProfile {
         }
 
         var act: ActClaim?
-        if let actJson = json["act"] as? [String: Any] {
+        if let actJson = json["act"] as? [String: any Sendable] {
             act = ActClaim(json: actJson)
         }
 
