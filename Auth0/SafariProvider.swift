@@ -36,53 +36,87 @@ public extension WebAuthentication {
     /// > Note: `SFSafariViewController` does not support using Universal Links as callback URLs.
     ///
     /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
+    /// - Parameter presentationWindow: Optional `UIWindow/NSWindow` to use for presenting the browser. If not specified,
+    /// the active key window will be used.
     /// - Returns: A ``WebAuthProvider`` instance.
     ///
     /// ## See Also
     ///
     /// - <doc:UserAgents>
-    static func safariProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
+    @MainActor
+    static func safariProvider(style: UIModalPresentationStyle = .fullScreen,
+                               presentationWindow: Auth0WindowRepresentable? = nil) -> WebAuthProvider {
         return { url, callback in
             let safari = SFSafariViewController(url: url)
             safari.dismissButtonStyle = .cancel
             safari.modalPresentationStyle = style
-            return SafariUserAgent(controller: safari, callback: callback)
+            return SafariUserAgent(controller: safari,
+                                 callback: callback,
+                                 presentationWindow: presentationWindow)
         }
     }
 
 }
 
-class SafariUserAgent: NSObject, WebAuthUserAgent {
+
+final class SafariUserAgent: NSObject, WebAuthUserAgent, Sendable {
 
     let controller: SFSafariViewController
     let callback: WebAuthProviderCallback
+    @MainActor
+    private weak var presentationWindow: Auth0WindowRepresentable?
 
-    init(controller: SFSafariViewController, callback: @escaping WebAuthProviderCallback) {
+    @MainActor
+    init(controller: SFSafariViewController,
+         callback: @escaping WebAuthProviderCallback,
+         presentationWindow: Auth0WindowRepresentable? = nil) {
         self.controller = controller
         self.callback = callback
+        self.presentationWindow = presentationWindow
         super.init()
         self.controller.delegate = self
         self.controller.presentationController?.delegate = self
     }
 
     func start() {
-        UIWindow.topViewController?.present(controller, animated: true, completion: nil)
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            startOnMain()
+        }
+    }
+
+    @MainActor
+    private func startOnMain() {
+        let topViewController: UIViewController?
+
+        if let window = presentationWindow,
+           let rootVC = window.rootViewController {
+            topViewController = Auth0WindowRepresentable.findTopViewController(from: rootVC)
+        } else {
+            topViewController = Auth0WindowRepresentable.topViewController
+        }
+
+        topViewController?.present(controller, animated: true, completion: nil)
     }
 
     func finish(with result: WebAuthResult<Void>) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            finishOnMain(with: result)
+        }
+    }
+
+    @MainActor
+    private func finishOnMain(with result: WebAuthResult<Void>) {
         if case .failure(let cause) = result, case .userCancelled = cause {
-            DispatchQueue.main.async { [callback] in
-                callback(result)
-            }
+            callback(result)
         } else {
-            DispatchQueue.main.async { [callback, weak controller] in
-                guard let presenting = controller?.presentingViewController else {
-                    let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
-                    return callback(.failure(error))
-                }
-                presenting.dismiss(animated: true) {
-                    callback(result)
-                }
+            guard let presenting = controller.presentingViewController else {
+                let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
+                return callback(.failure(error))
+            }
+            presenting.dismiss(animated: true) {
+                self.callback(result)
             }
         }
     }
