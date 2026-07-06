@@ -106,6 +106,77 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError>
 #endif
 
+    /// Requests a challenge for enrolling a password authentication method. This is the first part of the enrollment flow.
+    ///
+    /// You can specify an optional user identity identifier and an optional database connection name. If a
+    /// connection name is not specified, your tenant's default directory will be used.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .enrollPassword()
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let enrollmentChallenge):
+    ///             print("Obtained enrollment challenge: \(enrollmentChallenge)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// Use the challenge's ``PasswordEnrollmentChallenge/policy`` to guide the user toward a compliant password,
+    /// then call ``confirmPasswordEnrollment(id:authSession:newPassword:)`` with the new password to complete
+    /// the enrollment.
+    ///
+    /// - Parameters:
+    ///   - userIdentityId: Unique identifier of the current user's identity. Needed if the user logged in with a [linked account](https://auth0.com/docs/manage-users/user-accounts/user-account-linking).
+    ///   Defaults to `nil`.
+    ///   - connection:     Name of the database connection where the user is stored. Defaults to `nil`.
+    /// - Returns: A request that will yield a password enrollment challenge, including the password policy to satisfy.
+    func enrollPassword(userIdentityId: String?,
+                        connection: String?) -> Request<PasswordEnrollmentChallenge, MyAccountError>
+
+    /// Confirms the enrollment of a password authentication method by providing a new password that satisfies
+    /// the policy from the enrollment challenge. This is the last part of the enrollment flow.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .confirmPasswordEnrollment(id: id, authSession: authSession, newPassword: newPassword)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticationMethod):
+    ///             print("Enrolled password: \(authenticationMethod)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
+    ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
+    ///   - newPassword: The new password to set, satisfying the policy from the enrollment challenge.
+    /// - Returns: A request that will yield an enrolled password authentication method.
+    func confirmPasswordEnrollment(id: String,
+                                   authSession: String,
+                                   newPassword: String) -> Request<AuthenticationMethod, MyAccountError>
+
     /// Requests a challenge for enrolling a recovery code authentication method. This is the first part of the enrollment flow.
     ///
     /// ## Scopes Required
@@ -556,6 +627,11 @@ public extension MyAccountAuthenticationMethods {
                      preferredAuthenticationMethod: PreferredAuthenticationMethod? = nil) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
         self.enrollPhone(phoneNumber: phoneNumber,
                          preferredAuthenticationMethod: preferredAuthenticationMethod)
+    }
+
+    func enrollPassword(userIdentityId: String? = nil,
+                        connection: String? = nil) -> Request<PasswordEnrollmentChallenge, MyAccountError> {
+        self.enrollPassword(userIdentityId: userIdentityId, connection: connection)
     }
 
     func getAuthenticationMethods(type: AuthenticationMethodType? = nil) -> Request<[AuthenticationMethod], MyAccountError> {

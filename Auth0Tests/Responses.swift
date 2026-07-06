@@ -313,6 +313,41 @@ func recoveryCodeChallengeResponse(id: String, authSession: String, recoveryCode
     return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
 }
 
+func passwordEnrollmentChallengeResponse(id: String,
+                                         authSession: String,
+                                         minLength: Int = 8,
+                                         characterTypes: [String] = ["uppercase", "lowercase", "number", "special"],
+                                         characterTypeRule: String = "three_of_four",
+                                         profileDataActive: Bool = true,
+                                         blockedFields: [String] = ["name", "email"],
+                                         historySize: Int = 5,
+                                         dictionaryDefault: String = "en_10k") -> RequestResponse {
+    let payload: [String: Any] = [
+        "id": id,
+        "auth_session": authSession,
+        "policy": [
+            "complexity": [
+                "min_length": minLength,
+                "character_types": characterTypes,
+                "character_type_rule": characterTypeRule
+            ],
+            "profile_data": [
+                "active": profileDataActive,
+                "blocked_fields": blockedFields
+            ],
+            "history": [
+                "active": true,
+                "size": historySize
+            ],
+            "dictionary": [
+                "active": true,
+                "default": dictionaryDefault
+            ]
+        ]
+    ]
+    return apiSuccessResponse(json: payload)
+}
+
 func phoneEmailChallengeResponse(id: String, authSession: String, type: String) -> RequestResponse {
     let payload: [String: Any] = [
         "id": id,

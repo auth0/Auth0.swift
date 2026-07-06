@@ -154,6 +154,40 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        dpop: self.dpop)
     }
 
+    func enrollPassword(userIdentityId: String?,
+                        connection: String?) -> Request<PasswordEnrollmentChallenge, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["type"] = "password"
+        payload["identity_user_id"] = userIdentityId
+        payload["connection"] = connection
+        return Request(session: session,
+                       url: url.appending("authentication-methods"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
+                       logger: logger,
+                       telemetry: telemetry,
+                       dpop: self.dpop)
+    }
+
+    func confirmPasswordEnrollment(id: String,
+                                   authSession: String,
+                                   newPassword: String) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["auth_session"] = authSession
+        payload["new_password"] = newPassword
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id).appending("verify"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
+                       logger: logger,
+                       telemetry: telemetry,
+                       dpop: self.dpop)
+    }
+
     func confirmTOTPEnrollment(id: String,
                                authSession: String,
                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
