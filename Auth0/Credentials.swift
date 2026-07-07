@@ -82,20 +82,23 @@ public final class Credentials: NSObject, Sendable {
 
     /// Decodes the IPSIE `session_expiry` claim from a JWT string.
     ///
-    /// Returns the Unix-seconds timestamp as an `Int`, or `nil` when the token is absent, unparseable,
+    /// Returns the Unix-seconds timestamp as an `Int64`, or `nil` when the token is absent, unparseable,
     /// does not carry the claim, or carries a value outside `(0, 10_000_000_000)`.
     /// The upper bound rejects timestamps expressed in milliseconds (13-digit values produced by
     /// `Date.now()` in JavaScript) which would silently disable the ceiling if accepted.
     /// The claim is read as `Double` so a fractional value is truncated rather than dropped.
-    static func parseSessionExpiry(fromIdToken idToken: String?) -> Int? {
+    /// The result is `Int64` (not `Int`): a valid ceiling can exceed `Int32.max` (year 2038),
+    /// which would overflow the 32-bit `Int` used on watchOS.
+    static func parseSessionExpiry(fromIdToken idToken: String?) -> Int64? {
         guard let idToken = idToken,
               let jwt = try? decode(jwt: idToken),
               let rawValue = jwt.body["session_expiry"] as? Double else {
             return nil
         }
-        let value = Int(rawValue)
-        guard value > 0, value < 10_000_000_000 else { return nil }
-        return value
+        // Bound the value as a `Double` before truncating, so the ceiling is enforced identically
+        // on every platform and the truncation never overflows the destination integer.
+        guard rawValue > 0, rawValue < 10_000_000_000 else { return nil }
+        return Int64(rawValue)
     }
 
     /// Custom description that redacts the tokens with `<REDACTED>`.
