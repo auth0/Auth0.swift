@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.24.1](https://github.com/auth0/Auth0.swift/tree/2.24.1) (2026-07-07)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.24.0...2.24.1)
+
+**Added**
+- fix: prevent watchOS Int overflow in session_expiry parsing [\#1241](https://github.com/auth0/Auth0.swift/pull/1241) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
 ## [2.24.0](https://github.com/auth0/Auth0.swift/tree/2.24.0) (2026-07-01)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.23.0...2.24.0)
 
