@@ -1061,10 +1061,10 @@ public struct CredentialsManager: Sendable {
     }
 
     /// Returns the `session_expiry` ceiling (Unix seconds) pinned at login, or `nil` if nothing is stored.
-    private func pinnedSessionExpiry() -> Int? {
+    private func pinnedSessionExpiry() -> Int64? {
         guard let data = self.storage.getEntry(forKey: self.sessionExpiryKey),
               let string = String(data: data, encoding: .utf8),
-              let value = Int(string),
+              let value = Int64(string),
               value > 0 else { return nil }
         return value
     }
