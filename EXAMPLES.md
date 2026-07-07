@@ -3941,6 +3941,9 @@ Enrolling a new password authentication method is a two-step process. First, you
 
 You can specify an optional user identity identifier and/or a database connection name to help Auth0 find the user. The user identity identifier will be needed if the user logged in with a [linked account](https://auth0.com/docs/manage-users/user-accounts/user-account-linking).
 
+> [!NOTE]
+> Pass `userIdentityId` **without** the identity provider prefix.
+
 ```swift
 Auth0
     .myAccount(token: apiCredentials.accessToken)
