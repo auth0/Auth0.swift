@@ -19,6 +19,7 @@ private let Timeout: NimbleTimeInterval = .seconds(2)
 private let PhoneNumber = "+15551234567"
 private let OTPCode = "123456"
 private let AuthSession = "someAuthSessionToken"
+private let NewPassword = "S3cr3tP@ssw0rd"
 
 class MyAccountAuthenticationMethodsSpec: QuickSpec {
     override class func spec() {
@@ -123,6 +124,14 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 expect(request.dpop).toNot(beNil())
             }
 
+            it("should pass DPoP to enrollPassword POST requests") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken,
+                                                                      url: DomainURL).useDPoP()
+                let request = authMethods.enrollPassword()
+
+                expect(request.dpop).toNot(beNil())
+            }
+
             it("should not pass DPoP to GET requests when not enabled") {
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
                 let request = authMethods.getAuthenticationMethods(type: nil)
@@ -140,6 +149,13 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
             it("should not pass DPoP to DELETE requests when not enabled") {
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
                 let request = authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId)
+
+                expect(request.dpop).to(beNil())
+            }
+
+            it("should not pass DPoP to enrollPassword POST requests when not enabled") {
+                let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
+                let request = authMethods.enrollPassword()
 
                 expect(request.dpop).to(beNil())
             }
@@ -547,6 +563,71 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
             }
         }
 
+        describe("enroll Password") {
+            it("should enroll password successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "password"])
+                }, response: passwordEnrollmentChallengeResponse(id: AuthenticationMethodId,
+                                                                  authSession: AuthSession))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollPassword().start { result in
+                        expect(result).to(havePasswordEnrollmentChallenge(id: AuthenticationMethodId,
+                                                                          authSession: AuthSession,
+                                                                          minLength: 8,
+                                                                          characterTypeRule: "three_of_four",
+                                                                          blockedFields: ["name", "email"],
+                                                                          historySize: 5,
+                                                                          dictionaryDefault: "en_10k"))
+                        done()
+                    }
+                }
+            }
+
+            it("should include userIdentity and connection parameters") {
+                let identityUserId = "681359da4a20c7993310ff1d"
+
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "password",
+                                 "connection": Connection,
+                                 "identity_user_id": identityUserId])
+                }, response: passwordEnrollmentChallengeResponse(id: AuthenticationMethodId,
+                                                                  authSession: AuthSession))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollPassword(userIdentityId: identityUserId, connection: Connection).start { result in
+                        expect(result).to(havePasswordEnrollmentChallenge(id: AuthenticationMethodId,
+                                                                          authSession: AuthSession,
+                                                                          minLength: 8,
+                                                                          characterTypeRule: "three_of_four",
+                                                                          blockedFields: ["name", "email"],
+                                                                          historySize: 5,
+                                                                          dictionaryDefault: "en_10k"))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to enroll password") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "password"])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollPassword().start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
         // MARK: - Confirmation Tests
 
         describe("confirmTOTPEnrolment") {
@@ -735,6 +816,46 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     authMethods.confirmRecoveryCodeEnrollment(id: AuthenticationMethodId,
                                                              authSession: AuthSession).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("confirmPasswordEnrolment") {
+            let endpoint = "\(AuthenticationMethodId)/verify"
+            let usage = ["primary"]
+            let createdAt = "2025-07-30T13:08:49.508Z"
+
+            it("should confirm password enrollment successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession, "new_password": NewPassword])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "password", createdAt: createdAt, usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmPasswordEnrollment(id: AuthenticationMethodId,
+                                                          authSession: AuthSession,
+                                                          newPassword: NewPassword).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to confirm password enrollment") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession, "new_password": NewPassword])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmPasswordEnrollment(id: AuthenticationMethodId,
+                                                          authSession: AuthSession,
+                                                          newPassword: NewPassword).start { result in
                         expect(result).to(beUnsuccessful())
                         done()
                     }

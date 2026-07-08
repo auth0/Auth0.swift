@@ -238,6 +238,30 @@ func haveRecoveryCodeChallenge(id: String, authSession: String, recoveryCode: St
     }
 }
 
+func havePasswordEnrollmentChallenge(id: String,
+                                     authSession: String,
+                                     minLength: Int? = nil,
+                                     characterTypeRule: String? = nil,
+                                     blockedFields: [String]? = nil,
+                                     historySize: Int? = nil,
+                                     dictionaryDefault: String? = nil) -> Nimble.Matcher<MyAccountResult<PasswordEnrollmentChallenge>> {
+    let definition = "havePasswordEnrollmentChallenge with " +
+    "identifier <\(id)>, " +
+    "authSession <\(authSession)>"
+    return Matcher<MyAccountResult<PasswordEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: PasswordEnrollmentChallenge) ->
+            Bool in
+            return created.authenticationId == id &&
+            created.authenticationSession == authSession &&
+            created.policy.complexity.minLength == minLength &&
+            created.policy.complexity.characterTypeRule == characterTypeRule &&
+            created.policy.profileData.blockedFields == blockedFields &&
+            created.policy.history.size == historySize &&
+            created.policy.dictionary.default == dictionaryDefault
+        }
+    }
+}
+
 func haveAuthMethodEnrolmentError<T>(type: String,
                                      title: String,
                                      detail: String,
