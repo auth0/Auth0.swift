@@ -30,6 +30,30 @@
 - feat: add @Sendable annotations to closure parameters for Swift 6 compliance [\#1128](https://github.com/auth0/Auth0.swift/pull/1128) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
 - feat: Swift 6 strict concurrency compliance for WebAuth Part 1 [\#1123](https://github.com/auth0/Auth0.swift/pull/1123) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
 
+## [2.24.1](https://github.com/auth0/Auth0.swift/tree/2.24.1) (2026-07-07)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.24.0...2.24.1)
+
+**Added**
+- fix: prevent watchOS Int overflow in session_expiry parsing [\#1241](https://github.com/auth0/Auth0.swift/pull/1241) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
+## [2.24.0](https://github.com/auth0/Auth0.swift/tree/2.24.0) (2026-07-01)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.23.0...2.24.0)
+
+**Added**
+- feat: IPSIE session_expiry enforcement in CredentialsManager [EA] [\#1208](https://github.com/auth0/Auth0.swift/pull/1208) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
+## [2.23.0](https://github.com/auth0/Auth0.swift/tree/2.23.0) (2026-06-30)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.22.0...2.23.0)
+
+**Added**
+- feat: add passwordless OTP for database connections [\#1218](https://github.com/auth0/Auth0.swift/pull/1218) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
+## [2.22.0](https://github.com/auth0/Auth0.swift/tree/2.22.0) (2026-06-05)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.21.2...2.22.0)
+
+**Added**
+- feat: CTE delegation and impersonation support [\#1190](https://github.com/auth0/Auth0.swift/pull/1190) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [2.21.2](https://github.com/auth0/Auth0.swift/tree/2.21.2) (2026-05-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.21.1...2.21.2)
 
