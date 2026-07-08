@@ -170,7 +170,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Parameters:
-    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
+    ///   - id: The ``PasswordEnrollmentChallenge/authenticationId`` returned by ``enrollPassword(userIdentityId:connection:)``. It should be used as it is, without any modifications.
     ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
     ///   - newPassword: The new password to set, satisfying the policy from the enrollment challenge.
     /// - Returns: A request that will yield an enrolled password authentication method.

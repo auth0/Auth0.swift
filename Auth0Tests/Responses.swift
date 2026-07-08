@@ -345,7 +345,7 @@ func passwordEnrollmentChallengeResponse(id: String,
             ]
         ]
     ]
-    return apiSuccessResponse(json: payload)
+    return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
 }
 
 func phoneEmailChallengeResponse(id: String, authSession: String, type: String) -> RequestResponse {
