@@ -3933,10 +3933,6 @@ Auth0
 
 Enrolling a new password authentication method is a two-step process. First, you request an enrollment challenge, which returns the connection's [password policy](https://auth0.com/docs/authenticate/database-connections/password-options) so you can guide the user to choose a compliant password. Then, you confirm the enrollment with the new password.
 
-#### Prerequisites
-
-- Enable the MFA grant type for your application. Go to Auth0 Dashboard > Applications > Advanced Settings > Grant Types and select MFA.
-
 #### 1. Request an enrollment challenge
 
 You can specify an optional user identity identifier and/or a database connection name to help Auth0 find the user. The user identity identifier will be needed if the user logged in with a [linked account](https://auth0.com/docs/manage-users/user-accounts/user-account-linking).
