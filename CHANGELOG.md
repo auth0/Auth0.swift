@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.25.0](https://github.com/auth0/Auth0.swift/tree/2.25.0) (2026-07-09)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.24.1...2.25.0)
+
+**Added**
+- feat: add password method enrollment to My Account API [\#1242](https://github.com/auth0/Auth0.swift/pull/1242) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [2.24.1](https://github.com/auth0/Auth0.swift/tree/2.24.1) (2026-07-07)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.24.0...2.24.1)
 
