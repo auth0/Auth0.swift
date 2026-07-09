@@ -17,6 +17,12 @@ xcodebuild test -project Auth0.xcodeproj -scheme Auth0.tvOS   -destination 'plat
 xcodebuild test -project Auth0.xcodeproj -scheme Auth0.iOS \
   -destination 'platform=iOS Simulator,name=iPhone 16' \
   -only-testing:Auth0Tests/CredentialsManagerSpec
+
+# watchOS has no test target (Quick has no watchOS build) — CI only builds it.
+# Must target the real device destination, not the simulator: watchOS device
+# archs (armv7k/arm64_32) use a 32-bit Int, the simulator uses 64-bit like macOS,
+# so simulator-only builds miss 32-bit-only overflows (e.g. GH issue #1240).
+xcodebuild build -project Auth0.xcodeproj -scheme Auth0.watchOS -destination 'generic/platform=watchOS'
 ```
 
 ## Lint

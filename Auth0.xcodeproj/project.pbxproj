@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		005229CC4C8AF30F1B7BA65C /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F23E6B91D4ACA7100C3F2D9 /* Auth0.framework */; };
 		017C2B6A702C46DAA56A665B /* PARWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AF474A3493489D94B0172A /* PARWebAuth.swift */; };
+		063F434BF0721F161E8E21F2 /* Auth0.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5F23E6B91D4ACA7100C3F2D9 /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		075CB390F6F8410DAB7BB611 /* PARTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F326CAC21BF449259277265A /* PARTransactionSpec.swift */; };
 		0A0F9D0DDA714529BF5462DD /* PARTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F326CAC21BF449259277265A /* PARTransactionSpec.swift */; };
 		0ACFBBAE262440F0B51CB54E /* AuthenticationMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD9168AF9624D28BA13817F /* AuthenticationMethodType.swift */; };
@@ -15,11 +17,13 @@
 		0CD5CF64ECCD42468508DE77 /* PARWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AF474A3493489D94B0172A /* PARWebAuth.swift */; };
 		0EB36A18AD625BA83ED1F98F /* ActClaim.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B9ED3D3D1762B07C0A7562 /* ActClaim.swift */; };
 		166372EC715136D4FCB94214 /* ActorToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C78D7EA17C21B042A37FC3 /* ActorToken.swift */; };
+		1D25EBE89A0920353B32C26F /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1E28FB61EBEAFBD92492A8D2 /* PasswordPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B212F00558F59DC367340A57 /* PasswordPolicy.swift */; };
 		29E84797AF9EFF0C6855A19D /* ActClaim.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B9ED3D3D1762B07C0A7562 /* ActClaim.swift */; };
 		2E57AADDDE2C2AF80AEE89E2 /* PasswordEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D270AE9D2A18838FF165B24C /* PasswordEnrollmentChallenge.swift */; };
 		2Z7FPPVSUUJRZC06V5RA8B2B /* BiometricPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */; };
 		36EC376F25B0407FB07FC556 /* AuthenticationMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD9168AF9624D28BA13817F /* AuthenticationMethodType.swift */; };
+		40A642F7AAA76426F36CA1ED /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4005FED661C355BAD9615C50 /* PasswordEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D270AE9D2A18838FF165B24C /* PasswordEnrollmentChallenge.swift */; };
 		419D9EBDC83EBBFE7D02099F /* PasswordPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B212F00558F59DC367340A57 /* PasswordPolicy.swift */; };
 		45ABAB0DC62040D5BE4C6194 /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5BDA5FD4244027BC13F2E4 /* AuthorizationCode.swift */; };
@@ -943,6 +947,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A00503C61D9CB3EF623A656A /* Copy Files */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				063F434BF0721F161E8E21F2 /* Auth0.framework in Copy Files */,
+				1D25EBE89A0920353B32C26F /* JWTDecode.xcframework in Copy Files */,
+				40A642F7AAA76426F36CA1ED /* SimpleKeychain.xcframework in Copy Files */,
+			);
+			name = "Copy Files";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C1B3B9D82C24B39E004A32A4 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1149,6 +1166,7 @@
 		A1BC0001000000000000AA01 /* PasswordlessChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordlessChallenge.swift; sourceTree = "<group>"; };
 		A1BC0002000000000000AA01 /* DeliveryMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryMethod.swift; sourceTree = "<group>"; };
 		A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A98823069918A4BB1211D4FD /* OAuth2Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2Watch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B212F00558F59DC367340A57 /* PasswordPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordPolicy.swift; sourceTree = "<group>"; };
 		C0B9ED3D3D1762B07C0A7562 /* ActClaim.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActClaim.swift; sourceTree = "<group>"; };
 		C107B51B2C9AC4D3006B6BEA /* WebViewProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewProvider.swift; sourceTree = "<group>"; };
@@ -1193,42 +1211,87 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D424EDA62F1668C200052186 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		596EF85200C79C8C706694CA /* Exceptions for "App" folder in "OAuth2Watch" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				InfoWatch.plist,
+			);
+			target = 97452865BD86C0AAFCC2239D /* OAuth2Watch */;
+		};
+		D424EDA62F1668C200052186 /* Exceptions for "App" folder in "OAuth2Mac" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				InfoWatch.plist,
 			);
 			target = 5B7EE47820FCA0A100367724 /* OAuth2Mac */;
 		};
-		D424EDA72F1668C800052186 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		D424EDA72F1668C800052186 /* Exceptions for "App" folder in "OAuth2Vision" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				InfoWatch.plist,
 			);
 			target = C1B3B9A72C24B297004A32A4 /* OAuth2Vision */;
 		};
-		D424EDA82F1668CB00052186 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		D424EDA82F1668CB00052186 /* Exceptions for "App" folder in "OAuth2TV" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				InfoWatch.plist,
 			);
 			target = 5B7EE45720FC9F3200367724 /* OAuth2TV */;
 		};
-		D4ABFE5E2F0FA132000C828C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		D4ABFE5E2F0FA132000C828C /* Exceptions for "App" folder in "OAuth2" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				InfoWatch.plist,
 			);
 			target = 5F3965C61CF67DD800CDE7C0 /* OAuth2 */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		D424EBAA2F15D6A500052186 /* MFA */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MFA; sourceTree = "<group>"; };
-		D4ABFCF72F0F8D78000C828C /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (D4ABFE5E2F0FA132000C828C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, D424EDA82F1668CB00052186 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, D424EDA62F1668C200052186 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, D424EDA72F1668C800052186 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
+		D424EBAA2F15D6A500052186 /* MFA */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = MFA;
+			sourceTree = "<group>";
+		};
+		D4ABFCF72F0F8D78000C828C /* App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D4ABFE5E2F0FA132000C828C /* Exceptions for "App" folder in "OAuth2" target */,
+				D424EDA82F1668CB00052186 /* Exceptions for "App" folder in "OAuth2TV" target */,
+				D424EDA62F1668C200052186 /* Exceptions for "App" folder in "OAuth2Mac" target */,
+				D424EDA72F1668C800052186 /* Exceptions for "App" folder in "OAuth2Vision" target */,
+				596EF85200C79C8C706694CA /* Exceptions for "App" folder in "OAuth2Watch" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		02496FAF52E551C9CD8B0F79 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				005229CC4C8AF30F1B7BA65C /* Auth0.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5B7EE45520FC9F3200367724 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1550,6 +1613,7 @@
 				C1B3B9A82C24B297004A32A4 /* OAuth2Vision.app */,
 				C1B3B9C02C24B39E004A32A4 /* Auth0.framework */,
 				C1B3B9C72C24B39E004A32A4 /* Auth0Tests.xctest */,
+				A98823069918A4BB1211D4FD /* OAuth2Watch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2149,6 +2213,28 @@
 			productReference = 5F3965C71CF67DD800CDE7C0 /* OAuth2.app */;
 			productType = "com.apple.product-type.application";
 		};
+		97452865BD86C0AAFCC2239D /* OAuth2Watch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FAACF6E8FBDD9A1EF38A2A8F /* Build configuration list for PBXNativeTarget "OAuth2Watch" */;
+			buildPhases = (
+				50AB8A0F024D333A36B57F0E /* Sources */,
+				02496FAF52E551C9CD8B0F79 /* Frameworks */,
+				765CE01129F003278A9B17E4 /* Resources */,
+				A00503C61D9CB3EF623A656A /* Copy Files */,
+				53771ED4B82054C6B899D55D /* Auth0 */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D4ABFCF72F0F8D78000C828C /* App */,
+			);
+			name = OAuth2Watch;
+			productName = OAuth2Watch;
+			productReference = A98823069918A4BB1211D4FD /* OAuth2Watch.app */;
+			productType = "com.apple.product-type.application";
+		};
 		C1B3B9A72C24B297004A32A4 /* OAuth2Vision */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C1B3B9BA2C24B298004A32A4 /* Build configuration list for PBXNativeTarget "OAuth2Vision" */;
@@ -2315,6 +2401,7 @@
 				5B7EE45720FC9F3200367724 /* OAuth2TV */,
 				5B7EE47820FCA0A100367724 /* OAuth2Mac */,
 				C1B3B9A72C24B297004A32A4 /* OAuth2Vision */,
+				97452865BD86C0AAFCC2239D /* OAuth2Watch */,
 			);
 		};
 /* End PBXProject section */
@@ -2397,6 +2484,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		765CE01129F003278A9B17E4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C1B3B9A62C24B297004A32A4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2423,6 +2517,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		53771ED4B82054C6B899D55D /* Auth0 */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = Auth0;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "PLIST_PATH=\"${SRCROOT}/App/Auth0.plist\"\n\n# If missing, create a placeholder Auth0.plist so Xcode doesn't fail\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"Auth0.plist not found. Creating placeholder.\"\n    cat > \"$PLIST_PATH\" <<EOF\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>ClientId</key>\n    <string>YOUR_CLIENT_ID</string>\n    <key>Domain</key>\n    <string>YOUR_DOMAIN</string>\n</dict>\n</plist>\nEOF\nfi\n\n# Copy to .app bundle\ncp \"$PLIST_PATH\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\n\n\n";
+		};
 		5B717B241E2E2696004A05A7 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -2569,6 +2682,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		50AB8A0F024D333A36B57F0E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5B7EE45420FC9F3200367724 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3453,6 +3573,38 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		1C860BBB30F841B82F2EA4AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = App/InfoWatch.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2Watch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = watchos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 8.0;
+			};
+			name = Debug;
+		};
 		5B7EE46420FC9F3400367724 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4157,6 +4309,37 @@
 			};
 			name = Release;
 		};
+		81D835A21C70678DAC4C27E7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = App/InfoWatch.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2Watch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = watchos;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 8.0;
+			};
+			name = Release;
+		};
 		C1B3B9B82C24B298004A32A4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4534,6 +4717,15 @@
 			buildConfigurations = (
 				C1B3B9DA2C24B39E004A32A4 /* Debug */,
 				C1B3B9DB2C24B39E004A32A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FAACF6E8FBDD9A1EF38A2A8F /* Build configuration list for PBXNativeTarget "OAuth2Watch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C860BBB30F841B82F2EA4AC /* Debug */,
+				81D835A21C70678DAC4C27E7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

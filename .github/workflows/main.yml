@@ -59,6 +59,52 @@ jobs:
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
 
+    build-watchos:
+        name: Build for watchOS using Xcode ${{ matrix.xcode }}
+        runs-on: macos-14
+
+        strategy:
+          matrix:
+            xcode:
+              - '16.1'
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+            - name: Set up environment
+              uses: ./.github/actions/setup
+              with:
+                ruby: ${{ env.ruby }}
+                xcode: ${{ matrix.xcode }}
+
+            - name: Save Xcode version
+              run: xcodebuild -version | tee .xcode-version
+
+            - id: restore-carthage-cache
+              name: Restore Carthage cache
+              uses: actions/cache@v6
+              with:
+                path: Carthage
+                key: carthage-watchOS-${{ hashFiles('Cartfile.resolved') }}-${{ hashFiles('.xcode-version') }}-v1
+
+            - name: Install dependencies
+              if: steps.restore-carthage-cache.outputs.cache-hit != 'true'
+              run: carthage bootstrap --platform watchOS --use-xcframeworks --no-use-binaries --cache-builds
+
+            # `-destination generic/platform=watchOS` compiles for the real device
+            # architectures (armv7k / arm64_32), which use a 32-bit `Int`. The watchOS
+            # *simulator* destination compiles with a 64-bit `Int` (like macOS) and does
+            # NOT catch 32-bit-only overflows, e.g. https://github.com/auth0/Auth0.swift/issues/1240.
+            - name: Build for watchOS
+              run: |
+                set -o pipefail
+                xcodebuild build \
+                  -project Auth0.xcodeproj \
+                  -scheme Auth0.watchOS \
+                  -destination "generic/platform=watchOS" \
+                  | xcbeautify
+
     test-package:
         name: Test Swift package using Xcode ${{ matrix.xcode }}
         runs-on: macos-14
