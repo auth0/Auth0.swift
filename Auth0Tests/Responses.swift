@@ -111,13 +111,13 @@ func authResponse(accessToken: String,
                   issuedTokenType: String? = nil,
                   idToken: String,
                   refreshToken: String? = nil,
-                  expiresIn: Double = 3600,
+                  expiresAt: Double = 3600,
                   scope: String? = nil,
                   recoveryCode: String? = nil) -> RequestResponse {
     var json = [
         "access_token": accessToken,
         "token_type": tokenType,
-        "expires_in": String(expiresIn),
+        "expires_in": String(expiresAt),
         "id_token": idToken
     ]
 

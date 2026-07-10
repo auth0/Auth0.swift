@@ -23,7 +23,7 @@ import Foundation
 ///
 /// - [RFC 8693: OAuth 2.0 Token Exchange - act Claim](https://tools.ietf.org/html/rfc8693#section-4.4)
 /// - [Custom Token Exchange Documentation](https://auth0.com/docs/authenticate/custom-token-exchange)
-public final class ActClaim: Sendable {
+public final class ActClaim: @unchecked Sendable {
 
     /// The subject identifier of the acting party.
     ///
@@ -38,7 +38,7 @@ public final class ActClaim: Sendable {
     ///
     /// Values are preserved as-is, including non-string JSON values (numbers, booleans, objects, arrays), so that
     /// custom claims set via `api.authentication.setActor()` are not lost.
-    public let additionalClaims: [String: any Sendable]
+    public let additionalClaims: [String: Any]
 
     /// Creates a new `ActClaim` from a JSON dictionary.
     ///

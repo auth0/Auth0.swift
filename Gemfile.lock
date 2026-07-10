@@ -280,6 +280,7 @@ GEM
     rubyzip (2.4.1)
     securerandom (0.4.1)
     security (0.1.5)
+    semantic (1.6.1)
     signet (0.22.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
@@ -337,4 +338,4 @@ DEPENDENCIES
   slather
 
 BUNDLED WITH
-  4.0.2
+  4.0.11

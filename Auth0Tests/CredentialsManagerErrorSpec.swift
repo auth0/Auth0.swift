@@ -127,6 +127,12 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for unknown error") {
+                let message = "An unknown error occurred."
+                let error = CredentialsManagerError(code: .unknown)
+                expect(error.localizedDescription) == message
+            }
+
             it("should return message when minTTL is too big") {
                 let minTTL = 7200
                 let lifetime = 3600
