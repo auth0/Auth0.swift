@@ -8,9 +8,9 @@ class SpyGrant: OAuth2Grant {
     var defaults: [String: String] = [:]
     var items: [String: String] = [:]
 
-    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    func credentials(from values: [String: String], callback: @escaping @MainActor @Sendable (WebAuthResult<Credentials>) -> Void) {
         self.items = values
-        callback(.success(Credentials()))
+        Task { @MainActor in callback(.success(Credentials())) }
     }
 
     func values(fromComponents components: URLComponents) -> [String: String] {

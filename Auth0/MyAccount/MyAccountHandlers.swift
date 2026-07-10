@@ -1,7 +1,7 @@
 import Foundation
 
 func myAcccountDecodable<T: Decodable>(result: Result<ResponseValue, MyAccountError>,
-                                       callback: Request<T, MyAccountError>.Callback) {
+                                       callback: @Sendable (Result<T, MyAccountError>) -> Void) {
     do {
         let response = try result.get()
         if let data = response.data {
@@ -20,7 +20,7 @@ func myAcccountDecodable<T: Decodable>(result: Result<ResponseValue, MyAccountEr
 }
 
 func myAccountDecodableNoBody(from result: Result<ResponseValue, MyAccountError>,
-                              callback: Request<Void, MyAccountError>.Callback) {
+                              callback: @Sendable (Result<Void, MyAccountError>) -> Void) {
     do {
         _ = try result.get()
         callback(.success(()))
@@ -32,7 +32,7 @@ func myAccountDecodableNoBody(from result: Result<ResponseValue, MyAccountError>
 }
 
 func getAuthMethodsDecodable(from result: Result<ResponseValue, MyAccountError>,
-                             callback: Request<[AuthenticationMethod], MyAccountError>.Callback) {
+                             callback: @Sendable (Result<[AuthenticationMethod], MyAccountError>) -> Void) {
     do {
         let response = try result.get()
         if let data = response.data {
@@ -51,7 +51,7 @@ func getAuthMethodsDecodable(from result: Result<ResponseValue, MyAccountError>,
 }
 
 func getFactorsDecodable(from result: Result<ResponseValue, MyAccountError>,
-                         callback: Request<[Factor], MyAccountError>.Callback) {
+                         callback: @Sendable (Result<[Factor], MyAccountError>) -> Void) {
     do {
         let response = try result.get()
         if let data = response.data {
