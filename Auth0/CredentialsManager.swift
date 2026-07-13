@@ -801,7 +801,7 @@ public struct CredentialsManager: Sendable {
         let hasKeyPair = try? dpop.hasKeypair()
 
         guard hasKeyPair == true else {
-            try self.clear()
+            try self.clearAll()
             throw CredentialsManagerError.dpopKeyMissing
         }
 
@@ -809,7 +809,7 @@ public struct CredentialsManager: Sendable {
         let currentThumbprint = try dpop.jkt()
         if let stored = storedThumbPrintValue {
             if stored != currentThumbprint {
-                try self.clear()
+                try self.clearAll()
                 throw CredentialsManagerError.dpopKeyMismatch
             }
         } else {
@@ -885,7 +885,7 @@ public struct CredentialsManager: Sendable {
                     return callback(.failure(.noCredentials))
                 }
                 guard !self.hasSessionExpired(idToken: credentials.idToken) else {
-                    try? self.clear()
+                    try? self.clearAll()
                     complete()
                     return callback(.failure(.sessionExpired))
                 }
@@ -973,7 +973,7 @@ public struct CredentialsManager: Sendable {
                     return callback(.failure(.noCredentials))
                 }
                 guard !self.hasSessionExpired(idToken: credentials.idToken) else {
-                    try? self.clear()
+                    try? self.clearAll()
                     complete()
                     return callback(.failure(.sessionExpired))
                 }
@@ -1038,7 +1038,7 @@ public struct CredentialsManager: Sendable {
                     return callback(.failure(.noCredentials))
                 }
                 guard !self.hasSessionExpired(idToken: currentCredentials.idToken) else {
-                    try? self.clear()
+                    try? self.clearAll()
                     complete()
                     return callback(.failure(.sessionExpired))
                 }
