@@ -25,10 +25,10 @@ import LocalAuthentication
 /// - ``CredentialsManagerError``
 /// - <doc:RefreshTokens>
 public struct CredentialsManager: Sendable {
-    
+
     // storage is inherently sendable as it uses Keychain under the hood and is stateless
     private let sendableStorage: SendableBox<CredentialsStorage>
-    
+
     private var storage: CredentialsStorage {
         sendableStorage.value
     }
@@ -801,7 +801,7 @@ public struct CredentialsManager: Sendable {
         let hasKeyPair = try? dpop.hasKeypair()
 
         guard hasKeyPair == true else {
-            try self.clearAll()
+            try? self.clearAll()
             throw CredentialsManagerError.dpopKeyMissing
         }
 
@@ -809,7 +809,7 @@ public struct CredentialsManager: Sendable {
         let currentThumbprint = try dpop.jkt()
         if let stored = storedThumbPrintValue {
             if stored != currentThumbprint {
-                try self.clearAll()
+                try? self.clearAll()
                 throw CredentialsManagerError.dpopKeyMismatch
             }
         } else {
@@ -952,7 +952,7 @@ public struct CredentialsManager: Sendable {
                 callback(.failure(error))
             } catch {
                 complete()
-                callback(.failure(CredentialsManagerError(code: .noCredentials, cause: error)))
+                callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
             }
         }
     }
@@ -1011,7 +1011,7 @@ public struct CredentialsManager: Sendable {
                 return callback(.failure(error))
             } catch {
                 complete()
-                return callback(.failure(CredentialsManagerError(code: .noCredentials, cause: error)))
+                return callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: error)))
             }
         }
     }
@@ -1085,7 +1085,7 @@ public struct CredentialsManager: Sendable {
                 callback(.failure(error))
             } catch {
                 complete()
-                callback(.failure(CredentialsManagerError(code: .noCredentials, cause: error)))
+                callback(.failure(CredentialsManagerError(code: .apiExchangeFailed, cause: error)))
             }
         }
     }
