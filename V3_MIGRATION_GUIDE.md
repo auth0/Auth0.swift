@@ -42,6 +42,7 @@ Auth0.swift v3 is a Swift 6-ready release with improved error handling, predicta
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
   + [New required methods on the Authentication protocol](#new-required-methods-on-the-authentication-protocol)
+  + [New required methods on the MyAccountAuthenticationMethods protocol](#new-required-methods-on-the-myaccountauthenticationmethods-protocol)
   + [Request to Requestable](#request-to-requestable)
   + [ID Token Validation](#id-token-validation)
 - [**Removed APIs**](#removed-apis)
@@ -361,6 +362,9 @@ This change affects the following Credentials Manager methods:
 - `apiCredentials(forAudience:scope:minTTL:parameters:headers:)` (Combine)
 
 **Impact:** Credentials will be renewed if they expire within 60 seconds, instead of only when already expired.
+
+> [!NOTE]
+> `hasValid(minTTL:)` is **not** affected by this change — its default remains `0`. `hasValid()` with no arguments can report `true` for a token expiring in 1 second, even though a `credentials()` call right after would trigger a renewal anyway. If your app uses `hasValid()` to decide whether to show a login screen, keep this asymmetry in mind.
 
 <details>
   <summary>Migration example</summary>
@@ -790,6 +794,9 @@ credentialsManager.revoke { result in
 
 ### Web Auth
 
+> [!NOTE]
+> `presentationWindow(_:)` and `useCredentialsManager(_:)` (below) are new requirements on the `WebAuth` protocol itself, not just builder methods. If you have a **custom type conforming to `WebAuth`** (uncommon — most apps only call `Auth0.webAuth()`), it will fail to compile until it implements both. Auth0's own `Auth0WebAuth` implementation already conforms.
+
 Auth0.swift uses the current key window to present the in-app browser for Web Auth. When using ASWebAuthenticationSession, it grabs the key window and uses it as the ASPresentationAnchor; with SFSafariViewController, it presents using the topmost view controller in that window. While this works well for single-window apps, multi-window apps may see the in-app browser appear in an unexpected window. Auth0.swift now supports passing a custom window for presentation. The following methods are added to the Web Auth builder:
 
 - `presentationWindow(_ window:)`
@@ -944,6 +951,9 @@ This method removes **all** entries managed by the Credentials Manager from the 
 
 This is different from the existing `clear()` method, which only removes the default credentials entry.
 
+> [!WARNING]
+> `clearAll()` delegates to the underlying storage's `deleteAllEntries()`, which removes **every** entry for the configured Keychain service/access group — not just the entries this specific `CredentialsManager` instance wrote. If you share the default Keychain service across multiple `CredentialsManager` instances (e.g. one per test, or one per audience with distinct `storeKey`s but the same default storage), calling `clearAll()` on any one of them wipes the others' stored credentials too. Give each instance its own dedicated storage (a `SimpleKeychain` with a distinct `service`) if you need `clearAll()` to be scoped to just that instance. See [EXAMPLES.md](EXAMPLES.md#clear-all-stored-credentials) for the same caution.
+
 **Impact:** This is a new additive API. No migration is required. Use it when you need to completely wipe all stored credentials (e.g., on account deletion or full sign-out).
 
 ### CredentialsStorage deleteAllEntries
@@ -985,6 +995,7 @@ The following additive features were also included in this release. They require
 - **Passwordless OTP for database connections [EA]:** `passwordlessChallenge(email:connection:allowSignup:)`, `passwordlessChallenge(phoneNumber:connection:deliveryMethod:allowSignup:)`, and `login(otp:challenge:audience:scope:)` on `Authentication`. If you have a custom `Authentication` conformance, see [New required methods on the Authentication protocol](#new-required-methods-on-the-authentication-protocol). Usage: [EXAMPLES.md](EXAMPLES.md#passwordless-login-with-a-database-connection-ea).
 - **Custom token exchange with actor tokens [EA]:** `customTokenExchange(subjectToken:subjectTokenType:audience:scope:organization:actorToken:parameters:)` convenience overload on `Authentication`, plus the new `ActorToken` and `ActClaim` types, for delegation and impersonation flows. Usage: [EXAMPLES.md](EXAMPLES.md#custom-token-exchange).
 - **IPSIE `session_expiry` enforcement [EA]:** `CredentialsManager` now enforces an upstream IdP session ceiling when your enterprise connection emits a `session_expiry` claim, via the new `CredentialsManagerError.sessionExpired` error and `Credentials.sessionExpiresAt` property. Usage: [EXAMPLES.md](EXAMPLES.md#ipsie-session-expiry-ea).
+- **Password authentication method enrollment:** `enrollPassword(userIdentityId:connection:)` and `confirmPasswordEnrollment(id:authSession:newPassword:)` on `MyAccountAuthenticationMethods`, plus the new `PasswordEnrollmentChallenge` and `PasswordPolicy` types, for enrolling a password authentication method via the My Account API. If you have a custom `MyAccountAuthenticationMethods` conformance, see [New required methods on the MyAccountAuthenticationMethods protocol](#new-required-methods-on-the-myaccountauthenticationmethods-protocol). Usage: [EXAMPLES.md](EXAMPLES.md#enroll-a-new-password-authentication-method).
 
 ---
 
@@ -995,10 +1006,11 @@ The following additive features were also included in this release. They require
 **Change:** WebAuthError has been refined to provide more actionable error information:
 
 **Removed cases** (now return `.unknown` with descriptive messages):
-- `.noBundleIdentifier` - Configuration error that should be caught during development
-- `.noAuthorizationCode` - Rare edge case in PKCE flow
 - `.invalidInvitationURL` - Configuration error for organization invitations
 - `.pkceNotAllowed` - Configuration error (Application Type must be "Native" and Token Endpoint Authentication Method must be "None"). This error happens at most once when integrating the SDK into the app
+
+> [!NOTE]
+> Earlier drafts of this guide also listed `.noBundleIdentifier` and `.noAuthorizationCode` as removed. That is **not** accurate — both cases are still present in `WebAuthError` (`Auth0/WebAuthError.swift`) and are **not** folded into `.unknown`. If your app has an exhaustive `switch` over `WebAuthError` (without `@unknown default`), no change is needed for these two cases specifically.
 
 **New cases**:
 - `.authenticationFailed` - Server-side authentication failures (wrong password, MFA required, account locked, etc.)
@@ -1082,6 +1094,46 @@ class MockAuthentication: Authentication {
 </details>
 
 **Reason:** The passwordless OTP flow for database connections (see [EXAMPLES.md](EXAMPLES.md#passwordless-login-with-a-database-connection-ea)) is exposed on the `Authentication` protocol, consistent with every other authentication flow in the SDK.
+
+### New required methods on the MyAccountAuthenticationMethods protocol
+
+> [!IMPORTANT]
+> This section only affects you if your app has a **custom type conforming to `MyAccountAuthenticationMethods`** (for example, a mock or test double). If you only call `Auth0.myAccount(token:).authenticationMethods`, no action is required.
+
+**Change:** Two new methods have been added as requirements to the `MyAccountAuthenticationMethods` protocol, supporting password authentication method enrollment:
+
+```swift
+func enrollPassword(userIdentityId: String?, connection: String?) -> any Requestable<PasswordEnrollmentChallenge, MyAccountError>
+func confirmPasswordEnrollment(id: String, authSession: String, newPassword: String) -> any Requestable<AuthenticationMethod, MyAccountError>
+```
+
+**Impact:** Any custom type conforming to `MyAccountAuthenticationMethods` will fail to compile until it implements these two methods. Auth0's own `Auth0MyAccountAuthenticationMethods` implementation already conforms; this only affects custom conformances.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// Before - compiles
+class MockMyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
+    // ... existing method implementations
+}
+
+// After - add the two new methods
+class MockMyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
+    // ... existing method implementations
+
+    func enrollPassword(userIdentityId: String?, connection: String?) -> any Requestable<PasswordEnrollmentChallenge, MyAccountError> {
+        fatalError("not implemented")
+    }
+
+    func confirmPasswordEnrollment(id: String, authSession: String, newPassword: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
+        fatalError("not implemented")
+    }
+}
+```
+</details>
+
+**Reason:** Password authentication method enrollment (see [EXAMPLES.md](EXAMPLES.md#enroll-a-new-password-authentication-method)) is exposed on the `MyAccountAuthenticationMethods` protocol, consistent with every other authentication method (passkey, recovery code, TOTP, push, email, phone) in the SDK.
 
 ### Request to Requestable
 
@@ -1229,23 +1281,6 @@ For example, if you were reading or updating user metadata:
 2. **Call that endpoint from your app**, passing the user's access token as a `Bearer` token in the `Authorization` header.
 3. **On your backend**, obtain a machine-to-machine token via the [Client Credentials flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow) and use it to call the [Management API](https://auth0.com/docs/api/management/v2) with the precise scopes required.
 
----
-
-## Getting Help
-
-If you encounter issues during migration:
-
-- [GitHub Issues](https://github.com/auth0/Auth0.swift/issues) - Report bugs or ask questions
-- [Auth0 Community](https://community.auth0.com/) - Community support
-
-## Skill for Coding Agents
-
-If you use coding agents such as Claude Code or Cursor, we highly recommend adding the Auth0.swift migration skill to your repository:
-
-```
-npx skills add auth0/agent-skills --skill auth0-swift-major-migration
-```
-
 ### MFA methods on Authentication protocol
 
 **Change:** The following deprecated MFA methods have been removed from the `Authentication` protocol:
@@ -1267,6 +1302,23 @@ npx skills add auth0/agent-skills --skill auth0-swift-major-migration
 | `Auth0.authentication().multifactorChallenge(mfaToken: mfaToken, types: types, authenticatorId: id)` | `Auth0.mfa().challenge(with: id, mfaToken: mfaToken)` |
 
 See the [MFA API section](EXAMPLES.md#mfa-api-ios--macos--tvos--watchos--visionos) in EXAMPLES.md for full usage details.
+
+---
+
+## Getting Help
+
+If you encounter issues during migration:
+
+- [GitHub Issues](https://github.com/auth0/Auth0.swift/issues) - Report bugs or ask questions
+- [Auth0 Community](https://community.auth0.com/) - Community support
+
+## Skill for Coding Agents
+
+If you use coding agents such as Claude Code or Cursor, we highly recommend adding the Auth0.swift migration skill to your repository:
+
+```
+npx skills add auth0/agent-skills --skill auth0-swift-major-migration
+```
 
 ---
 [Go up ⤴](#table-of-contents)
