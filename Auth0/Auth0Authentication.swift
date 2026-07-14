@@ -76,7 +76,6 @@ struct Auth0Authentication: Authentication {
                              authentication: self)
     }
 
-
     func login(appleAuthorizationCode authorizationCode: String,
                fullName: PersonNameComponents?,
                profile: [String: Any]?,
