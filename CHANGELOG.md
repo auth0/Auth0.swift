@@ -1,5 +1,11 @@
 # Change Log
 
+## [3.0.0](https://github.com/auth0/Auth0.swift/tree/3.0.0) (2026-07-15)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.25.0...3.0.0)
+
+**Fixed**
+- fix: CredentialsManager error paths/DPoP cleanup, MFA file duplication, and safariProvider() stuck transaction [\#1250](https://github.com/auth0/Auth0.swift/pull/1250) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [3.0.0-beta.2](https://github.com/auth0/Auth0.swift/tree/3.0.0-beta.2) (2026-06-05)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.0-beta.1...3.0.0-beta.2)
 
