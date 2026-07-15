@@ -3190,7 +3190,7 @@ Auth0
                         // Step 4: Verify the OOB code
                         Auth0
                             .mfa()
-                            .verify(oobCode: userEnteredCode, bindingCode: nil, mfaToken: mfaToken)
+                            .verify(oobCode: challenge.oobCode, bindingCode: userEnteredCode, mfaToken: mfaToken)
                             .start { verifyResult in
                                 switch verifyResult {
                                 case .success(let credentials):
@@ -3307,18 +3307,18 @@ Auth0
                                     print("Challenge sent: \(challenge)")
 
                                     // Step 5: User enters the code
-                                    let userCode = "123456" // Get from user input
+                                    let userEnteredCode = "123456" // Get from user input
 
                                     // Step 6: Verify based on challenge type
                                     if challenge.challengeType == "oob" {
                                         Auth0
                                             .mfa()
-                                            .verify(oobCode: userCode, bindingCode: nil, mfaToken: mfaToken)
+                                            .verify(oobCode: challenge.oobCode, bindingCode: userEnteredCode, mfaToken: mfaToken)
                                             .start { print($0) }
                                     } else if challenge.challengeType == "otp" {
                                         Auth0
                                             .mfa()
-                                            .verify(otp: userCode, mfaToken: mfaToken)
+                                            .verify(otp: userEnteredCode, mfaToken: mfaToken)
                                             .start { print($0) }
                                     }
 
