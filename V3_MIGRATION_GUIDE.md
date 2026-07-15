@@ -10,6 +10,7 @@ Auth0.swift v3 is a Swift 6-ready release with improved error handling, predicta
 - **New APIs:** Multi-window Web Auth support, `clearAll()`, automatic credentials management and ID token validation.
 - **Removed APIs:** The Management API client and the deprecated MFA methods on the `Authentication` protocol have been removed.
 - **New `Authentication` protocol requirements:** Custom `Authentication` conformances (mocks, test doubles) must implement three new passwordless OTP methods.
+- **New `MyAccountAuthenticationMethods` protocol requirements:** Custom `MyAccountAuthenticationMethods` conformances (mocks, test doubles) must implement two password enrollment methods.
 
 - This guide covers every breaking change and the steps to migrate. Review it fully before upgrading.
 
@@ -41,8 +42,6 @@ Auth0.swift v3 is a Swift 6-ready release with improved error handling, predicta
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
   + [Renamed APIs](#renamed-apis)
-  + [New required methods on the Authentication protocol](#new-required-methods-on-the-authentication-protocol)
-  + [New required methods on the MyAccountAuthenticationMethods protocol](#new-required-methods-on-the-myaccountauthenticationmethods-protocol)
   + [Request to Requestable](#request-to-requestable)
   + [ID Token Validation](#id-token-validation)
 - [**Removed APIs**](#removed-apis)
@@ -993,9 +992,9 @@ class MyCustomCredentialStorage: CredentialsStorage {
 The following additive features were also included in this release. They require no migration — see the linked guides for usage:
 
 - **Passwordless OTP for database connections [EA]:** `passwordlessChallenge(email:connection:allowSignup:)`, `passwordlessChallenge(phoneNumber:connection:deliveryMethod:allowSignup:)`, and `login(otp:challenge:audience:scope:)` on `Authentication`. If you have a custom `Authentication` conformance, see [New required methods on the Authentication protocol](#new-required-methods-on-the-authentication-protocol). Usage: [EXAMPLES.md](EXAMPLES.md#passwordless-login-with-a-database-connection-ea).
+- **Password authentication method enrollment:** `enrollPassword(userIdentityId:connection:)` and `confirmPasswordEnrollment(id:authSession:newPassword:)` on `MyAccountAuthenticationMethods`, plus the new `PasswordEnrollmentChallenge` and `PasswordPolicy` types, for enrolling a password authentication method via the My Account API. If you have a custom `MyAccountAuthenticationMethods` conformance, see [New required methods on the MyAccountAuthenticationMethods protocol](#new-required-methods-on-the-myaccountauthenticationmethods-protocol). Usage: [EXAMPLES.md](EXAMPLES.md#enroll-a-new-password-authentication-method).
 - **Custom token exchange with actor tokens [EA]:** `customTokenExchange(subjectToken:subjectTokenType:audience:scope:organization:actorToken:parameters:)` convenience overload on `Authentication`, plus the new `ActorToken` and `ActClaim` types, for delegation and impersonation flows. Usage: [EXAMPLES.md](EXAMPLES.md#custom-token-exchange).
 - **IPSIE `session_expiry` enforcement [EA]:** `CredentialsManager` now enforces an upstream IdP session ceiling when your enterprise connection emits a `session_expiry` claim, via the new `CredentialsManagerError.sessionExpired` error and `Credentials.sessionExpiresAt` property. Usage: [EXAMPLES.md](EXAMPLES.md#ipsie-session-expiry-ea).
-- **Password authentication method enrollment:** `enrollPassword(userIdentityId:connection:)` and `confirmPasswordEnrollment(id:authSession:newPassword:)` on `MyAccountAuthenticationMethods`, plus the new `PasswordEnrollmentChallenge` and `PasswordPolicy` types, for enrolling a password authentication method via the My Account API. If you have a custom `MyAccountAuthenticationMethods` conformance, see [New required methods on the MyAccountAuthenticationMethods protocol](#new-required-methods-on-the-myaccountauthenticationmethods-protocol). Usage: [EXAMPLES.md](EXAMPLES.md#enroll-a-new-password-authentication-method).
 
 ---
 
