@@ -7,7 +7,7 @@ Auth0.swift v3 is a Swift 6-ready release with improved error handling, predicta
 - **Guaranteed main-thread delivery:** All callback, Combine, and async/await variants deliver results on the main thread — no more `DispatchQueue.main.async` boilerplate.
 - **Updated defaults:** Scope now includes `offline_access`, `minTTL` defaults to 60 seconds, and `signup` defaults the `connection` to `"Username-Password-Authentication"`.
 - **Renamed APIs** for consistency with the Android, Flutter, and React Native Auth0 SDKs.
-- **New APIs:** Multi-window Web Auth support, `clearAll()`, automatic credentials management, ID token validation, passwordless OTP for database connections, custom token exchange with actor tokens, and IPSIE `session_expiry` enforcement.
+- **New APIs:** Multi-window Web Auth support, `clearAll()`, automatic credentials management and ID token validation.
 - **Removed APIs:** The Management API client and the deprecated MFA methods on the `Authentication` protocol have been removed.
 - **New `Authentication` protocol requirements:** Custom `Authentication` conformances (mocks, test doubles) must implement three new passwordless OTP methods.
 
@@ -1006,11 +1006,10 @@ The following additive features were also included in this release. They require
 **Change:** WebAuthError has been refined to provide more actionable error information:
 
 **Removed cases** (now return `.unknown` with descriptive messages):
+- `.noBundleIdentifier` - Configuration error that should be caught during development
+- `.noAuthorizationCode` - Rare edge case in PKCE flow
 - `.invalidInvitationURL` - Configuration error for organization invitations
 - `.pkceNotAllowed` - Configuration error (Application Type must be "Native" and Token Endpoint Authentication Method must be "None"). This error happens at most once when integrating the SDK into the app
-
-> [!NOTE]
-> Earlier drafts of this guide also listed `.noBundleIdentifier` and `.noAuthorizationCode` as removed. That is **not** accurate — both cases are still present in `WebAuthError` (`Auth0/WebAuthError.swift`) and are **not** folded into `.unknown`. If your app has an exhaustive `switch` over `WebAuthError` (without `@unknown default`), no change is needed for these two cases specifically.
 
 **New cases**:
 - `.authenticationFailed` - Server-side authentication failures (wrong password, MFA required, account locked, etc.)
@@ -1050,94 +1049,9 @@ The `expiresIn` property on `Credentials`, `APICredentials`, and `SSOCredentials
 
 The `Telemetry` struct has been renamed to `Auth0ClientInfo`, and the `telemetry` property on `Trackable` conforming types has been renamed to `auth0ClientInfo`.
 
-### New required methods on the Authentication protocol
-
-> [!IMPORTANT]
-> This section only affects you if your app has a **custom type conforming to `Authentication`** (for example, a mock or test double). If you only call `Auth0.authentication()`, no action is required.
-
-**Change:** Three new methods have been added as requirements to the `Authentication` protocol, supporting the passwordless OTP flow for database connections:
-
-```swift
-func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError>
-func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError>
-func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError>
-```
-
-**Impact:** Any custom type conforming to `Authentication` — for example a mock `Authentication` implementation used in unit tests — will fail to compile until it implements these three methods. Auth0's own `Auth0Authentication` implementation already conforms; this only affects custom conformances.
-
-<details>
-  <summary>Migration example</summary>
-
-```swift
-// v3 beta.1/beta.2 - compiles
-class MockAuthentication: Authentication {
-    // ... existing method implementations
-}
-
-// v3 (this release) - add the three new methods
-class MockAuthentication: Authentication {
-    // ... existing method implementations
-
-    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
-        fatalError("not implemented")
-    }
-
-    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
-        fatalError("not implemented")
-    }
-
-    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
-        fatalError("not implemented")
-    }
-}
-```
-</details>
-
-**Reason:** The passwordless OTP flow for database connections (see [EXAMPLES.md](EXAMPLES.md#passwordless-login-with-a-database-connection-ea)) is exposed on the `Authentication` protocol, consistent with every other authentication flow in the SDK.
-
-### New required methods on the MyAccountAuthenticationMethods protocol
-
-> [!IMPORTANT]
-> This section only affects you if your app has a **custom type conforming to `MyAccountAuthenticationMethods`** (for example, a mock or test double). If you only call `Auth0.myAccount(token:).authenticationMethods`, no action is required.
-
-**Change:** Two new methods have been added as requirements to the `MyAccountAuthenticationMethods` protocol, supporting password authentication method enrollment:
-
-```swift
-func enrollPassword(userIdentityId: String?, connection: String?) -> any Requestable<PasswordEnrollmentChallenge, MyAccountError>
-func confirmPasswordEnrollment(id: String, authSession: String, newPassword: String) -> any Requestable<AuthenticationMethod, MyAccountError>
-```
-
-**Impact:** Any custom type conforming to `MyAccountAuthenticationMethods` will fail to compile until it implements these two methods. Auth0's own `Auth0MyAccountAuthenticationMethods` implementation already conforms; this only affects custom conformances.
-
-<details>
-  <summary>Migration example</summary>
-
-```swift
-// Before - compiles
-class MockMyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
-    // ... existing method implementations
-}
-
-// After - add the two new methods
-class MockMyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
-    // ... existing method implementations
-
-    func enrollPassword(userIdentityId: String?, connection: String?) -> any Requestable<PasswordEnrollmentChallenge, MyAccountError> {
-        fatalError("not implemented")
-    }
-
-    func confirmPasswordEnrollment(id: String, authSession: String, newPassword: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
-        fatalError("not implemented")
-    }
-}
-```
-</details>
-
-**Reason:** Password authentication method enrollment (see [EXAMPLES.md](EXAMPLES.md#enroll-a-new-password-authentication-method)) is exposed on the `MyAccountAuthenticationMethods` protocol, consistent with every other authentication method (passkey, recovery code, TOTP, push, email, phone) in the SDK.
-
 ### Request to Requestable
 
-**Change:** All `Authentication` and `MFAClient` methods now return protocol types instead of the concrete `Request` struct:
+**Change:** All `Authentication`, `MyAccountAuthenticationMethods` and `MFAClient` methods now return protocol types instead of the concrete `Request` struct:
 
 - Credential-returning methods return `any TokenRequestable<T, E>` (extends `Requestable`, adds `.validateClaims()` and related modifiers — see [ID Token Validation](#id-token-validation) below).
 - All other methods (e.g. `signup`, `resetPassword`, `userInfo`, `jwks`) return `any Requestable<T, E>`.

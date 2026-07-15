@@ -46,7 +46,7 @@ final class PARTransaction: AuthTransaction {
             let authorizationCode = AuthorizationCode(code: code, state: items["state"])
             Task { @MainActor in callback(.success(authorizationCode)) }
         } else {
-            let error = WebAuthError(code: .noAuthorizationCode(items))
+            let error = WebAuthError(code: .unknown("Authorization code missing from callback URL query parameters (\(items))"))
             self.finishUserAgent(with: .failure(error))
             Task { @MainActor in callback(.failure(error)) }
         }
