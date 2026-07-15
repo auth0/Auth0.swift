@@ -1,10 +1,10 @@
 {
-  "stable" : "v2.25.0",
+  "stable" : "v3.0.0",
   "versions" : [
     {
-      "name" : "v3.0.0-beta.2",
-      "path" : "v3.0.0-beta.2",
-      "version" : "3.0.0-beta.2"
+      "name" : "v3.0.0",
+      "path" : "v3.0.0",
+      "version" : "3.0.0"
     },
     {
       "name" : "v2.25.0",
