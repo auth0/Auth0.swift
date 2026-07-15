@@ -1,34 +1,5 @@
 # Change Log
 
-## [3.0.0](https://github.com/auth0/Auth0.swift/tree/3.0.0) (2026-07-15)
-[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.25.0...3.0.0)
-
-**⚠️ BREAKING CHANGES**
-- Removed deprecated MFA APIs [\#1159](https://github.com/auth0/Auth0.swift/pull/1159) ([NandanPrabhu](https://github.com/NandanPrabhu))
-- Throwing storage methods: CredentialsManager and CredentialsStorage methods now throw instead of returning Bool or nil, so failures are never silently swallowed. [\#1127](https://github.com/auth0/Auth0.swift/pull/1127) ([NandanPrabhu](https://github.com/NandanPrabhu))
-- Remove Management API client [\#1104](https://github.com/auth0/Auth0.swift/pull/1104) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-- feat: Add Error handling for DPoP thumbprint mismatch error [\#1145](https://github.com/auth0/Auth0.swift/pull/1145) ([NandanPrabhu](https://github.com/NandanPrabhu))
-- feat: Swift 6 strict concurrency compliance for web Auth: [\#1138](https://github.com/auth0/Auth0.swift/pull/1138) ([sanchitmehtagit](https://github.com/sanchitmehtagit)) & [\#1123](https://github.com/auth0/Auth0.swift/pull/1123) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-- feat: Swift 6 MainActor callbacks across all public APIs and Request<T: Sendable> constraint [\#1142](https://github.com/auth0/Auth0.swift/pull/1142) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-- feat: Update default values for minTTL, scope, and connection parameters to improve developer experience [\#1080](https://github.com/auth0/Auth0.swift/pull/1080) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-- Rename clearSession() to logout() and UserInfo to UserProfile [\#1105](https://github.com/auth0/Auth0.swift/pull/1105)([utkrishtsahu](https://github.com/utkrishtsahu))
-- Rename expiresIn to expiresAt and Telemetry to Auth0ClientInfo [\#1114](https://github.com/auth0/Auth0.swift/pull/1114) ([utkrishtsahu](https://github.com/utkrishtsahu))
-
-**Added**
-- feat: integrate credentials manager with webauth [\#1146](https://github.com/auth0/Auth0.swift/pull/1146) ([subhankarmaiti](https://github.com/subhankarmaiti))
-- feat: add clearAll() API to CredentialsManager and deleteAllEntries() method CredentialsStorage [\#1116](https://github.com/auth0/Auth0.swift/pull/1116) ([utkrishtsahu](https://github.com/utkrishtsahu))
-- ID token validation for the API that return id token as part of Credentials and SSOCredentials [\#1091](https://github.com/auth0/Auth0.swift/pull/1091) ([NandanPrabhu](https://github.com/NandanPrabhu))
-
-**Changed**
-- feat: Removes three sources of mutable global state that block Swift 6 strict concurrency [\#1141](https://github.com/auth0/Auth0.swift/pull/1141) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-- feat: Swift 6 Sendable closures and CredentialsManager parameter Sendability [\#1140](https://github.com/auth0/Auth0.swift/pull/1140) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-- feat: add Sendable annotations to closure parameters for Swift 6 compliance [\#1128](https://github.com/auth0/Auth0.swift/pull/1128) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-- feat: add Sendable conformances to value types and protocols that are inherently thread-safe  [\#1102](https://github.com/auth0/Auth0.swift/pull/1102) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-- chore: enable Swift 6 language mode in Package.swift  [\#1155](https://github.com/auth0/Auth0.swift/pull/1155) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-
-**Dependency Update**
-- chore: JWTDecode updated to 4.0 for swift 6 compliance [\#1101](https://github.com/auth0/Auth0.swift/pull/1101) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
-
 ## [3.0.0-beta.2](https://github.com/auth0/Auth0.swift/tree/3.0.0-beta.2) (2026-06-05)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.0-beta.1...3.0.0-beta.2)
 
