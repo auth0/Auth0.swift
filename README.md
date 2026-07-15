@@ -9,12 +9,12 @@
 📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 💡 [**Examples**](#examples) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
 
 > [!IMPORTANT]
-> **🚀 v3 Beta Available**
-> A new major version [`3.0.0-beta.2`](https://github.com/auth0/Auth0.swift/releases/tag/3.0.0-beta.2) of Auth0.swift is now available in beta. It includes breaking changes and improvements over v2.
+> **🚀 v3 GA Available**
+> A new major version [`3.0.0`](https://github.com/auth0/Auth0.swift/releases/tag/3.0.0) of Auth0.swift is now available as GA. It includes breaking changes and improvements over v2.
 >
 > We'd love for you to try it out and share your feedback! Please [open an issue](https://github.com/auth0/Auth0.swift/issues) if you encounter any problems or have suggestions.
 >
-> 📚 [Migration Guide](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.2/V3_MIGRATION_GUIDE.md) &nbsp;•&nbsp; 📦 [v3 Changelog](https://github.com/auth0/Auth0.swift/blob/3.0.0-beta.2/CHANGELOG.md) &nbsp;•&nbsp; 🤖 [Migration Skill](https://github.com/auth0/agent-skills/tree/main/plugins/auth0/skills/auth0-swift-major-migration)
+> 📚 [Migration Guide](https://github.com/auth0/Auth0.swift/blob/3.0.0/V3_MIGRATION_GUIDE.md) &nbsp;•&nbsp; 📦 [v3 Changelog](https://github.com/auth0/Auth0.swift/blob/3.0.0/CHANGELOG.md) &nbsp;•&nbsp; 🤖 [Migration Skill](https://github.com/auth0/agent-skills/tree/main/plugins/auth0/skills/auth0-swift-major-migration)
 >
 > **Skill for Coding Agents:** If you use coding agents such as Claude Code or Cursor, add the Auth0.swift migration skill to automate the upgrade:
 > ```
@@ -67,7 +67,7 @@ Then, select the dependency rule and press **Add Package**.
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 3.0.0-beta.2'
+pod 'Auth0', '~> 3.0.0'
 ```
 
 Then, run `pod install`.
@@ -77,7 +77,7 @@ Then, run `pod install`.
 Add the following line to your `Cartfile`:
 
 ```text
-github "auth0/Auth0.swift" ~> 3.0.0-beta.2
+github "auth0/Auth0.swift" ~> 3.0.0
 ```
 
 Then, run `carthage bootstrap --use-xcframeworks`.
