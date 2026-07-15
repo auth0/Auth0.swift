@@ -1049,6 +1049,92 @@ The `expiresIn` property on `Credentials`, `APICredentials`, and `SSOCredentials
 
 The `Telemetry` struct has been renamed to `Auth0ClientInfo`, and the `telemetry` property on `Trackable` conforming types has been renamed to `auth0ClientInfo`.
 
+
+### New required methods on the Authentication protocol
+
+> [!IMPORTANT]
+> This section only affects you if your app has a **custom type conforming to `Authentication`** (for example, a mock or test double). If you only call `Auth0.authentication()`, no action is required.
+
+**Change:** Three new methods have been added as requirements to the `Authentication` protocol, supporting the passwordless OTP flow for database connections:
+
+```swift
+func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError>
+func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError>
+func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError>
+```
+
+**Impact:** Any custom type conforming to `Authentication` — for example a mock `Authentication` implementation used in unit tests — will fail to compile until it implements these three methods. Auth0's own `Auth0Authentication` implementation already conforms; this only affects custom conformances.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v3 beta.1/beta.2 - compiles
+class MockAuthentication: Authentication {
+    // ... existing method implementations
+}
+
+// v3 (this release) - add the three new methods
+class MockAuthentication: Authentication {
+    // ... existing method implementations
+
+    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
+        fatalError("not implemented")
+    }
+
+    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
+        fatalError("not implemented")
+    }
+
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("not implemented")
+    }
+}
+```
+</details>
+
+**Reason:** The passwordless OTP flow for database connections (see [EXAMPLES.md](EXAMPLES.md#passwordless-login-with-a-database-connection-ea)) is exposed on the `Authentication` protocol, consistent with every other authentication flow in the SDK.
+
+### New required methods on the MyAccountAuthenticationMethods protocol
+
+> [!IMPORTANT]
+> This section only affects you if your app has a **custom type conforming to `MyAccountAuthenticationMethods`** (for example, a mock or test double). If you only call `Auth0.myAccount(token:).authenticationMethods`, no action is required.
+
+**Change:** Two new methods have been added as requirements to the `MyAccountAuthenticationMethods` protocol, supporting password authentication method enrollment:
+
+```swift
+func enrollPassword(userIdentityId: String?, connection: String?) -> any Requestable<PasswordEnrollmentChallenge, MyAccountError>
+func confirmPasswordEnrollment(id: String, authSession: String, newPassword: String) -> any Requestable<AuthenticationMethod, MyAccountError>
+```
+
+**Impact:** Any custom type conforming to `MyAccountAuthenticationMethods` will fail to compile until it implements these two methods. Auth0's own `Auth0MyAccountAuthenticationMethods` implementation already conforms; this only affects custom conformances.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// Before - compiles
+class MockMyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
+    // ... existing method implementations
+}
+
+// After - add the two new methods
+class MockMyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
+    // ... existing method implementations
+
+    func enrollPassword(userIdentityId: String?, connection: String?) -> any Requestable<PasswordEnrollmentChallenge, MyAccountError> {
+        fatalError("not implemented")
+    }
+
+    func confirmPasswordEnrollment(id: String, authSession: String, newPassword: String) -> any Requestable<AuthenticationMethod, MyAccountError> {
+        fatalError("not implemented")
+    }
+}
+```
+</details>
+
+**Reason:** Password authentication method enrollment (see [EXAMPLES.md](EXAMPLES.md#enroll-a-new-password-authentication-method)) is exposed on the `MyAccountAuthenticationMethods` protocol, consistent with every other authentication method (passkey, recovery code, TOTP, push, email, phone) in the SDK.
+
 ### Request to Requestable
 
 **Change:** All `Authentication`, `MyAccountAuthenticationMethods` and `MFAClient` methods now return protocol types instead of the concrete `Request` struct:
