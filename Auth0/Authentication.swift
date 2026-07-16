@@ -831,12 +831,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      Exchanges a user's refresh token for a session transfer token that can be used to perform web single sign-on
      (SSO).
 
-     ## Availability
-
-     This feature is currently available in
-     [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-     Please reach out to Auth0 support to get it enabled for your tenant.
-
      ## Usage
 
      ```swift
