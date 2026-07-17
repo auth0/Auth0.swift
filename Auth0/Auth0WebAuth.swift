@@ -1,16 +1,21 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 import Combine
+#if os(iOS) || os(visionOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
-final class Auth0WebAuth: WebAuth {
+struct Auth0WebAuth: WebAuth, Sendable {
 
     let clientId: String
     let url: URL
     let session: URLSession
     let storage: TransactionStore
 
-    var telemetry: Telemetry
-    var barrier: Barrier
+    var auth0ClientInfo: Auth0ClientInfo
+    let barrier: Barrier
     var logger: Logger?
     var dpop: DPoP?
 
@@ -34,7 +39,20 @@ final class Auth0WebAuth: WebAuth {
     private(set) var invitationURL: URL?
     private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
-    private(set) var onCloseCallback: (() -> Void)?
+    private(set) var onCloseCallback: (@Sendable @MainActor () -> Void)?
+    private(set) var presentationWindow: Auth0WindowRepresentable?
+    private var _credentialsManager: CredentialsManager?
+
+    private var _redirectURL: URL?
+
+    var redirectURL: URL? {
+        get { _redirectURL ?? computeDefaultRedirectURL() }
+        set { _redirectURL = newValue }
+    }
+
+    var credentialsManager: CredentialsManager? {
+        return _credentialsManager
+    }
 
     var state: String {
         return parameters["state"] ?? generateRandomString()
@@ -44,144 +62,162 @@ final class Auth0WebAuth: WebAuth {
         return parameters["nonce"] ?? generateRandomString()
     }
 
-    lazy var redirectURL: URL? = {
-        guard let bundleID = Bundle.main.bundleIdentifier, let domain = self.url.host else { return nil }
-        let scheme: String
-
-        if #available(iOS 17.4, macOS 14.4, *) {
-            scheme = https ? "https" : bundleID
-        } else {
-            scheme = bundleID
-        }
-
-        guard let baseURL = URL(string: "\(scheme)://\(domain)") else { return nil }
-        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
-
-        return components?.url?
-            .appendingPathComponent(self.url.path)
-            .appendingPathComponent(self.platform)
-            .appendingPathComponent(bundleID)
-            .appendingPathComponent("callback")
-    }()
-
     init(clientId: String,
          url: URL,
          session: URLSession = URLSession.shared,
          storage: TransactionStore = TransactionStore.shared,
-         telemetry: Telemetry = Telemetry(),
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo(),
          barrier: Barrier = QueueBarrier.shared) {
         self.clientId = clientId
         self.url = url
         self.session = session
         self.storage = storage
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
         self.barrier = barrier
         self.issuer = url.absoluteString
     }
 
     func connection(_ connection: String) -> Self {
-        self.parameters["connection"] = connection
-        return self
+        var copy = self
+        copy.parameters["connection"] = connection
+        return copy
     }
 
     func scope(_ scope: String) -> Self {
-        self.parameters["scope"] = scope
-        return self
+        var copy = self
+        copy.parameters["scope"] = scope
+        return copy
     }
 
     func connectionScope(_ connectionScope: String) -> Self {
-        self.parameters["connection_scope"] = connectionScope
-        return self
+        var copy = self
+        copy.parameters["connection_scope"] = connectionScope
+        return copy
     }
 
     func nonce(_ nonce: String) -> Self {
-        self.parameters["nonce"] = nonce
-        return self
+        var copy = self
+        copy.parameters["nonce"] = nonce
+        return copy
     }
 
     func state(_ state: String) -> Self {
-        self.parameters["state"] = state
-        return self
+        var copy = self
+        copy.parameters["state"] = state
+        return copy
     }
 
     func parameters(_ parameters: [String: String]) -> Self {
-        parameters.forEach { self.parameters[$0] = $1 }
-        return self
+        var copy = self
+        parameters.forEach { copy.parameters[$0] = $1 }
+        return copy
     }
 
     @available(iOS 17.4, macOS 14.4, visionOS 1.2, *)
     func headers(_ headers: [String: String]) -> Self {
-        headers.forEach { self.headers[$0] = $1 }
-        return self
+        var copy = self
+        headers.forEach { copy.headers[$0] = $1 }
+        return copy
     }
 
     func redirectURL(_ redirectURL: URL) -> Self {
-        self.redirectURL = redirectURL
-        return self
+        var copy = self
+        copy._redirectURL = redirectURL
+        return copy
     }
 
     func authorizeURL(_ authorizeURL: URL) -> Self {
-        self.overrideAuthorizeURL = authorizeURL
-        return self
+        var copy = self
+        copy.overrideAuthorizeURL = authorizeURL
+        return copy
     }
 
     func audience(_ audience: String) -> Self {
-        self.parameters["audience"] = audience
-        return self
+        var copy = self
+        copy.parameters["audience"] = audience
+        return copy
     }
 
     func issuer(_ issuer: String) -> Self {
-        self.issuer = issuer
-        return self
+        var copy = self
+        copy.issuer = issuer
+        return copy
     }
 
     func leeway(_ leeway: Int) -> Self {
-        self.leeway = leeway
-        return self
+        var copy = self
+        copy.leeway = leeway
+        return copy
     }
 
     func maxAge(_ maxAge: Int) -> Self {
-        self.maxAge = maxAge
-        return self
+        var copy = self
+        copy.maxAge = maxAge
+        return copy
     }
 
     func useHTTPS() -> Self {
-        self.https = true
-        return self
+        var copy = self
+        copy.https = true
+        return copy
     }
 
     func useEphemeralSession() -> Self {
-        self.ephemeralSession = true
-        return self
+        var copy = self
+        copy.ephemeralSession = true
+        return copy
     }
 
     func invitationURL(_ invitationURL: URL) -> Self {
-        self.invitationURL = invitationURL
-        return self
+        var copy = self
+        copy.invitationURL = invitationURL
+        return copy
     }
 
     func organization(_ organization: String) -> Self {
-        self.organization = organization
-        return self
+        var copy = self
+        copy.organization = organization
+        return copy
     }
 
     func provider(_ provider: @escaping WebAuthProvider) -> Self {
-        self.provider = provider
-        return self
+        var copy = self
+        copy.provider = provider
+        return copy
     }
 
-    func onClose(_ callback: (() -> Void)?) -> Self {
-        self.onCloseCallback = callback
-        return self
+    func onClose(_ callback: (@Sendable () -> Void)?) -> Self {
+        var copy = self
+        copy.onCloseCallback = callback
+        return copy
     }
 
-    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    func presentationWindow(_ window: Auth0WindowRepresentable) -> Self {
+        var copy = self
+        copy.presentationWindow = window
+        return copy
+    }
+
+    func start(_ callback: @escaping @Sendable @MainActor (WebAuthResult<Credentials>) -> Void) {
+        Task { @MainActor in
+            self._start(callback)
+        }
+    }
+
+    func useCredentialsManager(_ credentialsManager: CredentialsManager) -> Self {
+        var copy = self
+        copy._credentialsManager = credentialsManager
+        return copy
+    }
+
+    @MainActor
+    private func _start(_ callback: @escaping @Sendable @MainActor (WebAuthResult<Credentials>) -> Void) {
         guard barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
         guard let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            return callback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
         let nonce = nonce
@@ -198,18 +234,33 @@ final class Auth0WebAuth: WebAuth {
             return callback(.failure(error))
         }
 
+        let storingCallback: @MainActor @Sendable (WebAuthResult<Credentials>) -> Void = { result in
+            if case .success(let credentials) = result, let credentialsManager {
+                do {
+                    try credentialsManager.store(credentials: credentials)
+                } catch {
+                    return callback(.failure(WebAuthError(code: .credentialsManagerError, cause: error)))
+                }
+            }
+            callback(result)
+        }
+
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      ephemeralSession: ephemeralSession,
-                                                                     headers: headers)
-        let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
+                                                                     headers: headers,
+                                                                     presentationWindow: self.presentationWindow)
+        let closeCallback = onCloseCallback
+        let userAgent = provider(authorizeURL) { [storage, barrier] result in
             storage.clear()
             barrier.lower()
 
             switch result {
             case .success:
-                onCloseCallback?()
+                if let closeCallback {
+                    Task { @MainActor in closeCallback() }
+                }
             case .failure(let error):
-                callback(.failure(error))
+                Task { @MainActor in storingCallback(.failure(error)) }
             }
         }
         let transaction = LoginTransaction(redirectURL: redirectURL,
@@ -217,13 +268,18 @@ final class Auth0WebAuth: WebAuth {
                                            userAgent: userAgent,
                                            handler: handler,
                                            logger: self.logger,
-                                           callback: callback)
+                                           callback: storingCallback)
         self.storage.store(transaction)
         userAgent.start()
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
-    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    func logout(federated: Bool, callback: @escaping @Sendable @MainActor (WebAuthResult<Void>) -> Void) {
+        Task { @MainActor in self._logout(federated: federated, callback: callback) }
+    }
+
+    @MainActor
+    private func _logout(federated: Bool, callback: @escaping @Sendable @MainActor (WebAuthResult<Void>) -> Void) {
         guard barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
@@ -238,16 +294,30 @@ final class Auth0WebAuth: WebAuth {
         components?.queryItems = queryItems + [returnTo, clientId]
 
         guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            return callback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, headers: headers)
+        let credentialsManager = self.credentialsManager
+        let clearingCallback: @MainActor @Sendable (WebAuthResult<Void>) -> Void = { result in
+            if case .success = result, let cm = credentialsManager {
+                do {
+                    try cm.clear()
+                } catch {
+                    return callback(.failure(WebAuthError(code: .credentialsManagerError, cause: error)))
+                }
+            }
+            callback(result)
+        }
+
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
+                                                                     headers: headers,
+                                                                     presentationWindow: self.presentationWindow)
         let userAgent = provider(logoutURL) { [storage, barrier] result in
             storage.clear()
             barrier.lower()
-            callback(result)
+            Task { @MainActor in clearingCallback(result) }
         }
-        let transaction = ClearSessionTransaction(userAgent: userAgent)
+        let transaction = LogoutTransaction(userAgent: userAgent)
         self.storage.store(transaction)
         userAgent.start()
     }
@@ -277,7 +347,7 @@ final class Auth0WebAuth: WebAuth {
             guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
                   let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
                   let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
-                throw WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))
+                throw WebAuthError(code: .unknown("Invalid invitation URL: missing organization or invitation parameters"))
             }
 
             entries["organization"] = organizationId
@@ -298,7 +368,7 @@ final class Auth0WebAuth: WebAuth {
 
         entries["scope"] = includeRequiredScope(in: entries["scope"])
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
-        components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
+        components.queryItems = self.auth0ClientInfo.queryItemsWithTelemetry(queryItems: items)
         components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
         return components.url!
     }
@@ -314,11 +384,31 @@ final class Auth0WebAuth: WebAuth {
         return randomString
     }
 
+    private func computeDefaultRedirectURL() -> URL? {
+        guard let bundleID = Bundle.main.bundleIdentifier, let domain = self.url.host else { return nil }
+        let scheme: String
+
+        if #available(iOS 17.4, macOS 14.4, *) {
+            scheme = https ? "https" : bundleID
+        } else {
+            scheme = bundleID
+        }
+
+        guard let baseURL = URL(string: "\(scheme)://\(domain)") else { return nil }
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
+
+        return components?.url?
+            .appendingPathComponent(self.url.path)
+            .appendingPathComponent(self.platform)
+            .appendingPathComponent(bundleID)
+            .appendingPathComponent("callback")
+    }
+
     private func handler(_ redirectURL: URL, nonce: String) -> OAuth2Grant {
         var authentication = Auth0Authentication(clientId: self.clientId,
                                                  url: self.url,
                                                  session: self.session,
-                                                 telemetry: self.telemetry)
+                                                 auth0ClientInfo: self.auth0ClientInfo)
         authentication.dpop = self.dpop
         authentication.logger = self.logger
         return PKCE(authentication: authentication,
@@ -337,14 +427,23 @@ final class Auth0WebAuth: WebAuth {
 extension Auth0WebAuth {
 
     public func start() -> AnyPublisher<Credentials, WebAuthError> {
-        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+        Deferred {
+            Future { promise in
+                let box = SendableBox(value: promise)
+                self.start { result in
+                    box.value(result)
+                }
+            }
+        }
+        .eraseToAnyPublisher()
     }
 
-    public func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
+    public func logout(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
         return Deferred {
             Future { callback in
-                self.clearSession(federated: federated) { result in
-                    callback(result)
+                let box = SendableBox(value: callback)
+                self.logout(federated: federated) { result in
+                    box.value(result)
                 }
             }
         }.eraseToAnyPublisher()
@@ -357,25 +456,23 @@ extension Auth0WebAuth {
 #if canImport(_Concurrency)
 extension Auth0WebAuth {
 
+    @MainActor
     func start() async throws -> Credentials {
         var alreadyResumed = false
         return try await withCheckedThrowingContinuation { continuation in
-            Task { @MainActor in
-                self.start { result in
-                    guard !alreadyResumed else { return }
-                    alreadyResumed = true
-                    continuation.resume(with: result)
-                }
+            self.start { result in
+                guard !alreadyResumed else { return }
+                alreadyResumed = true
+                continuation.resume(with: result)
             }
         }
     }
 
-    func clearSession(federated: Bool) async throws {
+    @MainActor
+    func logout(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            Task { @MainActor in
-                self.clearSession(federated: federated) { result in
-                    continuation.resume(with: result)
-                }
+            self.logout(federated: federated) { result in
+                continuation.resume(with: result)
             }
         }
     }

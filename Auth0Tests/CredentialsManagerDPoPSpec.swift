@@ -19,17 +19,13 @@ private let Domain = "samples.auth0.com"
 
 private class DPoPSpyStorage: CredentialsStorage {
     var store: [String: Data] = [:]
-    func getEntry(forKey key: String) -> Data? {
-        return store[key]
+    func getEntry(forKey key: String) throws -> Data {
+        guard let data = store[key] else { throw SimpleKeychainError.itemNotFound }
+        return data
     }
-    func setEntry(_ data: Data, forKey key: String) -> Bool {
-        store[key] = data
-        return true
-    }
-    func deleteEntry(forKey key: String) -> Bool {
-        store.removeValue(forKey: key)
-        return true
-    }
+    func setEntry(_ data: Data, forKey key: String) throws { store[key] = data }
+    func deleteEntry(forKey key: String) throws { store.removeValue(forKey: key) }
+    func deleteAllEntries() throws { store.removeAll() }
 }
 
 class CredentialsManagerDPoPSpec: QuickSpec {
@@ -61,11 +57,11 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                   tokenType: TokenType,
                                                   idToken: IdToken,
                                                   refreshToken: RefreshToken,
-                                                  expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                   scope: Scope)
-                _ = manager.store(credentials: dpopCredentials)
+                try manager.store(credentials: dpopCredentials)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresAt: ExpiresIn))
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
                         expect(result).to(beSuccessful())
@@ -87,9 +83,9 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                   tokenType: "DPoP",
                                                   idToken: IdToken,
                                                   refreshToken: RefreshToken,
-                                                  expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                   scope: Scope)
-                _ = manager.store(credentials: dpopCredentials)
+                try manager.store(credentials: dpopCredentials)
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
                         expect(result).to(haveCredentialsManagerError(.dpopNotConfigured))
@@ -105,9 +101,9 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     idToken: IdToken,
                                                     refreshToken: RefreshToken,
-                                                    expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                    expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                     scope: Scope)
-                _ = manager.store(credentials: bearerCredentials)
+                try manager.store(credentials: bearerCredentials)
                 spyStorage.store[dpopThumbprintKey] = Data("some_thumbprint".utf8)
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
@@ -132,9 +128,9 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                   tokenType: "DPoP",
                                                   idToken: IdToken,
                                                   refreshToken: RefreshToken,
-                                                  expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                   scope: Scope)
-                _ = manager.store(credentials: dpopCredentials)
+                try manager.store(credentials: dpopCredentials)
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
                         expect(result).to(haveCredentialsManagerError(.dpopKeyMissing))
@@ -153,9 +149,9 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     idToken: IdToken,
                                                     refreshToken: RefreshToken,
-                                                    expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                    expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                     scope: Scope)
-                _ = manager.store(credentials: bearerCredentials)
+                try manager.store(credentials: bearerCredentials)
                 spyStorage.store[dpopThumbprintKey] = Data("some_thumbprint".utf8)
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
@@ -181,9 +177,9 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                   tokenType: "DPoP",
                                                   idToken: IdToken,
                                                   refreshToken: RefreshToken,
-                                                  expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                   scope: Scope)
-                _ = manager.store(credentials: dpopCredentials)
+                try manager.store(credentials: dpopCredentials)
                 spyStorage.store[dpopThumbprintKey] = Data("stale_thumbprint_from_old_key".utf8)
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
@@ -211,12 +207,12 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                   tokenType: "DPoP",
                                                   idToken: IdToken,
                                                   refreshToken: RefreshToken,
-                                                  expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                   scope: Scope)
-                _ = manager.store(credentials: dpopCredentials)
+                try manager.store(credentials: dpopCredentials)
                 spyStorage.store[dpopThumbprintKey] = Data(currentThumbprint.utf8)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresAt: ExpiresIn))
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
                         expect(result).to(beSuccessful())
@@ -234,11 +230,11 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                   tokenType: "DPoP",
                                                   idToken: IdToken,
                                                   refreshToken: RefreshToken,
-                                                  expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                   scope: Scope)
-                _ = manager.store(credentials: dpopCredentials)
+                try manager.store(credentials: dpopCredentials)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresAt: ExpiresIn))
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
                         expect(result).to(beSuccessful())
@@ -263,11 +259,11 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                   tokenType: "DPoP",
                                                   idToken: IdToken,
                                                   refreshToken: RefreshToken,
-                                                  expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                  expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                   scope: Scope)
-                _ = manager.store(credentials: dpopCredentials)
+                try manager.store(credentials: dpopCredentials)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, tokenType: "DPoP", idToken: NewIdToken, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, tokenType: "DPoP", idToken: NewIdToken, expiresAt: ExpiresIn))
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
                         expect(result).to(beSuccessful())
@@ -284,11 +280,11 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     idToken: IdToken,
                                                     refreshToken: RefreshToken,
-                                                    expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                    expiresAt: Date(timeIntervalSinceNow: -ExpiresIn),
                                                     scope: Scope)
-                _ = manager.store(credentials: bearerCredentials)
+                try manager.store(credentials: bearerCredentials)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
+                                    response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresAt: ExpiresIn))
                 waitUntil(timeout: Timeout) { done in
                     manager.credentials { result in
                         expect(result).to(beSuccessful())
@@ -311,11 +307,11 @@ class CredentialsManagerDPoPSpec: QuickSpec {
                                               tokenType: TokenType,
                                               idToken: IdToken,
                                               refreshToken: RefreshToken,
-                                              expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
+                                              expiresAt: Date(timeIntervalSinceNow: ExpiresIn),
                                               scope: Scope)
-                _ = manager.store(credentials: credentials)
+                try manager.store(credentials: credentials)
                 spyStorage.store[dpopThumbprintKey] = Data("some_thumbprint".utf8)
-                _ = manager.clear()
+                try manager.clear()
                 expect(spyStorage.store[dpopThumbprintKey]).to(beNil())
             }
 

@@ -3,13 +3,13 @@ import Foundation
 private struct _A0SSOCredentials {
     let sessionTransferToken: String
     let issuedTokenType: String
-    let expiresIn: Date
+    let expiresAt: Date
     let idToken: String
     let refreshToken: String?
 }
 
 /// Credentials obtained from Auth0 to perform web single sign-on (SSO).
-public struct SSOCredentials: CustomStringConvertible {
+public struct SSOCredentials: CustomStringConvertible, Sendable {
 
     /// Token that can be used to request a web session.
     public let sessionTransferToken: String
@@ -18,7 +18,7 @@ public struct SSOCredentials: CustomStringConvertible {
     public let issuedTokenType: String
 
     /// When the session transfer token expires.
-    public let expiresIn: Date
+    public let expiresAt: Date
 
     /// Token that contains the user information.
     ///
@@ -47,7 +47,7 @@ public struct SSOCredentials: CustomStringConvertible {
         let redacted = "<REDACTED>"
         let values = _A0SSOCredentials(sessionTransferToken: redacted,
                                        issuedTokenType: self.issuedTokenType,
-                                       expiresIn: self.expiresIn,
+                                       expiresAt: self.expiresAt,
                                        idToken: redacted,
                                        refreshToken: (self.refreshToken != nil) ? redacted : nil)
         return String(describing: values).replacingOccurrences(of: "_A0SSOCredentials", with: "SSOCredentials")
@@ -58,12 +58,12 @@ public struct SSOCredentials: CustomStringConvertible {
     /// Default initializer.
     public init(sessionTransferToken: String,
                 issuedTokenType: String,
-                expiresIn: Date,
+                expiresAt: Date,
                 idToken: String,
                 refreshToken: String? = nil) {
         self.sessionTransferToken = sessionTransferToken
         self.issuedTokenType = issuedTokenType
-        self.expiresIn = expiresIn
+        self.expiresAt = expiresAt
         self.idToken = idToken
         self.refreshToken = refreshToken
     }
@@ -76,7 +76,7 @@ extension SSOCredentials: Codable {
     enum CodingKeys: String, CodingKey {
         case sessionTransferToken = "access_token"
         case issuedTokenType = "issued_token_type"
-        case expiresIn = "expires_in"
+        case expiresAt = "expires_in"
         case idToken = "id_token"
         case refreshToken = "refresh_token"
     }
@@ -87,7 +87,7 @@ extension SSOCredentials: Codable {
 
         try container.encode(sessionTransferToken, forKey: .sessionTransferToken)
         try container.encode(issuedTokenType, forKey: .issuedTokenType)
-        try container.encode(expiresIn.timeIntervalSinceNow, forKey: .expiresIn)
+        try container.encode(expiresAt.timeIntervalSinceNow, forKey: .expiresAt)
         try container.encode(idToken, forKey: .idToken)
         try container.encodeIfPresent(refreshToken, forKey: .refreshToken)
     }
@@ -101,14 +101,14 @@ extension SSOCredentials: Codable {
         idToken = try values.decode(String.self, forKey: .idToken)
         refreshToken = try values.decodeIfPresent(String.self, forKey: .refreshToken)
 
-        if let string = try? values.decode(String.self, forKey: .expiresIn), let double = Double(string) {
-            expiresIn = Date(timeIntervalSinceNow: double)
-        } else if let double = try? values.decode(Double.self, forKey: .expiresIn) {
-            expiresIn = Date(timeIntervalSinceNow: double)
-        } else if let date = try? values.decode(Date.self, forKey: .expiresIn) {
-            expiresIn = date
+        if let string = try? values.decode(String.self, forKey: .expiresAt), let double = Double(string) {
+            expiresAt = Date(timeIntervalSinceNow: double)
+        } else if let double = try? values.decode(Double.self, forKey: .expiresAt) {
+            expiresAt = Date(timeIntervalSinceNow: double)
+        } else if let date = try? values.decode(Date.self, forKey: .expiresAt) {
+            expiresAt = date
         } else {
-            throw DecodingError.dataCorruptedError(forKey: .expiresIn,
+            throw DecodingError.dataCorruptedError(forKey: .expiresAt,
                                                    in: values,
                                                    debugDescription: "Format of expires_in is not recognized.")
         }
