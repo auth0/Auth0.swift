@@ -381,13 +381,13 @@
 ## [2.0.0](https://github.com/auth0/Auth0.swift/tree/2.0.0) (2022-03-14)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.39.0...2.0.0)
 
-[Migration Guide](https://github.com/auth0/Auth0.swift/blob/2.0.0/V2_MIGRATION_GUIDE.md)
+[Migration Guide](V2_MIGRATION_GUIDE.md)
 
 ## [2.0.0-beta.1](https://github.com/auth0/Auth0.swift/tree/2.0.0-beta.1) (2022-01-26)
 
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.0.0-beta.0...2.0.0-beta.1)
 
-[Migration Guide](https://github.com/auth0/Auth0.swift/blob/2.0.0/V2_MIGRATION_GUIDE.md)
+[Migration Guide](V2_MIGRATION_GUIDE.md)
 
 **Added**
 
@@ -397,7 +397,7 @@
 
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.38.0...2.0.0-beta.0)
 
-[Migration Guide](https://github.com/auth0/Auth0.swift/blob/2.0.0/V2_MIGRATION_GUIDE.md)
+[Migration Guide](V2_MIGRATION_GUIDE.md)
 
 ⚠️ **BREAKING CHANGES**
 
