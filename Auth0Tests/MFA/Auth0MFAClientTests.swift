@@ -339,6 +339,44 @@ struct Auth0MFAClientTests {
         }
     }
 
+    @Test
+    func testMFAChallengeWithOTPType() async {
+        let clientId = "testClientId"
+        let domain = "test.example.com"
+        let authenticatorId = "testAuthenticatorId"
+        let mfaToken = "testToken"
+        let expectedURL = URL(string: "https://\(domain)/mfa/challenge")!
+
+        let request = Auth0.mfa(clientId: clientId, domain: domain, session: makeMockSession()).challenge(with: authenticatorId, mfaToken: mfaToken, challengeType: "otp")
+
+        do {
+            try await confirmation(expectedCount: 1) { confirmation in
+                MockURLProtocol.requestHandler = { request in
+                    // Verify the request URL and method
+                    #expect(request.url == expectedURL)
+                    #expect(request.httpMethod == "POST")
+                    // Check the body for challenge_type=otp
+                    let bodyString = String(data: request.httpBody ?? Data(), encoding: .utf8)
+                    #expect(bodyString?.contains("challenge_type=otp") == true)
+
+                    let response = HTTPURLResponse(
+                        url: expectedURL,
+                        statusCode: 200,
+                        httpVersion: nil,
+                        headerFields: nil
+                    )!
+                    confirmation()
+                    return (response, self.challengeData)
+                }
+
+                let challenge = try await request.start()
+                #expect(challenge.oobCode == "Fe26.2*SERVER_1767928705*c07b491097a63f380a635dcd122f3191e10a671f8a136e53d261d3a99e53abc1*YVe_7o7SbFNURbjXSQzTEg*1BDWU0i-IO1kE_WRLjHcXQhszHgoQcVKsHAniyWMnOaUwRxTc5uKlfoWz2poYwS2cwFPbf868KFmAshTlXlytlQe4uGvLBkwjwdAYL8VL2BwV9e2rDtoqBCAgP4qESzLiNWuN8vRN_eddsG7mrfmEkz3t_k7LNYTHLIkyC1zgTLww4QVbsHwHGL3TvBu1U3xvzMQ_Abv3xbnLtIrWcZbMzxe-JXRQ5Fw9-pD5zx6-2xeU3zcBzUQ2SQSC_cs5fuwzUzKm7TiMAE2kGV_EJ_8UmAoc6yPnRAvudm2kNvY_G6jfuzriqsV8mhfJVrCKM8dQGwwnMye1Nqe9tavMs9Tk7bm6KEjEAYk7x6CepdIeVajtlpjlef_Mwwn02nuK_pC*1768216113061*a7b60435bf02e470f56767477678fb852edb9c032d8e1528f64b003078286a11*tfFIO4_1BFvlNdzs5s7mKjW6ajvrlkBF7HUrGur9VIk")
+            }
+        } catch {
+            Issue.record(error)
+        }
+    }
+
     // MARK: - OTP Enrollment Tests
 
     @Test
