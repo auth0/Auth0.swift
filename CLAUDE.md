@@ -23,7 +23,7 @@ Apply these on every task in this repo — they keep changes correct, small, and
 
 **Auth0.swift** is the official Auth0 SDK for Apple platforms — providing authentication, authorization, and credential management for iOS, macOS, tvOS, watchOS, and visionOS apps.
 
-- **Language:** Swift 5.0+ (Package.swift uses Swift 6.0 tools, `.swiftLanguageMode(.v6)` for the library target)
+- **Language:** Swift 6.0 tools (`swift-tools-version:6.0`) — library target runs in Swift 6 language mode (`.swiftLanguageMode(.v6)`), test target runs in Swift 5 language mode (`.swiftLanguageMode(.v5)`)
 - **Tech Stack:** Apple platforms, Xcode 16.1, SPM + CocoaPods + Carthage, URLSession, Combine, CryptoKit
 - **Package Manager:** Swift Package Manager (primary), CocoaPods, Carthage (development deps)
 - **Minimum Platform Version:** iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, visionOS 1.0
