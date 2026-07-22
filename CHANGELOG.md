@@ -1,10 +1,5 @@
 # Change Log
 
-## Unreleased
-
-**Fixed**
-- Fixed MFA authenticator listing to decode responses that omit `type` and filter by `authenticator_type`.
-
 ## [3.0.0](https://github.com/auth0/Auth0.swift/tree/3.0.0) (2026-07-15)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.25.0...3.0.0)
 

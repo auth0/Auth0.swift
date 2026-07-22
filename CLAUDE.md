@@ -88,7 +88,6 @@ Auth0.swift/
 
 - Write or update tests in `Auth0Tests/` for every new or changed behavior.
 - Add DocC comments (`/// ...`) to all `public` types, methods, and properties.
-- Update `CHANGELOG.md` for every user-facing addition, change, fix, deprecation, or security update.
 - Gate WebAuth and Passkeys code with `#if WEB_AUTH_PLATFORM` / `#if PASSKEYS_PLATFORM`.
 - Expose both a completion-handler API and an `async throws` API for any new public method.
 - Keep `Auth0/Version.swift` and `Auth0.podspec` `s.version` in sync — this is the version source of truth.
