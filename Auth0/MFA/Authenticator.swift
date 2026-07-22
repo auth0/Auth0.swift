@@ -39,42 +39,43 @@ import Foundation
  - [Authenticate Using ROPG Flow with MFA](https://auth0.com/docs/secure/multi-factor-authentication/authenticate-using-ropg-flow-with-mfa)
  */
 public struct Authenticator: Decodable, Hashable, Sendable {
-    
+
     /// The type of MFA authenticator.
     ///
     /// Common values are `"oob"` (out-of-band for SMS, push, email),
     /// `"otp"` (one-time password for TOTP apps), or `"recovery-code"`.
     public let authenticatorType: String
-    
+
     /// The out-of-band channel used for this authenticator.
     ///
     /// Only populated for `oob` authenticator types. Possible values are
     /// `"sms"`, `"auth0"` (Guardian push), or `"email"`. Returns `nil`
     /// for non-OOB authenticators.
     public let oobChannel: String?
-    
+
     /// The unique identifier for this authenticator instance.
     ///
     /// Used to reference this specific authenticator when initiating MFA challenges.
     /// Format typically follows the pattern `{type}|{id}`, such as `sms|dev_authenticator_id`.
     public let id: String
-    
+
     /// An optional display name for the authenticator.
     ///
     /// Typically shows masked information like the last digits of a phone number
     /// (e.g., `"****0135"`) or a masked email address. May be `nil` if no display
     /// name is available.
     public let name: String?
-    
+
     /// Indicates whether this authenticator is currently active.
     ///
     /// Only active authenticators can be used to complete MFA challenges.
     /// Inactive authenticators require re-enrollment.
     public let active: Bool
-    
+
     /// Additional type information about the authenticator.
     ///
     /// Provides supplementary type classification beyond the primary `authenticatorType`.
+    /// Falls back to ``authenticatorType`` when the API response does not include this value.
     public let type: String
 
     enum CodingKeys: String, CodingKey {
@@ -84,6 +85,19 @@ public struct Authenticator: Decodable, Hashable, Sendable {
         case name
         case active
         case id
+    }
+
+    /// Creates an authenticator from the MFA API response.
+    ///
+    /// - Parameter decoder: The decoder containing the MFA authenticator payload.
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        authenticatorType = try container.decode(String.self, forKey: .authenticatorType)
+        oobChannel = try container.decodeIfPresent(String.self, forKey: .oobChannel)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        active = try container.decode(Bool.self, forKey: .active)
+        type = try container.decodeIfPresent(String.self, forKey: .type) ?? authenticatorType
     }
 
     /// Hashes the essential components of this authenticator.

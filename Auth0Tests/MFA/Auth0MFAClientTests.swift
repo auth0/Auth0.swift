@@ -85,6 +85,23 @@ struct Auth0MFAClientTests {
         """.data(using: .utf8)!
     }
 
+    var authenticatorsDataWithoutType: Data {
+        return """
+        [
+            {
+                "id": "totp|dev_etzXFoNfYTODuJdb",
+                "authenticator_type": "otp",
+                "active": false
+            },
+            {
+                "id": "recovery-code|dev_rDWlrHRcGocPnxuu",
+                "authenticator_type": "recovery-code",
+                "active": false
+            }
+        ]
+        """.data(using: .utf8)!
+    }
+
     var otpEnrollmentChallengeWithRecoveryCodes: Data {
         return """
         {
@@ -237,7 +254,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testGetAuthenticatorsSuccess() async {
-        let request = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).getAuthenticators(mfaToken: "", factorsAllowed: ["phone"])
+        let request = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).getAuthenticators(mfaToken: "", factorsAllowed: ["oob"])
 
         do {
             try await confirmation(expectedCount: 1) { confirmation in
@@ -253,7 +270,34 @@ struct Auth0MFAClientTests {
                 }
 
                 let authenticators = try await request.start()
+                #expect(authenticators.count == 3)
+            }
+        } catch {
+            Issue.record(error)
+        }
+    }
+
+    @Test
+    func testGetAuthenticatorsDecodesResponseWithoutType() async {
+        let request = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).getAuthenticators(mfaToken: "", factorsAllowed: ["recovery-code", "oob", "otp"])
+
+        do {
+            try await confirmation(expectedCount: 1) { confirmation in
+                MockURLProtocol.requestHandler = { _ in
+                    let response = HTTPURLResponse(
+                        url: URL(string: "https://test.auth0.com")!,
+                        statusCode: 200,
+                        httpVersion: nil,
+                        headerFields: nil
+                    )!
+                    confirmation()
+                    return (response, self.authenticatorsDataWithoutType)
+                }
+
+                let authenticators = try await request.start()
                 #expect(authenticators.count == 2)
+                #expect(authenticators.first?.authenticatorType == "otp")
+                #expect(authenticators.first?.type == "otp")
             }
         } catch {
             Issue.record(error)
