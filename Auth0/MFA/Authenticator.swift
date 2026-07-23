@@ -75,7 +75,7 @@ public struct Authenticator: Decodable, Hashable, Sendable {
     /// Additional type information about the authenticator.
     ///
     /// Provides supplementary type classification beyond the primary `authenticatorType`.
-    /// Falls back to ``authenticatorType`` when the API response does not include this value.
+    /// Empty if the API response does not include this value.
     public let type: String
 
     enum CodingKeys: String, CodingKey {
@@ -97,7 +97,7 @@ public struct Authenticator: Decodable, Hashable, Sendable {
         id = try container.decode(String.self, forKey: .id)
         name = try container.decodeIfPresent(String.self, forKey: .name)
         active = try container.decode(Bool.self, forKey: .active)
-        type = try container.decodeIfPresent(String.self, forKey: .type) ?? authenticatorType
+        type = try container.decodeIfPresent(String.self, forKey: .type) ?? ""
     }
 
     /// Hashes the essential components of this authenticator.

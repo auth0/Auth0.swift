@@ -297,7 +297,7 @@ struct Auth0MFAClientTests {
                 let authenticators = try await request.start()
                 #expect(authenticators.count == 2)
                 #expect(authenticators.first?.authenticatorType == "otp")
-                #expect(authenticators.first?.type == "otp")
+                #expect(authenticators.first?.type == "")
             }
         } catch {
             Issue.record(error)
