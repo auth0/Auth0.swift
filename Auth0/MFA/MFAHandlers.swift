@@ -63,7 +63,7 @@ func listAuthenticatorsResponseMapper(factorsAllowed: [String], result: Result<R
         if let data = response.data {
             let decoder = JSONDecoder()
             let authenticators = try decoder.decode([Authenticator].self, from: data)
-            let filteredAuthenticators = authenticators.filter { authenticator in factorsAllowed.contains { $0 == authenticator.type } }
+            let filteredAuthenticators = authenticators.filter { authenticator in  !authenticator.type.isEmpty && factorsAllowed.contains { $0 == authenticator.type } }
             callback(.success(filteredAuthenticators))
         } else {
             callback(.failure(MfaListAuthenticatorsError(from: response)))
