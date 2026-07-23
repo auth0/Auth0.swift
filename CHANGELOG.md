@@ -1,5 +1,11 @@
 # Change Log
 
+## [3.0.1](https://github.com/auth0/Auth0.swift/tree/3.0.1) (2026-07-23)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.0...3.0.1)
+
+**Fixed**
+- fix: MFA authenticator listing without type [\#1267](https://github.com/auth0/Auth0.swift/pull/1267) ([sanchitmehtagit](https://github.com/sanchitmehtagit))
+
 ## [3.0.0](https://github.com/auth0/Auth0.swift/tree/3.0.0) (2026-07-15)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.25.0...3.0.0)
 
