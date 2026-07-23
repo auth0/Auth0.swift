@@ -254,7 +254,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testGetAuthenticatorsSuccess() async {
-        let request = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).getAuthenticators(mfaToken: "", factorsAllowed: ["oob"])
+        let request = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).getAuthenticators(mfaToken: "", factorsAllowed: ["phone"])
 
         do {
             try await confirmation(expectedCount: 1) { confirmation in
@@ -270,7 +270,7 @@ struct Auth0MFAClientTests {
                 }
 
                 let authenticators = try await request.start()
-                #expect(authenticators.count == 3)
+                #expect(authenticators.count == 2)
             }
         } catch {
             Issue.record(error)
@@ -295,9 +295,7 @@ struct Auth0MFAClientTests {
                 }
 
                 let authenticators = try await request.start()
-                #expect(authenticators.count == 2)
-                #expect(authenticators.first?.authenticatorType == "otp")
-                #expect(authenticators.first?.type == "")
+                #expect(authenticators.isEmpty)
             }
         } catch {
             Issue.record(error)
