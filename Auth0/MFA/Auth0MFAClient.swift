@@ -48,11 +48,11 @@ struct Auth0MFAClient: MFAClient {
                        auth0ClientInfo: auth0ClientInfo)
     }
 
-    func challenge(with authenticatorId: String, mfaToken: String) -> any Requestable<MFAChallenge, MfaChallengeError> {
+    func challenge(with authenticatorId: String, mfaToken: String, challengeType: String? = nil) -> any Requestable<MFAChallenge, MfaChallengeError> {
         let url = URL(string: "mfa/challenge", relativeTo: self.url)!
         var payload: [String: Any] = [:]
         payload["client_id"] = clientId
-        payload["challenge_type"] = "oob"
+        payload["challenge_type"] = challengeType ?? "oob"
         payload["authenticator_id"] = authenticatorId
         payload["mfa_token"] = mfaToken
         return Request(session: session,

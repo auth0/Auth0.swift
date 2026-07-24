@@ -2966,6 +2966,66 @@ Auth0
 ```
 </details>
 
+### Challenge an OTP authenticator
+
+For OTP authenticators (like Google Authenticator, Authy, etc.), you need to specify the challenge type as "otp":
+
+```swift
+Auth0
+    .mfa()
+    .challenge(with: "otp|dev_authenticator_id", mfaToken: mfaToken, challengeType: "otp")
+    .start { result in
+        switch result {
+        case .success(let challenge):
+            print("Challenge sent")
+            print("Challenge type: \(challenge.challengeType)") // Will be "otp"
+            // For OTP challenges, you might get different properties in the challenge object
+            // Now prompt user for the OTP code from their authenticator app
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+<summary>Using async/await</summary>
+
+```swift
+do {
+    let challenge = try await Auth0
+        .mfa()
+        .challenge(with: "otp|dev_authenticator_id", mfaToken: mfaToken, challengeType: "otp")
+        .start()
+    print("Challenge sent")
+    print("Challenge type: \(challenge.challengeType)") // Will be "otp"
+    // Handle OTP challenge
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+<summary>Using Combine</summary>
+
+```swift
+Auth0
+    .mfa()
+    .challenge(with: "otp|dev_authenticator_id", mfaToken: mfaToken, challengeType: "otp")
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { challenge in
+        print("Challenge sent")
+        print("Challenge type: \(challenge.challengeType)") // Will be "otp"
+        // Handle OTP challenge
+    })
+    .store(in: &cancellables)
+```
+</details>
+
 ### Verify MFA
 
 After enrolling or challenging an MFA factor, you need to verify the code to complete authentication.
