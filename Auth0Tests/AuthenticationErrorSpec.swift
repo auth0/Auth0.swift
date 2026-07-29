@@ -416,6 +416,38 @@ class AuthenticationErrorSpec: QuickSpec {
                 }
             }
 
+            it("should decode mfa required payload with mfa_requirements") {
+                let values: [String: Any] = [
+                    "error": "mfa_required",
+                    "error_description": "MFA Required",
+                    "mfa_token": "test-mfa-token",
+                    "mfa_requirements": [
+                        "enroll": [["type": "otp"]],
+                        "challenge": [["type": "otp"]]
+                    ]
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                let payload = error.mfaRequiredErrorPayload
+                expect(payload).toNot(beNil())
+                expect(payload?.mfaToken) == "test-mfa-token"
+                expect(payload?.mfaRequirements.enroll?.first?.type) == "otp"
+                expect(payload?.mfaRequirements.challenge?.first?.type) == "otp"
+            }
+
+            it("should decode mfa required payload without mfa_requirements") {
+                let values: [String: Any] = [
+                    "error": "mfa_required",
+                    "error_description": "MFA Required",
+                    "mfa_token": "test-mfa-token"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                let payload = error.mfaRequiredErrorPayload
+                expect(payload).toNot(beNil())
+                expect(payload?.mfaToken) == "test-mfa-token"
+                expect(payload?.mfaRequirements.enroll).to(beNil())
+                expect(payload?.mfaRequirements.challenge).to(beNil())
+            }
+
         }
 
         describe("error message") {
