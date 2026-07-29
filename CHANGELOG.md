@@ -1,5 +1,11 @@
 # Change Log
 
+## [3.1.0](https://github.com/auth0/Auth0.swift/tree/3.1.0) (2026-07-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.1...3.1.0)
+
+**Fixed**
+- fix: mfa_requirements in MFARequiredErrorPayload made optional [\#1272](https://github.com/auth0/Auth0.swift/pull/1272) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [3.0.1](https://github.com/auth0/Auth0.swift/tree/3.0.1) (2026-07-23)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.0...3.0.1)
 
