@@ -314,6 +314,23 @@ struct Auth0Authentication: Authentication {
                        auth0ClientInfo: self.auth0ClientInfo)
     }
 
+    func resetPassword(email: String, connection: String, organization: String?) -> any Requestable<Void, AuthenticationError> {
+        var payload: [String: Any] = [
+            "email": email,
+            "connection": connection,
+            "client_id": self.clientId
+        ]
+        payload["organization"] = organization
+        let resetPassword = URL(string: "dbconnections/change_password", relativeTo: self.url)!
+        return Request(session: session,
+                       url: resetPassword,
+                       method: "POST",
+                       handle: authenticationNoBody,
+                       parameters: payload,
+                       logger: self.logger,
+                       auth0ClientInfo: self.auth0ClientInfo)
+    }
+
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> {
         let payload: [String: Any] = [
             "email": email,

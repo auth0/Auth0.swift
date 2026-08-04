@@ -685,6 +685,32 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     func resetPassword(email: String, connection: String) -> any Requestable<Void, AuthenticationError>
 
     /**
+     Resets the password of a database user, associating the request with an organization.
+
+     ## Usage
+
+     ```swift
+     Auth0
+         .authentication()
+         .resetPassword(email: "support@auth0.com",
+                        connection: "Username-Password-Authentication",
+                        organization: "org_aaAA1aa11aAAAA1a")
+         .start { print($0) }
+     ```
+
+     - Parameters:
+       - email:      Email of the database user.
+       - connection: Name of the database connection.
+       - organization: Identifier of the organization associated with the user.
+     - Returns: A request for resetting the password.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/change-password/change-password)
+     */
+    func resetPassword(email: String, connection: String, organization: String?) -> any Requestable<Void, AuthenticationError>
+
+    /**
      Starts passwordless authentication by sending an email with an OTP code. This is the first part of the
      passwordless login flow.
 
@@ -1221,6 +1247,10 @@ public extension Authentication {
 
     func signup(email: String, username: String? = nil, password: String, connection: String = "Username-Password-Authentication", userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> any Requestable<DatabaseUser, AuthenticationError> {
         return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
+    }
+
+    func resetPassword(email: String, connection: String, organization: String? = nil) -> any Requestable<Void, AuthenticationError> {
+        return self.resetPassword(email: email, connection: connection, organization: organization)
     }
 
     #if PASSKEYS_PLATFORM

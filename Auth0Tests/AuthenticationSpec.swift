@@ -1334,6 +1334,16 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
+            it("should reset password with organization") {
+                NetworkStub.addStub(condition: { $0.isResetPassword(Domain) && $0.hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId, "organization": OrganizationId])}, response: resetPasswordResponse())
+                waitUntil(timeout: Timeout) { done in
+                    auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName, organization: OrganizationId).start { result in
+                        guard case .success = result else { return fail("Failed to reset password") }
+                        done()
+                    }
+                }
+            }
+
             it("should not use DPoP") {
                 let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                 let request = auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName)
