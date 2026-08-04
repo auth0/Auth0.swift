@@ -26,7 +26,7 @@ import Foundation
  - [Auth0 Guardian](https://auth0.com/docs/secure/multi-factor-authentication/auth0-guardian)
  - [MFA API Documentation](https://auth0.com/docs/api/authentication#multi-factor-authentication)
  */
-public struct PushMFAEnrollmentChallenge: Decodable {
+public struct PushMFAEnrollmentChallenge: Decodable, Sendable {
     
     /// The type of MFA authenticator that was enrolled.
     ///

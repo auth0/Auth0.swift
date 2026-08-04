@@ -31,22 +31,37 @@ class SafariProviderSpec: QuickSpec {
             }
 
             it("should use the fullscreen presentation style by default") {
-                let provider = WebAuthentication.safariProvider()
-                let userAgent = provider(RedirectURL, { _ in }) as! SafariUserAgent
-                expect(userAgent.controller.modalPresentationStyle) == .fullScreen
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        let provider = WebAuthentication.safariProvider()
+                        let userAgent = provider(RedirectURL, { _ in }) as! SafariUserAgent
+                        expect(userAgent.controller.modalPresentationStyle) == .fullScreen
+                        done()
+                    }
+                }
             }
 
             it("should set a custom presentation style") {
                 let style = UIModalPresentationStyle.formSheet
-                let provider = WebAuthentication.safariProvider(style: style)
-                let userAgent = provider(RedirectURL, { _ in }) as! SafariUserAgent
-                expect(userAgent.controller.modalPresentationStyle) == style
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        let provider = WebAuthentication.safariProvider(style: style)
+                        let userAgent = provider(RedirectURL, { _ in }) as! SafariUserAgent
+                        expect(userAgent.controller.modalPresentationStyle) == style
+                        done()
+                    }
+                }
             }
 
             it("should use the cancel dismiss button style") {
-                let provider = WebAuthentication.safariProvider()
-                let userAgent = provider(RedirectURL, { _ in }) as! SafariUserAgent
-                expect(userAgent.controller.dismissButtonStyle) == .cancel
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        let provider = WebAuthentication.safariProvider()
+                        let userAgent = provider(RedirectURL, { _ in }) as! SafariUserAgent
+                        expect(userAgent.controller.dismissButtonStyle) == .cancel
+                        done()
+                    }
+                }
             }
 
         }
@@ -54,9 +69,14 @@ class SafariProviderSpec: QuickSpec {
         describe("user agent") {
 
             it("should have a custom description") {
-                let safari = SFSafariViewController(url: RedirectURL)
-                let userAgent = SafariUserAgent(controller: safari, callback: { _ in })
-                expect(userAgent.description) == "SFSafariViewController"
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        let safari = SFSafariViewController(url: RedirectURL)
+                        let userAgent = SafariUserAgent(controller: safari, callback: { _ in })
+                        expect(userAgent.description) == "SFSafariViewController"
+                        done()
+                    }
+                }
             }
 
             it("should be the safari view controller's delegate") {
@@ -71,16 +91,22 @@ class SafariProviderSpec: QuickSpec {
                 let root = SpyViewController()
                 UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = root
                 let safari = SpySafariViewController(url: RedirectURL)
-                userAgent = SafariUserAgent(controller: safari, callback: { _ in })
-                root.presented = safari
-                userAgent.start()
-                expect(safari.isPresented) == true
+                waitUntil(timeout: Timeout) { done in
+                    Task { @MainActor in
+                        userAgent = SafariUserAgent(controller: safari, callback: { _ in })
+                        root.presented = safari
+                        userAgent.start()
+                        await Task.yield()
+                        expect(safari.isPresented) == true
+                        done()
+                    }
+                }
             }
 
             it("should call the callback with an error when the user cancels the operation") {
                 waitUntil(timeout: Timeout) { done in
-                    DispatchQueue.main.async { [safari] in
-                        let userAgent = SafariUserAgent(controller: safari!, callback: { result in
+                    Task { @MainActor in
+                        userAgent = SafariUserAgent(controller: safari!, callback: { result in
                             expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                             done()
                         })
@@ -93,8 +119,8 @@ class SafariProviderSpec: QuickSpec {
                 let expectedError = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
 
                waitUntil(timeout: Timeout) { done in
-                    DispatchQueue.main.async { [safari] in
-                        let userAgent = SafariUserAgent(controller: safari!, callback: { result in
+                    Task { @MainActor in
+                        userAgent = SafariUserAgent(controller: safari!, callback: { result in
                             expect(result).to(haveWebAuthError(expectedError))
                             done()
                         })
@@ -111,8 +137,8 @@ class SafariProviderSpec: QuickSpec {
                 root.present(safari, animated: false)
 
                 waitUntil(timeout: Timeout) { done in
-                    DispatchQueue.main.async { [safari] in
-                        let userAgent = SafariUserAgent(controller: safari!, callback: { result in
+                    Task { @MainActor in
+                        userAgent = SafariUserAgent(controller: safari!, callback: { result in
                             expect(result).to(beSuccessful())
                             done()
                         })

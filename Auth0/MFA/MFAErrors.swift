@@ -18,7 +18,7 @@ import Foundation
  - ``Authenticator``
  - [MFA API Documentation](https://auth0.com/docs/api/authentication#multi-factor-authentication)
  */
-public struct MfaListAuthenticatorsError: Auth0APIError {
+public struct MfaListAuthenticatorsError: Auth0APIError, @unchecked Sendable {
     /**
      Creates an MFA list authenticators error from the API response.
      
@@ -83,7 +83,7 @@ public struct MfaListAuthenticatorsError: Auth0APIError {
  - ``PushMFAEnrollmentChallenge``
  - [MFA API Documentation](https://auth0.com/docs/api/authentication#multi-factor-authentication)
  */
-public struct MfaEnrollmentError: Auth0APIError {
+public struct MfaEnrollmentError: Auth0APIError, @unchecked Sendable {
     /**
      Creates an MFA enrollment error from the API response.
      
@@ -145,7 +145,7 @@ public struct MfaEnrollmentError: Auth0APIError {
  - ``Authenticator``
  - [MFA API Documentation](https://auth0.com/docs/api/authentication#multi-factor-authentication)
  */
-public struct MfaChallengeError: Auth0APIError {
+public struct MfaChallengeError: Auth0APIError, @unchecked Sendable {
     /**
      Creates an MFA challenge error from the API response.
      
@@ -209,7 +209,7 @@ public struct MfaChallengeError: Auth0APIError {
  - ``Credentials``
  - [MFA API Documentation](https://auth0.com/docs/api/authentication#multi-factor-authentication)
  */
-public struct MFAVerifyError: Auth0APIError {
+public struct MFAVerifyError: Auth0APIError, @unchecked Sendable {
     /**
      Creates an MFA verification error from the API response.
      

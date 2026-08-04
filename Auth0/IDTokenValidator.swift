@@ -1,13 +1,24 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
-@preconcurrency import JWTDecode
+import JWTDecode
 
-protocol JWTValidator {
+/// A type that carries an ID token string. Conformed to by ``Credentials`` and ``SSOCredentials``.
+protocol IDTokenCarrying {
+    var idToken: String { get }
+}
+
+/// Marker protocol adopted by every ID token validation error type.
+/// Used to identify validation failures without exhaustive type checking.
+protocol IDTokenValidationError: Auth0Error {}
+
+extension Credentials: IDTokenCarrying {}
+extension SSOCredentials: IDTokenCarrying {}
+
+protocol JWTValidator: Sendable {
     func validate(_ jwt: JWT) -> Auth0Error?
 }
 
-protocol JWTAsyncValidator {
-    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void)
+protocol JWTAsyncValidator: Sendable {
+    func validate(_ jwt: JWT, callback: @escaping @Sendable (Auth0Error?) -> Void)
 }
 
 struct IDTokenValidator: JWTAsyncValidator {
@@ -23,7 +34,7 @@ struct IDTokenValidator: JWTAsyncValidator {
         self.context = context
     }
 
-    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void) {
+    func validate(_ jwt: JWT, callback: @escaping @Sendable (Auth0Error?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             self.signatureValidator.validate(jwt) { error in
                 if let error = error { return callback(error) }
@@ -36,12 +47,14 @@ struct IDTokenValidator: JWTAsyncValidator {
     }
 }
 
-enum IDTokenDecodingError: Auth0Error {
+enum IDTokenDecodingError: IDTokenValidationError {
     case cannotDecode
+    case missingIDToken
 
     var debugDescription: String {
         switch self {
         case .cannotDecode: return "ID token could not be decoded"
+        case .missingIDToken: return "ID token validation was requested but the response did not include an ID token"
         }
     }
 }
@@ -50,7 +63,7 @@ func validate(idToken: String,
               with context: IDTokenValidatorContext,
               signatureValidator: JWTAsyncValidator? = nil, // for testing
               claimsValidator: JWTValidator? = nil,
-              callback: @escaping (Auth0Error?) -> Void) {
+              callback: @escaping @Sendable (Auth0Error?) -> Void) {
     guard let jwt = try? decode(jwt: idToken) else { return callback(IDTokenDecodingError.cannotDecode) }
     var claimValidators: [JWTValidator] = [IDTokenIssValidator(issuer: context.issuer),
                                            IDTokenSubValidator(),
@@ -78,4 +91,7 @@ func validate(idToken: String,
                                      context: context)
     validator.validate(jwt, callback: callback)
 }
-#endif
+/// Returns true if the error is an ID token validation failure produced by any of the IDToken validators.
+func isIDTokenValidationError(_ error: Error) -> Bool {
+    return error is any IDTokenValidationError
+}

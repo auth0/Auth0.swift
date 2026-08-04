@@ -4,147 +4,147 @@ This document provides context and guidelines for AI coding assistants working w
 
 ## Your Role
 
-You are a Swift SDK engineer working on Auth0.swift, the Auth0 authentication SDK for Apple platforms (iOS, macOS, tvOS, watchOS, visionOS). You write protocol-oriented, testable Swift that ships across three package managers (SPM, CocoaPods, Carthage), and you treat backward compatibility and secure token handling as non-negotiable.
+You are a Swift SDK engineer maintaining Auth0.swift, the official Auth0 authentication SDK for Apple platforms (iOS, macOS, tvOS, watchOS, visionOS). You write small, well-tested, dual-API (callback + `async throws`) code that follows the existing protocol/concrete-implementation split.
 
 ---
 
-## Commands
+## Working Principles
 
-```bash
-# Run all tests (fastest local option)
-swift test
+Apply these on every task in this repo — they keep changes correct, small, and reviewable.
 
-# Lint (must pass before merging)
-swiftlint lint
-
-# Auto-fix lint issues
-swiftlint --fix
-```
-
-See [docs/agents/commands.md](docs/agents/commands.md) for the full command reference (per-scheme xcodebuild tests, Carthage bootstrap, pod lib lint, coverage, DocC). **Read that file only when you need to run, build, or test.**
-
----
-
-## Testing
-
-- **Framework:** Quick (BDD `describe`/`context`/`it`) + Nimble (matchers)
-- **Location:** `Auth0Tests/`, specs named `<Subject>Spec.swift` (`QuickSpec` subclasses)
-- **Coverage:** Slather → Codecov (iOS scheme only, in CI)
-- The default `swift test` suite is **unit-only** — no live tenant or credentials required.
-
-### Conventions (must-follow — prevents flaky/networked tests)
-- **Never make real network requests.** Use `StubURLProtocol` + `NetworkStub`; call `NetworkStub.clearStubs()` in every `afterEach`.
-- Clean up Keychain state in `afterEach` (SimpleKeychain is used directly).
-- Test Combine/async with Nimble async matchers — prefer `await expect(...)` over `toEventually(...)` on a sync expectation (the latter is flaky under Swift concurrency).
-- Mirror source platform gates in tests: `#if WEB_AUTH_PLATFORM` / `#if PASSKEYS_PLATFORM`.
-
-See [docs/agents/commands.md](docs/agents/commands.md) for the single-spec xcodebuild invocation.
+- **Think before coding.** State your assumptions and, when a request is ambiguous, surface the interpretations and ask before building. Recommend a simpler approach when you see one. A clarifying question up front beats a wrong implementation.
+- **Simplicity first.** Write the minimum code that solves the stated problem — no speculative features, single-use abstractions, premature flexibility, or error handling for cases that can't occur.
+- **Surgical changes.** Touch only what the request requires. Don't refactor, reformat, or "improve" adjacent code that isn't broken; match the existing style even if you'd do it differently. Every changed line should trace directly to the request. Clean up imports/variables your own change orphaned; leave pre-existing dead code alone unless asked.
+- **Goal-driven execution.** Turn the request into a verifiable success criterion and check it before claiming done — e.g. "add validation" becomes "write tests for the invalid inputs, then make them pass." Don't report success you haven't verified.
 
 ---
 
 ## Project Structure
 
 ```
-Auth0/           # SDK source (~85 Swift files)
-  ├─ Auth0.swift            # public entry point — authentication()/mfa()/users()/webAuth() factories
-  ├─ Authentication.swift, WebAuth.swift, Users.swift  # public protocols
-  ├─ Auth0Authentication.swift, Auth0WebAuth.swift     # concrete (package-internal) impls
-  ├─ *Error.swift           # typed errors conforming to Auth0Error
-  ├─ CredentialsManager.swift  # thread-safe Keychain storage & renewal
-  ├─ Telemetry.swift        # Auth0-Client telemetry header
-  ├─ Version.swift          # single source of truth for the version string
-  ├─ DPoP/, MFA/, MyAccount/ # feature areas
-Auth0Tests/      # Quick/Nimble specs (mirror Auth0/)
-Documentation.docc/  # DocC catalog     App/  # demo app
-scripts/DocsVersions/  # versioned-docs tooling     fastlane/  # release + build_docs
+Auth0.swift/
+├── Auth0/                        # Library source (121 Swift files)
+│   ├── Auth0.swift               # Public result type aliases & top-level factory functions
+│   ├── Authentication.swift      # Authentication protocol (OAuth2 / OIDC)
+│   ├── Auth0Authentication.swift # Concrete Authentication implementation
+│   ├── CredentialsManager.swift  # Thread-safe Keychain credential storage & renewal
+│   ├── Credentials.swift         # User credentials model
+│   ├── WebAuth.swift              # Web Auth protocol (Universal Login)
+│   ├── Auth0WebAuth.swift         # Concrete WebAuth implementation
+│   ├── Auth0ClientInfo.swift      # Auth0-Client telemetry header generation
+│   ├── Version.swift               # Single source of truth for SDK version string
+│   ├── DPoP/                      # DPoP (Demonstration of Proof-of-Possession) support
+│   ├── MFA/                       # Multi-factor authentication
+│   ├── MyAccount/                 # My Account API (EA)
+│   └── ...                        # OAuth2, JWT/JWKS, passkeys, keychain utils, etc.
+├── Auth0Tests/                    # Test specs (65 files, mirrors Auth0/ structure)
+│   ├── DPoP/
+│   ├── MFA/
+│   └── MyAccount/
+├── Documentation.docc/             # DocC documentation bundle
+├── App/                            # Demo application (uses Auth0.plist config)
+├── fastlane/                       # Release automation (Fastfile)
+├── .github/
+│   ├── workflows/main.yml          # CI: tests, lint, pod-lint
+│   └── actions/{setup,test}/       # Composite: Ruby+CocoaPods+Xcode setup, Carthage+xcodebuild test
+├── Auth0.xcodeproj
+├── Auth0.podspec
+├── Package.swift
+└── CHANGELOG.md
 ```
-
----
-
-## Code Style
-
-- **Linter:** SwiftLint (`.swiftlint.yml`; `line_length` 500, `type_body_length` 300/400, `identifier_name`/`type_name` min 3). Lints `Auth0/` only. No auto-formatter; 4-space indent.
-- **Naming:** `UpperCamelCase` types, `lowerCamelCase` members; concrete impls prefixed `Auth0` (`Auth0Authentication`); error types end in `Error`.
-- **Conditional compilation:** WebAuth/Passkeys code is gated with `#if WEB_AUTH_PLATFORM` / `#if PASSKEYS_PLATFORM` — **never** `#if os(iOS)` for these guards.
-
-Dominant patterns: public **protocol** + package-internal concrete type; fluent **builder** (`webAuth.scope(...).connection(...).start()`); typed result aliases (`AuthenticationResult<T>`); **dual API** — every public method has both a completion-handler and an `async throws` variant. See `Auth0/Authentication.swift` and `Auth0/WebAuth.swift`.
-
----
-
-## Git Workflow
-
-- **Branches:** `release/vX.Y.Z` for releases; descriptive names otherwise (`feature/…`, `fix/…`)
-- **Commits:** conventional-style prefixes (`feat:`, `fix:`, `chore:`, `docs:`)
-- **PRs:** satisfy `.github/PULL_REQUEST_TEMPLATE.md` — tests for all changes, DocC comments for all public API. Required checks: unit tests (iOS/macOS/tvOS), SwiftLint, pod lib lint, SPM tests.
-- **Changelog:** Keep a Changelog format in `CHANGELOG.md`, every user-facing change.
 
 ---
 
 ## Boundaries
 
 ### ✅ Always Do
-- Make surgical changes — touch only what the request requires. Don't refactor, reformat, or "improve" adjacent code that isn't broken; match the existing style. Every changed line should trace directly to the request.
-- Run `swift test` and `swiftlint lint` before committing
-- Add Quick/Nimble specs for new behavior; add DocC comments to all `public` API
-- Expose both a completion-handler and an `async throws` API for new public methods
-- Keep `Auth0/Version.swift` and `Auth0.podspec` `s.version` in sync
-- Update `README.md` and `EXAMPLES.md` in the same PR when changing the public API, configuration options, or supported integration patterns
-- When adding a **new request path to Auth0** (not every feature — most ride on the shared transport), route it through the existing `Auth0/Telemetry.swift` mechanism so it carries the `Auth0-Client` header (base64url `{name,version,env}`) — don't create a separate HTTP client, and preserve the `tracking(enabled:)` opt-out
+
+- Write or update tests in `Auth0Tests/` for every new or changed behavior.
+- Add DocC comments (`/// ...`) to all `public` types, methods, and properties.
+- Gate WebAuth and Passkeys code with `#if WEB_AUTH_PLATFORM` / `#if PASSKEYS_PLATFORM`.
+- Expose both a completion-handler API and an `async throws` API for any new public method.
+- Keep `Auth0/Version.swift` and `Auth0.podspec` `s.version` in sync — this is the version source of truth.
+- Follow the existing error hierarchy — use or extend typed error structs (`AuthenticationError`, `WebAuthError`, etc.).
+- Run `swiftlint lint` and resolve all warnings before submitting.
+- Use `StubURLProtocol` / `NetworkStub` for all network interactions in tests.
+- Update `README.md` and `EXAMPLES.md` in the same PR when changing the public API, configuration options, or supported integration patterns.
+- When adding a **new outbound request path to Auth0**, route it through the existing `Auth0/Auth0ClientInfo.swift` mechanism so it carries the `Auth0-Client` header — don't hand-roll a separate client — and preserve the `tracking(enabled:)` opt-out.
 
 ### ⚠️ Ask First
+
 - **Any breaking change — always ask first.** Never make a breaking change on your own initiative; stop and ask the maintainer before writing it.
-- Adding/bumping dependencies (affects SPM, CocoaPods, and Carthage)
-- Modifying public API signatures on `Authentication`/`WebAuth`/`Users`/`CredentialsManager` (breaking → major bump)
-- Raising a minimum platform version (`Package.swift` / `Auth0.podspec`)
-- Changes to `.github/workflows/` or release tooling (`fastlane/`)
-- Modifying security-sensitive code: DPoP key generation, PKCE, token storage, biometric auth
+- Adding new external dependencies (SPM packages or CocoaPods pods).
+- Modifying public API signatures.
+- Adding new minimum platform versions or dropping support for existing ones.
+- Changes to `.github/workflows/` CI configuration.
+- Modifying security-sensitive code: DPoP key generation, PKCE, token storage, biometric auth.
+- Deprecating or removing any public API.
 
 ### 🚫 Never Do
-- Commit secrets, API keys, tokens, or `.plist` files with real credentials
-- Log `accessToken` / `refreshToken` / `idToken` / `recoveryCode` — not even in debug or tests
-- Disable PKCE or weaken DPoP proof generation
-- Force-unwrap optionals in library source
-- Edit generated/vendored dirs by hand (`Carthage/`, `Pods/`, `.build/`, `DerivedData/`)
-- Remove or skip failing specs instead of fixing the cause
-- Break backward compatibility without asking first (see Ask First) and getting explicit approval
+
+- Commit secrets, API keys, tokens, or `.plist` files containing real credentials.
+- Log `accessToken`, `refreshToken`, `idToken`, or any sensitive user data — not in source, not in tests.
+- Disable PKCE — it is always enabled for Authorization Code flows.
+- Bypass or weaken DPoP proof generation.
+- Force-unwrap optionals in library source code.
+- Use `#if os(iOS)` / `#if os(macOS)` for guards that belong under `WEB_AUTH_PLATFORM` / `PASSKEYS_PLATFORM`.
+- Modify files under `Carthage/`, `Pods/`, `.build/`, or `docs/` (generated artifacts) by hand.
+- Remove or skip failing tests instead of fixing them.
+- Break backward API compatibility without a major version bump and explicit team approval.
+- Write `public` types or methods without DocC documentation comments.
 
 ---
 
 ## Security Considerations
 
-- **PKCE:** always enabled for Authorization Code flows — never expose an option to disable it.
-- **Token storage:** Keychain via SimpleKeychain only — never `UserDefaults`/`NSCache`/in-memory for tokens.
-- **Token logging:** never log tokens or `Credentials` contents.
-- **DPoP:** keys generated in the Secure Enclave where available (`Auth0/DPoP/`); do not silently downgrade to software keys.
-- **ID tokens:** validated (signature + claims) in `IDTokenValidator*.swift` — do not bypass validation.
+1. **PKCE:** Always enabled for Authorization Code flows (`Auth0/OAuth2Grant.swift`) — never provide an option to disable it.
+2. **Token Storage:** Keychain via `SimpleKeychain` — never `UserDefaults`, `NSCache`, or in-memory-only storage for sensitive tokens.
+3. **Token Logging:** Never log `accessToken`, `refreshToken`, `idToken`, or `recoveryCode` — not even in debug builds.
+4. **DPoP:** Supported (`Auth0/DPoP/`) — keys generated in the Secure Enclave where available (`SecureEnclaveKeyStore.swift`), falling back to a Keychain-backed store. Do not silently downgrade to software keys without the existing fallback path.
+5. **Certificate Pinning:** Not built-in; can be configured via a custom `URLSession` passed at init.
+6. **Biometric Auth:** Optional gate on `CredentialsManager.credentials()` via `LocalAuthentication` (`Auth0/BioAuthentication.swift`) — never store biometric data.
 
 ---
+
+> The sections below are reference — each keeps a one-line anchor here and offloads detail to `references/*.md`.
+
+## Commands
+
+```bash
+swift test                    # Run all tests via SPM (fastest local option)
+swiftlint lint --reporter github-actions-logging   # Lint (must pass before merging)
+```
+
+See [references/commands.md](references/commands.md) for the full command reference (xcodebuild per-scheme, Carthage bootstrap, coverage, pod lint, DocC generation). Read only when you need to build, test, or lint beyond the two commands above.
+
+## Testing
+
+- **Framework:** Quick 7.0+ (BDD) + Nimble 13.0+ (assertions)
+- **Test Location:** `Auth0Tests/`
+- The default `swift test` suite is unit-only — `StubURLProtocol` intercepts all network calls, no credentials required.
+
+See [references/testing.md](references/testing.md) for spec conventions, mocking utilities, coverage tooling, and how to run a single spec via `xcodebuild`. Read when writing or modifying tests.
+
+## Code Style
+
+- **Naming:** Types `PascalCase`, functions/properties `camelCase`, error types end in `Error`, protocol-backed implementations prefixed `Auth0` (e.g. `Auth0Authentication`).
+- **CI-enforced (SwiftLint, `.swiftlint.yml`):** line length 500, type body length 300 warning / 400 error, `empty_count` opt-in rule — a SwiftLint failure blocks CI.
+
+See [references/code-style.md](references/code-style.md) for good/bad code examples and the dominant patterns (protocol + concrete implementation, builder, dual callback/async API). Read before writing new public API.
+
+## Git Workflow
+
+- **Commits:** Free-form with conventional-style prefixes (`feat:`, `fix:`, `chore:`, `docs:`).
+- **PRs:** Must follow `.github/PULL_REQUEST_TEMPLATE.md` — new/changed functionality covered by tests, documentation added.
+
+See [references/git-workflow.md](references/git-workflow.md) for branch naming, the full PR checklist, and CHANGELOG format. Read before opening a PR.
 
 ## Common Pitfalls
 
-See [docs/agents/pitfalls.md](docs/agents/pitfalls.md) for platform gotchas (conditional-compilation flags, Carthage bootstrap before Xcode work, `CredentialsManager` thread-safety limits, Swift 6 tools + v5 language mode, Nimble async matchers). **Read when debugging build/platform/concurrency issues.**
-
----
+See [references/pitfalls.md](references/pitfalls.md) for the full list (missing `WEB_AUTH_PLATFORM` guards, Carthage vs SPM for dev, `CredentialsManager` thread-safety limits, Swift 6 concurrency, Nimble async matchers). Read when debugging a build failure or flaky test.
 
 ## Docs Update Rules
 
-> A PR that changes public API, configuration, or supported patterns is **not complete** until the relevant docs are updated in the same PR.
+> Treat documentation as a first-class deliverable. A PR that adds or changes public API, configuration, or integration patterns is **not complete** until the relevant docs are updated in the same PR — see the Always Do rule above.
 
-### Tracked Docs
-
-| Doc | Covers |
-|-----|--------|
-| `README.md` | Install (SPM/CocoaPods/Carthage), quick-start, config, Web Auth, support policy |
-| `EXAMPLES.md` | Web Auth, Credentials Manager, Authentication/MFA/My Account/Management APIs, DPoP, logging |
-
-### When You Change Code, Update These Docs
-
-| When this changes | Update |
-|-------------------|--------|
-| Public API on `Authentication`/`WebAuth`/`Users`/`CredentialsManager`/`MFAClient`/`MyAccount` | `README.md` (usage), `EXAMPLES.md` (affected samples) |
-| Public API removed or renamed | `README.md` + `EXAMPLES.md` — update every reference to the old symbol |
-| Installation requirements (platform min, Xcode, package version) | `README.md` (Requirements/Installation; bump version pins in all three package managers) |
-| `Auth0.plist` keys / SDK init options | `README.md` (Configure the SDK) |
-| New integration pattern (grant type, provider, EA feature) | `EXAMPLES.md` (new section) |
-
-> When you touch code that maps to a doc above, update that doc **in the same PR** — do not defer.
+See [references/docs-update.md](references/docs-update.md) for the tracked-docs inventory (`README.md`, `EXAMPLES.md`) and the full code-to-docs mapping table. Read before closing out a PR that touches public API.

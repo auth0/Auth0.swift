@@ -43,7 +43,7 @@ Auth0
     }
 ```
 
-Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
+Note that with `useEphemeralSession()` you don't need to call `logout(federated:)` at all. Just clearing the credentials from the app will suffice. What `logout(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
 
 > [!NOTE]
 > `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`.
@@ -66,9 +66,9 @@ See:
 
 ![Screenshot of the SSO alert box](https://user-images.githubusercontent.com/5055789/198689762-8f3459a7-fdde-4c14-a13b-68933ef675e6.png)
 
-Since `clearSession(federated:)` needs to use `ASWebAuthenticationSession` as well to clear the shared session cookie, the same alert box will be displayed. 
+Since `logout(federated:)` needs to use `ASWebAuthenticationSession` as well to clear the shared session cookie, the same alert box will be displayed. 
 
-If you need SSO with `ASWebAuthenticationSession` and/or are willing to tolerate the alert box on the login call, but would prefer to do away with it when calling `clearSession(federated:)`, you can simply not call `clearSession(federated:)` and just clear the credentials from the app. This means that the shared session cookie will not be removed, so to get the user to log in again you need to add the `"prompt": "login"` parameter to the _login_ call.
+If you need SSO with `ASWebAuthenticationSession` and/or are willing to tolerate the alert box on the login call, but would prefer to do away with it when calling `logout(federated:)`, you can simply not call `logout(federated:)` and just clear the credentials from the app. This means that the shared session cookie will not be removed, so to get the user to log in again you need to add the `"prompt": "login"` parameter to the _login_ call.
 
 ```swift
 Auth0

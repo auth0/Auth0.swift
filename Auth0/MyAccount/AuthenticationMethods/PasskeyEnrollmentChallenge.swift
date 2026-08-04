@@ -2,7 +2,7 @@
 import Foundation
 
 /// A passkey enrollment challenge.
-public struct PasskeyEnrollmentChallenge {
+public struct PasskeyEnrollmentChallenge: Sendable {
 
     /// Unique identifier of the authentication method.
     public let authenticationMethodId: String

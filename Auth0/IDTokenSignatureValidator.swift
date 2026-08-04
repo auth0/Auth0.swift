@@ -1,15 +1,14 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
 
-protocol IDTokenSignatureValidatorContext {
+protocol IDTokenSignatureValidatorContext: Sendable {
     var issuer: String { get }
     var audience: String { get }
-    var jwksRequest: Request<JWKS, AuthenticationError> { get }
+    var jwksRequest: any Requestable<JWKS, AuthenticationError> { get }
 }
 
 struct IDTokenSignatureValidator: JWTAsyncValidator {
-    enum ValidationError: Auth0Error {
+    enum ValidationError: IDTokenValidationError {
         case invalidAlgorithm(actual: String, expected: String)
         case missingPublicKey(kid: String)
         case invalidSignature
@@ -30,7 +29,7 @@ struct IDTokenSignatureValidator: JWTAsyncValidator {
         self.context = context
     }
 
-    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void) {
+    func validate(_ jwt: JWT, callback: @escaping @Sendable (Auth0Error?) -> Void) {
         if let error = validateAlg(jwt) { return callback(error) }
         let algorithm = jwt.algorithm!
         if let error = validateKid(jwt) { return callback(error) }
@@ -65,4 +64,3 @@ struct IDTokenSignatureValidator: JWTAsyncValidator {
         return nil
     }
 }
-#endif

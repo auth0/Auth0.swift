@@ -1,7 +1,7 @@
 import Foundation
 
 func mfaChallengeDecodable<T: Decodable>(from result: Result<ResponseValue, MfaChallengeError>,
-                                           callback: Request<T, MfaChallengeError>.Callback) {
+                                           callback: @Sendable (Result<T, MfaChallengeError>) -> Void) {
     do {
         let response = try result.get()
         if let data = response.data {
@@ -20,7 +20,7 @@ func mfaChallengeDecodable<T: Decodable>(from result: Result<ResponseValue, MfaC
 }
 
 func mfaVerifyDecodable<T: Decodable>(from result: Result<ResponseValue, MFAVerifyError>,
-                                           callback: Request<T, MFAVerifyError>.Callback) {
+                                           callback: @Sendable (Result<T, MFAVerifyError>) -> Void) {
     do {
         let response = try result.get()
         if let data = response.data {
@@ -39,7 +39,7 @@ func mfaVerifyDecodable<T: Decodable>(from result: Result<ResponseValue, MFAVeri
 }
 
 func mfaEnrollDecodable<T: Decodable>(from result: Result<ResponseValue, MfaEnrollmentError>,
-                                           callback: Request<T, MfaEnrollmentError>.Callback) {
+                                           callback: @Sendable (Result<T, MfaEnrollmentError>) -> Void) {
     do {
         let response = try result.get()
         if let data = response.data {
@@ -57,13 +57,13 @@ func mfaEnrollDecodable<T: Decodable>(from result: Result<ResponseValue, MfaEnro
     }
 }
 
-func listAuthenticatorsResponseMapper(factorsAllowed: [String], result: Result<ResponseValue, MfaListAuthenticatorsError>, callback: Request<[Authenticator], MfaListAuthenticatorsError>.Callback) {
+func listAuthenticatorsResponseMapper(factorsAllowed: [String], result: Result<ResponseValue, MfaListAuthenticatorsError>, callback: @Sendable (Result<[Authenticator], MfaListAuthenticatorsError>) -> Void) {
     do {
         let response = try result.get()
         if let data = response.data {
             let decoder = JSONDecoder()
             let authenticators = try decoder.decode([Authenticator].self, from: data)
-            let filteredAuthenticators = authenticators.filter { authenticator in factorsAllowed.contains { $0 == authenticator.type } }
+            let filteredAuthenticators = authenticators.filter { authenticator in  !authenticator.type.isEmpty && factorsAllowed.contains { $0 == authenticator.type } }
             callback(.success(filteredAuthenticators))
         } else {
             callback(.failure(MfaListAuthenticatorsError(from: response)))

@@ -3,12 +3,12 @@ import Foundation
 private struct _A0APICredentials {
     let accessToken: String
     let tokenType: String
-    let expiresIn: Date
+    let expiresAt: Date
     let scope: String
 }
 
 /// User's credentials obtained from Auth0 for a specific API as the result of exchanging a refresh token.
-public struct APICredentials: CustomStringConvertible {
+public struct APICredentials: CustomStringConvertible, Sendable {
 
     /// Token that can be used to make authenticated requests to the API.
     ///
@@ -21,7 +21,7 @@ public struct APICredentials: CustomStringConvertible {
     public let tokenType: String
 
     /// When the access token expires.
-    public let expiresIn: Date
+    public let expiresAt: Date
 
     /// The scopes that have been granted by Auth0.
     ///
@@ -35,7 +35,7 @@ public struct APICredentials: CustomStringConvertible {
         let redacted = "<REDACTED>"
         let values = _A0APICredentials(accessToken: redacted,
                                        tokenType: self.tokenType,
-                                       expiresIn: self.expiresIn,
+                                       expiresAt: self.expiresAt,
                                        scope: self.scope)
         return String(describing: values).replacingOccurrences(of: "_A0APICredentials", with: "APICredentials")
     }
@@ -45,11 +45,11 @@ public struct APICredentials: CustomStringConvertible {
     /// Default initializer.
     public init(accessToken: String,
                 tokenType: String,
-                expiresIn: Date,
+                expiresAt: Date,
                 scope: String) {
         self.accessToken = accessToken
         self.tokenType = tokenType
-        self.expiresIn = expiresIn
+        self.expiresAt = expiresAt
         self.scope = scope
     }
 }
@@ -61,7 +61,7 @@ extension APICredentials: Codable {
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case tokenType = "token_type"
-        case expiresIn = "expires_in"
+        case expiresAt = "expires_in"
         case scope
     }
 
@@ -92,7 +92,7 @@ public extension APICredentials {
     init(from credentials: Credentials) {
         self.accessToken = credentials.accessToken
         self.tokenType = credentials.tokenType
-        self.expiresIn = credentials.expiresIn
+        self.expiresAt = credentials.expiresAt
         self.scope = credentials.scope ?? ""
     }
 

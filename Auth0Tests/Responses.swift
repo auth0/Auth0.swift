@@ -111,13 +111,13 @@ func authResponse(accessToken: String,
                   issuedTokenType: String? = nil,
                   idToken: String,
                   refreshToken: String? = nil,
-                  expiresIn: Double = 3600,
+                  expiresAt: Double = 3600,
                   scope: String? = nil,
                   recoveryCode: String? = nil) -> RequestResponse {
     var json = [
         "access_token": accessToken,
         "token_type": tokenType,
-        "expires_in": String(expiresIn),
+        "expires_in": String(expiresAt),
         "id_token": idToken
     ]
 
@@ -309,6 +309,41 @@ func recoveryCodeChallengeResponse(id: String, authSession: String, recoveryCode
         "auth_session": authSession,
         "recovery_code": recoveryCode,
         "type": "recovery-code"
+    ]
+    return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
+}
+
+func passwordEnrollmentChallengeResponse(id: String,
+                                         authSession: String,
+                                         minLength: Int = 8,
+                                         characterTypes: [String] = ["uppercase", "lowercase", "number", "special"],
+                                         characterTypeRule: String = "three_of_four",
+                                         profileDataActive: Bool = true,
+                                         blockedFields: [String] = ["name", "email"],
+                                         historySize: Int = 5,
+                                         dictionaryDefault: String = "en_10k") -> RequestResponse {
+    let payload: [String: Any] = [
+        "id": id,
+        "auth_session": authSession,
+        "policy": [
+            "complexity": [
+                "min_length": minLength,
+                "character_types": characterTypes,
+                "character_type_rule": characterTypeRule
+            ],
+            "profile_data": [
+                "active": profileDataActive,
+                "blocked_fields": blockedFields
+            ],
+            "history": [
+                "active": true,
+                "size": historySize
+            ],
+            "dictionary": [
+                "active": true,
+                "default": dictionaryDefault
+            ]
+        ]
     ]
     return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
 }

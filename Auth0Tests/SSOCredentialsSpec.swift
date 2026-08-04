@@ -36,7 +36,7 @@ class SSOCredentialsSpec: QuickSpec {
 
                 expect(ssoCredentials.sessionTransferToken) == SessionTransferToken
                 expect(ssoCredentials.issuedTokenType) == IssuedTokenType
-                expect(ssoCredentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                expect(ssoCredentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 expect(ssoCredentials.refreshToken) == RefreshToken
             }
 
@@ -53,13 +53,13 @@ class SSOCredentialsSpec: QuickSpec {
 
                 expect(ssoCredentials.sessionTransferToken) == SessionTransferToken
                 expect(ssoCredentials.issuedTokenType) == IssuedTokenType
-                expect(ssoCredentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                expect(ssoCredentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 expect(ssoCredentials.refreshToken).to(beNil())
             }
 
             context("expires_in") {
 
-                it("should have valid expiresIn from string") {
+                it("should have valid expiresAt from string") {
                     let json = """
                         {
                             "access_token": "\(SessionTransferToken)",
@@ -70,10 +70,10 @@ class SSOCredentialsSpec: QuickSpec {
                     """.data(using: .utf8)!
                     let ssoCredentials = try decoder.decode(SSOCredentials.self, from: json)
 
-                    expect(ssoCredentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                    expect(ssoCredentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 }
 
-                it("should have valid expiresIn from integer number") {
+                it("should have valid expiresAt from integer number") {
                     let json = """
                         {
                             "access_token": "\(SessionTransferToken)",
@@ -84,10 +84,10 @@ class SSOCredentialsSpec: QuickSpec {
                     """.data(using: .utf8)!
                     let ssoCredentials = try decoder.decode(SSOCredentials.self, from: json)
 
-                    expect(ssoCredentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                    expect(ssoCredentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 }
 
-                it("should have valid expiresIn from floating point number") {
+                it("should have valid expiresAt from floating point number") {
                     let json = """
                         {
                             "access_token": "\(SessionTransferToken)",
@@ -98,10 +98,10 @@ class SSOCredentialsSpec: QuickSpec {
                     """.data(using: .utf8)!
                     let ssoCredentials = try decoder.decode(SSOCredentials.self, from: json)
 
-                    expect(ssoCredentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                    expect(ssoCredentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 }
 
-                it("should have valid expiresIn from ISO date") {
+                it("should have valid expiresAt from ISO date") {
                     let formatter = ISO8601DateFormatter()
                     let json = """
                         {
@@ -114,10 +114,10 @@ class SSOCredentialsSpec: QuickSpec {
                     decoder.dateDecodingStrategy = .iso8601
                     let ssoCredentials = try decoder.decode(SSOCredentials.self, from: json)
 
-                    expect(ssoCredentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                    expect(ssoCredentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 }
 
-                it("should fail when expiresIn is invalid") {
+                it("should fail when expiresAt is invalid") {
                     let json = """
                         {
                             "access_token": "\(SessionTransferToken)",
@@ -142,11 +142,11 @@ class SSOCredentialsSpec: QuickSpec {
             it("should have all unredacted properties") {
                 let ssoCredentials = SSOCredentials(sessionTransferToken: SessionTransferToken,
                                                     issuedTokenType: IssuedTokenType,
-                                                    expiresIn: ExpiresInDate,
+                                                    expiresAt: ExpiresInDate,
                                                     idToken: IdToken,
                                                     refreshToken: RefreshToken)
                 let description = "SSOCredentials(sessionTransferToken: \"<REDACTED>\", issuedTokenType:"
-                + " \"\(IssuedTokenType)\", expiresIn: \(ExpiresInDate), idToken: \"<REDACTED>\", refreshToken:"
+                + " \"\(IssuedTokenType)\", expiresAt: \(ExpiresInDate), idToken: \"<REDACTED>\", refreshToken:"
                 + " Optional(\"<REDACTED>\"))"
 
                 expect(ssoCredentials.description) == description
@@ -157,10 +157,10 @@ class SSOCredentialsSpec: QuickSpec {
             it("should have only the non-optional unredacted properties") {
                 let ssoCredentials = SSOCredentials(sessionTransferToken: SessionTransferToken,
                                                     issuedTokenType: IssuedTokenType,
-                                                    expiresIn: ExpiresInDate,
+                                                    expiresAt: ExpiresInDate,
                                                     idToken: IdToken)
                 let description = "SSOCredentials(sessionTransferToken: \"<REDACTED>\", issuedTokenType:"
-                + " \"\(IssuedTokenType)\", expiresIn: \(ExpiresInDate), idToken: \"<REDACTED>\", refreshToken: nil)"
+                + " \"\(IssuedTokenType)\", expiresAt: \(ExpiresInDate), idToken: \"<REDACTED>\", refreshToken: nil)"
 
                 expect(ssoCredentials.description) == description
                 expect(ssoCredentials.description).toNot(contain(SessionTransferToken))

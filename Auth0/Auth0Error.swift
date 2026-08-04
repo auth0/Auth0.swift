@@ -5,7 +5,7 @@ let nonJSONError = "a0.sdk.internal_error.plain"
 let emptyBodyError = "a0.sdk.internal_error.empty"
 
 /// Generic representation of Auth0 errors.
-public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
+public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible, Sendable {
 
     /// The underlying `Error` value, if any.
     var cause: Error? { get }

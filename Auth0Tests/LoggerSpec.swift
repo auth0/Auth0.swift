@@ -17,101 +17,98 @@ class LoggerSpec: QuickSpec {
     override class func spec() {
 
         describe("Auth0Log") {
-            
+
             var mockService: MockLoggingService!
-            
+            var logger: Auth0Log!
+
             beforeEach {
                 mockService = MockLoggingService()
-                Auth0Log.loggingService = mockService
+                logger = Auth0Log(loggingService: mockService)
             }
-            
-            afterEach {
-                Auth0Log.loggingService = OSUnifiedLoggingService()
-            }
-            
+
             it("should have correct subsystem identifier") {
                 expect(Auth0Log.subsystem) == "com.auth0.Auth0"
             }
-            
+
             describe("log categories") {
-                
+
                 it("should have networkTracing category") {
                     expect(LogCategory.networkTracing.rawValue) == "NetworkTracing"
                 }
-                
+
                 it("should have configuration category") {
                     expect(LogCategory.configuration.rawValue) == "Configuration"
                 }
-                
+
             }
-            
+
             describe("debug method") {
-                
+
                 it("should log debug message with correct category") {
-                    Auth0Log.debug(.networkTracing, "test debug")
+                    logger.debug(.networkTracing, "test debug")
                     expect(mockService.loggedMessages).to(haveCount(1))
                     expect(mockService.loggedMessages.first?.category) == .networkTracing
                     expect(mockService.loggedMessages.first?.level) == .debug
                     expect(mockService.loggedMessages.first?.message) == "test debug"
                 }
-                
+
             }
-            
+
             describe("info method") {
-                
+
                 it("should log info message") {
-                    Auth0Log.info(.configuration, "test info")
+                    logger.info(.configuration, "test info")
                     expect(mockService.loggedMessages.first?.level) == .info
                     expect(mockService.loggedMessages.first?.message) == "test info"
                 }
-                
+
             }
-            
+
             describe("warning method") {
-                
+
                 it("should log warning message") {
-                    Auth0Log.warning(.networkTracing, "test warning")
+                    logger.warning(.networkTracing, "test warning")
                     expect(mockService.loggedMessages.first?.level) == .warning
                     expect(mockService.loggedMessages.first?.message) == "test warning"
                 }
-                
+
             }
-            
+
             describe("error method") {
-                
+
                 it("should log error message") {
-                    Auth0Log.error(.configuration, "test error")
+                    logger.error(.configuration, "test error")
                     expect(mockService.loggedMessages.first?.level) == .error
                     expect(mockService.loggedMessages.first?.message) == "test error"
                 }
-                
+
             }
-            
+
             describe("fault method") {
-                
+
                 it("should log fault message") {
-                    Auth0Log.fault(.networkTracing, "test fault")
+                    logger.fault(.networkTracing, "test fault")
                     expect(mockService.loggedMessages.first?.level) == .fault
                     expect(mockService.loggedMessages.first?.message) == "test fault"
                 }
-                
+
             }
-            
+
             describe("multiple logs") {
-                
+
                 it("should capture all logged messages") {
-                    Auth0Log.debug(.networkTracing, "first")
-                    Auth0Log.error(.configuration, "second")
-                    Auth0Log.warning(.networkTracing, "third")
-                    
+                    logger.debug(.networkTracing, "first")
+                    logger.error(.configuration, "second")
+                    logger.warning(.networkTracing, "third")
+
                     expect(mockService.loggedMessages).to(haveCount(3))
                     expect(mockService.loggedMessages[0].message) == "first"
                     expect(mockService.loggedMessages[1].message) == "second"
                     expect(mockService.loggedMessages[2].message) == "third"
                 }
-                
+
             }
-            
+
         }
 
         it("should build with default output") {

@@ -1,10 +1,9 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 
 struct IDTokenValidatorContext: IDTokenSignatureValidatorContext, IDTokenClaimsValidatorContext {
     let issuer: String
     let audience: String
-    let jwksRequest: Request<JWKS, AuthenticationError>
+    let jwksRequest: any Requestable<JWKS, AuthenticationError>
     let leeway: Int
     let maxAge: Int?
     let nonce: String?
@@ -29,4 +28,3 @@ extension IDTokenValidatorContext {
     }
 
 }
-#endif

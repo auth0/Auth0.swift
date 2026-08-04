@@ -13,6 +13,10 @@ extension NSApplication {
 extension ASUserAgent: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        // Use custom window if provided, otherwise fall back to key window
+        if let window = presentationWindow {
+            return window
+        }
         return NSApplication.shared()?.windows.last(where: \.isKeyWindow) ?? ASPresentationAnchor()
     }
 

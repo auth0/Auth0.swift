@@ -1,4 +1,4 @@
-github "Quick/Nimble" "v13.7.1"
+github "Quick/Nimble" "v13.8.0"
 github "Quick/Quick" "v7.6.2"
-github "auth0/JWTDecode.swift" "3.3.0"
+github "auth0/JWTDecode.swift" "4.0.0"
 github "auth0/SimpleKeychain" "1.3.0"

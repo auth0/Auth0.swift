@@ -3,7 +3,7 @@ import Foundation
 
 class LoginTransaction: NSObject, AuthTransaction {
 
-    typealias FinishTransaction = (WebAuthResult<Credentials>) -> Void
+    typealias FinishTransaction = @MainActor @Sendable (WebAuthResult<Credentials>) -> Void
 
     private(set) var userAgent: WebAuthUserAgent?
 
@@ -48,7 +48,8 @@ class LoginTransaction: NSObject, AuthTransaction {
         }
 
         if items["error"] != nil {
-            let error = WebAuthError(code: .other, cause: AuthenticationError(info: items, statusCode: 302))
+            let authError = AuthenticationError(info: items, statusCode: 302)
+            let error = WebAuthError(code: .authenticationFailed, cause: authError)
             // The user agent can handle the error
             self.finishUserAgent(with: .failure(error))
         } else {

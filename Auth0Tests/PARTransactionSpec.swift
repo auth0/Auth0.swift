@@ -85,7 +85,7 @@ class PARTransactionSpec: QuickSpec {
                                                   userAgent: userAgent,
                                                   callback: { result = $0 })
                     let url = URL(string: "https://samples.auth0.com/callback?state=some-state")!
-                    let expectedError = WebAuthError(code: .noAuthorizationCode(["state": "some-state"]))
+                    let expectedError = WebAuthError(code: .unknown("Authorization code missing from callback URL query parameters ([\"state\": \"some-state\"])"))
                     expect(transaction.resume(url)) == true
                     expect(transaction.userAgent).to(beNil())
                     expect(result).toEventually(haveWebAuthError(expectedError))

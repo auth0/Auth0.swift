@@ -9,7 +9,9 @@ private let Url = URL(string: "https://samples.auth0.com")!
 private let DPoPNonce = "auth0-nonce"
 private let Timeout: NimbleTimeInterval = .seconds(2)
 
-fileprivate extension Request where T == [String: Any], E == AuthenticationError {
+private struct AnyJSON: Decodable, Sendable {}
+
+fileprivate extension Request where T == AnyJSON, E == AuthenticationError {
 
     init(session: URLSession = .shared,
          url: URL = Url,
@@ -24,10 +26,22 @@ fileprivate extension Request where T == [String: Any], E == AuthenticationError
                   parameters: parameters,
                   headers: headers,
                   logger: nil,
-                  telemetry: Telemetry(),
+                  auth0ClientInfo: Auth0ClientInfo(),
                   dpop: dpop)
     }
 
+}
+
+extension Requestable {
+    var storedParameters: [String: Any] {
+        (self as? Request<ResultType, ErrorType>)?.parameters ?? [:]
+    }
+    var storedHeaders: [String: String] {
+        (self as? Request<ResultType, ErrorType>)?.headers ?? [:]
+    }
+    var dpop: DPoP? {
+        (self as? Request<ResultType, ErrorType>)?.dpop
+    }
 }
 
 class RequestSpec: QuickSpec {
@@ -53,29 +67,31 @@ class RequestSpec: QuickSpec {
 
                 it("should create a new request with extra parameters") {
                     let request = Request().parameters(["foo": "bar"])
-                    expect(request.parameters["foo"] as? String) == "bar"
+                    expect(request.storedParameters["foo"] as? String) == "bar"
                 }
 
                 it("should merge extra parameters with existing parameters") {
                     let request = Request(parameters: ["foo": "bar"]).parameters(["baz": "qux"])
-                    expect(request.parameters["foo"] as? String) == "bar"
-                    expect(request.parameters["baz"] as? String) == "qux"
+                    expect(request.storedParameters["foo"] as? String) == "bar"
+                    expect(request.storedParameters["baz"] as? String) == "qux"
                 }
 
                 it("should overwrite existing parameters with extra parameters") {
                     let request = Request(parameters: ["foo": "bar"]).parameters(["foo": "baz"])
-                    expect(request.parameters["foo"] as? String) == "baz"
+                    expect(request.storedParameters["foo"] as? String) == "baz"
                 }
 
                 it("should create a new request and not mutate an existing request") {
                     let request = Request(parameters: ["foo": "bar"])
-                    expect(request.parameters(["foo": "baz"]).parameters["foo"] as? String) == "baz"
+                    let updated = request.parameters(["foo": "baz"])
+                    expect(updated.storedParameters["foo"] as? String) == "baz"
                     expect(request.parameters["foo"] as? String) == "bar"
                 }
 
                 it("should enforce the openid scope when adding extra parameters") {
                     let request = Request(parameters: ["foo": "bar"])
-                    expect(request.parameters(["scope": "email phone"]).parameters["scope"] as? String) == "openid email phone"
+                    let updated = request.parameters(["scope": "email phone"])
+                    expect(updated.storedParameters["scope"] as? String) == "openid email phone"
                 }
 
                 it("should add the parameters as query parameters") {
@@ -112,23 +128,24 @@ class RequestSpec: QuickSpec {
 
                 it("should create a new request with extra headers") {
                     let request = Request().headers(["foo": "bar"])
-                    expect(request.headers["foo"]) == "bar"
+                    expect(request.storedHeaders["foo"]) == "bar"
                 }
 
                 it("should merge extra headers with existing headers") {
                     let request = Request(headers: ["foo": "bar"]).headers(["baz": "qux"])
-                    expect(request.headers["foo"]) == "bar"
-                    expect(request.headers["baz"]) == "qux"
+                    expect(request.storedHeaders["foo"]) == "bar"
+                    expect(request.storedHeaders["baz"]) == "qux"
                 }
 
                 it("should overwrite existing headers with extra headers") {
                     let request = Request(headers: ["foo": "bar"]).headers(["foo": "baz"])
-                    expect(request.headers["foo"]) == "baz"
+                    expect(request.storedHeaders["foo"]) == "baz"
                 }
 
                 it("should create a new request and not mutate an existing request") {
                     let request = Request(headers: ["foo": "bar"])
-                    expect(request.headers(["foo": "baz"]).headers["foo"]) == "baz"
+                    let updated = request.headers(["foo": "baz"])
+                    expect(updated.storedHeaders["foo"]) == "baz"
                     expect(request.headers["foo"]) == "bar"
                 }
 
@@ -374,7 +391,7 @@ class RequestSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         Request(dpop: DPoP()).start { result in
-                            expect(DPoP.auth0Nonce) == DPoPNonce
+                            expect(DPoP.nonceStorage.nonce) == DPoPNonce
                             done()
                         }
                     }
@@ -386,7 +403,7 @@ class RequestSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         Request(dpop: DPoP()).start { result in
-                            expect(DPoP.auth0Nonce) == DPoPNonce
+                            expect(DPoP.nonceStorage.nonce) == DPoPNonce
                             done()
                         }
                     }
@@ -408,7 +425,7 @@ class RequestSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         Request(dpop: DPoP()).start { result in
-                            expect(DPoP.auth0Nonce) == newNonce
+                            expect(DPoP.nonceStorage.nonce) == newNonce
                             done()
                         }
                     }
@@ -454,8 +471,7 @@ class RequestSpec: QuickSpec {
                         .sink(receiveCompletion: { completion in
                             guard case .finished = completion else { return }
                             done()
-                        }, receiveValue: { response in
-                            expect(response).toNot(beEmpty())
+                        }, receiveValue: { _ in
                         })
                         .store(in: &cancellables)
                 }
@@ -490,8 +506,7 @@ class RequestSpec: QuickSpec {
                 let request = Request()
                 waitUntil(timeout: Timeout) { done in
                     Task.init {
-                        let response = try await request.start()
-                        expect(response).toNot(beEmpty())
+                        _ = try await request.start()
                         done()
                     }
                 }
@@ -516,16 +531,85 @@ class RequestSpec: QuickSpec {
         }
         #endif
 
+        describe("main thread callback execution") {
+
+            it("should execute callback on main thread on success") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiSuccessResponse(json: ["key": "value"]))
+
+                waitUntil(timeout: Timeout) { done in
+                    Request().start { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should execute callback on main thread on failure") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    Request().start { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should execute callback on main thread on network error") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: { _ in
+                    return (nil, nil, URLError(.notConnectedToInternet))
+                })
+
+                waitUntil(timeout: Timeout) { done in
+                    Request().start { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            #if canImport(_Concurrency)
+            it("should execute callback on main thread for async/await success") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiSuccessResponse(json: ["key": "value"]))
+
+                waitUntil(timeout: Timeout) { done in
+                    Task {
+                        _ = try? await Request().start()
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should execute callback on main thread for async/await failure") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    Task {
+                        _ = try? await Request().start()
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+            #endif
+
+        }
+
     }
 }
 
-func plainJson(from result: Result<ResponseValue, AuthenticationError>,
-               callback: Request<[String: Any], AuthenticationError>.Callback) {
+fileprivate func plainJson(from result: Result<ResponseValue, AuthenticationError>,
+                           callback: @Sendable (Result<AnyJSON, AuthenticationError>) -> Void) {
     do {
         let response = try result.get()
-        if let data = response.data,
-           let dictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-            callback(.success(dictionary))
+        if response.data != nil {
+            callback(.success(AnyJSON()))
         } else {
             callback(.failure(AuthenticationError(from: response)))
         }
