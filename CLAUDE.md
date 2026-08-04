@@ -19,18 +19,6 @@ Apply these on every task in this repo — they keep changes correct, small, and
 
 ---
 
-## Project Overview
-
-**Auth0.swift** is the official Auth0 SDK for Apple platforms — providing authentication, authorization, and credential management for iOS, macOS, tvOS, watchOS, and visionOS apps.
-
-- **Language:** Swift 6.0 tools (`swift-tools-version:6.0`) — library target runs in Swift 6 language mode (`.swiftLanguageMode(.v6)`), test target runs in Swift 5 language mode (`.swiftLanguageMode(.v5)`)
-- **Tech Stack:** Apple platforms, Xcode 16.1, SPM + CocoaPods + Carthage, URLSession, Combine, CryptoKit
-- **Package Manager:** Swift Package Manager (primary), CocoaPods, Carthage (development deps)
-- **Minimum Platform Version:** iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, visionOS 1.0
-- **Dependencies:** SimpleKeychain 1.3.0, JWTDecode.swift 4.0.0 · test: Quick 7.0+, Nimble 13.0+ — see `Package.swift` for the authoritative list
-
----
-
 ## Project Structure
 
 ```
@@ -64,21 +52,6 @@ Auth0.swift/
 ├── Package.swift
 └── CHANGELOG.md
 ```
-
-### Key Files
-
-| File | Purpose |
-|------|---------|
-| `Auth0/Auth0.swift` | Entry point: result type aliases and factory functions (`Auth0.authentication()`, `Auth0.webAuth()`, etc.) |
-| `Auth0/Version.swift` | Version string — single source of truth; bump here for every release |
-| `Auth0/CredentialsManager.swift` | Thread-safe credential storage, renewal, biometric auth |
-| `Auth0/Authentication.swift` | Full OAuth2/OIDC Authentication protocol definition |
-| `Auth0/WebAuth.swift` | Universal Login protocol (iOS/macOS/visionOS only, `WEB_AUTH_PLATFORM`) |
-| `Auth0/Auth0ClientInfo.swift` | `Auth0-Client` telemetry header generation and opt-out |
-| `Auth0.podspec` | CocoaPods spec; `s.version` must match `Version.swift` |
-| `Package.swift` | SPM manifest; lists all targets, platforms, and dependencies |
-| `.swiftlint.yml` | SwiftLint config — lints only the `Auth0/` source directory |
-| `CHANGELOG.md` | Keep a Changelog format; updated for every release |
 
 ---
 
