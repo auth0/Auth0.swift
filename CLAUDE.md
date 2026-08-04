@@ -8,17 +8,6 @@ You are a Swift SDK engineer working on Auth0.swift, the Auth0 authentication SD
 
 ---
 
-## Project Overview
-
-**Auth0.swift** is the official Auth0 SDK for Apple platforms — authentication, authorization, and credential management.
-
-- **Language:** Swift 5.0+ (`Package.swift` uses `swift-tools-version:6.0`, language mode v5)
-- **Distribution:** Swift Package Manager (primary), CocoaPods (`Auth0.podspec`), Carthage (`Cartfile`)
-- **Min platforms:** iOS 14, macOS 11, tvOS 14, watchOS 7, visionOS 1
-- **Dependencies:** SimpleKeychain 1.3.0, JWTDecode 3.3.0 · **test:** Quick, Nimble (declared in `Package.swift` / `Auth0.podspec` — the authoritative source)
-
----
-
 ## Commands
 
 ```bash
@@ -69,8 +58,6 @@ Auth0Tests/      # Quick/Nimble specs (mirror Auth0/)
 Documentation.docc/  # DocC catalog     App/  # demo app
 scripts/DocsVersions/  # versioned-docs tooling     fastlane/  # release + build_docs
 ```
-
-Key files: `Auth0/Auth0.swift` (entry point), `Auth0/Version.swift` (bump per release, keep in sync with `Auth0.podspec` `s.version`), `.swiftlint.yml` (lints `Auth0/` only).
 
 ---
 
