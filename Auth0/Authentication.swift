@@ -669,39 +669,15 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      Auth0
          .authentication()
          .resetPassword(email: "support@auth0.com",
-                        connection: "Username-Password-Authentication")
-         .start { print($0) }
-     ```
-
-     - Parameters:
-       - email:      Email of the database user.
-       - connection: Name of the database connection.
-     - Returns: A request for resetting the password.
-
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/change-password/change-password)
-     */
-    func resetPassword(email: String, connection: String) -> any Requestable<Void, AuthenticationError>
-
-    /**
-     Resets the password of a database user, associating the request with an organization.
-
-     ## Usage
-
-     ```swift
-     Auth0
-         .authentication()
-         .resetPassword(email: "support@auth0.com",
                         connection: "Username-Password-Authentication",
                         organization: "org_aaAA1aa11aAAAA1a")
          .start { print($0) }
      ```
 
      - Parameters:
-       - email:      Email of the database user.
-       - connection: Name of the database connection.
-       - organization: Identifier of the organization associated with the user.
+       - email:        Email of the database user.
+       - connection:   Name of the database connection.
+       - organization: Identifier of the organization associated with the user. Defaults to `nil`.
      - Returns: A request for resetting the password.
 
      ## See Also

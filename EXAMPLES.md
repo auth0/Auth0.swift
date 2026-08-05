@@ -1413,6 +1413,7 @@ credentialsManager.credentials { result in
 
 - [Log in with database connection](#log-in-with-database-connection)
 - [Sign up with database connection](#sign-up-with-database-connection)
+- [Reset a password](#reset-a-password)
 - [Log in with passkey [EA]](#log-in-with-passkey-ea)
 - [Sign up with passkey [EA]](#sign-up-with-passkey-ea)
 - [Passwordless login](#passwordless-login)
@@ -1575,6 +1576,85 @@ Auth0
         }
     }, receiveValue: { user in
         print("User signed up: \(user)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+### Reset a password
+
+Send a password reset email to a database user.
+
+```swift
+Auth0
+    .authentication()
+    .resetPassword(email: "support@auth0.com",
+                   connection: "Username-Password-Authentication")
+    .start { result in
+        switch result {
+        case .success:
+            print("Password reset email sent")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+If the user belongs to an [organization](#organizations), pass its identifier to associate the reset request with that organization. Auth0 then includes the `organization_id` and `organization_name` values in the password reset redirect URL, and makes them available as variables in customized email templates.
+
+```swift
+Auth0
+    .authentication()
+    .resetPassword(email: "support@auth0.com",
+                   connection: "Username-Password-Authentication",
+                   organization: "org_abc123") // 👈🏼
+    .start { result in
+        switch result {
+        case .success:
+            print("Password reset email sent")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+> [!NOTE]
+> The `organization` value must be the organization ID (for example, `org_abc123`), not the organization name. It is optional; pass `nil` to omit it.
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    try await Auth0
+        .authentication()
+        .resetPassword(email: "support@auth0.com",
+                       connection: "Username-Password-Authentication",
+                       organization: "org_abc123")
+        .start()
+    print("Password reset email sent")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .resetPassword(email: "support@auth0.com",
+                   connection: "Username-Password-Authentication",
+                   organization: "org_abc123")
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { _ in
+        print("Password reset email sent")
     })
     .store(in: &cancellables)
 ```
@@ -5147,6 +5227,8 @@ if let act = credentialsManager.user?.act {
 
 > [!NOTE]
 > Organizations is currently only available to customers on our Enterprise and Startup subscription plans.
+
+Besides Web Auth login, the Authentication API client can also associate a password reset request with an organization. See [Reset a password](#reset-a-password).
 
 #### Log in to an organization
 

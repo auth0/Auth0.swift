@@ -1351,6 +1351,16 @@ class AuthenticationSpec: QuickSpec {
                 expect((request as? Request<Void, AuthenticationError>)?.dpop).to(beNil())
             }
 
+            it("should not send an organization when it is nil") {
+                NetworkStub.addStub(condition: { $0.isResetPassword(Domain) && $0.hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])}, response: resetPasswordResponse())
+                waitUntil(timeout: Timeout) { done in
+                    auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName, organization: nil).start { result in
+                        guard case .success = result else { return fail("Failed to reset password") }
+                        done()
+                    }
+                }
+            }
+
         }
         
         describe("passwordless email") {
