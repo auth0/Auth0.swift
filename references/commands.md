@@ -38,6 +38,6 @@ bundle exec fastlane build_docs
 
 ## CI Structure
 
-- `.github/workflows/main.yml` runs on every PR: `test` (matrix over iOS/macOS/tvOS via `Auth0.xcodeproj` + Xcode 16.1), `test-package` (`swift test`), `pod-lint`, and `swiftlint`.
+- `.github/workflows/main.yml` runs on every PR: `test` (matrix over iOS/macOS/tvOS via `Auth0.xcodeproj` + Xcode 26.6), `test-package` (`swift test`), `pod-lint`, and `swiftlint`.
 - `.github/actions/setup/action.yml` — composite action: Ruby + CocoaPods + Xcode setup.
 - `.github/actions/test/action.yml` — composite action: SPM cache restore, Carthage bootstrap per platform, `xcodebuild` test run with coverage enabled.
