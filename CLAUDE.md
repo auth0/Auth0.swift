@@ -49,6 +49,7 @@ Auth0.swift/
 ### ✅ Always Do
 
 - Write or update tests in `Auth0Tests/` for every new or changed behavior.
+- Make surgical changes — touch only what the request requires; don't refactor or reformat adjacent code that isn't broken.
 - Add DocC comments (`/// ...`) to all `public` types, methods, and properties.
 - Gate WebAuth and Passkeys code with `#if WEB_AUTH_PLATFORM` / `#if PASSKEYS_PLATFORM`.
 - Expose both a completion-handler API and an `async throws` API for any new public method.
