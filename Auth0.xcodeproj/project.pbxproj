@@ -8,9 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		085D5430CF1CFC03E992568B /* PasswordPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C042EE2830B50E3F0005CDFF /* PasswordPolicy.swift */; };
+		08F2C4C7FE384269A5BBF982 /* Quick in Frameworks */ = {isa = PBXBuildFile; productRef = E556811CAC75439B9E685D20 /* Quick */; };
 		0D773438597F22AF2198B051 /* PasswordPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C042EE2830B50E3F0005CDFF /* PasswordPolicy.swift */; };
 		0F6B4AC10673B31597E39278 /* PasswordEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70F0679C8E8E5F0048DE88F /* PasswordEnrollmentChallenge.swift */; };
 		0FFE53444E5A243D940BA8C7 /* PARUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E8FEDE0DF1C1FFEE83CEA8 /* PARUtils.swift */; };
+		1118DD28D56941318666F4BF /* Nimble in Frameworks */ = {isa = PBXBuildFile; productRef = F7D43A01CA9449B3B32DEAA0 /* Nimble */; };
 		1390555BB144493384F45B4C /* JWT+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D6B23D0BBA500074024 /* JWT+Header.swift */; };
 		14870DC1A047069AD14D359D /* PARWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D49A114A2453046747C148 /* PARWebAuth.swift */; };
 		242453F3718F87992EB123D2 /* PARWebAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42370625A7B309DDD4F5A840 /* PARWebAuthSpec.swift */; };
@@ -24,6 +26,7 @@
 		47820395033F8A3A8D1CFDFC /* PARUtilsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED1B213D06A9C36CD799CAF /* PARUtilsSpec.swift */; };
 		49142CE5706064B21F827F40 /* AuthenticationMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4F5F9C7F385332E6CD553FD /* AuthenticationMethodType.swift */; };
 		4BB16993DDF6AA30E97A5B66 /* PARWebAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42370625A7B309DDD4F5A840 /* PARWebAuthSpec.swift */; };
+		4DA2D382B2A64A809FF7AC30 /* Quick in Frameworks */ = {isa = PBXBuildFile; productRef = C5F5F3AEAC454B56A586D024 /* Quick */; };
 		4DB1A784D5BF4CD9C14E9926 /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF978746AFDAE6595E37F3A2 /* AuthorizationCode.swift */; };
 		5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
@@ -273,12 +276,6 @@
 		5CCDDC492E2A8D7700079840 /* DPoPSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CCDDC472E2A8D6F00079840 /* DPoPSpec.swift */; };
 		5CCDDC4A2E2A8D7700079840 /* DPoPSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CCDDC472E2A8D6F00079840 /* DPoPSpec.swift */; };
 		5CCDDC4B2E2A8D7700079840 /* DPoPSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CCDDC472E2A8D6F00079840 /* DPoPSpec.swift */; };
-		5CD9FC7226FE30BA009C2B27 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC7426FE30BA009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC7826FE30C8009C2B27 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC7A26FE30C8009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC7E26FE30D4009C2B27 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC8026FE30D4009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CDF672A2DD395C700A9B513 /* NewPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67292DD395C300A9B513 /* NewPasskey.swift */; };
 		5CDF672B2DD395C700A9B513 /* NewPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67292DD395C300A9B513 /* NewPasskey.swift */; };
 		5CDF672C2DD395C700A9B513 /* NewPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67292DD395C300A9B513 /* NewPasskey.swift */; };
@@ -480,6 +477,7 @@
 		659BDC8930D67C0B16E1964D /* PARUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E8FEDE0DF1C1FFEE83CEA8 /* PARUtils.swift */; };
 		67F29969E34F4B3593A1927A /* Array+Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F551923C8FB8E00C89615 /* Array+Encode.swift */; };
 		6CCED9E07EA67D5D34F8E5C5 /* AuthenticationMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4F5F9C7F385332E6CD553FD /* AuthenticationMethodType.swift */; };
+		6F0BDF1041EA4687A416605D /* Nimble in Frameworks */ = {isa = PBXBuildFile; productRef = 320357F22246490183674AF7 /* Nimble */; };
 		6F69AFC4A286D2D9746FA1AD /* PARTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DF7D030F62B7A0E523811F /* PARTransactionSpec.swift */; };
 		712F7EE4562971318DE9FBCC /* PARAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF70536F8CF2AB2248C2312B /* PARAuth.swift */; };
 		74694336DFAB357500C89908 /* PARAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF70536F8CF2AB2248C2312B /* PARAuth.swift */; };
@@ -500,6 +498,7 @@
 		B1D3E82D358A988EF8D4BB2A /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF978746AFDAE6595E37F3A2 /* AuthorizationCode.swift */; };
 		B5C46C7A0B145497D1A06610 /* PARWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D49A114A2453046747C148 /* PARWebAuth.swift */; };
 		BB176C8C5C79D40ECB078E7C /* PasswordEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70F0679C8E8E5F0048DE88F /* PasswordEnrollmentChallenge.swift */; };
+		BE311AAB241B4744926A5E48 /* Quick in Frameworks */ = {isa = PBXBuildFile; productRef = FDC0BF634C814C629C24FDEE /* Quick */; };
 		C107B51D2C9AC4D8006B6BEA /* WebViewProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C107B51B2C9AC4D3006B6BEA /* WebViewProvider.swift */; };
 		C107B5222CA27F7C006B6BEA /* WebViewProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C107B5202CA27F76006B6BEA /* WebViewProviderSpec.swift */; };
 		C12BFE432C352DD400D1CC00 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D76F2C2BDFE40094C657 /* NetworkStub.swift */; };
@@ -516,8 +515,6 @@
 		C177D7772C2BE00D0094C657 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
 		C1B3B9D32C24B39E004A32A4 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1B3B9C02C24B39E004A32A4 /* Auth0.framework */; };
 		C1B3B9D42C24B39E004A32A4 /* Auth0.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = C1B3B9C02C24B39E004A32A4 /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C1B3B9E62C24B65B004A32A4 /* Nimble.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C1B3B9EB2C24B65D004A32A4 /* Quick.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C1B3B9EC2C24B692004A32A4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		C1B3B9EE2C24B6D4004A32A4 /* Auth0Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE87491D8A424700EA27DC /* Auth0Authentication.swift */; };
 		C1B3B9EF2C24B6D4004A32A4 /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE874A1D8A424700EA27DC /* Authentication.swift */; };
@@ -609,20 +606,13 @@
 		C321EB0B6F2750E8314D3AB2 /* PARTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DF7D030F62B7A0E523811F /* PARTransactionSpec.swift */; };
 		C323E0033AD1C5B8B5BAB031 /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF978746AFDAE6595E37F3A2 /* AuthorizationCode.swift */; };
 		C63D026CF427EF70E6C4AEDF /* PARUtilsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED1B213D06A9C36CD799CAF /* PARUtilsSpec.swift */; };
+		C830DE0D42154C24BC85F779 /* Nimble in Frameworks */ = {isa = PBXBuildFile; productRef = 32052A251B7F4E119E59D1AB /* Nimble */; };
 		D0D5B6ADC64B62608E2423A3 /* PasswordPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C042EE2830B50E3F0005CDFF /* PasswordPolicy.swift */; };
 		D40B77242F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
 		D40B77252F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
 		D40B77262F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
 		D40B77272F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
 		D40B77282F5AA7B2000F5F90 /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B77232F5AA7A6000F5F90 /* TokenRequest.swift */; };
-		D41DED172DCA083800F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
-		D41DED182DCA083B00F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
-		D41DED192DCA084100F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
-		D41DED1A2DCA084200F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
-		D41DED1B2DCA084700F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
-		D41DED1C2DCA084900F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
-		D41DED1D2DCA084E00F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
-		D41DED1E2DCA085000F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
 		D41DED292DCA099E00F5B1A4 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
 		D41DED2C2DCA099F00F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
 		D41DED2E2DCA09A200F5B1A4 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
@@ -706,6 +696,8 @@
 		D499DB222E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE72E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift */; };
 		D499DB232E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEC2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift */; };
 		D499DB242E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAED2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift */; };
+		D4A5C85030303E0A000534FF /* Nimble in Frameworks */ = {isa = PBXBuildFile; productRef = D4A5C84F30303E0A000534FF /* Nimble */; };
+		D4A5C85230303E0D000534FF /* Quick in Frameworks */ = {isa = PBXBuildFile; productRef = D4A5C85130303E0D000534FF /* Quick */; };
 		D4ABFE6D2F10BEA9000C828C /* MFARequiredErrorPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ABFE6C2F10BEA3000C828C /* MFARequiredErrorPayload.swift */; };
 		D4ABFE6E2F10BEA9000C828C /* MFARequiredErrorPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ABFE6C2F10BEA3000C828C /* MFARequiredErrorPayload.swift */; };
 		D4ABFE6F2F10BEA9000C828C /* MFARequiredErrorPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ABFE6C2F10BEA3000C828C /* MFARequiredErrorPayload.swift */; };
@@ -917,8 +909,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5CD9FC7226FE30BA009C2B27 /* Nimble.xcframework in CopyFiles */,
-				5CD9FC7426FE30BA009C2B27 /* Quick.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -928,8 +918,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5CD9FC7826FE30C8009C2B27 /* Nimble.xcframework in CopyFiles */,
-				5CD9FC7A26FE30C8009C2B27 /* Quick.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -939,8 +927,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5CD9FC7E26FE30D4009C2B27 /* Nimble.xcframework in CopyFiles */,
-				5CD9FC8026FE30D4009C2B27 /* Quick.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -963,8 +949,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C1B3B9EB2C24B65D004A32A4 /* Quick.xcframework in Copy Files */,
-				C1B3B9E62C24B65B004A32A4 /* Nimble.xcframework in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1053,8 +1037,6 @@
 		5CB41D8123D611AE00074024 /* ClaimValidatorsSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClaimValidatorsSpec.swift; sourceTree = "<group>"; };
 		5CCDDC412E29702E00079840 /* KeychainKeyStoreSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainKeyStoreSpec.swift; sourceTree = "<group>"; };
 		5CCDDC472E2A8D6F00079840 /* DPoPSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPSpec.swift; sourceTree = "<group>"; };
-		5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Nimble.xcframework; path = Carthage/Build/Nimble.xcframework; sourceTree = "<group>"; };
-		5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Quick.xcframework; path = Carthage/Build/Quick.xcframework; sourceTree = "<group>"; };
 		5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = JWTDecode.xcframework; path = Carthage/Build/JWTDecode.xcframework; sourceTree = "<group>"; };
 		5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SimpleKeychain.xcframework; path = Carthage/Build/SimpleKeychain.xcframework; sourceTree = "<group>"; };
 		5CDF67292DD395C300A9B513 /* NewPasskey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPasskey.swift; sourceTree = "<group>"; };
@@ -1266,9 +1248,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4A5C85230303E0D000534FF /* Quick in Frameworks */,
 				C177D6C72C2ADEB60094C657 /* CwlPreconditionTesting in Frameworks */,
-				D41DED1D2DCA084E00F5B1A4 /* Nimble.xcframework in Frameworks */,
-				D41DED1E2DCA085000F5B1A4 /* Quick.xcframework in Frameworks */,
+				D4A5C85030303E0A000534FF /* Nimble in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1277,8 +1259,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */,
-				D41DED1C2DCA084900F5B1A4 /* Quick.xcframework in Frameworks */,
-				D41DED1B2DCA084700F5B1A4 /* Nimble.xcframework in Frameworks */,
+				08F2C4C7FE384269A5BBF982 /* Quick in Frameworks */,
+				6F0BDF1041EA4687A416605D /* Nimble in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1304,9 +1286,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D41DED1A2DCA084200F5B1A4 /* Nimble.xcframework in Frameworks */,
-				D41DED192DCA084100F5B1A4 /* Quick.xcframework in Frameworks */,
 				D4B8E9E62DCDD23C0021262D /* CwlPosixPreconditionTesting in Frameworks */,
+				1118DD28D56941318666F4BF /* Nimble in Frameworks */,
+				BE311AAB241B4744926A5E48 /* Quick in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1339,9 +1321,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D41DED172DCA083800F5B1A4 /* Nimble.xcframework in Frameworks */,
-				D41DED182DCA083B00F5B1A4 /* Quick.xcframework in Frameworks */,
 				D4B8E9E42DCDD2340021262D /* CwlPreconditionTesting in Frameworks */,
+				C830DE0D42154C24BC85F779 /* Nimble in Frameworks */,
+				4DA2D382B2A64A809FF7AC30 /* Quick in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1614,8 +1596,6 @@
 			children = (
 				5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */,
 				5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */,
-				5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */,
-				5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2020,6 +2000,8 @@
 			name = Auth0Tests.iOS;
 			packageProductDependencies = (
 				C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */,
+				D4A5C84F30303E0A000534FF /* Nimble */,
+				D4A5C85130303E0D000534FF /* Quick */,
 			);
 			productName = Auth0Tests.iOS;
 			productReference = 5F06DDA01CC451540011842B /* Auth0Tests.xctest */;
@@ -2046,6 +2028,8 @@
 			name = Auth0Tests.macOS;
 			packageProductDependencies = (
 				C177D6D32C2B0DCB0094C657 /* CwlPreconditionTesting */,
+				E556811CAC75439B9E685D20 /* Quick */,
+				320357F22246490183674AF7 /* Nimble */,
 			);
 			productName = Auth0Tests.OSX;
 			productReference = 5F06DDAF1CC451700011842B /* Auth0Tests.xctest */;
@@ -2110,6 +2094,8 @@
 			name = Auth0Tests.tvOS;
 			packageProductDependencies = (
 				D4B8E9E52DCDD23C0021262D /* CwlPosixPreconditionTesting */,
+				FDC0BF634C814C629C24FDEE /* Quick */,
+				F7D43A01CA9449B3B32DEAA0 /* Nimble */,
 			);
 			productName = Auth0Tests.tvOS;
 			productReference = 5F331AF91D4BB24C00AE4382 /* Auth0Tests.xctest */;
@@ -2199,6 +2185,8 @@
 			name = Auth0Tests.visionOS;
 			packageProductDependencies = (
 				D4B8E9E32DCDD2340021262D /* CwlPreconditionTesting */,
+				C5F5F3AEAC454B56A586D024 /* Quick */,
+				32052A251B7F4E119E59D1AB /* Nimble */,
 			);
 			productName = Auth0Tests.visionOS;
 			productReference = C1B3B9C72C24B39E004A32A4 /* Auth0Tests.xctest */;
@@ -2311,6 +2299,8 @@
 			mainGroup = 5F049B5F1CB42C29006F6C05;
 			packageReferences = (
 				C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */,
+				108B304B59754BEE824D6BF3 /* XCRemoteSwiftPackageReference "Quick" */,
+				C7A50454C5DA49B4974A43AB /* XCRemoteSwiftPackageReference "Nimble" */,
 			);
 			productRefGroup = 5F049B6A1CB42C29006F6C05 /* Products */;
 			projectDirPath = "";
@@ -4650,6 +4640,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		108B304B59754BEE824D6BF3 /* XCRemoteSwiftPackageReference "Quick" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Quick/Quick.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 		C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mattgallagher/CwlPreconditionTesting.git";
@@ -4658,9 +4656,27 @@
 				minimumVersion = 2.2.1;
 			};
 		};
+		C7A50454C5DA49B4974A43AB /* XCRemoteSwiftPackageReference "Nimble" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Quick/Nimble.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		320357F22246490183674AF7 /* Nimble */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7A50454C5DA49B4974A43AB /* XCRemoteSwiftPackageReference "Nimble" */;
+			productName = Nimble;
+		};
+		32052A251B7F4E119E59D1AB /* Nimble */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7A50454C5DA49B4974A43AB /* XCRemoteSwiftPackageReference "Nimble" */;
+			productName = Nimble;
+		};
 		C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
@@ -4671,6 +4687,21 @@
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
 			productName = CwlPreconditionTesting;
 		};
+		C5F5F3AEAC454B56A586D024 /* Quick */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 108B304B59754BEE824D6BF3 /* XCRemoteSwiftPackageReference "Quick" */;
+			productName = Quick;
+		};
+		D4A5C84F30303E0A000534FF /* Nimble */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7A50454C5DA49B4974A43AB /* XCRemoteSwiftPackageReference "Nimble" */;
+			productName = Nimble;
+		};
+		D4A5C85130303E0D000534FF /* Quick */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 108B304B59754BEE824D6BF3 /* XCRemoteSwiftPackageReference "Quick" */;
+			productName = Quick;
+		};
 		D4B8E9E32DCDD2340021262D /* CwlPreconditionTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
@@ -4680,6 +4711,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
 			productName = CwlPosixPreconditionTesting;
+		};
+		E556811CAC75439B9E685D20 /* Quick */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 108B304B59754BEE824D6BF3 /* XCRemoteSwiftPackageReference "Quick" */;
+			productName = Quick;
+		};
+		F7D43A01CA9449B3B32DEAA0 /* Nimble */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7A50454C5DA49B4974A43AB /* XCRemoteSwiftPackageReference "Nimble" */;
+			productName = Nimble;
+		};
+		FDC0BF634C814C629C24FDEE /* Quick */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 108B304B59754BEE824D6BF3 /* XCRemoteSwiftPackageReference "Quick" */;
+			productName = Quick;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
