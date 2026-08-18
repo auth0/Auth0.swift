@@ -39,8 +39,8 @@
 
 ### Requirements
 
-- iOS 14.0+ / macOS 11.0+ / tvOS 14.0+ / watchOS 7.0+ / visionOS 1.0+
-- Xcode 16.x
+- iOS 15.0+ / macOS 12.0+ / tvOS 15.0+ / watchOS 8.0+ / visionOS 1.0+
+- Xcode 26.x
 - Swift 6.0+
 
 > [!IMPORTANT]
@@ -633,7 +633,7 @@ The minimum supported Swift minor version is the one released with the oldest-su
 
 We support only the last four major versions of any platform, including the current major version.
 
-Once a platform version becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release. For example, iOS 14 will cease to be supported when iOS 18 gets released, and Auth0.swift will be able to drop it in a minor release.
+Once a platform version becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release. For example, a given major version of iOS will cease to be supported once the fourth subsequent major version is released, and Auth0.swift will be able to drop it in a minor release.
 
 In the case of macOS, the yearly named releases are considered a major platform version for the purposes of this Policy, regardless of the actual version numbers.
 

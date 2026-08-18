@@ -17,7 +17,7 @@ let testSwiftSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "Auth0",
-    platforms: [.iOS(.v14), .macOS(.v11), .tvOS(.v14), .watchOS(.v7), .visionOS(.v1)],
+    platforms: [.iOS(.v15), .macOS(.v12), .tvOS(.v15), .watchOS(.v8), .visionOS(.v1)],
     products: [.library(name: "Auth0", targets: ["Auth0"])],
     dependencies: [
         .package(url: "https://github.com/auth0/SimpleKeychain.git", exact:"1.3.0"),
