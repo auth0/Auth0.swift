@@ -1,5 +1,11 @@
 # Change Log
 
+## [3.1.0](https://github.com/auth0/Auth0.swift/tree/3.1.0) (2026-08-19)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.2...3.1.0)
+
+**Added**
+- feat: add organization parameter to resetPassword [\#1276](https://github.com/auth0/Auth0.swift/pull/1276) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [3.0.2](https://github.com/auth0/Auth0.swift/tree/3.0.2) (2026-07-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.1...3.0.2)
 
