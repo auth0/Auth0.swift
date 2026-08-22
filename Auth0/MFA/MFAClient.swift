@@ -104,16 +104,33 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
          }
      ```
 
+     ## Usage with OTP authenticator
+
+     ```swift
+     Auth0
+         .mfa()
+         .challenge(with: "otp|dev_authenticator_id", mfaToken: "MFA_TOKEN", challengeType: "otp")
+         .start { result in
+             switch result {
+             case .success(let challenge):
+                 print("Challenge sent: \(challenge)")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
      - Parameters:
        - authenticatorId: The ID of the enrolled authenticator.
        - mfaToken: The MFA token received from an authentication error when MFA is required.
+       - challengeType: The type of challenge to initiate (e.g., "oob" for out-of-band, "otp" for one-time password). Defaults to "oob" for backward compatibility.
      - Returns: A request that will yield an MFA challenge.
 
      ## See Also
 
      - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/request-mfa-challenge)
      */
-    func challenge(with authenticatorId: String, mfaToken: String) -> any Requestable<MFAChallenge, MfaChallengeError>
+    func challenge(with authenticatorId: String, mfaToken: String, challengeType: String?) -> any Requestable<MFAChallenge, MfaChallengeError>
 
     // MARK: - OOB Verification
 
