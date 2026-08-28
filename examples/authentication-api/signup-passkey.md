@@ -126,7 +126,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -145,7 +145,7 @@ do {
                connection: "Username-Password-Authentication",
                scope: "openid profile email offline_access")
         .start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -168,7 +168,7 @@ Auth0
             print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```

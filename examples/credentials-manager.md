@@ -11,6 +11,7 @@
 - [Renew stored credentials](#renew-stored-credentials)
 - [Retrieve stored user information](#retrieve-stored-user-information)
 - [Clear stored credentials](#clear-stored-credentials)
+- [Clear all stored credentials](#clear-all-stored-credentials)
 - [Biometric authentication](#biometric-authentication)
 - [IPSIE session expiry \[EA\]](#ipsie-session-expiry-ea)
 - [Other credentials](#other-credentials)
@@ -105,7 +106,7 @@ See [Get a refresh token](web-auth.md#get-a-refresh-token) to learn how to obtai
 credentialsManager.credentials { result in 
     switch result {
     case .success(let credentials):
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     case .failure(let error):
         print("Failed with: \(error)") 
     }
@@ -118,7 +119,7 @@ credentialsManager.credentials { result in
 ```swift
 do {
     let credentials = try await credentialsManager.credentials()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -136,7 +137,7 @@ credentialsManager
             print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
@@ -197,7 +198,7 @@ See [Get a refresh token](web-auth.md#get-a-refresh-token) to learn how to obtai
 credentialsManager.renew { result in
     switch result {
     case .success(let credentials):
-        print("Renewed credentials: \(credentials)")
+        print("Renewed credentials")
     case .failure(let error):
         print("Failed with: \(error)")
     }
@@ -210,7 +211,7 @@ credentialsManager.renew { result in
 ```swift
 do {
     let credentials = try await credentialsManager.renew()
-    print("Renewed credentials: \(credentials)")
+    print("Renewed credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -228,7 +229,7 @@ credentialsManager
             print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
-        print("Renewed credentials: \(credentials)")
+        print("Renewed credentials")
     })
     .store(in: &cancellables)
 ```
@@ -371,7 +372,7 @@ When `session_expiry` is reached, `credentials()` returns `CredentialsManagerErr
 credentialsManager.credentials { result in
     switch result {
     case .success(let credentials):
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     case .failure(CredentialsManagerError.sessionExpired):
         // Upstream IdP session has ended — send the user back to login
         Auth0.webAuth().start { _ in }
@@ -387,7 +388,7 @@ credentialsManager.credentials { result in
 ```swift
 do {
     let credentials = try await credentialsManager.credentials()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch CredentialsManagerError.sessionExpired {
     // Upstream IdP session has ended — send the user back to login
     let _ = try? await Auth0.webAuth().start()
@@ -439,7 +440,7 @@ credentialsManager.apiCredentials(forAudience: "https://example.com/me",
                                   scope: "create:me:authentication_methods") { result in
     switch result {
     case .success(let apiCredentials):
-        print("Obtained API credentials: \(apiCredentials)")
+        print("Obtained API credentials")
     case .failure(let error):
         print("Failed with: \(error)")
     }
@@ -453,7 +454,7 @@ credentialsManager.apiCredentials(forAudience: "https://example.com/me",
 do {
     let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "https://example.com/me",
                                                                      scope: "create:me:authentication_methods")
-    print("Obtained API credentials: \(apiCredentials)")
+    print("Obtained API credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -472,7 +473,7 @@ credentialsManager
             print("Failed with: \(error)")
         }
     }, receiveValue: { apiCredentials in
-        print("Obtained API credentials: \(apiCredentials)")
+        print("Obtained API credentials")
     })
     .store(in: &cancellables)
 ```
@@ -495,7 +496,7 @@ First, you need to exchange the [refresh token](https://auth0.com/docs/secure/to
 credentialsManager.ssoCredentials { result in
     switch result {
     case .success(let ssoCredentials):
-        print("Obtained SSO credentials: \(ssoCredentials)")
+        print("Obtained SSO credentials")
     case .failure(let error):
         print("Failed with: \(error)")
     }
@@ -508,7 +509,7 @@ credentialsManager.ssoCredentials { result in
 ```swift
 do {
     let ssoCredentials = try await credentialsManager.ssoCredentials()
-    print("Obtained SSO credentials: \(ssoCredentials)")
+    print("Obtained SSO credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -526,7 +527,7 @@ credentialsManager
             print("Failed with: \(error)")
         }
     }, receiveValue: { ssoCredentials in
-        print("Obtained SSO credentials: \(ssoCredentials)")
+        print("Obtained SSO credentials")
     })
     .store(in: &cancellables)
 ```
@@ -539,6 +540,9 @@ See [Get a refresh token](web-auth.md#get-a-refresh-token) to learn how to obtai
 
 Then, when opening your website on any browser or web view, add the session transfer token to the URL as a query parameter.
 For example, `https://example.com/login?session_transfer_token=THE_TOKEN`.
+
+> [!CAUTION]
+> A token in the query string can leak through browser history, server and proxy logs, analytics, and `Referer` headers. Send it only over HTTPS to a trusted target, redeem it immediately, and redirect to a clean URL afterwards. Prefer the cookie approach below when you can.
 
 If you're using `WKWebView` to open your website, you can place the session transfer token inside a cookie instead. It will be automatically sent to the `/authorize` endpoint.
 
@@ -566,7 +570,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 credentialsManager.credentials { result in
     switch result {
     case .success(let credentials):
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     case .failure(let error):
         switch error {
         case CredentialsManagerError.noCredentials:
@@ -640,7 +644,7 @@ When using DPoP with the Credentials Manager, additional validation is performed
 credentialsManager.credentials { result in
     switch result {
     case .success(let credentials):
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     case .failure(let error):
         switch error {
         case .dpopNotConfigured:

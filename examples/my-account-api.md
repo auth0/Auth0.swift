@@ -584,7 +584,7 @@ Enrolling a new push notification authentication method is a two-step process. F
 #### Prerequisites
 
 - Enable the MFA grant type for your application. Go to Auth0 Dashboard > Applications > Advanced Settings > Grant Types and select MFA.
-- Enable the Email factor. Go to Auth0 Dashboard > Security > Multi-factor Auth > Push Notification using Auth0 Guardian.
+- Enable the Push Notification factor. Go to Auth0 Dashboard > Security > Multi-factor Auth > Push Notification using Auth0 Guardian.
 - The iOS **Device Settings** configured for your Auth0 application.
 
 #### 1. Request an enrollment challenge
@@ -643,7 +643,7 @@ Auth0
 
 #### 2. Enroll the push notification authentication method
 
-To confirm the enrollment, the end user will need to scan a QR code with the barcode_uri from enrollment challenge in the Guardian application, within the next 5 minutes and invoke confirmPushNotificatonEnrollment method.
+To confirm the enrollment, the end user will need to scan a QR code with the barcode_uri from enrollment challenge in the Guardian application, within the next 5 minutes and invoke confirmPushNotificationEnrollment method.
 
 ```swift
 Auth0

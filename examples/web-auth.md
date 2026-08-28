@@ -30,7 +30,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -49,11 +49,12 @@ do {
         .webAuth()
         .parameters(["screen_hint": "signup"])
         .start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
 ```
+
 </details>
 
 <details>
@@ -69,10 +70,11 @@ Auth0
             print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
+
 </details>
 
 ### Web Auth configuration
@@ -385,7 +387,7 @@ Auth0
 
 > [!TIP]
 > See [`ASWebAuthenticationSession` vs `SFSafariViewController` (iOS)](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents) to help determine which option best suits your use case, depending on your requirements.
-
+<!-- -->
 > [!NOTE]
 > `SFSafariViewController` does not support using Universal Links as callback URLs.
 
@@ -413,6 +415,7 @@ func application(_ app: UIApplication,
     return WebAuthentication.resume(with: url)
 }
 ```
+
 </details>
 
 <details>
@@ -426,6 +429,7 @@ func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>)
     WebAuthentication.resume(with: url)
 }
 ```
+
 </details>
 
 <details>
@@ -437,6 +441,7 @@ SomeView()
         WebAuthentication.resume(with: url)
     }
 ```
+
 </details>
 
 ##### Logout
@@ -472,7 +477,7 @@ Auth0
 
 > [!NOTE]
 > To use Universal Login's biometrics and passkeys with `WKWebView`, you must [set up an associated domain](https://github.com/auth0/Auth0.swift#configure-an-associated-domain).
-
+<!-- -->
 > [!WARNING]
 > The use of `WKWebView` for performing web-based authentication [is not recommended](https://auth0.com/blog/oauth-2-best-practices-for-native-apps), and some social identity providers –such as Google– do not support it.
 
@@ -530,7 +535,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -608,7 +613,7 @@ try await Auth0
 
 > [!IMPORTANT]
 > Call `useCredentialsManager(_:)` on **both** your `start()` and `logout()` call chains. Omitting it on `logout()` will succeed but credentials will **not** be cleared automatically. Do not manually call `store(credentials:)` after login or `clear()` after logout on the same instance — doing so can lead to race conditions or inconsistent state.
-
+<!-- -->
 > [!NOTE]
 > If the credentials manager fails to store or clear credentials, a `WebAuthError.credentialsManagerError` will be thrown. The underlying error can be accessed via the `cause` property.
 
@@ -627,7 +632,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
             
         case .failure(let error):
             switch error {
@@ -665,7 +670,7 @@ Auth0
 ```swift
 do {
     let credentials = try await Auth0.webAuth().start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch let error as WebAuthError {
     switch error {
     case .userCancelled:
@@ -687,6 +692,7 @@ do {
     print("Unexpected error: \(error)")
 }
 ```
+
 </details>
 
 <details>
@@ -716,10 +722,11 @@ Auth0
             }
         }
     }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
+
 </details>
 
 [Go up ⤴](../EXAMPLES.md#examples)

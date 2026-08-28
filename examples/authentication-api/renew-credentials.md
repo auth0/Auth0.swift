@@ -11,7 +11,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained new credentials: \(credentials)")
+            print("Obtained new credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -27,7 +27,7 @@ do {
         .authentication()
         .renew(withRefreshToken: credentials.refreshToken)
         .start()
-    print("Obtained new credentials: \(credentials)")
+    print("Obtained new credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -47,7 +47,7 @@ Auth0
             print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
-        print("Obtained new credentials: \(credentials)")
+        print("Obtained new credentials")
     })
     .store(in: &cancellables)
 ```

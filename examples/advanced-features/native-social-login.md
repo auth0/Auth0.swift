@@ -11,7 +11,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -27,7 +27,7 @@ do {
         .authentication()
         .login(appleAuthorizationCode: "auth-code")
         .start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -47,7 +47,7 @@ Auth0
             print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
@@ -68,7 +68,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -85,7 +85,7 @@ do {
         .login(facebookSessionAccessToken: "session-info-access-token",
                profile: ["key": "value"])
         .start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -106,7 +106,7 @@ Auth0
             print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```

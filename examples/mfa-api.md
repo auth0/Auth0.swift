@@ -2,6 +2,7 @@
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/mfaclient)**
 
+- [Prerequisites](#prerequisites)
 - [Handling MFA required errors](#handling-mfa-required-errors)
 - [Get available authenticators](#get-available-authenticators)
 - [Enroll MFA factors](#enroll-mfa-factors)
@@ -51,12 +52,12 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error) where error.isMultifactorRequired:
             // MFA is required
             if let mfaPayload = error.mfaRequiredErrorPayload {
                 let mfaToken = mfaPayload.mfaToken
-                print("MFA token: \(mfaToken)")
+                print("Received MFA token")
 
                 // Check if enrollment is required
                 if let enrollTypes = mfaPayload.mfaRequirements.enroll {
@@ -92,12 +93,12 @@ do {
                realmOrConnection: "Username-Password-Authentication",
                scope: "openid profile email")
         .start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch let error as AuthenticationError where error.isMultifactorRequired {
     // MFA is required
     if let mfaPayload = error.mfaRequiredErrorPayload {
         let mfaToken = mfaPayload.mfaToken
-        print("MFA token: \(mfaToken)")
+        print("Received MFA token")
 
         // Check if enrollment is required
         if let enrollTypes = mfaPayload.mfaRequirements.enroll {
@@ -135,7 +136,7 @@ Auth0
            error.isMultifactorRequired,
            let mfaPayload = error.mfaRequiredErrorPayload {
             let mfaToken = mfaPayload.mfaToken
-            print("MFA token: \(mfaToken)")
+            print("Received MFA token")
 
             if let enrollTypes = mfaPayload.mfaRequirements.enroll {
                 print("User needs to enroll MFA")
@@ -150,7 +151,7 @@ Auth0
             }
         }
     }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
@@ -159,6 +160,9 @@ Auth0
 ### Get available authenticators
 
 After receiving an MFA token, you can retrieve the list of available authenticators that the user has already enrolled. Use the factors from the `challenge` field of the MFA required error payload to filter the authenticators.
+
+> [!NOTE]
+> If the `challenge` list is empty the user has no enrolled factors, so direct them to [enrollment](#enroll-mfa-factors) instead. Calling `getAuthenticators` with an empty `factorsAllowed` fails with `invalid_request`.
 
 ```swift
 // Extract factors from the challenge field of MFA required error payload
@@ -243,7 +247,7 @@ Auth0
         switch result {
         case .success(let challenge):
             print("SMS enrollment initiated")
-            print("OOB Code: \(challenge.oobCode)")
+            print("Received OOB challenge")
             // Now prompt user for the code they received via SMS
         case .failure(let error):
             print("Failed with: \(error)")
@@ -261,7 +265,7 @@ do {
         .enroll(mfaToken: mfaToken, phoneNumber: "+12025550135")
         .start()
     print("SMS enrollment initiated")
-    print("OOB Code: \(challenge.oobCode)")
+    print("Received OOB challenge")
 } catch {
     print("Failed with: \(error)")
 }
@@ -282,7 +286,7 @@ Auth0
         }
     }, receiveValue: { challenge in
         print("SMS enrollment initiated")
-        print("OOB Code: \(challenge.oobCode)")
+        print("Received OOB challenge")
     })
     .store(in: &cancellables)
 ```
@@ -300,7 +304,7 @@ Auth0
         switch result {
         case .success(let challenge):
             print("Email enrollment initiated")
-            print("OOB Code: \(challenge.oobCode)")
+            print("Received OOB challenge")
             // Now prompt user for the code they received via email
         case .failure(let error):
             print("Failed with: \(error)")
@@ -318,7 +322,7 @@ do {
         .enroll(mfaToken: mfaToken, email: "user@example.com")
         .start()
     print("Email enrollment initiated")
-    print("OOB Code: \(challenge.oobCode)")
+    print("Received OOB challenge")
 } catch {
     print("Failed with: \(error)")
 }
@@ -339,7 +343,7 @@ Auth0
         }
     }, receiveValue: { challenge in
         print("Email enrollment initiated")
-        print("OOB Code: \(challenge.oobCode)")
+        print("Received OOB challenge")
     })
     .store(in: &cancellables)
 ```
@@ -362,7 +366,7 @@ Auth0
                 // Display this as a QR code for the user to scan
             }
             if let secret = challenge.secret {
-                print("Secret: \(secret)")
+                print("TOTP secret generated")
                 // User can manually enter this into their authenticator app
             }
             // After user scans QR code and sets up authenticator app,
@@ -387,7 +391,7 @@ do {
         print("QR Code URI: \(barcodeUri)")
     }
     if let secret = challenge.secret {
-        print("Secret: \(secret)")
+        print("TOTP secret generated")
     }
 } catch {
     print("Failed with: \(error)")
@@ -413,7 +417,7 @@ Auth0
             print("QR Code URI: \(barcodeUri)")
         }
         if let secret = challenge.secret {
-            print("Secret: \(secret)")
+            print("TOTP secret generated")
         }
     })
     .store(in: &cancellables)
@@ -497,7 +501,7 @@ Auth0
             print("Challenge sent")
             print("Challenge type: \(challenge.challengeType)")
             if let oobCode = challenge.oobCode {
-                print("OOB Code: \(oobCode)")
+                print("Received OOB challenge")
             }
             // Now prompt user for the verification code they received
         case .failure(let error):
@@ -518,7 +522,7 @@ do {
     print("Challenge sent")
     print("Challenge type: \(challenge.challengeType)")
     if let oobCode = challenge.oobCode {
-        print("OOB Code: \(oobCode)")
+        print("Received OOB challenge")
     }
 } catch {
     print("Failed with: \(error)")
@@ -542,7 +546,7 @@ Auth0
         print("Challenge sent")
         print("Challenge type: \(challenge.challengeType)")
         if let oobCode = challenge.oobCode {
-            print("OOB Code: \(oobCode)")
+            print("Received OOB challenge")
         }
     })
     .store(in: &cancellables)
@@ -565,7 +569,7 @@ Auth0
         switch result {
         case .success(let credentials):
             print("MFA verification successful!")
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -582,7 +586,7 @@ Auth0
         switch result {
         case .success(let credentials):
             print("MFA verification successful!")
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -599,7 +603,7 @@ do {
         .verify(oobCode: "123456", bindingCode: nil, mfaToken: mfaToken)
         .start()
     print("MFA verification successful!")
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -620,7 +624,7 @@ Auth0
         }
     }, receiveValue: { credentials in
         print("MFA verification successful!")
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
@@ -638,7 +642,7 @@ Auth0
         switch result {
         case .success(let credentials):
             print("MFA verification successful!")
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -655,7 +659,7 @@ do {
         .verify(otp: "123456", mfaToken: mfaToken)
         .start()
     print("MFA verification successful!")
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -676,7 +680,7 @@ Auth0
         }
     }, receiveValue: { credentials in
         print("MFA verification successful!")
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
@@ -694,7 +698,7 @@ Auth0
         switch result {
         case .success(let credentials):
             print("MFA verification successful!")
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -711,7 +715,7 @@ do {
         .verify(recoveryCode: "RECOVERY_CODE_123", mfaToken: mfaToken)
         .start()
     print("MFA verification successful!")
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -732,7 +736,7 @@ Auth0
         }
     }, receiveValue: { credentials in
         print("MFA verification successful!")
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
@@ -750,7 +754,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Login successful: \(credentials)")
+            print("Login successful")
 
         case .failure(let error) where error.isMultifactorRequired:
             guard let mfaToken = error.mfaRequiredErrorPayload?.mfaToken else { return }
@@ -762,7 +766,7 @@ Auth0
                 .start { enrollResult in
                     switch enrollResult {
                     case .success(let challenge):
-                        print("SMS sent with OOB code: \(challenge.oobCode)")
+                        print("SMS challenge sent")
 
                         // Step 3: User enters the code they received via SMS
                         let userEnteredCode = "123456" // Get this from user input
@@ -801,7 +805,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Login successful: \(credentials)")
+            print("Login successful")
 
         case .failure(let error) where error.isMultifactorRequired:
             guard let mfaToken = error.mfaRequiredErrorPayload?.mfaToken else { return }
@@ -819,7 +823,7 @@ Auth0
                             // Generate and display QR code from this URI
                         }
                         if let secret = challenge.secret {
-                            print("Or manual entry code: \(secret)")
+                            print("Manual entry code generated")
                         }
 
                         // Step 4: User scans QR code and enters OTP from their app
@@ -859,7 +863,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Login successful: \(credentials)")
+            print("Login successful")
 
         case .failure(let error) where error.isMultifactorRequired:
             guard let mfaPayload = error.mfaRequiredErrorPayload else { return }

@@ -49,7 +49,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -72,7 +72,7 @@ do {
         .authentication()
         .login(otp: userEnteredOTP, challenge: challenge)
         .start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }

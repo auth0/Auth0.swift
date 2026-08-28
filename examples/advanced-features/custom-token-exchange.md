@@ -22,7 +22,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -42,7 +42,7 @@ do {
                             scope: "openid profile email",
                             organization: "org_id")
         .start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -66,7 +66,7 @@ Auth0
             print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
@@ -90,7 +90,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
+            print("Obtained credentials")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -111,7 +111,7 @@ do {
                              subjectTokenType: "urn:ietf:params:oauth:token-type:id_token",
                              actorToken: actor)
         .start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained credentials")
 } catch {
     print("Failed with: \(error)")
 }
@@ -136,7 +136,7 @@ Auth0
             print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
+        print("Obtained credentials")
     })
     .store(in: &cancellables)
 ```
