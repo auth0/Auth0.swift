@@ -17,8 +17,8 @@
 | `Auth0.plist` keys or SDK initialisation options change | `README.md` — Configure the SDK section |
 | Callback / logout URL setup changes | `README.md` — Configure Web Auth section |
 | New integration pattern supported (e.g., new grant type, new provider, new EA feature) | `examples/` — add a new file with a runnable example and link it from `EXAMPLES.md` |
-| DPoP behaviour changes (key generation, nonce handling, logout) | `examples/web-auth/dpop.md` and `examples/authentication-api/dpop.md` |
-| My Account API methods added, removed, or promoted from EA to GA | `examples/my-account-api/` — update EA callout if promoted |
-| Biometric auth options or `CredentialsManager` init signature changes | `examples/credentials-manager/biometric-authentication.md` |
+| DPoP behaviour changes (key generation, nonce handling, logout) | `examples/web-auth.md` (DPoP [EA]) and `examples/authentication-api/dpop.md` |
+| My Account API methods added, removed, or promoted from EA to GA | `examples/my-account-api.md` — update EA callout if promoted |
+| Biometric auth options or `CredentialsManager` init signature changes | `examples/credentials-manager.md` (Biometric authentication) |
 
 > When you touch code that maps to a doc above, update that doc **in the same PR** — do not defer.

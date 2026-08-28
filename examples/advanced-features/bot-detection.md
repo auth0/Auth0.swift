@@ -30,7 +30,7 @@ Auth0
     }
 ```
 
-In the case of signup, you can add an [additional parameter](../web-auth/signup.md#web-auth-signup) to make the user land directly on the signup page.
+In the case of signup, you can add an [additional parameter](../web-auth.md#web-auth-signup) to make the user land directly on the signup page.
 
 ```swift
 Auth0
@@ -39,6 +39,6 @@ Auth0
     // ...
 ```
 
-Check how to set up Web Auth in the [Web Auth Configuration](../web-auth/configuration.md#web-auth-configuration) section.
+Check how to set up Web Auth in the [Web Auth Configuration](../web-auth.md#web-auth-configuration) section.
 
 ---

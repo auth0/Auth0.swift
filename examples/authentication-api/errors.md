@@ -12,4 +12,4 @@ Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/
 > [!WARNING]
 > Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the [error types](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror/#topics) instead, which are part of the API.
 
-[Go up ⤴](../../EXAMPLES.md)
+[Go up ⤴](../../EXAMPLES.md#examples)

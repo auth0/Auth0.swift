@@ -2,7 +2,7 @@
 
 Use a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) to renew the user's credentials. It is recommended that you read and understand the refresh token process beforehand.
 
-See [Get a refresh token](../web-auth/configuration.md#get-a-refresh-token) to learn how to obtain a refresh token.
+See [Get a refresh token](../web-auth.md#get-a-refresh-token) to learn how to obtain a refresh token.
 
 ```swift
 Auth0

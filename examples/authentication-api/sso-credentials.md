@@ -55,7 +55,7 @@ Auth0
 ```
 </details>
 
-See [Get a refresh token](../web-auth/configuration.md#get-a-refresh-token) to learn how to obtain a refresh token.
+See [Get a refresh token](../web-auth.md#get-a-refresh-token) to learn how to obtain a refresh token.
 
 > [!IMPORTANT]
 > You don't need to store the SSO credentials. The session transfer token is single-use and short-lived. However, if you're using [refresh token rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation), you will get a new refresh token with the SSO credentials. You should store the new refresh token, replacing the previous one that is now invalid.
