@@ -57,7 +57,7 @@ Auth0.swift/
 - Follow the existing error hierarchy — use or extend typed error structs (`AuthenticationError`, `WebAuthError`, etc.).
 - Run `swiftlint lint` and resolve all warnings before submitting.
 - Use `StubURLProtocol` / `NetworkStub` for all network interactions in tests.
-- Update `README.md` and the relevant file under `examples/` in the same PR when changing the public API, configuration options, or supported integration patterns.
+- Update `README.md` and the relevant files under `examples/` in the same PR when changing the public API, configuration options, or supported integration patterns; for a new integration pattern, also link the new example from the `EXAMPLES.md` index.
 - When adding a **new outbound request path to Auth0**, route it through the existing `Auth0/Auth0ClientInfo.swift` mechanism so it carries the `Auth0-Client` header — don't hand-roll a separate client — and preserve the `tracking(enabled:)` opt-out.
 
 ### ⚠️ Ask First

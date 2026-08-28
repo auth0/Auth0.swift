@@ -37,7 +37,7 @@ Auth0
     }
 ```
 
-You might want to log the user in after signup. See [Log in with database connection](login-database.md#log-in-with-database-connection) above for an example.
+You might want to log the user in after signup. See [Log in with database connection](login-database.md#log-in-with-database-connection) for an example.
 
 <details>
   <summary>Using async/await</summary>

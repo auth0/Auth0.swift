@@ -7,6 +7,7 @@ Signing a user up with a passkey is a three-step process. First, you request a s
 
 #### Prerequisites
 
+- A deployment target of iOS 16.6+, macOS 13.5+, or visionOS 1.0+ (the passkey APIs are unavailable on older versions).
 - A custom domain configured for your Auth0 tenant.
 - The **Passkeys** grant to be enabled for your Auth0 application.
 - The iOS **Device Settings** configured for your Auth0 application.
