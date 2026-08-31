@@ -277,7 +277,7 @@ Auth0
 
 Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your app.
 
-Call the `logout()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](EXAMPLES.md#clear-stored-credentials).
+Call the `logout()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](examples/credentials-manager.md#clear-stored-credentials).
 
 ```swift
 Auth0
@@ -406,7 +406,7 @@ credentialsManager.credentials { result in
 }
 ```
 
-For a full guide including configuration steps and reading the raw claim value, see the [IPSIE session expiry section in EXAMPLES.md](EXAMPLES.md#ipsie-session-expiry-ea).
+For a full guide including configuration steps and reading the raw claim value, see the [IPSIE session expiry examples](examples/credentials-manager.md#ipsie-session-expiry-ea).
 
 ### Clear stored credentials
 
@@ -479,7 +479,7 @@ do {
 Implement multi-factor authentication (MFA) flows using the MFA API. This includes enrolling MFA factors, challenging enrolled factors, and verifying MFA codes.
 
 > [!NOTE]
-> For complete MFA implementation examples including SMS, email, OTP, and push notifications, see the [**MFA section in EXAMPLES.md**](EXAMPLES.md#mfa-api-ios--macos--tvos--watchos--visionos).
+> For complete MFA implementation examples including SMS, email, OTP, and push notifications, see the [**MFA examples**](examples/mfa-api.md).
 
 #### Handle MFA required errors
 
