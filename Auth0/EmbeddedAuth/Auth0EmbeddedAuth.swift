@@ -45,72 +45,71 @@ private func decodeDiscoveryResult(
     case .failure(let error):
         callback(.failure(error))
     case .success(let response):
-        guard let data = response.data,
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let rawAlternatives = json["alternatives"] as? [[String: Any]] else {
+        guard let data = response.data else {
             callback(.failure(EmbeddedAuthError(from: response)))
             return
         }
-        let options = rawAlternatives.map(LoginOption.init(from:))
-        callback(.success(DiscoveryResult(options: options)))
+        do {
+            let decoded = try JSONDecoder().decode(DiscoveryResponse.self, from: data)
+            callback(.success(DiscoveryResult(options: decoded.alternatives.map(\.loginOption))))
+        } catch {
+            callback(.failure(EmbeddedAuthError(from: response)))
+        }
     }
 }
 
-// MARK: - LoginOption decoding
+// MARK: - Wire types (Decodable)
 
-private extension LoginOption {
+private struct DiscoveryResponse: Decodable {
+    let alternatives: [DiscoveryAlternativePayload]
+}
 
-    init(from dict: [String: Any]) {
-        let grantType = dict["grant_type"] as? String ?? ""
-        let connection = dict["connection"] as? String
+private struct DiscoveryAlternativePayload: Decodable {
 
+    let grantType: String
+    let connection: String?
+    let type: String?
+    let subjectTokenType: String?
+    let identifierTypes: [String]?
+    let realm: String?
+
+    enum CodingKeys: String, CodingKey {
+        case grantType = "grant_type"
+        case connection
+        case type
+        case subjectTokenType = "subject_token_type"
+        case identifierTypes = "identifier_types"
+        case realm
+    }
+
+    var loginOption: LoginOption {
         switch grantType {
         case "authorization_code":
-            self = LoginOption.embeddedAuthorize(from: dict, grantType: grantType)
+            guard let conn = connection else { return .unknown(rawGrantType: grantType, connection: nil) }
+            return .embeddedAuthorize(connection: conn)
         case "urn:ietf:params:oauth:grant-type:token-exchange":
-            let stt = dict["subject_token_type"] as? String ?? ""
-            self = .nativeSocial(subjectTokenType: stt)
+            return .nativeSocial(subjectTokenType: subjectTokenType ?? "")
         case "password":
-            self = .password
+            return .password
         case "urn:okta:params:oauth:grant-type:webauthn":
-            self = LoginOption.passkey(from: dict, grantType: grantType)
+            guard let conn = connection else { return .unknown(rawGrantType: grantType, connection: nil) }
+            return .passkey(connection: conn)
         case "http://auth0.com/oauth/grant-type/passwordless/otp":
-            self = LoginOption.passwordlessOtp(from: dict)
-        case "http://auth0.com/oauth/grant-type/password-realm":
-            let realm = dict["realm"] as? String ?? ""
-            self = .passwordRealm(realm: realm)
-        default:
-            self = .unknown(rawGrantType: grantType, connection: connection)
-        }
-    }
-
-    private static func embeddedAuthorize(from dict: [String: Any], grantType: String) -> LoginOption {
-        guard let conn = dict["connection"] as? String else {
-            return .unknown(rawGrantType: grantType, connection: nil)
-        }
-        return .embeddedAuthorize(connection: conn)
-    }
-
-    private static func passkey(from dict: [String: Any], grantType: String) -> LoginOption {
-        guard let conn = dict["connection"] as? String else {
-            return .unknown(rawGrantType: grantType, connection: nil)
-        }
-        return .passkey(connection: conn)
-    }
-
-    private static func passwordlessOtp(from dict: [String: Any]) -> LoginOption {
-        let identifierStrings = dict["identifier_types"] as? [String] ?? []
-        let identifiers: [PasswordlessIdentifier] = identifierStrings.compactMap {
-            switch $0 {
-            case "email":        return .email
-            case "phone_number": return .phoneNumber
-            default:             return nil
+            let identifiers: [PasswordlessIdentifier] = (identifierTypes ?? []).compactMap {
+                switch $0 {
+                case "email":        return .email
+                case "phone_number": return .phoneNumber
+                default:             return nil
+                }
             }
+            return .passwordlessOtp(connection: connection ?? "",
+                                    identifiers: identifiers,
+                                    type: type == "auth0" ? .auth0 : .legacy)
+        case "http://auth0.com/oauth/grant-type/password-realm":
+            return .passwordRealm(realm: realm ?? "")
+        default:
+            return .unknown(rawGrantType: grantType, connection: connection)
         }
-        let rawType = dict["type"] as? String ?? ""
-        let flowType: OTPFlowType = rawType == "auth0" ? .auth0 : .legacy
-        let conn = dict["connection"] as? String ?? ""
-        return .passwordlessOtp(connection: conn, identifiers: identifiers, type: flowType)
     }
 
 }
