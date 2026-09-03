@@ -523,7 +523,7 @@ Auth0
     .start { result in ... }
 ```
 
-### DPoP [EA]
+### DPoP
 
 [DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Possession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method.
 
