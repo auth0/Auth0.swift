@@ -7,7 +7,7 @@ Each feature lives in its own file under [`examples/`](examples).
 - [Web Auth signup](examples/web-auth.md#web-auth-signup)
 - [Web Auth configuration](examples/web-auth.md#web-auth-configuration)
 - [ID token validation](examples/web-auth.md#id-token-validation)
-- [DPoP [EA]](examples/web-auth.md#dpop-ea)
+- [DPoP](examples/web-auth.md#dpop)
 - [Automatic credentials management](examples/web-auth.md#automatic-credentials-management)
 - [Web Auth errors](examples/web-auth.md#web-auth-errors)
 
@@ -30,8 +30,8 @@ Each feature lives in its own file under [`examples/`](examples).
 - [Log in with database connection](examples/authentication-api/login-database.md)
 - [Sign up with database connection](examples/authentication-api/signup-database.md)
 - [Reset a password](examples/authentication-api/reset-password.md)
-- [Log in with passkey [EA]](examples/authentication-api/login-passkey.md)
-- [Sign up with passkey [EA]](examples/authentication-api/signup-passkey.md)
+- [Log in with passkey](examples/authentication-api/login-passkey.md)
+- [Sign up with passkey](examples/authentication-api/signup-passkey.md)
 - [Passwordless login](examples/authentication-api/passwordless.md)
 - [Passwordless login with a database connection [EA]](examples/authentication-api/passwordless-database.md)
 - [Retrieve user information](examples/authentication-api/user-information.md)
@@ -53,7 +53,7 @@ Each feature lives in its own file under [`examples/`](examples).
 - [MFA client configuration](examples/mfa-api.md#mfa-client-configuration)
 - [MFA client errors](examples/mfa-api.md#mfa-client-errors)
 
-## [My Account API (iOS / macOS / tvOS / watchOS / visionOS) [EA]](examples/my-account-api.md)
+## [My Account API (iOS / macOS / tvOS / watchOS / visionOS)](examples/my-account-api.md)
 
 - [Enroll a new passkey](examples/my-account-api.md#enroll-a-new-passkey)
 - [Enroll a new email authentication method](examples/my-account-api.md#enroll-a-new-email-authentication-method)

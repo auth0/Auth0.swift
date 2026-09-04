@@ -1,4 +1,4 @@
-## My Account API (iOS / macOS / tvOS / watchOS / visionOS) [EA]
+## My Account API (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/myaccount)**
 
@@ -15,12 +15,9 @@
 - [Delete an authentication method](#delete-an-authentication-method)
 - [My Account API client errors](#my-account-api-client-errors)
 
-> [!NOTE]
-> The My Account API is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
-
 Use the Auth0 My Account API to manage the current user's account.
 
-To call the My Account API, you need an access token issued specifically for this API, including any required scopes for the operations you want to perform. See [API credentials [EA]](credentials-manager.md#api-credentials-ea) to learn how to obtain one.
+To call the My Account API, you need an access token issued specifically for this API, including any required scopes for the operations you want to perform. See [API credentials](credentials-manager.md#api-credentials) to learn how to obtain one.
 
 ### Enroll a new passkey
 

@@ -11,12 +11,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// You can specify an optional user identity identifier and an optional database connection name. If a
     /// connection name is not specified, your tenant's default directory will be used.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Scopes Required
     ///
     /// `create:me:authentication_methods`
@@ -77,12 +71,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
                                     connection: String?) -> any Requestable<PasskeyEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new passkey credential. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Scopes Required
     ///
@@ -192,12 +180,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
     /// Requests a challenge for enrolling a recovery code authentication method. This is the first part of the enrollment flow.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Scopes Required
     ///
     /// `create:me:authentication_methods`
@@ -223,12 +205,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func enrollRecoveryCode() -> any Requestable<RecoveryCodeEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new Recovery code credential. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Scopes Required
     ///
@@ -260,12 +236,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
     /// Requests a challenge for enrolling a TOTP authentication method. This is the first part of the enrollment flow.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Scopes Required
     ///
     /// `create:me:authentication_methods`
@@ -291,12 +261,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func enrollTOTP() -> any Requestable<TOTPEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new ToTP authentication method. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Scopes Required
     ///
@@ -330,12 +294,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
     /// Requests a challenge for enrolling a push notification authentication method. This is the first part of the enrollment flow.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Scopes Required
     ///
     /// `create:me:authentication_methods`
@@ -361,12 +319,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func enrollPushNotification() -> any Requestable<PushEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new Push Notification authentication method. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Scopes Required
     ///
@@ -399,12 +351,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
     /// Requests a challenge for enrolling a Email authentication method. This is the first part of the enrollment flow.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Scopes Required
     ///
     /// `create:me:authentication_methods`
@@ -432,12 +378,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func enrollEmail(emailAddress: String) -> any Requestable<EmailEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new Email authentication method. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Scopes Required
     ///
@@ -471,12 +411,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
     /// Requests a challenge for enrolling a Phone authentication method. This is the first part of the enrollment flow.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Scopes Required
     ///
     /// `create:me:authentication_methods`
@@ -506,12 +440,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
                      preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> any Requestable<PhoneEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new Phone authentication method. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Scopes Required
     ///
@@ -545,12 +473,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
     /// Delete an authentication method associated with an id
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Scopes Required
     ///
     /// `delete:me:authentication_methods`
@@ -578,12 +500,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func deleteAuthenticationMethod(by id: String) -> any Requestable<Void, MyAccountError>
 
     /// Fetch details of an authentication method associated with an id
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Scopes Required
     ///
@@ -613,12 +529,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
     /// Retrieve detailed list of authentication methods belonging to the authenticated user.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Scopes Required
     ///
     /// `read:me:authentication_methods`
@@ -645,12 +555,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func getAuthenticationMethods(type: AuthenticationMethodType?) -> any Requestable<[AuthenticationMethod], MyAccountError>
 
     /// Update an authentication method associated with an id.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Scopes Required
     ///
@@ -683,12 +587,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
                                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> any Requestable<AuthenticationMethod, MyAccountError>
 
     /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Scopes Required
     ///

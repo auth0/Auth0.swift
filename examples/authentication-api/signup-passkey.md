@@ -1,7 +1,4 @@
-### Sign up with passkey [EA]
-
-> [!NOTE]
-> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+### Sign up with passkey
 
 Signing a user up with a passkey is a three-step process. First, you request a signup challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a **new passkey credential**. Finally, you use the created passkey credential and the original challenge to log the new user in.
 

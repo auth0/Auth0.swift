@@ -380,12 +380,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     #if PASSKEYS_PLATFORM
     /// Logs a user in using an existing passkey credential and the login challenge. This is the last part of the passkey login flow.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Usage
     ///
     /// ```swift
@@ -442,12 +436,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
     /// Requests a challenge for logging a user in with an existing passkey. This is the first part of the passkey login flow.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Usage
     ///
     /// ```swift
@@ -503,12 +491,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                                organization: String?) -> any Requestable<PasskeyLoginChallenge, AuthenticationError>
 
     /// Logs a new user in using a signup passkey credential and the signup challenge. This is the last part of the passkey signup flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Usage
     ///
@@ -573,12 +555,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// By default, database connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers)
     /// for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These user
     /// identifiers can be required or optional and must match your Flexible Identifiers configuration.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Usage
     ///
