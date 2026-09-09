@@ -531,6 +531,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
     ///   - organization: Identifier of an organization the user is a member of.
+    ///   - verification: OTP codes required to verify ownership of identifiers returned in ``PasskeySignupChallenge/verificationRequired``. For example, `["email": "123456", "phone": "654321"]`. Pass only the keys that are applicable.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -544,7 +545,8 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> any TokenRequestable<Credentials, AuthenticationError>
+               organization: String?,
+               verification: [String: String]?) -> any TokenRequestable<Credentials, AuthenticationError>
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
@@ -1232,13 +1234,15 @@ public extension Authentication {
                connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope,
-               organization: String? = nil) -> any TokenRequestable<Credentials, AuthenticationError> {
+               organization: String? = nil,
+               verification: [String: String]? = nil) -> any TokenRequestable<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
                           audience: audience,
                           scope: scope,
-                          organization: organization)
+                          organization: organization,
+                          verification: verification)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)

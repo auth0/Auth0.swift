@@ -19,6 +19,9 @@ public struct PasskeySignupChallenge: Sendable {
     /// Signup challenge data.
     public let challengeData: Data
 
+    /// Verification methods required before the passkey can be used, if any (e.g. `["email"]`).
+    public let verificationRequired: [String]?
+
     /// Creates a new ``PasskeySignupChallenge`` instance.
     ///
     /// - Parameters:
@@ -27,16 +30,19 @@ public struct PasskeySignupChallenge: Sendable {
     ///   - userId: Generated unique identifier of the user.
     ///   - userName: A user identifier, like the user's email.
     ///   - challengeData: Signup challenge data.
+    ///   - verificationRequired: Verification methods required before the passkey can be used, if any.
     public init(authenticationSession: String,
                 relyingPartyId: String,
                 userId: Data,
                 userName: String,
-                challengeData: Data) {
+                challengeData: Data,
+                verificationRequired: [String]? = nil) {
         self.authenticationSession = authenticationSession
         self.relyingPartyId = relyingPartyId
         self.userId = userId
         self.userName = userName
         self.challengeData = challengeData
+        self.verificationRequired = verificationRequired
     }
 
 }
@@ -46,6 +52,7 @@ extension PasskeySignupChallenge: Decodable {
     enum CodingKeys: String, CodingKey {
         case authenticationSession = "auth_session"
         case credentialCreationOptions = "authn_params_public_key"
+        case verificationRequired = "verification_required"
     }
 
     /// `Decodable` initializer.
@@ -59,7 +66,7 @@ extension PasskeySignupChallenge: Decodable {
         userId = credentialOptions.user.id
         userName = credentialOptions.user.name
         challengeData = credentialOptions.challengeData
-
+        verificationRequired = try values.decodeIfPresent([String].self, forKey: .verificationRequired)
     }
 
 }

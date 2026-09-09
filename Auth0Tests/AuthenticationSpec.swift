@@ -341,6 +341,37 @@ class AuthenticationSpec: QuickSpec {
 
                 }
 
+                it("should login with signup passkey and verification codes") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession,
+                            "verification": ["email": "123456", "phone": "654321"],
+                            "authn_response": [
+                                "authenticatorAttachment": authenticatorAttachment,
+                                "type": credentialType,
+                                "response": [
+                                    "attestationObject": attestationObject,
+                                    "clientDataJSON": clientData
+                                ]
+                            ]
+                        ])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   verification: ["email": "123456", "phone": "654321"])
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                            }
+                    }
+                }
+
                 it("should use DPoP when it is enabled") {
                     let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
                     let request = auth.login(passkey: signupPasskey,

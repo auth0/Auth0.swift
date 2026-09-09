@@ -19,90 +19,133 @@ struct ContentView: View {
     #endif
 
     var body: some View {
-        VStack(spacing: 20) {
+        ScrollView {
+            VStack(spacing: 20) {
 
-            VStack {
-                TextField(text: $viewModel.email) {
-                    Text("email")
+                // MARK: Email / Password
+
+                VStack {
+                    TextField(text: $viewModel.email) {
+                        Text("email")
+                    }
+
+                    SecureField(text: $viewModel.password) {
+                        Text("password")
+                    }
+
+                    Button {
+                        Task { await viewModel.login() }
+                    } label: {
+                        Text("Login")
+                    }
                 }
 
-                SecureField(text: $viewModel.password) {
-                    Text("password")
+                // MARK: Passkeys
+
+                #if PASSKEYS_PLATFORM
+                if #available(iOS 16.6, *) {
+                    VStack(spacing: 12) {
+                        Button {
+                            Task {
+                                await viewModel.signupWithPasskey(window: window)
+                            }
+                        } label: {
+                            Label("Signup with Passkey", systemImage: "person.badge.key")
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+
+                        Button {
+                            Task {
+                                await viewModel.loginWithPasskey(window: window)
+                            }
+                        } label: {
+                            Label("Login with Passkey", systemImage: "key.fill")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
                 }
+                #endif
+
+                // MARK: OTP
+
+                Button {
+                    Task { await viewModel.requestOTPChallenge() }
+                } label: {
+                    Label("Send OTP to Email", systemImage: "envelope.badge")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .disabled(viewModel.isLoading || viewModel.email.isEmpty)
+
+                // MARK: Web Auth
+
+                #if WEB_AUTH_PLATFORM
+                Button {
+                    Task {
+                        #if os(macOS)
+                        await viewModel.webLogin(presentationWindow: currentWindow)
+                        #else
+                        await viewModel.webLogin(presentationWindow: window)
+                        #endif
+                    }
+                } label: {
+                    Text("Login with Browser")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .disabled(viewModel.isLoading)
+
+                #if os(iOS)
+                Button {
+                    Task { await viewModel.webViewLogin() }
+                } label: {
+                    Text("Login with WebView (Page Sheet)")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .disabled(viewModel.isLoading)
+                #endif
+                #endif
+
+                Divider()
+                    .padding(.vertical)
 
                 Button {
                     Task {
-                        await viewModel.login()
+                        #if WEB_AUTH_PLATFORM
+                        #if os(macOS)
+                        await viewModel.logout(presentationWindow: currentWindow)
+                        #else
+                        await viewModel.logout(presentationWindow: window)
+                        #endif
+                        #endif
                     }
                 } label: {
-                    Text("Login")
+                    Text("Logout")
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(viewModel.isLoading || !viewModel.isAuthenticated)
+
+                if viewModel.isAuthenticated {
+                    Text("✓ Authenticated")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                }
+
+                if let error = viewModel.errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                        .multilineTextAlignment(.center)
                 }
             }
-
-            #if WEB_AUTH_PLATFORM
-            Button {
-                Task {
-                    #if os(macOS)
-                    await viewModel.webLogin(presentationWindow: currentWindow)
-                    #else
-                    await viewModel.webLogin(presentationWindow: window)
-                    #endif
-                }
-            } label: {
-                Text("Login with Browser")
-            }
-            .buttonStyle(SecondaryButtonStyle())
-            .disabled(viewModel.isLoading)
-
-            #if os(iOS)
-            Button {
-                Task {
-                    await viewModel.webViewLogin()
-                }
-            } label: {
-                Text("Login with WebView (Page Sheet)")
-            }
-            .buttonStyle(SecondaryButtonStyle())
-            .disabled(viewModel.isLoading)
-            #endif
-            #endif
-
-            Divider()
-                .padding(.vertical)
-
-            Button {
-                Task {
-                    #if WEB_AUTH_PLATFORM
-                    #if os(macOS)
-                    await viewModel.logout(presentationWindow: currentWindow)
-                    #else
-                    await viewModel.logout(presentationWindow: window)
-                    #endif
-                    #endif
-                }
-            } label: {
-                Text("Logout")
-            }
-            .buttonStyle(PrimaryButtonStyle())
-            .disabled(viewModel.isLoading || !viewModel.isAuthenticated)
-
-            if viewModel.isAuthenticated {
-                Text("✓ Authenticated")
-                    .foregroundColor(.green)
-                    .font(.caption)
-            }
-
-            if let error = viewModel.errorMessage {
-                Text(error)
-                    .foregroundColor(.red)
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-            }
+            .padding(.horizontal)
+            .padding(.top, 10)
         }
-        .padding(.horizontal)
-        .padding(.top, 10)
         .task {
             await viewModel.checkAuthentication()
+        }
+        .sheet(isPresented: $viewModel.showOTPSheet) {
+            OTPSheetView(viewModel: viewModel)
         }
         #if os(macOS)
         .onAppear {
@@ -111,6 +154,144 @@ struct ContentView: View {
         #endif
     }
 }
+
+// MARK: - OTP Sheet
+
+struct OTPSheetView: View {
+    @ObservedObject var viewModel: ContentViewModel
+
+    private var isPasskeyVerification: Bool {
+        if case .passkeyVerification = viewModel.otpContext { return true }
+        return false
+    }
+
+    private var channelLabel: String {
+        if case .passkeyVerification(let channel) = viewModel.otpContext {
+            return channel == "phone" ? "phone" : "email"
+        }
+        return "email"
+    }
+
+    private var title: String { isPasskeyVerification ? "Verify \(channelLabel)" : "Verify Email" }
+
+    private var subtitle: String {
+        isPasskeyVerification
+            ? "Enter the 6-digit code sent to your \(channelLabel) to continue passkey registration."
+            : "Enter the 6-digit code sent to\n\(viewModel.email)"
+    }
+
+    private func submitAction() {
+        Task {
+            if isPasskeyVerification {
+                await viewModel.submitPasskeyVerificationOTP()
+            } else {
+                await viewModel.loginWithOTP()
+            }
+        }
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 32) {
+                VStack(spacing: 8) {
+                    Text(title)
+                        .font(.title2.bold())
+                    Text(subtitle)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+
+                OTPInputView(digits: $viewModel.otpDigits, onComplete: submitAction)
+
+                if let error = viewModel.errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                        .multilineTextAlignment(.center)
+                }
+
+                Button {
+                    submitAction()
+                } label: {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    } else {
+                        Text("Verify")
+                    }
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(viewModel.isLoading || viewModel.otpDigits.joined().count < 6)
+
+                if !isPasskeyVerification {
+                    Button("Resend code") {
+                        Task { await viewModel.requestOTPChallenge() }
+                    }
+                    .font(.subheadline)
+                    .disabled(viewModel.isLoading)
+                }
+            }
+            .padding(24)
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        viewModel.showOTPSheet = false
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - OTP Input
+
+struct OTPInputView: View {
+    @Binding var digits: [String]
+    @FocusState private var focusedIndex: Int?
+    let onComplete: () -> Void
+
+    var body: some View {
+        HStack(spacing: 10) {
+            ForEach(0..<6, id: \.self) { index in
+                TextField("", text: $digits[index])
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.center)
+                    .frame(width: 44, height: 54)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(focusedIndex == index ? Color.blue : Color.clear, lineWidth: 2)
+                    )
+                    .font(.title2.bold())
+                    .focused($focusedIndex, equals: index)
+                    .onChange(of: digits[index]) { newValue in
+                        let filtered = newValue.filter { $0.isNumber }
+                        if filtered.count > 1 {
+                            digits[index] = String(filtered.last!)
+                        } else {
+                            digits[index] = filtered
+                        }
+                        if digits[index].count == 1 {
+                            if index < 5 {
+                                focusedIndex = index + 1
+                            } else {
+                                focusedIndex = nil
+                                onComplete()
+                            }
+                        }
+                    }
+            }
+        }
+        .onAppear { focusedIndex = 0 }
+    }
+}
+
+// MARK: - Button Styles
 
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
