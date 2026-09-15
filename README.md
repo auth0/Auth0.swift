@@ -617,6 +617,30 @@ do {
 ```
 </details>
 
+### Discover login options [EA]
+
+> [!IMPORTANT]
+> Embedded Login Discovery is currently in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant and application.
+
+Use the Embedded Auth client to fetch the live set of login alternatives available for your application, so you can render the right authentication options at runtime without hardcoding them.
+
+```swift
+Auth0
+    .embeddedAuth()
+    .discover()
+    .start { result in
+        switch result {
+        case .success(let discovery):
+            print("Available options: \(discovery.options)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+> [!NOTE]
+> For the full guide including filtering by connection, inspecting the discovered options, and error handling, see the [**Embedded Auth examples**](examples/embedded-auth.md).
+
 ## Support Policy
 
 This Policy defines the extent of the support for Xcode, Swift, and platform (iOS, macOS, tvOS, and watchOS) versions in Auth0.swift.
