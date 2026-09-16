@@ -1,0 +1,115 @@
+import Foundation
+
+struct Auth0EmbeddedAuth: EmbeddedAuth {
+
+    let clientId: String
+    let url: URL
+    let session: URLSession
+
+    var auth0ClientInfo: Auth0ClientInfo
+    var logger: Logger?
+
+    init(clientId: String,
+         url: URL,
+         session: URLSession = .shared,
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo()) {
+        self.clientId = clientId
+        self.url = url
+        self.session = session
+        self.auth0ClientInfo = auth0ClientInfo
+    }
+
+    func discover(connection: String?) -> Request<DiscoveryResult, EmbeddedAuthError> {
+        var params: [String: Any] = ["client_id": clientId]
+        if let connection {
+            params["connection"] = connection
+        }
+        return Request(session: session,
+                       url: url.appending("e/discovery"),
+                       method: "GET",
+                       handle: decodeDiscoveryResult,
+                       parameters: params,
+                       logger: logger,
+                       auth0ClientInfo: auth0ClientInfo)
+    }
+
+}
+
+// MARK: - Response decoder
+
+private func decodeDiscoveryResult(
+    from result: Result<ResponseValue, EmbeddedAuthError>,
+    callback: @Sendable (Result<DiscoveryResult, EmbeddedAuthError>) -> Void
+) {
+    switch result {
+    case .failure(let error):
+        callback(.failure(error))
+    case .success(let response):
+        guard let data = response.data else {
+            callback(.failure(EmbeddedAuthError(from: response)))
+            return
+        }
+        do {
+            let decoded = try JSONDecoder().decode(DiscoveryResponse.self, from: data)
+            callback(.success(DiscoveryResult(options: decoded.alternatives.map(\.loginOption))))
+        } catch {
+            callback(.failure(EmbeddedAuthError(from: response)))
+        }
+    }
+}
+
+// MARK: - Wire types (Decodable)
+
+private struct DiscoveryResponse: Decodable {
+    let alternatives: [DiscoveryAlternativePayload]
+}
+
+private struct DiscoveryAlternativePayload: Decodable {
+
+    let grantType: String
+    let connection: String?
+    let type: String?
+    let subjectTokenType: String?
+    let identifierTypes: [String]?
+    let realm: String?
+
+    enum CodingKeys: String, CodingKey {
+        case grantType = "grant_type"
+        case connection
+        case type
+        case subjectTokenType = "subject_token_type"
+        case identifierTypes = "identifier_types"
+        case realm
+    }
+
+    var loginOption: LoginOption {
+        switch grantType {
+        case "authorization_code":
+            guard let conn = connection else { return .unknown(rawGrantType: grantType, connection: nil) }
+            return .embeddedAuthorize(connection: conn)
+        case "urn:ietf:params:oauth:grant-type:token-exchange":
+            return .nativeSocial(subjectTokenType: subjectTokenType ?? "")
+        case "password":
+            return .password
+        case "urn:okta:params:oauth:grant-type:webauthn":
+            guard let conn = connection else { return .unknown(rawGrantType: grantType, connection: nil) }
+            return .passkey(connection: conn)
+        case "http://auth0.com/oauth/grant-type/passwordless/otp":
+            let identifiers: [PasswordlessIdentifier] = (identifierTypes ?? []).compactMap {
+                switch $0 {
+                case "email":        return .email
+                case "phone_number": return .phoneNumber
+                default:             return nil
+                }
+            }
+            return .passwordlessOtp(connection: connection ?? "",
+                                    identifiers: identifiers,
+                                    type: type == "auth0" ? .auth0 : .legacy)
+        case "http://auth0.com/oauth/grant-type/password-realm":
+            return .passwordRealm(realm: realm ?? "")
+        default:
+            return .unknown(rawGrantType: grantType, connection: connection)
+        }
+    }
+
+}
