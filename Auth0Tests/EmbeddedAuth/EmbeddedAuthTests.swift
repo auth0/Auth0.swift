@@ -2,6 +2,32 @@ import Testing
 import Foundation
 @testable import Auth0
 
+// Dedicated mock protocol so EmbeddedAuthTests never shares static state with Auth0MFAClientTests,
+// which also registers MockURLProtocol. The two @Suite(.serialized) structs run concurrently in
+// Swift Testing, and a shared static requestHandler causes handler cross-contamination.
+private final class EmbeddedAuthMockURLProtocol: URLProtocol {
+    static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data?))?
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        guard let handler = EmbeddedAuthMockURLProtocol.requestHandler else {
+            fatalError("EmbeddedAuthMockURLProtocol requires a requestHandler.")
+        }
+        do {
+            let (response, data) = try handler(request)
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            if let data = data { client?.urlProtocol(self, didLoad: data) }
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() {}
+}
+
 private let clientId = "TEST_CLIENT_ID"
 private let domain = "test.auth0.com"
 
@@ -68,7 +94,7 @@ struct EmbeddedAuthTests {
 
     private func makeClient() -> EmbeddedAuth {
         let config = URLSessionConfiguration.ephemeral
-        config.protocolClasses = [MockURLProtocol.self]
+        config.protocolClasses = [EmbeddedAuthMockURLProtocol.self]
         return Auth0.embeddedAuth(clientId: clientId, domain: domain, session: URLSession(configuration: config))
     }
 
@@ -114,7 +140,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 #expect(result.options.isEmpty)
                 #expect(result.types.isEmpty)
@@ -131,7 +157,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [embeddedAuthorizeAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .embeddedAuthorize(let conn) = result.options.first else {
                     Issue.record("Expected .embeddedAuthorize"); return
@@ -151,7 +177,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [tokenExchangeGoogleAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .nativeSocial(let stt) = result.options.first else {
                     Issue.record("Expected .nativeSocial"); return
@@ -168,7 +194,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [tokenExchangeAppleAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .nativeSocial(let stt) = result.options.first else {
                     Issue.record("Expected .nativeSocial"); return
@@ -185,7 +211,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [tokenExchangeGoogleAlt, tokenExchangeAppleAlt, tokenExchangeFacebookAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 #expect(result.socialProviders.count == 3)
                 #expect(result.socialProviders.contains("http://auth0.com/oauth/token-type/google-id-token"))
@@ -202,7 +228,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [passwordAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .password = result.options.first else {
                     Issue.record("Expected .password"); return
@@ -221,7 +247,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [passkeyAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .passkey(let conn) = result.options.first else {
                     Issue.record("Expected .passkey"); return
@@ -238,7 +264,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [passkeyAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 #expect(result.passkeyConnections == ["my-db"])
             }
@@ -254,7 +280,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [passwordlessOtpLegacyAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .passwordlessOtp(let conn, let ids, let flowType) = result.options.first else {
                     Issue.record("Expected .passwordlessOtp"); return
@@ -273,7 +299,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [passwordlessOtpAuth0Alt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .passwordlessOtp(let conn, let ids, let flowType) = result.options.first else {
                     Issue.record("Expected .passwordlessOtp"); return
@@ -293,7 +319,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [passwordlessOtpLegacyAlt, passwordlessOtpAuth0Alt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 #expect(result.otpOptions.count == 2)
             }
@@ -309,7 +335,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [passwordRealmAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .passwordRealm(let realm) = result.options.first else {
                     Issue.record("Expected .passwordRealm"); return
@@ -326,7 +352,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [passwordRealmAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 #expect(result.passwordRealms == ["Username-Password-Authentication"])
             }
@@ -342,7 +368,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [unknownAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .unknown(let raw, let conn) = result.options.first else {
                     Issue.record("Expected .unknown"); return
@@ -360,7 +386,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [unknownAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 #expect(result.supports(.unknown))
             }
@@ -384,7 +410,7 @@ struct EmbeddedAuthTests {
         ])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 #expect(result.options.count == 7)
             }
@@ -398,7 +424,7 @@ struct EmbeddedAuthTests {
         let data = successData(alternatives: [passwordAlt, passkeyAlt, passwordRealmAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
-                MockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
                 guard case .password = result.options[0] else { Issue.record("Expected .password at index 0"); return }
                 guard case .passkey = result.options[1] else { Issue.record("Expected .passkey at index 1"); return }
@@ -414,7 +440,7 @@ struct EmbeddedAuthTests {
     @Test func discoverSendsClientIdQueryParam() async {
         let sut = makeClient()
         var capturedURL: URL?
-        MockURLProtocol.requestHandler = { request in
+        EmbeddedAuthMockURLProtocol.requestHandler = { request in
             capturedURL = request.url
             return (self.successResponse(), self.successData(alternatives: []))
         }
@@ -430,7 +456,7 @@ struct EmbeddedAuthTests {
     @Test func discoverSendsConnectionQueryParamWhenProvided() async {
         let sut = makeClient()
         var capturedURL: URL?
-        MockURLProtocol.requestHandler = { request in
+        EmbeddedAuthMockURLProtocol.requestHandler = { request in
             capturedURL = request.url
             return (self.successResponse(), self.successData(alternatives: []))
         }
@@ -446,7 +472,7 @@ struct EmbeddedAuthTests {
     @Test func discoverOmitsConnectionQueryParamWhenNil() async {
         let sut = makeClient()
         var capturedURL: URL?
-        MockURLProtocol.requestHandler = { request in
+        EmbeddedAuthMockURLProtocol.requestHandler = { request in
             capturedURL = request.url
             return (self.successResponse(), self.successData(alternatives: []))
         }
@@ -463,7 +489,7 @@ struct EmbeddedAuthTests {
 
     @Test func discoverReturnsInvalidRequestOn400() async {
         let sut = makeClient()
-        MockURLProtocol.requestHandler = { _ in
+        EmbeddedAuthMockURLProtocol.requestHandler = { _ in
             return (self.errorResponse(statusCode: 400),
                     self.errorData(["error": "invalid_request", "error_description": "embedded_discovery is disabled"]))
         }
@@ -480,7 +506,7 @@ struct EmbeddedAuthTests {
 
     @Test func discoverReturnsInvalidClientOn401() async {
         let sut = makeClient()
-        MockURLProtocol.requestHandler = { _ in
+        EmbeddedAuthMockURLProtocol.requestHandler = { _ in
             return (self.errorResponse(statusCode: 401),
                     self.errorData(["error": "invalid_client", "error_description": "Unknown client_id"]))
         }
@@ -497,7 +523,7 @@ struct EmbeddedAuthTests {
 
     @Test func discoverReturnsServerErrorOn500() async {
         let sut = makeClient()
-        MockURLProtocol.requestHandler = { _ in
+        EmbeddedAuthMockURLProtocol.requestHandler = { _ in
             return (self.errorResponse(statusCode: 500),
                     self.errorData(["error": "server_error", "error_description": "Unexpected error"]))
         }
@@ -514,7 +540,7 @@ struct EmbeddedAuthTests {
 
     @Test func discoverReturnsFeatureDisabledOnBare404() async {
         let sut = makeClient()
-        MockURLProtocol.requestHandler = { _ in
+        EmbeddedAuthMockURLProtocol.requestHandler = { _ in
             return (self.errorResponse(statusCode: 404), nil)
         }
         do {
