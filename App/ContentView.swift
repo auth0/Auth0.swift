@@ -70,6 +70,94 @@ struct ContentView: View {
             Divider()
                 .padding(.vertical)
 
+            // MARK: Embedded Auth Section
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Embedded Auth")
+                    .font(.headline)
+
+                switch viewModel.embeddedAuthUIState {
+
+                case .initial:
+                    Button {
+                        Task { await viewModel.startEmbeddedFlow() }
+                    } label: {
+                        Text("Start Embedded Auth")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+
+                case .identifyEmail:
+                    TextField("Email", text: $viewModel.email)
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                    Button {
+                        Task { await viewModel.submitEmail(viewModel.email) }
+                    } label: {
+                        Text("Submit Email")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.email.isEmpty)
+
+                case .challengeEmail:
+                    Text("We'll send a one-time code to your email.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Button {
+                        Task { await viewModel.triggerChallenge() }
+                    } label: {
+                        Text("Send OTP")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+
+                case .verifyOTP(_, let identifier):
+                    if let identifier {
+                        Text("Enter the code sent to \(identifier)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    TextField("One-time code", text: $viewModel.otp)
+                        .textContentType(.oneTimeCode)
+                        .keyboardType(.numberPad)
+                    Button {
+                        Task { await viewModel.submitOtp(viewModel.otp) }
+                    } label: {
+                        Text("Verify")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.otp.isEmpty)
+
+                case .success:
+                    Text("✓ Embedded Auth succeeded")
+                        .foregroundColor(.green)
+                    Button {
+                        viewModel.embeddedAuthUIState = .initial
+                        viewModel.otp = ""
+                    } label: {
+                        Text("Reset")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+
+                case .failed(let message):
+                    Text("Error: \(message)")
+                        .foregroundColor(.red)
+                        .font(.caption)
+                        .multilineTextAlignment(.leading)
+                    Button {
+                        viewModel.embeddedAuthUIState = .initial
+                        viewModel.otp = ""
+                    } label: {
+                        Text("Try Again")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                }
+            }
+
+            Divider()
+                .padding(.vertical)
+
             Button {
                 Task {
                     #if WEB_AUTH_PLATFORM
