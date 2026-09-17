@@ -35,36 +35,26 @@ import Foundation
 
     @Test func tooManyAttemptsTrueWhenBothFieldsMatch() {
         let error = EmbeddedAuthError(
-            info: ["error": "too_many_requests", "error_description": "too_many_attempts"],
-            statusCode: 429
+            info: ["error": "access_denied", "error_description": "too_many_wrong_otp_attempts"],
+            statusCode: 403
         )
         #expect(error.isTooManyAttempts)
     }
 
-    @Test func tooManyAttemptsFalseWhenDescriptionDiffers() {
+    @Test func tooManyAttemptsFalseWhenCodeDiffers() {
         let error = EmbeddedAuthError(
-            info: ["error": "too_many_requests", "error_description": "too_many_logins"],
-            statusCode: 429
+            info: ["error": "insufficient_authorization", "error_description": "too_many_wrong_otp_attempts"],
+            statusCode: 403
         )
         #expect(!error.isTooManyAttempts)
     }
 
-    // MARK: isTooManyLogins
-
-    @Test func tooManyLoginsTrueWhenBothFieldsMatch() {
+    @Test func tooManyAttemptsFalseWhenDescriptionDiffers() {
         let error = EmbeddedAuthError(
-            info: ["error": "too_many_requests", "error_description": "too_many_logins"],
-            statusCode: 429
+            info: ["error": "access_denied", "error_description": "no_next_steps"],
+            statusCode: 403
         )
-        #expect(error.isTooManyLogins)
-    }
-
-    @Test func tooManyLoginsFalseWhenDescriptionDiffers() {
-        let error = EmbeddedAuthError(
-            info: ["error": "too_many_requests", "error_description": "too_many_attempts"],
-            statusCode: 429
-        )
-        #expect(!error.isTooManyLogins)
+        #expect(!error.isTooManyAttempts)
     }
 
     // MARK: nextActions — identifyEmail

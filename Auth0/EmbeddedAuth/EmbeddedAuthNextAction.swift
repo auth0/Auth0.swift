@@ -24,7 +24,7 @@ public enum NextAction: Sendable, Equatable {
     /// Server expects the caller to submit a phone number via ``EmbeddedAuthClient/identifyPhone(_:)``.
     case identifyPhone
 
-    /// Server expects the caller to trigger an email OTP send via ``EmbeddedAuthClient/challengeEmail(index:)``.
+    /// Server expects the caller to trigger an email OTP send via ``EmbeddedAuthClient/challengeEmail()``.
     case challengeEmail
 
     /// Server expects a one-time code via ``EmbeddedAuthClient/verifyOtp(_:type:)``.
@@ -95,9 +95,9 @@ public enum EmbeddedCapability: Sendable, Equatable {
 public enum OtpType: String, Sendable {
 
     /// An out-of-band code delivered over email, SMS, or voice.
-    case oob  = "oob"
+    case oob
 
     /// A time-based code from an authenticator app (TOTP).
-    case totp = "totp"
+    case totp
 
 }

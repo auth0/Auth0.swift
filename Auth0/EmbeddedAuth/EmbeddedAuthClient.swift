@@ -67,8 +67,7 @@ public protocol EmbeddedAuthClient: Trackable, Loggable, Sendable {
     /// Requests that the server send an email OTP challenge.
     ///
     /// Requires an active session.
-    /// - Parameter index: Index of the challenge target in the `next` menu (defaults to `0`).
-    func challengeEmail(index: Int) -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError>
+    func challengeEmail() -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError>
 
     /// Submits a one-time password to verify the user's identity.
     ///
@@ -96,11 +95,6 @@ public extension EmbeddedAuthClient {
     /// Starts a new embedded authorization flow targeting a specific connection.
     func authorize(connection: String) -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError> {
         authorize(connection: connection, capabilities: EmbeddedCapability.all, scope: nil, audience: nil)
-    }
-
-    /// Requests an email OTP challenge targeting the first entry in the `next` menu.
-    func challengeEmail() -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError> {
-        challengeEmail(index: 0)
     }
 
 }

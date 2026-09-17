@@ -53,51 +53,56 @@ final class Auth0EmbeddedAuthClient: EmbeddedAuthClient, @unchecked Sendable {
         if let connection { body["connection"] = connection }
         if let scope      { body["scope"]      = scope      }
         if let audience   { body["audience"]   = audience   }
-        return _authorize(body: body)
+        return buildAuthorizeRequest(body: body)
     }
 
     /// Submits an email address as the user's identifier.
     func identifyEmail(_ email: String) -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError> {
         guard sessionActive else { return missingSessionRequest() }
         var body: [String: Any] = [
+            "client_id": clientId,
             "action": EmbeddedAction.identifyEmail.rawValue,
-            "email":  email
+            "email": email
         ]
         if let s = authSession { body["auth_session"] = s }
-        return _authorize(body: body)
+        return buildAuthorizeRequest(body: body)
     }
 
     /// Submits a phone number as the user's identifier.
     func identifyPhone(_ phone: String) -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError> {
         guard sessionActive else { return missingSessionRequest() }
         var body: [String: Any] = [
+            "client_id": clientId,
             "action": EmbeddedAction.identifyPhone.rawValue,
-            "phone":  phone
+            "phone": phone
         ]
         if let s = authSession { body["auth_session"] = s }
-        return _authorize(body: body)
+        return buildAuthorizeRequest(body: body)
     }
 
     /// Requests that the server send an email OTP challenge.
-    func challengeEmail(index: Int) -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError> {
+    func challengeEmail() -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError> {
         guard sessionActive else { return missingSessionRequest() }
         var body: [String: Any] = [
-            "action": EmbeddedAction.challengeEmail.rawValue
+            "client_id": clientId,
+            "action": EmbeddedAction.challengeEmail.rawValue,
+            "index": 0
         ]
         if let s = authSession { body["auth_session"] = s }
-        return _authorize(body: body)
+        return buildAuthorizeRequest(body: body)
     }
 
     /// Submits a one-time password to verify the user's identity.
     func verifyOtp(_ otp: String, type: OtpType) -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError> {
         guard sessionActive else { return missingSessionRequest() }
         var body: [String: Any] = [
-            "action":         EmbeddedAction.verifyOTP.rawValue,
-            "otp":            otp,
-            "binding_method": type.rawValue
+            "client_id": clientId,
+            "action": EmbeddedAction.verifyOTP.rawValue,
+            "otp": otp,
+            "type": type.rawValue
         ]
         if let s = authSession { body["auth_session"] = s }
-        return _authorize(body: body)
+        return buildAuthorizeRequest(body: body)
     }
 
 }
@@ -143,10 +148,11 @@ private extension Auth0EmbeddedAuthClient {
         )
     }
 
-    func _authorize(body: [String: Any]) -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError> {
-        Request(
+    func buildAuthorizeRequest(body: [String: Any]) -> Request<EmbeddedAuthorizationCode, EmbeddedAuthError> {
+        let endpoint = url.appending("e/authorize")
+        return Request(
             session: session,
-            url: url.appending("e/authorize"),
+            url: endpoint,
             method: "POST",
             handle: { [weak self] result, callback in
                 guard let self else { return }
@@ -167,6 +173,8 @@ private extension Auth0EmbeddedAuthClient {
             if error.isInsufficientAuthorization,
                let newSession = error.info["auth_session"] as? String {
                 setAuthSession(newSession)
+            } else if error.isAccessDenied {
+                setAuthSession(nil)
             }
             callback(.failure(error))
 

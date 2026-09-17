@@ -1,170 +1,32 @@
 import SwiftUI
 import Auth0
-import Combine
 
 @MainActor
 final class ContentViewModel: ObservableObject {
     @Published var email: String = ""
-    @Published var password: String = ""
-    @Published var isLoading: Bool = false
-    @Published var errorMessage: String?
-    @Published var isAuthenticated: Bool = false
-    private let credentialsManager: CredentialsManager
-    private let embeddedAuthClient: EmbeddedAuthClient
-    @Published var embeddedAuthUIState: EmbeddedAuthUIState = .initial
     @Published var otp: String = ""
+    @Published var isLoading: Bool = false
+    @Published var embeddedAuthUIState: EmbeddedAuthUIState = .initial
+    @Published var otpAttemptError: String?
 
     private let authenticationClient: Authentication
-    #if WEB_AUTH_PLATFORM
-    private let webAuth: WebAuth
-    #endif
+    private let embeddedAuthClient: EmbeddedAuthClient
 
     init(email: String = "",
-         password: String = "",
-         isLoading: Bool = false,
-         errorMessage: String? = nil,
-         isAuthenticated: Bool = false,
          authenticationClient: Authentication,
-         credentialsManager: CredentialsManager? = nil,
          embeddedAuthClient: EmbeddedAuthClient? = nil) {
         self.email = email
-        self.password = password
-        self.isLoading = isLoading
-        self.errorMessage = errorMessage
-        self.isAuthenticated = isAuthenticated
         self.authenticationClient = authenticationClient
-        self.credentialsManager = credentialsManager ?? CredentialsManager(authentication: Auth0.authentication())
-        self.embeddedAuthClient = embeddedAuthClient ?? Auth0.embeddedAuthClient()
-        #if WEB_AUTH_PLATFORM
-        self.webAuth = Auth0
-            .webAuth()
-            .useCredentialsManager(self.credentialsManager)
-        #endif
+        self.embeddedAuthClient = embeddedAuthClient ?? Auth0.embeddedAuthClient().logging(enabled: true)
     }
 
-    func login() async {
-        isLoading = true
-        errorMessage = nil
-        do {
-            let credentials = try await authenticationClient
-                .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication", audience: nil, scope: "openid profile email offline_access")
-                .validateClaims()
-                .start()
-            try credentialsManager.store(credentials: credentials)
-            isAuthenticated = true
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isLoading = false
-    }
-
-    #if WEB_AUTH_PLATFORM
-    func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {
-        isLoading = true
-        errorMessage = nil
-
-        do {
-            _ = try await webAuth
-                .scope("openid profile email offline_access")
-                .start()
-
-            isAuthenticated = true
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-        } catch let error as Auth0Error {
-            errorMessage = "Login failed: \(error.localizedDescription)"
-        } catch {
-            errorMessage = "Unexpected error: \(error.localizedDescription)"
-        }
-
-        isLoading = false
-    }
-
-    #if os(iOS)
-    func webViewLogin() async {
-        isLoading = true
-        errorMessage = nil
-
-        do {
-            _ = try await webAuth
-                .provider(WebAuthentication.webViewProvider(style: .pageSheet))
-                .scope("openid profile email offline_access")
-                .start()
-
-            isAuthenticated = true
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-        } catch let error as Auth0Error {
-            errorMessage = "Login failed: \(error.localizedDescription)"
-        } catch {
-            errorMessage = "Unexpected error: \(error.localizedDescription)"
-        }
-
-        isLoading = false
-    }
-    #endif
-
-    func logout(presentationWindow window: Auth0WindowRepresentable? = nil) async {
-        isLoading = true
-        errorMessage = nil
-        do {
-            try await webAuth.logout()
-            isAuthenticated = false
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-        } catch let error as Auth0Error {
-            errorMessage = "Logout failed: \(error.localizedDescription)"
-        } catch {
-            errorMessage = "Unexpected error: \(error.localizedDescription)"
-        }
-
-        isLoading = false
-    }
-    #endif
-
-    func checkAuthentication() async {
-        do {
-            _ = try await credentialsManager.credentials()
-            isAuthenticated = true
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-            isAuthenticated = false
-        } catch {
-            errorMessage = "Unexpected error: \(error.localizedDescription)"
-            isAuthenticated = false
-        }
-    }
-
-    private func handleCredentialsManagerError(_ error: CredentialsManagerError) -> String {
-        switch error {
-        case CredentialsManagerError.noCredentials:
-            return "No credentials found. Please log in again."
-        case CredentialsManagerError.noRefreshToken:
-            return "Session expired. Please log in again."
-        case CredentialsManagerError.renewFailed:
-            return "Failed to renew credentials: \(error.cause?.localizedDescription ?? "Unknown error")"
-        case CredentialsManagerError.storeFailed:
-            return "Failed to save credentials. Please try again."
-        case CredentialsManagerError.clearFailed:
-            return "Failed to clear credentials. Please try again."
-        case CredentialsManagerError.biometricsFailed:
-            return "Biometric authentication failed. Please try again."
-        case CredentialsManagerError.revokeFailed:
-            return "Failed to revoke session: \(error.cause?.localizedDescription ?? "Unknown error")"
-        default:
-            return "Credentials error: \(error.localizedDescription)"
-        }
-    }
-
-    // MARK: Embedded auth methods
+    // MARK: Embedded auth
 
     func startEmbeddedFlow() async {
         isLoading = true
         embeddedAuthUIState = .initial
         do {
-            _ = try await embeddedAuthClient.authorize().start()
+            _ = try await embeddedAuthClient.authorize(connection: "Username-Password-Authentication").start()
         } catch let error as EmbeddedAuthError {
             handle(embeddedAuthError: error)
         } catch {
@@ -201,9 +63,7 @@ final class ContentViewModel: ObservableObject {
         isLoading = true
         do {
             let authCode = try await embeddedAuthClient.verifyOtp(otp, type: .oob).start()
-            let credentials = try await authenticationClient
-                .codeExchange(withCode: authCode.code, codeVerifier: "", redirectURI: "")
-                .start()
+            let credentials = try await exchangeEmbeddedCode(authCode.code)
             embeddedAuthUIState = .success(credentials)
         } catch let error as EmbeddedAuthError {
             handle(embeddedAuthError: error)
@@ -213,34 +73,70 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
-    private func handle(embeddedAuthError error: EmbeddedAuthError) {
-        if error.isInsufficientAuthorization {
-            switch error.nextActions.first {
-            case .identifyEmail:
-                embeddedAuthUIState = .identifyEmail
-            case .challengeEmail:
-                embeddedAuthUIState = .challengeEmail
-            case .verifyOTP(let channel, let identifier):
-                embeddedAuthUIState = .verifyOTP(channel: channel, identifier: identifier)
-            default:
-                embeddedAuthUIState = .failed(error.debugDescription)
-            }
-        } else {
-            embeddedAuthUIState = .failed(error.debugDescription)
+    // Exchanges an embedded authorization code for Credentials.
+    // Does NOT send redirect_uri or code_verifier — not part of the embedded flow.
+    private func exchangeEmbeddedCode(_ code: String) async throws -> Credentials {
+        guard let plist = Bundle.main.url(forResource: "Auth0", withExtension: "plist"),
+              let values = NSDictionary(contentsOf: plist),
+              let domain = values["Domain"] as? String,
+              let clientId = values["ClientId"] as? String else {
+            throw EmbeddedAuthError(info: ["error": "configuration_error",
+                                           "error_description": "Auth0.plist missing or invalid"],
+                                    statusCode: 0)
         }
+        var request = URLRequest(url: URL(string: "https://\(domain)/oauth/token")!)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: [
+            "grant_type": "authorization_code",
+            "code": code,
+            "client_id": clientId
+        ])
+        let (data, response) = try await URLSession.shared.data(for: request)
+        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw EmbeddedAuthError(info: ["error": "parse_error",
+                                           "error_description": "Could not parse token response"],
+                                    statusCode: statusCode)
+        }
+        guard statusCode == 200,
+              let accessToken = json["access_token"] as? String else {
+            throw EmbeddedAuthError(info: json, statusCode: statusCode)
+        }
+        return Credentials(accessToken: accessToken,
+                           tokenType: json["token_type"] as? String ?? "Bearer",
+                           idToken: json["id_token"] as? String ?? "",
+                           refreshToken: json["refresh_token"] as? String,
+                           expiresAt: Date(timeIntervalSinceNow: json["expires_in"] as? Double ?? 3600),
+                           scope: json["scope"] as? String)
     }
-}
 
-extension Array where Element: Hashable {
-    func uniqued() -> [Element] {
-        var seen = Set<Element>()
-        return filter { seen.insert($0).inserted }
+    private func handle(embeddedAuthError error: EmbeddedAuthError) {
+        guard error.isInsufficientAuthorization else {
+            embeddedAuthUIState = .failed("[\(error.code)] \(error.info)")
+            return
+        }
+        let next = error.nextActions.first
+        let description = error.info["error_description"] as? String
+        switch next {
+        case .identifyEmail:
+            embeddedAuthUIState = .identifyEmail
+        case .challengeEmail:
+            embeddedAuthUIState = .challengeEmail
+        case .verifyOTP(let channel, let identifier):
+            otp = ""
+            if description == "invalid_identifier_or_code" || description == "invalid_code" {
+                otpAttemptError = "Wrong code — try again"
+            }
+            embeddedAuthUIState = .verifyOTP(channel: channel, identifier: identifier)
+        default:
+            embeddedAuthUIState = .failed("Unhandled next action: \(String(describing: next))\nFull error: \(error.info)")
+        }
     }
 }
 
 // MARK: - Embedded Auth UI State
 
-/// Drives the embedded auth section of ``ContentView``.
 enum EmbeddedAuthUIState {
     case initial
     case identifyEmail

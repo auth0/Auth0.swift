@@ -1,6 +1,6 @@
 import Foundation
 
-/// Represents an error during a request to the Auth0 Embedded Login Discovery API.
+/// Represents an error during a request to the Auth0 Embedded Authentication API.
 public struct EmbeddedAuthError: Auth0APIError, @unchecked Sendable {
 
     /// Raw error values from the JSON response (or empty for bare HTTP errors).
@@ -89,14 +89,8 @@ public extension EmbeddedAuthError {
 
     /// Whether the server rejected the attempt due to too many wrong OTP submissions.
     var isTooManyAttempts: Bool {
-        code == "too_many_requests" &&
-        (info["error_description"] as? String) == "too_many_attempts"
-    }
-
-    /// Whether the server rejected the attempt due to too many login attempts.
-    var isTooManyLogins: Bool {
-        code == "too_many_requests" &&
-        (info["error_description"] as? String) == "too_many_logins"
+        code == "access_denied" &&
+        (info["error_description"] as? String) == "too_many_wrong_otp_attempts"
     }
 
     /// Typed menu of what the server will accept on the next call.

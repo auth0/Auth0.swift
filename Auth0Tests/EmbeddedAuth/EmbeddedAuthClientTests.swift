@@ -72,11 +72,6 @@ private func response(status: Int) -> HTTPURLResponse {
                     headerFields: nil)!
 }
 
-private func capturedBody(from request: URLRequest) -> [String: Any]? {
-    guard let data = request.httpBody else { return nil }
-    return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-}
-
 // MARK: - Suite
 
 @Suite(.serialized)
@@ -325,7 +320,7 @@ struct EmbeddedAuthClientTests {
 
         #expect(body?["action"] as? String == "action:verify:otp:v1")
         #expect(body?["otp"] as? String == "123456")
-        #expect(body?["binding_method"] as? String == "oob")
+        #expect(body?["type"] as? String == "oob")
         #expect(body?["auth_session"] as? String == "sess_001")
     }
 
@@ -397,19 +392,26 @@ struct EmbeddedAuthClientTests {
 
     @Test func authorizeThrowsAccessDeniedOnTerminalDenial() async {
         let sut = makeClient()
+        let verifyNextAction: [[String: Any]] = [["action": "action:verify:otp:v1", "channel": "email"]]
+
+        // Step 1: establish session via insufficient_authorization
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: verifyNextAction))
+        }
+        _ = try? await sut.authorize().start()
+
+        // Step 2: verifyOtp returns terminal access_denied
         let terminalData = try! JSONSerialization.data(withJSONObject: [
             "error": "access_denied",
             "error_description": "too_many_wrong_otp_attempts"
         ])
-        EmbeddedAuthClientMockProtocol.requestHandler = { _ in (response(status: 403), terminalData) }
-        _ = try? await sut.authorize().start()  // establish session
-
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in (response(status: 403), terminalData) }
         do {
             _ = try await sut.verifyOtp("000000", type: .oob).start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
             #expect(error.isAccessDenied)
+            #expect(error.isTooManyAttempts)
         } catch {
             Issue.record("Wrong error type: \(error)")
         }
