@@ -74,3 +74,53 @@ extension EmbeddedAuthError: Equatable {
     }
 
 }
+
+// MARK: - Authorize loop helpers
+
+public extension EmbeddedAuthError {
+
+    /// Whether the flow has more steps to complete (non-terminal).
+    ///
+    /// When `true`, read ``nextActions`` to know which step to present next.
+    var isInsufficientAuthorization: Bool { code == "insufficient_authorization" }
+
+    /// Whether the server terminated the flow without issuing a code.
+    var isAccessDenied: Bool { code == "access_denied" }
+
+    /// Whether the server rejected the attempt due to too many wrong OTP submissions.
+    var isTooManyAttempts: Bool {
+        code == "too_many_requests" &&
+        (info["error_description"] as? String) == "too_many_attempts"
+    }
+
+    /// Whether the server rejected the attempt due to too many login attempts.
+    var isTooManyLogins: Bool {
+        code == "too_many_requests" &&
+        (info["error_description"] as? String) == "too_many_logins"
+    }
+
+    /// Typed menu of what the server will accept on the next call.
+    ///
+    /// Non-empty only when ``isInsufficientAuthorization`` is `true`.
+    var nextActions: [NextAction] {
+        guard let nextArray = info["next"] as? [[String: Any]] else { return [] }
+        return nextArray.map { entry in
+            guard let actionString = entry["action"] as? String else {
+                return .unknown(rawAction: "")
+            }
+            switch EmbeddedAction(rawValue: actionString) {
+            case .identifyEmail:  return .identifyEmail
+            case .identifyPhone:  return .identifyPhone
+            case .challengeEmail: return .challengeEmail
+            case .verifyOTP:
+                return .verifyOTP(
+                    channel: entry["channel"] as? String,
+                    identifier: entry["identifier"] as? String
+                )
+            case .none:
+                return .unknown(rawAction: actionString)
+            }
+        }
+    }
+
+}
