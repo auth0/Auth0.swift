@@ -10,6 +10,9 @@ final class ContentViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isAuthenticated: Bool = false
     private let credentialsManager: CredentialsManager
+    private let embeddedAuthClient: EmbeddedAuthClient
+    @Published var embeddedAuthUIState: EmbeddedAuthUIState = .initial
+    @Published var otp: String = ""
 
     private let authenticationClient: Authentication
     #if WEB_AUTH_PLATFORM
@@ -22,7 +25,8 @@ final class ContentViewModel: ObservableObject {
          errorMessage: String? = nil,
          isAuthenticated: Bool = false,
          authenticationClient: Authentication,
-         credentialsManager: CredentialsManager? = nil) {
+         credentialsManager: CredentialsManager? = nil,
+         embeddedAuthClient: EmbeddedAuthClient? = nil) {
         self.email = email
         self.password = password
         self.isLoading = isLoading
@@ -30,6 +34,7 @@ final class ContentViewModel: ObservableObject {
         self.isAuthenticated = isAuthenticated
         self.authenticationClient = authenticationClient
         self.credentialsManager = credentialsManager ?? CredentialsManager(authentication: Auth0.authentication())
+        self.embeddedAuthClient = embeddedAuthClient ?? Auth0.embeddedAuthClient()
         #if WEB_AUTH_PLATFORM
         self.webAuth = Auth0
             .webAuth()
@@ -152,6 +157,78 @@ final class ContentViewModel: ObservableObject {
             return "Credentials error: \(error.localizedDescription)"
         }
     }
+
+    // MARK: Embedded auth methods
+
+    func startEmbeddedFlow() async {
+        isLoading = true
+        embeddedAuthUIState = .initial
+        do {
+            _ = try await embeddedAuthClient.authorize().start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    func submitEmail(_ email: String) async {
+        isLoading = true
+        do {
+            _ = try await embeddedAuthClient.identifyEmail(email).start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    func triggerChallenge() async {
+        isLoading = true
+        do {
+            _ = try await embeddedAuthClient.challengeEmail().start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    func submitOtp(_ otp: String) async {
+        isLoading = true
+        do {
+            let authCode = try await embeddedAuthClient.verifyOtp(otp, type: .oob).start()
+            let credentials = try await authenticationClient
+                .codeExchange(withCode: authCode.code, codeVerifier: "", redirectURI: "")
+                .start()
+            embeddedAuthUIState = .success(credentials)
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    private func handle(embeddedAuthError error: EmbeddedAuthError) {
+        if error.isInsufficientAuthorization {
+            switch error.nextActions.first {
+            case .identifyEmail:
+                embeddedAuthUIState = .identifyEmail
+            case .challengeEmail:
+                embeddedAuthUIState = .challengeEmail
+            case .verifyOTP(let channel, let identifier):
+                embeddedAuthUIState = .verifyOTP(channel: channel, identifier: identifier)
+            default:
+                embeddedAuthUIState = .failed(error.debugDescription)
+            }
+        } else {
+            embeddedAuthUIState = .failed(error.debugDescription)
+        }
+    }
 }
 
 extension Array where Element: Hashable {
@@ -159,4 +236,16 @@ extension Array where Element: Hashable {
         var seen = Set<Element>()
         return filter { seen.insert($0).inserted }
     }
+}
+
+// MARK: - Embedded Auth UI State
+
+/// Drives the embedded auth section of ``ContentView``.
+enum EmbeddedAuthUIState {
+    case initial
+    case identifyEmail
+    case challengeEmail
+    case verifyOTP(channel: String?, identifier: String?)
+    case success(Credentials)
+    case failed(String)
 }
