@@ -1,3 +1,4 @@
+#if WEB_AUTH_PLATFORM
 import Foundation
 import AuthenticationServices
 import Quick
@@ -203,7 +204,8 @@ class ASProviderSpec: QuickSpec {
                 }
             }
         }
-        
+
     }
-    
+
 }
+#endif

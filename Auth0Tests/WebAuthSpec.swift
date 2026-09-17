@@ -1,3 +1,4 @@
+#if WEB_AUTH_PLATFORM
 import Quick
 import Combine
 import Nimble
@@ -1166,4 +1167,5 @@ class MockUserAgent: WebAuthUserAgent {
 
 }
 
+#endif
 

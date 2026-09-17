@@ -1,3 +1,4 @@
+#if PASSKEYS_PLATFORM
 import Foundation
 import Quick
 import Nimble
@@ -111,3 +112,4 @@ class PasskeyEnrollmentChallengeSpec: QuickSpec {
 
     }
 }
+#endif

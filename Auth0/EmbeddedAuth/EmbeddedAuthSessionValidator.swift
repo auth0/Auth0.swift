@@ -1,9 +1,9 @@
 import Foundation
 
-/// Fails the request locally when there is no active ``EmbeddedAuthClient`` session.
+/// Fails the request locally when there is no active ``EmbeddedAuth`` session.
 ///
-/// Prevents continuation methods from making a network call when ``EmbeddedAuthClient/authorize(connection:capabilities:scope:audience:)``
-/// has not been called first (or after a successful ``EmbeddedAuthorizationCode`` was already issued).
+/// Prevents continuation methods from making a network call when ``EmbeddedAuth/authorize(connection:capabilities:scope:audience:)``
+/// has not been called first (or after a successful ``EmbeddedAuth/verifyOtp(_:type:)`` call).
 struct EmbeddedAuthSessionValidator: RequestValidator {
 
     let hasSession: Bool

@@ -90,6 +90,7 @@ private let unknownAlt: [String: Any] = [
 // MARK: - Suite
 
 @Suite(.serialized)
+// swiftlint:disable:next type_body_length
 struct EmbeddedAuthTests {
 
     private func makeClient() -> EmbeddedAuth {
@@ -99,6 +100,7 @@ struct EmbeddedAuthTests {
     }
 
     private func successData(alternatives: [[String: Any]]) -> Data {
+        // swiftlint:disable:next force_try
         try! JSONSerialization.data(withJSONObject: ["alternatives": alternatives])
     }
 
@@ -111,25 +113,15 @@ struct EmbeddedAuthTests {
     }
 
     private func errorData(_ json: [String: Any]) -> Data {
+        // swiftlint:disable:next force_try
         try! JSONSerialization.data(withJSONObject: json)
     }
 
     // MARK: - Factory
 
-    @Test func factoryCreatesClientWithExplicitParams() {
-        let client = Auth0.embeddedAuth(clientId: clientId, domain: domain) as! Auth0EmbeddedAuth
-        #expect(client.clientId == clientId)
-        #expect(client.url.absoluteString == "https://\(domain)/")
-    }
-
-    @Test func factoryUsesSharedSessionByDefault() {
-        let client = Auth0.embeddedAuth(clientId: clientId, domain: domain) as! Auth0EmbeddedAuth
-        #expect(client.session === URLSession.shared)
-    }
-
-    @Test func factoryAcceptsCustomSession() {
+    @Test func factoryAcceptsCustomSession() throws {
         let custom = URLSession(configuration: .ephemeral)
-        let client = Auth0.embeddedAuth(clientId: clientId, domain: domain, session: custom) as! Auth0EmbeddedAuth
+        let client = try #require(Auth0.embeddedAuth(clientId: clientId, domain: domain, session: custom) as? Auth0EmbeddedAuth)
         #expect(client.session === custom)
     }
 

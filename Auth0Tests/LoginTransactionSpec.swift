@@ -1,3 +1,4 @@
+#if WEB_AUTH_PLATFORM
 import Foundation
 import Quick
 import Nimble
@@ -73,3 +74,4 @@ class LoginTransactionSpec: QuickSpec {
     }
 
 }
+#endif
