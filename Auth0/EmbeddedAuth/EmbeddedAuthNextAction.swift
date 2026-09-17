@@ -1,5 +1,18 @@
 import Foundation
 
+// MARK: - EmbeddedAuthorizationCode
+
+/// Returned by a completed embedded authorization loop.
+///
+/// Pass ``code`` to ``Authentication/codeExchange(withCode:codeVerifier:redirectURI:)``
+/// to obtain ``Credentials``.
+public struct EmbeddedAuthorizationCode: Sendable {
+
+    /// The raw authorization code to exchange for tokens.
+    public let code: String
+
+}
+
 // MARK: - NextAction
 
 /// A typed action the server will accept on the next ``EmbeddedAuthClient`` call.
