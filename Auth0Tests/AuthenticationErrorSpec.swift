@@ -434,6 +434,97 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(payload?.mfaRequirements.challenge?.first?.type) == "otp"
             }
 
+            it("should expose passkeyVerificationRequired from error info") {
+                let values: [String: Any] = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid or expired session",
+                    "auth_session": "pas_sess_123",
+                    "verification_required": ["email"]
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.passkeyVerificationRequired) == ["email"]
+            }
+
+            it("should expose passkeyVerificationRequired for multiple methods") {
+                let values: [String: Any] = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid or expired session",
+                    "auth_session": "pas_sess_123",
+                    "verification_required": ["email", "phone"]
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.passkeyVerificationRequired) == ["email", "phone"]
+            }
+
+            it("should return nil passkeyVerificationRequired when absent") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid or expired session"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.passkeyVerificationRequired).to(beNil())
+            }
+
+            it("should expose passkeyAuthSession from error info") {
+                let authSession = "pas_sess_123"
+                let values: [String: Any] = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid or expired session",
+                    "auth_session": authSession,
+                    "verification_required": ["email"]
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.passkeyAuthSession) == authSession
+            }
+
+            it("should return nil passkeyAuthSession when absent") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid or expired session"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.passkeyAuthSession).to(beNil())
+            }
+
+            it("should be retryable when invalid_grant has auth_session") {
+                let values: [String: Any] = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid or expired session",
+                    "auth_session": "pas_sess_123",
+                    "verification_required": ["email"]
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.isPasskeyVerificationRetryable) == true
+            }
+
+            it("should not be retryable when invalid_grant has no auth_session") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid or expired session"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.isPasskeyVerificationRetryable) == false
+            }
+
+            it("should not be retryable when 403 invalid_grant has no auth_session") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid or expired session"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                expect(error.isPasskeyVerificationRetryable) == false
+            }
+
+            it("should not be retryable for non-invalid_grant errors even with auth_session") {
+                let values: [String: Any] = [
+                    "error": "invalid_request",
+                    "error_description": "Missing required parameter",
+                    "auth_session": "pas_sess_123"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.isPasskeyVerificationRetryable) == false
+            }
+
             it("should decode mfa required payload without mfa_requirements") {
                 let values: [String: Any] = [
                     "error": "mfa_required",

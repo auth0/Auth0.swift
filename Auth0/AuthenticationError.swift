@@ -138,6 +138,32 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
         return self.code == DPoP.nonceRequiredErrorCode
     }
 
+    /// Identifier verification methods still required after a failed passkey token exchange (e.g. `["email", "phone"]`).
+    ///
+    /// Non-`nil` only when the token exchange returned `invalid_grant` and the session is still retryable.
+    /// Use together with ``passkeyAuthSession`` to retry the exchange with the corrected OTP codes.
+    public var passkeyVerificationRequired: [String]? {
+        return self.info["verification_required"] as? [String]
+    }
+
+    /// The passkey `auth_session` returned in a retryable token-exchange failure.
+    ///
+    /// When this is non-`nil` inside an `invalid_grant` error, the session is still alive — retry by passing
+    /// the corrected OTP codes to ``Authentication/login(passkey:challenge:connection:audience:scope:organization:verification:)``.
+    /// When `nil`, the session is terminal and a fresh ``Authentication/passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:)``
+    /// call is required.
+    public var passkeyAuthSession: String? {
+        return self.info["auth_session"] as? String
+    }
+
+    /// Whether a failed passkey token exchange can be retried on the same session.
+    ///
+    /// `true` when `auth_session` is present in an `invalid_grant` response, meaning verification codes were
+    /// wrong or missing but the session still has remaining attempts. `false` when the session is terminal.
+    public var isPasskeyVerificationRetryable: Bool {
+        return self.code == "invalid_grant" && self.passkeyAuthSession != nil
+    }
+
 }
 
 // MARK: - Error Messages

@@ -15,6 +15,7 @@ final class ContentViewModel: ObservableObject {
     @Published var showOTPSheet: Bool = false
     @Published var otpDigits: [String] = Array(repeating: "", count: 6)
     @Published var otpContext: OTPContext = .passwordless
+    @Published var isRetryingPasskeyVerification: Bool = false
 
     enum OTPContext {
         case passwordless
@@ -30,6 +31,8 @@ final class ContentViewModel: ObservableObject {
     private var pendingVerificationChannels: [String] = []
     private var collectedVerificationCodes: [String: String] = [:]
     private var pendingPasskeyWindow: UIWindow?
+    // Stored after ASAuthorizationController succeeds so the same credential is reused across OTP retries.
+    private var pendingSignupPasskey: AnyObject?
     #endif
 
     #if WEB_AUTH_PLATFORM
@@ -159,7 +162,7 @@ final class ContentViewModel: ObservableObject {
         errorMessage = nil
         do {
             let challenge = try await authenticationClient
-                .passkeySignupChallenge(phoneNumber: "+91\(email)", connection: "Username-Password-Authentication")
+                .passkeySignupChallenge(email: email, connection: "Username-Password-Authentication")
                 .start()
 
             if let channels = challenge.verificationRequired, !channels.isEmpty {
@@ -214,25 +217,72 @@ final class ContentViewModel: ObservableObject {
     @available(iOS 16.6, *)
     private func finalizePasskeySignupVerification() async {
         guard let challenge = pendingPasskeySignupChallenge else { return }
-        let codes = collectedVerificationCodes
-        let window = pendingPasskeyWindow
-        pendingPasskeySignupChallenge = nil
-        pendingPasskeyWindow = nil
-        collectedVerificationCodes = [:]
 
         isLoading = true
         errorMessage = nil
+
+        // Create the passkey credential once (only after all OTPs are collected), then reuse it across retries.
+        let passkey: any SignupPasskey
+        if let existing = pendingSignupPasskey as? ASAuthorizationPlatformPublicKeyCredentialRegistration {
+            passkey = existing
+        } else {
+            do {
+                passkeyController.window = pendingPasskeyWindow
+                let registration = try await passkeyController.presentRegistration(challenge: challenge)
+                pendingSignupPasskey = registration
+                passkey = registration
+            } catch let error as ASAuthorizationError where error.code == .canceled {
+                clearPendingPasskeySignup()
+                isLoading = false
+                return
+            } catch {
+                errorMessage = error.localizedDescription
+                isLoading = false
+                return
+            }
+        }
+
         do {
-            try await completePasskeySignup(challenge: challenge, window: window, verification: codes)
-        } catch let error as ASAuthorizationError where error.code == .canceled {
-            print(error)
+            let credentials = try await authenticationClient
+                .login(passkey: passkey,
+                       challenge: challenge,
+                       connection: "Username-Password-Authentication",
+                       scope: "openid profile email offline_access",
+                       verification: collectedVerificationCodes.isEmpty ? nil : collectedVerificationCodes)
+                .validateClaims()
+                .start()
+            try credentialsManager.store(credentials: credentials)
+            // Success — clear all pending state.
+            clearPendingPasskeySignup()
+            isAuthenticated = true
+        } catch let error as AuthenticationError where error.isPasskeyVerificationRetryable {
+            // Wrong OTP or a missing code — the session is still alive. Ask only for the failed channels.
+            let failedChannels = error.passkeyVerificationRequired ?? pendingVerificationChannels
+            pendingVerificationChannels = failedChannels.uniqued()
+            collectedVerificationCodes = [:]
+            isRetryingPasskeyVerification = true
+            errorMessage = "Incorrect code. Please try again."
+            isLoading = false
+            presentNextPasskeyVerificationChannel()
+            return
         } catch let error as CredentialsManagerError {
-            print(error)
             errorMessage = handleCredentialsManagerError(error)
         } catch {
-            errorMessage = error.localizedDescription
+            // Terminal (exhausted attempts, expired session, unknown session).
+            clearPendingPasskeySignup()
+            errorMessage = "Session expired. Please try signing up again."
         }
         isLoading = false
+    }
+
+    @available(iOS 16.6, *)
+    private func clearPendingPasskeySignup() {
+        pendingPasskeySignupChallenge = nil
+        pendingSignupPasskey = nil
+        pendingPasskeyWindow = nil
+        pendingVerificationChannels = []
+        collectedVerificationCodes = [:]
+        isRetryingPasskeyVerification = false
     }
 
     @available(iOS 16.6, *)

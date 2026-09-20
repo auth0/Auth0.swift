@@ -78,6 +78,12 @@ struct ContentView: View {
                 .buttonStyle(SecondaryButtonStyle())
                 .disabled(viewModel.isLoading || viewModel.email.isEmpty)
 
+                // Inline OTP entry — shown whenever a 6-digit code is required
+                // (passkey identifier verification or passwordless login).
+                if viewModel.showOTPSheet {
+                    OTPEntryView(viewModel: viewModel)
+                }
+
                 // MARK: Web Auth
 
                 #if WEB_AUTH_PLATFORM
@@ -144,9 +150,6 @@ struct ContentView: View {
         .task {
             await viewModel.checkAuthentication()
         }
-        .sheet(isPresented: $viewModel.showOTPSheet) {
-            OTPSheetView(viewModel: viewModel)
-        }
         #if os(macOS)
         .onAppear {
             currentWindow = getCurrentWindow()
@@ -155,9 +158,9 @@ struct ContentView: View {
     }
 }
 
-// MARK: - OTP Sheet
+// MARK: - Inline OTP Entry
 
-struct OTPSheetView: View {
+struct OTPEntryView: View {
     @ObservedObject var viewModel: ContentViewModel
 
     private var isPasskeyVerification: Bool {
@@ -172,7 +175,12 @@ struct OTPSheetView: View {
         return "email"
     }
 
-    private var title: String { isPasskeyVerification ? "Verify \(channelLabel)" : "Verify Email" }
+    private var title: String {
+        if isPasskeyVerification {
+            return viewModel.isRetryingPasskeyVerification ? "Retry \(channelLabel) verification" : "Verify \(channelLabel)"
+        }
+        return "Verify Email"
+    }
 
     private var subtitle: String {
         isPasskeyVerification
@@ -191,40 +199,33 @@ struct OTPSheetView: View {
     }
 
     var body: some View {
-        NavigationView {
-            VStack(spacing: 32) {
-                VStack(spacing: 8) {
-                    Text(title)
-                        .font(.title2.bold())
-                    Text(subtitle)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
+        VStack(spacing: 20) {
+            VStack(spacing: 8) {
+                Text(title)
+                    .font(.title3.bold())
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            OTPInputView(digits: $viewModel.otpDigits, onComplete: submitAction)
+
+            Button {
+                submitAction()
+            } label: {
+                if viewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                } else {
+                    Text("Verify")
                 }
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .disabled(viewModel.isLoading || viewModel.otpDigits.joined().count < 6)
 
-                OTPInputView(digits: $viewModel.otpDigits, onComplete: submitAction)
-
-                if let error = viewModel.errorMessage {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .font(.caption)
-                        .multilineTextAlignment(.center)
-                }
-
-                Button {
-                    submitAction()
-                } label: {
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                    } else {
-                        Text("Verify")
-                    }
-                }
-                .buttonStyle(PrimaryButtonStyle())
-                .disabled(viewModel.isLoading || viewModel.otpDigits.joined().count < 6)
-
+            HStack {
                 if !isPasskeyVerification {
                     Button("Resend code") {
                         Task { await viewModel.requestOTPChallenge() }
@@ -232,18 +233,16 @@ struct OTPSheetView: View {
                     .font(.subheadline)
                     .disabled(viewModel.isLoading)
                 }
-            }
-            .padding(24)
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        viewModel.showOTPSheet = false
-                    }
+                Spacer()
+                Button("Cancel") {
+                    viewModel.showOTPSheet = false
                 }
+                .font(.subheadline)
             }
         }
+        .padding(16)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
     }
 }
 
