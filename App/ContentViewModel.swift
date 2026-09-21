@@ -256,7 +256,7 @@ final class ContentViewModel: ObservableObject {
             clearPendingPasskeySignup()
             isAuthenticated = true
         } catch let error as AuthenticationError where error.isPasskeyVerificationRetryable {
-            // Wrong OTP or a missing code — the session is still alive. Ask only for the failed channels.
+            // Wrong OTP or a missing code — the session is still alive. Ask only for the failed channels. 
             let failedChannels = error.passkeyVerificationRequired ?? pendingVerificationChannels
             pendingVerificationChannels = failedChannels.uniqued()
             collectedVerificationCodes = [:]
@@ -383,8 +383,21 @@ final class ContentViewModel: ObservableObject {
 
     // MARK: - Session
 
+    func clearCredentials() {
+        errorMessage = nil
+        do {
+            try credentialsManager.clear()
+            isAuthenticated = false
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func checkAuthentication() async {
         do {
+            try await credentialsManager.clearAll()
             _ = try await credentialsManager.credentials()
             isAuthenticated = true
         } catch let error as CredentialsManagerError {

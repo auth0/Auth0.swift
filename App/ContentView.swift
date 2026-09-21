@@ -22,114 +22,48 @@ struct ContentView: View {
         ScrollView {
             VStack(spacing: 20) {
 
-                // MARK: Email / Password
+                // MARK: Email
 
-                VStack {
-                    TextField(text: $viewModel.email) {
-                        Text("email")
-                    }
-
-                    SecureField(text: $viewModel.password) {
-                        Text("password")
-                    }
-
-                    Button {
-                        Task { await viewModel.login() }
-                    } label: {
-                        Text("Login")
-                    }
+                TextField(text: $viewModel.email) {
+                    Text("email")
                 }
+                .textFieldStyle(.roundedBorder)
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                .keyboardType(.emailAddress)
+                #endif
 
-                // MARK: Passkeys
+                // MARK: Signup with Passkey
 
                 #if PASSKEYS_PLATFORM
                 if #available(iOS 16.6, *) {
-                    VStack(spacing: 12) {
-                        Button {
-                            Task {
-                                await viewModel.signupWithPasskey(window: window)
-                            }
-                        } label: {
-                            Label("Signup with Passkey", systemImage: "person.badge.key")
+                    Button {
+                        Task {
+                            await viewModel.signupWithPasskey(window: window)
                         }
-                        .buttonStyle(PrimaryButtonStyle())
-                        .disabled(viewModel.isLoading)
-
-                        Button {
-                            Task {
-                                await viewModel.loginWithPasskey(window: window)
-                            }
-                        } label: {
-                            Label("Login with Passkey", systemImage: "key.fill")
-                        }
-                        .buttonStyle(SecondaryButtonStyle())
-                        .disabled(viewModel.isLoading)
+                    } label: {
+                        Label("Signup with Passkey", systemImage: "person.badge.key")
                     }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.email.isEmpty)
                 }
                 #endif
 
-                // MARK: OTP
-
-                Button {
-                    Task { await viewModel.requestOTPChallenge() }
-                } label: {
-                    Label("Send OTP to Email", systemImage: "envelope.badge")
-                }
-                .buttonStyle(SecondaryButtonStyle())
-                .disabled(viewModel.isLoading || viewModel.email.isEmpty)
-
-                // Inline OTP entry — shown whenever a 6-digit code is required
-                // (passkey identifier verification or passwordless login).
+                // Inline OTP entry — shown while collecting the 6-digit
+                // identifier-verification code during passkey signup.
                 if viewModel.showOTPSheet {
                     OTPEntryView(viewModel: viewModel)
                 }
 
-                // MARK: Web Auth
+                // MARK: Clear Credentials
 
-                #if WEB_AUTH_PLATFORM
                 Button {
-                    Task {
-                        #if os(macOS)
-                        await viewModel.webLogin(presentationWindow: currentWindow)
-                        #else
-                        await viewModel.webLogin(presentationWindow: window)
-                        #endif
-                    }
+                    viewModel.clearCredentials()
                 } label: {
-                    Text("Login with Browser")
+                    Label("Clear Credentials", systemImage: "trash")
                 }
                 .buttonStyle(SecondaryButtonStyle())
                 .disabled(viewModel.isLoading)
-
-                #if os(iOS)
-                Button {
-                    Task { await viewModel.webViewLogin() }
-                } label: {
-                    Text("Login with WebView (Page Sheet)")
-                }
-                .buttonStyle(SecondaryButtonStyle())
-                .disabled(viewModel.isLoading)
-                #endif
-                #endif
-
-                Divider()
-                    .padding(.vertical)
-
-                Button {
-                    Task {
-                        #if WEB_AUTH_PLATFORM
-                        #if os(macOS)
-                        await viewModel.logout(presentationWindow: currentWindow)
-                        #else
-                        await viewModel.logout(presentationWindow: window)
-                        #endif
-                        #endif
-                    }
-                } label: {
-                    Text("Logout")
-                }
-                .buttonStyle(PrimaryButtonStyle())
-                .disabled(viewModel.isLoading || !viewModel.isAuthenticated)
 
                 if viewModel.isAuthenticated {
                     Text("✓ Authenticated")
