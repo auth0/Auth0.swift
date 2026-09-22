@@ -599,6 +599,52 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
 
+                it("should send delivery_method text when specified") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email],
+                            "delivery_method": "text"
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email, deliveryMethod: .text)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+                }
+
+                it("should send delivery_method voice when specified") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email],
+                            "delivery_method": "voice"
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email, deliveryMethod: .voice)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+                }
+
                 it("should decode verification_required when present in the challenge response") {
                     NetworkStub.addStub(condition: {
                         $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([

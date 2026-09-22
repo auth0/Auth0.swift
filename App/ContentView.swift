@@ -33,6 +33,17 @@ struct ContentView: View {
                 .keyboardType(.emailAddress)
                 #endif
 
+                // MARK: Phone Number
+
+                TextField(text: $viewModel.phoneNumber) {
+                    Text("phone number (e.g. +14155552671)")
+                }
+                .textFieldStyle(.roundedBorder)
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                .keyboardType(.phonePad)
+                #endif
+
                 // MARK: Signup with Passkey
 
                 #if PASSKEYS_PLATFORM
@@ -45,7 +56,7 @@ struct ContentView: View {
                         Label("Signup with Passkey", systemImage: "person.badge.key")
                     }
                     .buttonStyle(PrimaryButtonStyle())
-                    .disabled(viewModel.isLoading || viewModel.email.isEmpty)
+                    .disabled(viewModel.isLoading || (viewModel.email.isEmpty && viewModel.phoneNumber.isEmpty))
                 }
                 #endif
 

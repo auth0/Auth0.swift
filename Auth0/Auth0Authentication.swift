@@ -269,7 +269,8 @@ struct Auth0Authentication: Authentication {
                                 picture: String?,
                                 userMetadata: [String: String]?,
                                 connection: String?,
-                                organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
+                                organization: String?,
+                                deliveryMethod: DeliveryMethod?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
         let url = URL(string: "passkey/register", relativeTo: self.url)!
 
         var userProfile: [String: Any] = [:]
@@ -289,6 +290,7 @@ struct Auth0Authentication: Authentication {
         payload["realm"] = connection
         payload["organization"] = organization
         payload["user_metadata"] = userMetadata
+        payload["delivery_method"] = deliveryMethod?.rawValue
 
         return Request(session: session,
                        url: url,

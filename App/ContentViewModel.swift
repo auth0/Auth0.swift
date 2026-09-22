@@ -8,6 +8,7 @@ import AuthenticationServices
 @MainActor
 final class ContentViewModel: ObservableObject {
     @Published var email: String = ""
+    @Published var phoneNumber: String = ""
     @Published var password: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
@@ -154,15 +155,19 @@ final class ContentViewModel: ObservableObject {
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, *)
     func signupWithPasskey(window: UIWindow?) async {
-        guard !email.isEmpty else {
-            errorMessage = "Please enter your email to sign up with a passkey"
+        guard !email.isEmpty || !phoneNumber.isEmpty else {
+            errorMessage = "Please enter an email or phone number to sign up with a passkey"
             return
         }
         isLoading = true
         errorMessage = nil
         do {
             let challenge = try await authenticationClient
-                .passkeySignupChallenge(email: email, connection: "Username-Password-Authentication")
+                .passkeySignupChallenge(
+                    email: email.isEmpty ? nil : email,
+                    phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber,
+                    connection: "Username-Password-Authentication",
+                    deliveryMethod: phoneNumber.isEmpty ? nil : .voice)
                 .start()
 
             if let channels = challenge.verificationRequired, !channels.isEmpty {
@@ -337,7 +342,7 @@ final class ContentViewModel: ObservableObject {
 
     func requestOTPChallenge() async {
         guard !email.isEmpty else {
-            errorMessage = "Please enter your email to receive an OTP"
+            errorMessage = "Please enter your email to receive a passwordless code"
             return
         }
         isLoading = true

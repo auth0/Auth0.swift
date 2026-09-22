@@ -606,17 +606,18 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// passkey credential and the challenge to log the new user in.
     ///
     /// - Parameters:
-    ///   - email:        Email address of the user. Defaults to `nil`.
-    ///   - phoneNumber:  Phone number of the user. Defaults to `nil`.
-    ///   - username:     Username of the user. Defaults to `nil`.
-    ///   - name:         Display name of the user. Defaults to `nil`.
-    ///   - givenName:    First name of the user. Defaults to `nil`.
-    ///   - familyName:   Last name of the user. Defaults to `nil`.
-    ///   - nickname:     Preferred nickname of the user. Defaults to `nil`.
-    ///   - picture:      URL pointing to the user's profile picture. Defaults to `nil`.
-    ///   - userMetadata: Additional user metadata as key-value pairs. Defaults to `nil`.
-    ///   - connection:   Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
-    ///   - organization: Identifier of an organization the user is a member of.
+    ///   - email:          Email address of the user. Defaults to `nil`.
+    ///   - phoneNumber:    Phone number of the user. Defaults to `nil`.
+    ///   - username:       Username of the user. Defaults to `nil`.
+    ///   - name:           Display name of the user. Defaults to `nil`.
+    ///   - givenName:      First name of the user. Defaults to `nil`.
+    ///   - familyName:     Last name of the user. Defaults to `nil`.
+    ///   - nickname:       Preferred nickname of the user. Defaults to `nil`.
+    ///   - picture:        URL pointing to the user's profile picture. Defaults to `nil`.
+    ///   - userMetadata:   Additional user metadata as key-value pairs. Defaults to `nil`.
+    ///   - connection:     Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - organization:   Identifier of an organization the user is a member of.
+    ///   - deliveryMethod: OTP delivery channel for phone identifier verification. Only relevant when the connection requires phone verification and `phoneNumber` is provided. Defaults to `nil` (server default applies).
     /// - Returns: A request that will yield a passkey signup challenge.
     ///
     /// ## See Also
@@ -635,7 +636,8 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                                 picture: String?,
                                 userMetadata: [String: String]?,
                                 connection: String?,
-                                organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError>
+                                organization: String?,
+                                deliveryMethod: DeliveryMethod?) -> any Requestable<PasskeySignupChallenge, AuthenticationError>
     #endif
 
     /**
@@ -1256,7 +1258,8 @@ public extension Authentication {
                                 picture: String? = nil,
                                 userMetadata: [String: String]? = nil,
                                 connection: String? = nil,
-                                organization: String? = nil) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
+                                organization: String? = nil,
+                                deliveryMethod: DeliveryMethod? = nil) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
         return self.passkeySignupChallenge(email: email,
                                            phoneNumber: phoneNumber,
                                            username: username,
@@ -1267,7 +1270,8 @@ public extension Authentication {
                                            picture: picture,
                                            userMetadata: userMetadata,
                                            connection: connection,
-                                           organization: organization)
+                                           organization: organization,
+                                           deliveryMethod: deliveryMethod)
     }
     #endif
 
