@@ -134,8 +134,8 @@ for option in discovery.options {
         print("Passwordless OTP on \(connection) via \(identifiers) (\(type))")
     case .nativeSocial(let subjectTokenType):
         print("Native social: \(subjectTokenType)")
-    case .authorizationCode(let connection):
-        print("Authorization code: \(connection)")
+    case .authorizationCode(let connection, let type):
+        print("Authorization code: \(connection) (\(type ?? "-"))")
     case .unknown(let rawGrantType, let connection):
         print("Unknown grant \(rawGrantType) on \(connection ?? "-")")
     }

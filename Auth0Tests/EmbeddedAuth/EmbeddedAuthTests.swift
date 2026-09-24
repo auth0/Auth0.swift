@@ -84,7 +84,7 @@ private let passwordRealmAlt: [String: Any] = [
 
 private let unknownAlt: [String: Any] = [
     "grant_type": "urn:custom:grant-type:future",
-    "connection": "some-conn"
+    "connection": "some-connection"
 ]
 
 // MARK: - Suite
@@ -159,11 +159,33 @@ struct EmbeddedAuthTests {
             try await confirmation(expectedCount: 1) { confirm in
                 EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
-                guard case .authorizationCode(let conn) = result.options.first else {
+                guard case .authorizationCode(let connection, let type) = result.options.first else {
                     Issue.record("Expected .authorizationCode"); return
                 }
-                #expect(conn == "my-db")
+                #expect(connection == "my-db")
+                #expect(type == "embedded_authorize")
                 #expect(result.supports(.authorizationCode))
+                #expect(result.hasEmbeddedAuthorization)
+            }
+        } catch {
+            Issue.record(error)
+        }
+    }
+
+    @Test func hasEmbeddedAuthorizationFalseWhenTypeDiffers() async {
+        let sut = makeClient()
+        let otherTypeAlt: [String: Any] = [
+            "grant_type": "authorization_code",
+            "type": "some_other_type",
+            "connection": "my-db"
+        ]
+        let data = successData(alternatives: [otherTypeAlt])
+        do {
+            try await confirmation(expectedCount: 1) { confirm in
+                EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
+                let result = try await sut.discover().start()
+                #expect(result.supports(.authorizationCode))
+                #expect(!result.hasEmbeddedAuthorization)
             }
         } catch {
             Issue.record(error)
@@ -249,10 +271,10 @@ struct EmbeddedAuthTests {
             try await confirmation(expectedCount: 1) { confirm in
                 EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
-                guard case .passkey(let conn) = result.options.first else {
+                guard case .passkey(let connection) = result.options.first else {
                     Issue.record("Expected .passkey"); return
                 }
-                #expect(conn == "my-db")
+                #expect(connection == "my-db")
             }
         } catch {
             Issue.record(error)
@@ -282,11 +304,11 @@ struct EmbeddedAuthTests {
             try await confirmation(expectedCount: 1) { confirm in
                 EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
-                guard case .passwordlessOtp(let conn, let ids, let flowType) = result.options.first else {
+                guard case .passwordlessOtp(let connection, let identifiers, let flowType) = result.options.first else {
                     Issue.record("Expected .passwordlessOtp"); return
                 }
-                #expect(conn == "email")
-                #expect(ids == [.email])
+                #expect(connection == "email")
+                #expect(identifiers == [.email])
                 #expect(flowType == .legacy)
             }
         } catch {
@@ -301,12 +323,12 @@ struct EmbeddedAuthTests {
             try await confirmation(expectedCount: 1) { confirm in
                 EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
-                guard case .passwordlessOtp(let conn, let ids, let flowType) = result.options.first else {
+                guard case .passwordlessOtp(let connection, let identifiers, let flowType) = result.options.first else {
                     Issue.record("Expected .passwordlessOtp"); return
                 }
-                #expect(conn == "my-db")
-                #expect(ids.contains(.email))
-                #expect(ids.contains(.phoneNumber))
+                #expect(connection == "my-db")
+                #expect(identifiers.contains(.email))
+                #expect(identifiers.contains(.phoneNumber))
                 #expect(flowType == .auth0)
             }
         } catch {
@@ -370,11 +392,11 @@ struct EmbeddedAuthTests {
             try await confirmation(expectedCount: 1) { confirm in
                 EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
-                guard case .unknown(let raw, let conn) = result.options.first else {
+                guard case .unknown(let rawGrantType, let connection) = result.options.first else {
                     Issue.record("Expected .unknown"); return
                 }
-                #expect(raw == "urn:custom:grant-type:future")
-                #expect(conn == "some-conn")
+                #expect(rawGrantType == "urn:custom:grant-type:future")
+                #expect(connection == "some-connection")
             }
         } catch {
             Issue.record(error)

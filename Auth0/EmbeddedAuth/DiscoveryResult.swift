@@ -34,16 +34,16 @@ public struct DiscoveryResult: Sendable {
     /// Connection names for all `.passkey` alternatives.
     public var passkeyConnections: [String] {
         options.compactMap {
-            guard case .passkey(let conn) = $0 else { return nil }
-            return conn
+            guard case .passkey(let connection) = $0 else { return nil }
+            return connection
         }
     }
 
     /// Projected ``PasswordlessOTPOption`` values for all `.passwordlessOtp` alternatives.
     public var passwordlessOTPOptions: [PasswordlessOTPOption] {
         options.compactMap {
-            guard case .passwordlessOtp(let conn, let ids, let type) = $0 else { return nil }
-            return PasswordlessOTPOption(connection: conn, identifiers: ids, type: type)
+            guard case .passwordlessOtp(let connection, let identifiers, let type) = $0 else { return nil }
+            return PasswordlessOTPOption(connection: connection, identifiers: identifiers, type: type)
         }
     }
 
@@ -58,6 +58,15 @@ public struct DiscoveryResult: Sendable {
     /// Returns `true` if any alternative matches the given grant type.
     public func supports(_ grantType: GrantType) -> Bool {
         options.contains { $0.grantType == grantType }
+    }
+
+    /// `true` if any `.authorizationCode` alternative advertises embedded authorization
+    /// (`type == "embedded_authorize"`).
+    public var hasEmbeddedAuthorization: Bool {
+        options.contains {
+            guard case .authorizationCode(_, let type) = $0 else { return false }
+            return type == TypeValue.embeddedAuthorize
+        }
     }
 
 }
@@ -83,7 +92,13 @@ public enum LoginOption: Sendable {
     case nativeSocial(subjectTokenType: String)
 
     /// Interactive embedded authorization via `POST /e/authorize`.
-    case authorizationCode(connection: String)
+    ///
+    /// - Parameters:
+    ///   - connection: Name of the connection this alternative targets.
+    ///   - type:       The alternative's `type` discriminator, or `nil` when absent.
+    ///     A value of `embedded_authorize` indicates embedded authorization is available
+    ///     (see ``DiscoveryResult/hasEmbeddedAuthorization``).
+    case authorizationCode(connection: String, type: String?)
 
     /// An unrecognized grant type returned by the server (forward-compatibility).
     case unknown(rawGrantType: String, connection: String?)
@@ -110,8 +125,9 @@ public enum LoginOption: Sendable {
             return nil
         case .passwordRealm(let realm):
             return realm
-        case .passkey(let connection),
-                .authorizationCode(let connection):
+        case .passkey(let connection):
+            return connection
+        case .authorizationCode(let connection, _):
             return connection
         case .passwordlessOtp(let connection, _, _):
             return connection

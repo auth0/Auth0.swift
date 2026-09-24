@@ -61,34 +61,34 @@ struct DiscoveryAlternativePayload: Decodable {
 
     var loginOption: LoginOption? {
         switch grantType {
-        case "authorization_code":
+        case GrantTypeValue.authorizationCode:
             if let connection {
-                return .authorizationCode(connection: connection)
+                return .authorizationCode(connection: connection, type: type)
             }
-        case "urn:ietf:params:oauth:grant-type:token-exchange":
+        case GrantTypeValue.tokenExchange:
             if let subjectTokenType {
                 return .nativeSocial(subjectTokenType: subjectTokenType)
             }
-        case "password":
+        case GrantTypeValue.password:
             return .password
-        case "urn:okta:params:oauth:grant-type:webauthn":
+        case GrantTypeValue.webAuthn:
             if let connection {
                 return .passkey(connection: connection)
             }
-        case "http://auth0.com/oauth/grant-type/passwordless/otp":
+        case GrantTypeValue.passwordlessOTP:
             if let identifierTypes, let connection = connection {
                 let identifiers: [PasswordlessIdentifier] = (identifierTypes).compactMap {
                     switch $0 {
-                    case "email":        return .email
-                    case "phone_number": return .phoneNumber
-                    default:             return nil
+                    case IdentifierTypeValue.email:       return .email
+                    case IdentifierTypeValue.phoneNumber: return .phoneNumber
+                    default:                              return nil
                     }
                 }
                 return .passwordlessOtp(connection: connection,
                                         identifiers: identifiers,
-                                        type: type == "auth0" ? .auth0 : .legacy)
+                                        type: type == TypeValue.auth0 ? .auth0 : .legacy)
             }
-        case "http://auth0.com/oauth/grant-type/password-realm":
+        case GrantTypeValue.passwordRealm:
             if let realm {
                 return .passwordRealm(realm: realm)
             }
