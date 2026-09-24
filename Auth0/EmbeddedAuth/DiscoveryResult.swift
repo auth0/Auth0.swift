@@ -39,11 +39,11 @@ public struct DiscoveryResult: Sendable {
         }
     }
 
-    /// Projected ``OTPOption`` values for all `.passwordlessOtp` alternatives.
-    public var otpOptions: [OTPOption] {
+    /// Projected ``PasswordlessOTPOption`` values for all `.passwordlessOtp` alternatives.
+    public var passwordlessOTPOptions: [PasswordlessOTPOption] {
         options.compactMap {
             guard case .passwordlessOtp(let conn, let ids, let type) = $0 else { return nil }
-            return OTPOption(connection: conn, identifiers: ids, type: type)
+            return PasswordlessOTPOption(connection: conn, identifiers: ids, type: type)
         }
     }
 
@@ -77,13 +77,13 @@ public enum LoginOption: Sendable {
     case passkey(connection: String)
 
     /// Passwordless OTP — either `legacy` (via `/passwordless/start`) or `auth0` (via `/otp/challenge`).
-    case passwordlessOtp(connection: String, identifiers: [PasswordlessIdentifier], type: OTPFlowType)
+    case passwordlessOtp(connection: String, identifiers: [PasswordlessIdentifier], type: PasswordlessOTPFlowType)
 
     /// Native social login via token exchange (Google, Apple, Facebook).
     case nativeSocial(subjectTokenType: String)
 
     /// Interactive embedded authorization via `POST /e/authorize`.
-    case embeddedAuthorize(connection: String)
+    case authorizationCode(connection: String)
 
     /// An unrecognized grant type returned by the server (forward-compatibility).
     case unknown(rawGrantType: String, connection: String?)
@@ -98,7 +98,7 @@ public enum LoginOption: Sendable {
         case .passkey:             return .passkey
         case .passwordlessOtp:     return .passwordlessOtp
         case .nativeSocial:        return .nativeSocial
-        case .embeddedAuthorize:   return .authorizationCode
+        case .authorizationCode:   return .authorizationCode
         case .unknown:             return .unknown
         }
     }
@@ -106,11 +106,17 @@ public enum LoginOption: Sendable {
     /// The connection name associated with this alternative, if any.
     public var connection: String? {
         switch self {
-        case .password, .nativeSocial:                          return nil
-        case .passwordRealm:                                    return nil
-        case .passkey(let conn), .embeddedAuthorize(let conn):  return conn
-        case .passwordlessOtp(let conn, _, _):                  return conn
-        case .unknown(_, let conn):                             return conn
+        case .password, .nativeSocial:
+            return nil
+        case .passwordRealm(let realm):
+            return realm
+        case .passkey(let connection),
+                .authorizationCode(let connection):
+            return connection
+        case .passwordlessOtp(let connection, _, _):
+            return connection
+        case .unknown(_, let connection):
+            return connection
         }
     }
 
@@ -141,17 +147,17 @@ public enum PasswordlessIdentifier: Sendable, Equatable {
 ///
 /// - `legacy`: Use `POST /passwordless/start` → verify with realm + otp.
 /// - `auth0`:  Use `POST /otp/challenge` → verify with auth_session + otp.
-public enum OTPFlowType: Sendable, Equatable {
+public enum PasswordlessOTPFlowType: Sendable, Equatable {
     case legacy
     case auth0
 }
 
 /// Projected OTP details for a `.passwordlessOtp` alternative.
-public struct OTPOption: Sendable {
+public struct PasswordlessOTPOption: Sendable {
     /// Name of the connection.
     public let connection: String
     /// Identifier types this connection accepts.
     public let identifiers: [PasswordlessIdentifier]
     /// Which passwordless flow the connection uses.
-    public let type: OTPFlowType
+    public let type: PasswordlessOTPFlowType
 }

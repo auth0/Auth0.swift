@@ -35,36 +35,13 @@ struct Auth0EmbeddedAuth: EmbeddedAuth {
 
 }
 
-// MARK: - Response decoder
-
-private func decodeDiscoveryResult(
-    from result: Result<ResponseValue, EmbeddedAuthError>,
-    callback: @Sendable (Result<DiscoveryResult, EmbeddedAuthError>) -> Void
-) {
-    switch result {
-    case .failure(let error):
-        callback(.failure(error))
-    case .success(let response):
-        guard let data = response.data else {
-            callback(.failure(EmbeddedAuthError(from: response)))
-            return
-        }
-        do {
-            let decoded = try JSONDecoder().decode(DiscoveryResponse.self, from: data)
-            callback(.success(DiscoveryResult(options: decoded.alternatives.map(\.loginOption))))
-        } catch {
-            callback(.failure(EmbeddedAuthError(from: response)))
-        }
-    }
-}
-
 // MARK: - Wire types (Decodable)
 
-private struct DiscoveryResponse: Decodable {
+struct DiscoveryResponse: Decodable {
     let alternatives: [DiscoveryAlternativePayload]
 }
 
-private struct DiscoveryAlternativePayload: Decodable {
+struct DiscoveryAlternativePayload: Decodable {
 
     let grantType: String
     let connection: String?
@@ -82,34 +59,43 @@ private struct DiscoveryAlternativePayload: Decodable {
         case realm
     }
 
-    var loginOption: LoginOption {
+    var loginOption: LoginOption? {
         switch grantType {
         case "authorization_code":
-            guard let conn = connection else { return .unknown(rawGrantType: grantType, connection: nil) }
-            return .embeddedAuthorize(connection: conn)
+            if let connection {
+                return .authorizationCode(connection: connection)
+            }
         case "urn:ietf:params:oauth:grant-type:token-exchange":
-            return .nativeSocial(subjectTokenType: subjectTokenType ?? "")
+            if let subjectTokenType {
+                return .nativeSocial(subjectTokenType: subjectTokenType)
+            }
         case "password":
             return .password
         case "urn:okta:params:oauth:grant-type:webauthn":
-            guard let conn = connection else { return .unknown(rawGrantType: grantType, connection: nil) }
-            return .passkey(connection: conn)
-        case "http://auth0.com/oauth/grant-type/passwordless/otp":
-            let identifiers: [PasswordlessIdentifier] = (identifierTypes ?? []).compactMap {
-                switch $0 {
-                case "email":        return .email
-                case "phone_number": return .phoneNumber
-                default:             return nil
-                }
+            if let connection {
+                return .passkey(connection: connection)
             }
-            return .passwordlessOtp(connection: connection ?? "",
-                                    identifiers: identifiers,
-                                    type: type == "auth0" ? .auth0 : .legacy)
+        case "http://auth0.com/oauth/grant-type/passwordless/otp":
+            if let identifierTypes, let connection = connection {
+                let identifiers: [PasswordlessIdentifier] = (identifierTypes).compactMap {
+                    switch $0 {
+                    case "email":        return .email
+                    case "phone_number": return .phoneNumber
+                    default:             return nil
+                    }
+                }
+                return .passwordlessOtp(connection: connection,
+                                        identifiers: identifiers,
+                                        type: type == "auth0" ? .auth0 : .legacy)
+            }
         case "http://auth0.com/oauth/grant-type/password-realm":
-            return .passwordRealm(realm: realm ?? "")
+            if let realm {
+                return .passwordRealm(realm: realm)
+            }
         default:
             return .unknown(rawGrantType: grantType, connection: connection)
         }
+        return nil
     }
 
 }

@@ -28,7 +28,7 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// Calls `GET /e/discovery?client_id=<id>[&connection=<name>]`.
     ///
     /// - Parameter connection: Optional connection name to filter results to a single connection.
-    ///   Pass `nil` (the default) to retrieve all alternatives (up to 100).
+    ///   Pass `nil` (the default) to retrieve all alternatives.
     /// - Returns: A request that yields a ``DiscoveryResult``.
     func discover(connection: String?) -> Request<DiscoveryResult, EmbeddedAuthError>
 

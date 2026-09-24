@@ -118,7 +118,7 @@ if discovery.supports(.passkey) {
 // Typed accessors for each alternative
 let realms = discovery.passwordRealms         // [String]
 let passkeyConnections = discovery.passkeyConnections // [String]
-let otpOptions = discovery.otpOptions         // [OTPOption]
+let otpOptions = discovery.passwordlessOTPOptions // [PasswordlessOTPOption]
 let socialProviders = discovery.socialProviders // [String] of subject_token_type values
 
 // Or iterate the options directly
@@ -134,8 +134,8 @@ for option in discovery.options {
         print("Passwordless OTP on \(connection) via \(identifiers) (\(type))")
     case .nativeSocial(let subjectTokenType):
         print("Native social: \(subjectTokenType)")
-    case .embeddedAuthorize(let connection):
-        print("Embedded authorize: \(connection)")
+    case .authorizationCode(let connection):
+        print("Authorization code: \(connection)")
     case .unknown(let rawGrantType, let connection):
         print("Unknown grant \(rawGrantType) on \(connection ?? "-")")
     }

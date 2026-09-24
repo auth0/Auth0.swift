@@ -33,7 +33,7 @@ private let domain = "test.auth0.com"
 
 // MARK: - Fixtures
 
-private let embeddedAuthorizeAlt: [String: Any] = [
+private let authorizationCodeAlt: [String: Any] = [
     "grant_type": "authorization_code",
     "type": "embedded_authorize",
     "connection": "my-db"
@@ -154,13 +154,13 @@ struct EmbeddedAuthTests {
 
     @Test func discoverDecodesEmbeddedAuthorize() async {
         let sut = makeClient()
-        let data = successData(alternatives: [embeddedAuthorizeAlt])
+        let data = successData(alternatives: [authorizationCodeAlt])
         do {
             try await confirmation(expectedCount: 1) { confirm in
                 EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
-                guard case .embeddedAuthorize(let conn) = result.options.first else {
-                    Issue.record("Expected .embeddedAuthorize"); return
+                guard case .authorizationCode(let conn) = result.options.first else {
+                    Issue.record("Expected .authorizationCode"); return
                 }
                 #expect(conn == "my-db")
                 #expect(result.supports(.authorizationCode))
@@ -321,7 +321,7 @@ struct EmbeddedAuthTests {
             try await confirmation(expectedCount: 1) { confirm in
                 EmbeddedAuthMockURLProtocol.requestHandler = { _ in confirm(); return (self.successResponse(), data) }
                 let result = try await sut.discover().start()
-                #expect(result.otpOptions.count == 2)
+                #expect(result.passwordlessOTPOptions.count == 2)
             }
         } catch {
             Issue.record(error)
@@ -400,7 +400,7 @@ struct EmbeddedAuthTests {
     @Test func discoverDecodesAllSevenAlternatives() async {
         let sut = makeClient()
         let data = successData(alternatives: [
-            embeddedAuthorizeAlt,
+            authorizationCodeAlt,
             tokenExchangeGoogleAlt,
             passwordAlt,
             passkeyAlt,
