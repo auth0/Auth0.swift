@@ -94,11 +94,11 @@ public enum LoginOption: Sendable {
     /// Interactive embedded authorization via `POST /e/authorize`.
     ///
     /// - Parameters:
-    ///   - connection: Name of the connection this alternative targets.
+    ///   - connection: Name of the connection this alternative targets, or `nil` when the server omits it.
     ///   - type:       The alternative's `type` discriminator, or `nil` when absent.
     ///     A value of `embedded_authorize` indicates embedded authorization is available
     ///     (see ``DiscoveryResult/hasEmbeddedAuthorization``).
-    case authorizationCode(connection: String, type: String?)
+    case authorizationCode(connection: String?, type: String?)
 
     /// An unrecognized grant type returned by the server (forward-compatibility).
     case unknown(rawGrantType: String, connection: String?)

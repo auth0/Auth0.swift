@@ -1,114 +1,143 @@
 import SwiftUI
-import Combine
 import Auth0
-
-#if !os(macOS)
-   import UIKit
-#else
-   import AppKit
-#endif
-
 
 struct ContentView: View {
     @StateObject private var viewModel = ContentViewModel(authenticationClient: Auth0.authentication())
 
-    #if os(macOS)
-    @State private var currentWindow: Auth0WindowRepresentable?
-    #else
-    @Environment(\.window) private var window
-    #endif
-
     var body: some View {
-        VStack(spacing: 20) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Embedded Auth")
+                    .font(.title2.bold())
+                    .padding(.bottom, 4)
 
-            VStack {
-                TextField(text: $viewModel.email) {
-                    Text("email")
-                }
+                switch viewModel.embeddedAuthUIState {
 
-                SecureField(text: $viewModel.password) {
-                    Text("password")
-                }
-
-                Button {
-                    Task {
-                        await viewModel.login()
+                case .initial:
+                    Button {
+                        Task { await viewModel.startEmbeddedFlow() }
+                    } label: {
+                        Text("Start Embedded Auth")
                     }
-                } label: {
-                    Text("Login")
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+
+                case .identifyEmail:
+                    TextField("Email", text: $viewModel.email)
+                        #if !os(macOS)
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    Button {
+                        Task { await viewModel.submitEmail(viewModel.email) }
+                    } label: {
+                        Text("Submit Email")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.email.isEmpty)
+
+                case .challengeEmail:
+                    Text("We'll send a one-time code to your email.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Button {
+                        Task { await viewModel.triggerChallenge() }
+                    } label: {
+                        Text("Send OTP")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+
+                case .verifyOTP(_, let identifier):
+                    if let identifier {
+                        Text("Enter the code sent to \(identifier)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    TextField("One-time code", text: $viewModel.otp)
+                        #if !os(macOS)
+                        .textContentType(.oneTimeCode)
+                        .keyboardType(.numberPad)
+                        #endif
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    if let otpError = viewModel.otpAttemptError {
+                        Text(otpError)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    Button {
+                        viewModel.otpAttemptError = nil
+                        Task { await viewModel.submitOtp(viewModel.otp) }
+                    } label: {
+                        Text("Verify")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.otp.isEmpty)
+
+                case .success(let credentials):
+                    Text("✓ Authenticated")
+                        .font(.headline)
+                        .foregroundColor(.green)
+                    Group {
+                        LabeledValue(label: "Token type", value: credentials.tokenType)
+                        LabeledValue(label: "Scope", value: credentials.scope ?? "—")
+                        LabeledValue(label: "Expires", value: credentials.expiresAt.formatted())
+                    }
+                    Button {
+                        viewModel.embeddedAuthUIState = .initial
+                        viewModel.otp = ""
+                        viewModel.email = ""
+                    } label: {
+                        Text("Reset")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+
+                case .failed(let message):
+                    Text("Error")
+                        .font(.headline)
+                        .foregroundColor(.red)
+                    Text(message)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.leading)
+                    Button {
+                        viewModel.embeddedAuthUIState = .initial
+                        viewModel.otp = ""
+                    } label: {
+                        Text("Try Again")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                }
+
+                if viewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
                 }
             }
-
-            #if WEB_AUTH_PLATFORM
-            Button {
-                Task {
-                    #if os(macOS)
-                    await viewModel.webLogin(presentationWindow: currentWindow)
-                    #else
-                    await viewModel.webLogin(presentationWindow: window)
-                    #endif
-                }
-            } label: {
-                Text("Login with Browser")
-            }
-            .buttonStyle(SecondaryButtonStyle())
-            .disabled(viewModel.isLoading)
-
-            #if os(iOS)
-            Button {
-                Task {
-                    await viewModel.webViewLogin()
-                }
-            } label: {
-                Text("Login with WebView (Page Sheet)")
-            }
-            .buttonStyle(SecondaryButtonStyle())
-            .disabled(viewModel.isLoading)
-            #endif
-            #endif
-
-            Divider()
-                .padding(.vertical)
-
-            Button {
-                Task {
-                    #if WEB_AUTH_PLATFORM
-                    #if os(macOS)
-                    await viewModel.logout(presentationWindow: currentWindow)
-                    #else
-                    await viewModel.logout(presentationWindow: window)
-                    #endif
-                    #endif
-                }
-            } label: {
-                Text("Logout")
-            }
-            .buttonStyle(PrimaryButtonStyle())
-            .disabled(viewModel.isLoading || !viewModel.isAuthenticated)
-
-            if viewModel.isAuthenticated {
-                Text("✓ Authenticated")
-                    .foregroundColor(.green)
-                    .font(.caption)
-            }
-
-            if let error = viewModel.errorMessage {
-                Text(error)
-                    .foregroundColor(.red)
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-            }
+            .padding()
         }
-        .padding(.horizontal)
-        .padding(.top, 10)
-        .task {
-            await viewModel.checkAuthentication()
+    }
+}
+
+private struct LabeledValue: View {
+    let label: String
+    let value: String
+    var body: some View {
+        HStack(alignment: .top) {
+            Text(label + ":")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .frame(width: 80, alignment: .leading)
+            Text(value)
+                .font(.caption.monospaced())
         }
-        #if os(macOS)
-        .onAppear {
-            currentWindow = getCurrentWindow()
-        }
-        #endif
     }
 }
 
@@ -142,17 +171,10 @@ struct SecondaryButtonStyle: ButtonStyle {
 
 #if os(macOS)
 private func getCurrentWindow() -> NSWindow? {
-    if let keyWindow = NSApplication.shared.keyWindow {
-        return keyWindow
-    }
-
-    if let mainWindow = NSApplication.shared.mainWindow {
-        return mainWindow
-    }
-
-    return NSApplication.shared.windows.first
+    NSApplication.shared.keyWindow
+        ?? NSApplication.shared.mainWindow
+        ?? NSApplication.shared.windows.first
 }
-
 #else
 private struct WindowKey: EnvironmentKey {
     static let defaultValue: UIWindow? = nil
@@ -167,29 +189,22 @@ extension EnvironmentValues {
 
 struct WindowReaderModifier: ViewModifier {
     @State private var window: UIWindow?
-
     func body(content: Content) -> some View {
         content
             .environment(\.window, window)
-            .background(
-                WindowAccessor(window: $window)
-            )
+            .background(WindowAccessor(window: $window))
     }
 }
 
 struct WindowAccessor: UIViewRepresentable {
     @Binding var window: UIWindow?
-
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }
-
     func updateUIView(_ uiView: UIView, context: Context) {
-        DispatchQueue.main.async {
-            self.window = uiView.window
-        }
+        DispatchQueue.main.async { self.window = uiView.window }
     }
 }
 
@@ -198,5 +213,4 @@ extension View {
         self.modifier(WindowReaderModifier())
     }
 }
-
 #endif
