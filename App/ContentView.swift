@@ -24,8 +24,8 @@ struct ContentView: View {
 
                 case .identifyEmail:
                     TextField("Email", text: $viewModel.email)
-                        .textContentType(.emailAddress)
                         #if !os(macOS)
+                        .textContentType(.emailAddress)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                         #endif
@@ -60,8 +60,8 @@ struct ContentView: View {
                             .foregroundColor(.secondary)
                     }
                     TextField("One-time code", text: $viewModel.otp)
-                        .textContentType(.oneTimeCode)
                         #if !os(macOS)
+                        .textContentType(.oneTimeCode)
                         .keyboardType(.numberPad)
                         #endif
                         #if !os(tvOS)
