@@ -636,7 +636,7 @@ do {
 ```
 
 > [!NOTE]
-> Experiment Center is currently in Beta and runs only on **development tenants**. Production tenants are not supported during the Beta period. The override only applies to the current request — the next login without these parameters reverts to server-side deterministic assignment. Refer to the [Experiment Center documentation](https://auth0.com/docs/customize/experiment-center/overview) for setup instructions.
+> Experiment Center is an Enterprise feature, and support via SDKs is currently in Early Access. To request access to this feature, contact your Auth0 representative. The override only applies to the current request — the next login without these parameters reverts to server-side deterministic assignment. Refer to the [Experiment Center documentation](https://auth0.com/docs/customize/experiment-center/overview) for setup instructions.
 >
 > Only Web Auth (Universal Login) reaches Experiment Center. The Authentication API (embedded login, resource owner password grant) skips `/authorize` entirely and does not support experiment overrides.
 
