@@ -31,30 +31,126 @@ import Foundation
         #expect(!error.isAccessDenied)
     }
 
-    // MARK: isTooManyAttempts
+    // MARK: isTooManyWrongOtpAttempts
 
-    @Test func tooManyAttemptsTrueWhenBothFieldsMatch() {
+    @Test func tooManyWrongOtpAttemptsTrueWhenBothFieldsMatch() {
         let error = EmbeddedAuthError(
             info: ["error": "access_denied", "error_description": "too_many_wrong_otp_attempts"],
             statusCode: 403
         )
-        #expect(error.isTooManyAttempts)
+        #expect(error.isTooManyWrongOtpAttempts)
     }
 
-    @Test func tooManyAttemptsFalseWhenCodeDiffers() {
+    @Test func tooManyWrongOtpAttemptsFalseWhenCodeDiffers() {
         let error = EmbeddedAuthError(
             info: ["error": "insufficient_authorization", "error_description": "too_many_wrong_otp_attempts"],
             statusCode: 403
         )
-        #expect(!error.isTooManyAttempts)
+        #expect(!error.isTooManyWrongOtpAttempts)
     }
 
-    @Test func tooManyAttemptsFalseWhenDescriptionDiffers() {
+    @Test func tooManyWrongOtpAttemptsFalseWhenDescriptionDiffers() {
         let error = EmbeddedAuthError(
             info: ["error": "access_denied", "error_description": "no_next_steps"],
             statusCode: 403
         )
+        #expect(!error.isTooManyWrongOtpAttempts)
+    }
+
+    // MARK: isTooManyAttempts
+
+    @Test func tooManyAttemptsTrueForRateLimitCode() {
+        let error = EmbeddedAuthError(
+            info: ["error": "too_many_requests", "error_description": "too_many_attempts"],
+            statusCode: 429
+        )
+        #expect(error.isTooManyAttempts)
+    }
+
+    @Test func tooManyAttemptsFalseForWrongCode() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "too_many_attempts"],
+            statusCode: 429
+        )
         #expect(!error.isTooManyAttempts)
+    }
+
+    @Test func tooManyAttemptsFalseForWrongDescription() {
+        let error = EmbeddedAuthError(
+            info: ["error": "too_many_requests", "error_description": "too_many_logins"],
+            statusCode: 429
+        )
+        #expect(!error.isTooManyAttempts)
+    }
+
+    // MARK: isInvalidCode
+
+    @Test func isInvalidCodeTrueForInvalidIdentifierOrCode() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "invalid_identifier_or_code"],
+            statusCode: 403
+        )
+        #expect(error.isInvalidCode)
+    }
+
+    @Test func isInvalidCodeTrueForInvalidCode() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "invalid_code"],
+            statusCode: 403
+        )
+        #expect(error.isInvalidCode)
+    }
+
+    @Test func isInvalidCodeFalseForWrongErrorCode() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "invalid_code"],
+            statusCode: 403
+        )
+        #expect(!error.isInvalidCode)
+    }
+
+    @Test func isInvalidCodeFalseForOtherDescription() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "no_next_steps"],
+            statusCode: 403
+        )
+        #expect(!error.isInvalidCode)
+    }
+
+    // MARK: isChallengeExpired
+
+    @Test func isChallengeExpiredTrueWhenBothFieldsMatch() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "challenge_expired"],
+            statusCode: 403
+        )
+        #expect(error.isChallengeExpired)
+    }
+
+    @Test func isChallengeExpiredFalseForWrongCode() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "challenge_expired"],
+            statusCode: 403
+        )
+        #expect(!error.isChallengeExpired)
+    }
+
+    // MARK: isTooManyLogins
+
+    @Test func isTooManyLoginsTrueWhenBothFieldsMatch() {
+        let error = EmbeddedAuthError(
+            info: ["error": "too_many_requests", "error_description": "too_many_logins"],
+            statusCode: 429
+        )
+        #expect(error.isTooManyLogins)
+    }
+
+    @Test func isTooManyLoginsFalseForWrongCode() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "too_many_logins"],
+            statusCode: 429
+        )
+        #expect(!error.isTooManyLogins)
     }
 
     // MARK: nextActions — identifyEmail
@@ -81,13 +177,30 @@ import Foundation
 
     // MARK: nextActions — challengeEmail
 
-    @Test func nextActionsDecodesChallengeEmail() {
+    @Test func nextActionsDecodesChallengeEmailWithIndexAndIdentifier() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "auth_session": "sess_abc",
+            "next": [["action": "action:challenge:email:v1", "index": 2, "identifier": "al**@example.com"]]
+        ], statusCode: 403)
+        guard case .challengeEmail(let index, let identifier) = error.nextActions.first else {
+            Issue.record("Expected .challengeEmail"); return
+        }
+        #expect(index == 2)
+        #expect(identifier == "al**@example.com")
+    }
+
+    @Test func nextActionsDecodesChallengeEmailDefaultsIndexToZero() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1"]]
         ], statusCode: 403)
-        #expect(error.nextActions == [.challengeEmail])
+        guard case .challengeEmail(let index, let identifier) = error.nextActions.first else {
+            Issue.record("Expected .challengeEmail"); return
+        }
+        #expect(index == 0)
+        #expect(identifier == nil)
     }
 
     // MARK: nextActions — verifyOTP with channel and identifier

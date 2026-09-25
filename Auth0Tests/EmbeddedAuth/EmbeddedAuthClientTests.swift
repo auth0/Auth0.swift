@@ -47,10 +47,10 @@ private let domain   = "test.auth0.com"
 
 // MARK: - Helpers
 
-private func makeClient() -> EmbeddedAuthClient {
+private func makeClient() -> EmbeddedAuth {
     let config = URLSessionConfiguration.ephemeral
     config.protocolClasses = [EmbeddedAuthClientMockProtocol.self]
-    return Auth0.embeddedAuthClient(clientId: clientId, domain: domain, session: URLSession(configuration: config))
+    return Auth0.embeddedAuth(clientId: clientId, domain: domain, session: URLSession(configuration: config))
 }
 
 private func insufficientAuthData(session: String, nextActions: [[String: Any]]) -> Data {
@@ -63,6 +63,15 @@ private func insufficientAuthData(session: String, nextActions: [[String: Any]])
 
 private func authCodeData(code: String = "auth0_ac_test123") -> Data {
     try! JSONSerialization.data(withJSONObject: ["authorization_code": code])
+}
+
+private func credentialsData(accessToken: String = "test_access_token") -> Data {
+    try! JSONSerialization.data(withJSONObject: [
+        "access_token": accessToken,
+        "token_type": "Bearer",
+        "id_token": "test_id_token",
+        "expires_in": 86400
+    ])
 }
 
 private func response(status: Int) -> HTTPURLResponse {
@@ -80,13 +89,13 @@ struct EmbeddedAuthClientTests {
     // MARK: Factory
 
     @Test func factoryCreatesClientWithExplicitParams() {
-        let client = Auth0.embeddedAuthClient(clientId: clientId, domain: domain) as! Auth0EmbeddedAuthClient
+        let client = Auth0.embeddedAuth(clientId: clientId, domain: domain) as! Auth0EmbeddedAuth
         #expect(client.clientId == clientId)
         #expect(client.url.absoluteString == "https://\(domain)/")
     }
 
     @Test func factoryUsesSharedSessionByDefault() {
-        let client = Auth0.embeddedAuthClient(clientId: clientId, domain: domain) as! Auth0EmbeddedAuthClient
+        let client = Auth0.embeddedAuth(clientId: clientId, domain: domain) as! Auth0EmbeddedAuth
         #expect(client.session === URLSession.shared)
     }
 
@@ -99,7 +108,7 @@ struct EmbeddedAuthClientTests {
             capturedURL = req.url
             return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
         #expect(capturedURL?.path.hasSuffix("/e/authorize") == true)
     }
 
@@ -110,7 +119,7 @@ struct EmbeddedAuthClientTests {
             capturedMethod = req.httpMethod
             return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
         #expect(capturedMethod == "POST")
     }
 
@@ -121,8 +130,19 @@ struct EmbeddedAuthClientTests {
             capturedBody = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
             return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
         #expect(capturedBody?["client_id"] as? String == clientId)
+    }
+
+    @Test func authorizeSendsConnectionInBody() async {
+        let sut = makeClient()
+        var body: [String: Any]?
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
+            return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection", capabilities: EmbeddedCapability.all, scope: nil, audience: nil).start()
+        #expect(body?["connection"] as? String == "test-connection")
     }
 
     @Test func authorizeSendsCapabilitiesInBody() async {
@@ -132,17 +152,17 @@ struct EmbeddedAuthClientTests {
             body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
             return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
         }
-        _ = try? await sut.authorize(connection: nil,
-                                       capabilities: [.identifyEmail, .challengeEmail, .verifyOTP],
-                                       scope: nil,
-                                       audience: nil).start()
+        _ = try? await sut.authorize(connection: "test-connection",
+                                     capabilities: [.identifyEmail, .challengeEmail, .verifyOTP],
+                                     scope: nil,
+                                     audience: nil).start()
         let caps = body?["capabilities"] as? [String]
         #expect(caps?.contains("action:identify:email:v1") == true)
         #expect(caps?.contains("action:challenge:email:v1") == true)
         #expect(caps?.contains("action:verify:otp:v1") == true)
     }
 
-    @Test func authorizeSendsOptionalConnectionWhenProvided() async {
+    @Test func authorizeSendsSpecifiedConnectionWhenProvided() async {
         let sut = makeClient()
         var body: [String: Any]?
         EmbeddedAuthClientMockProtocol.requestHandler = { req in
@@ -153,17 +173,6 @@ struct EmbeddedAuthClientTests {
         #expect(body?["connection"] as? String == "my-db")
     }
 
-    @Test func authorizeOmitsConnectionWhenNil() async {
-        let sut = makeClient()
-        var body: [String: Any]?
-        EmbeddedAuthClientMockProtocol.requestHandler = { req in
-            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
-            return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
-        }
-        _ = try? await sut.authorize(connection: nil, capabilities: EmbeddedCapability.all, scope: nil, audience: nil).start()
-        #expect(body?["connection"] == nil)
-    }
-
     // MARK: authorize() — response parsing
 
     @Test func authorizeThrowsInsufficientAuthorizationWith403() async {
@@ -172,7 +181,7 @@ struct EmbeddedAuthClientTests {
             return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
         }
         do {
-            _ = try await sut.authorize().start()
+            _ = try await sut.authorize(connection: "test-connection").start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
             #expect(error.isInsufficientAuthorization)
@@ -207,7 +216,7 @@ struct EmbeddedAuthClientTests {
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:identify:email:v1"]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
 
         // Second call: capture identifyEmail body
         var body: [String: Any]?
@@ -227,8 +236,8 @@ struct EmbeddedAuthClientTests {
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:identify:email:v1"]]))
         }
-        _ = try? await sut.authorize().start()
-        // auth_session is stored internally — there is no public accessor on EmbeddedAuthClient
+        _ = try? await sut.authorize(connection: "test-connection").start()
+        // auth_session is stored internally — there is no public accessor on EmbeddedAuth
         // This test documents the invariant: the protocol has no authSession property
         let mirror = Mirror(reflecting: sut)
         let hasPublicSession = mirror.children.contains { $0.label == "authSession" }
@@ -240,7 +249,7 @@ struct EmbeddedAuthClientTests {
     @Test func challengeEmailFailsLocallyWithNoSession() async {
         let sut = makeClient()
         do {
-            _ = try await sut.challengeEmail().start()
+            _ = try await sut.challengeEmail(index: 0).start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
             #expect(error.code == "no_active_session")
@@ -253,36 +262,57 @@ struct EmbeddedAuthClientTests {
         let sut = makeClient()
 
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
-            return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:challenge:email:v1"]]))
+            return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:challenge:email:v1", "index": 0]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
 
         var body: [String: Any]?
         EmbeddedAuthClientMockProtocol.requestHandler = { req in
             body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
             return (response(status: 403), insufficientAuthData(session: "sess_002", nextActions: [["action": "action:verify:otp:v1", "channel": "email", "identifier": "al**@example.com"]]))
         }
-        _ = try? await sut.challengeEmail().start()
+        _ = try? await sut.challengeEmail(index: 0).start()
         #expect(body?["action"] as? String == "action:challenge:email:v1")
         #expect(body?["auth_session"] as? String == "sess_001")
+        #expect(body?["index"] as? Int == 0)
+    }
+
+    @Test func challengeEmailSendsIndexInBody() async {
+        let sut = makeClient()
+
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:challenge:email:v1", "index": 2]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+
+        var body: [String: Any]?
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
+            return (response(status: 403), insufficientAuthData(session: "sess_002", nextActions: []))
+        }
+        _ = try? await sut.challengeEmail(index: 2).start()
+        #expect(body?["index"] as? Int == 2)
     }
 
     @Test func challengeEmailRotatesSession() async {
         let sut = makeClient()
 
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
-            return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:challenge:email:v1"]]))
+            return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:challenge:email:v1", "index": 0]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
 
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             return (response(status: 403), insufficientAuthData(session: "sess_002", nextActions: [["action": "action:verify:otp:v1"]]))
         }
-        _ = try? await sut.challengeEmail().start()
+        _ = try? await sut.challengeEmail(index: 0).start()
 
         // Next call should use the rotated session
         var body: [String: Any]?
         EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            if req.url?.path.hasSuffix("/oauth/token") == true {
+                return (response(status: 200), credentialsData())
+            }
             body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
             return (response(status: 200), authCodeData())
         }
@@ -309,10 +339,13 @@ struct EmbeddedAuthClientTests {
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:verify:otp:v1"]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
 
         var body: [String: Any]?
         EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            if req.url?.path.hasSuffix("/oauth/token") == true {
+                return (response(status: 200), credentialsData())
+            }
             body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
             return (response(status: 200), authCodeData())
         }
@@ -324,19 +357,22 @@ struct EmbeddedAuthClientTests {
         #expect(body?["auth_session"] as? String == "sess_001")
     }
 
-    @Test func verifyOtpReturnsAuthorizationCodeOn200() async {
+    @Test func verifyOtpReturnsCredentialsOn200() async {
         let sut = makeClient()
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:verify:otp:v1"]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
 
-        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            if req.url?.path.hasSuffix("/oauth/token") == true {
+                return (response(status: 200), credentialsData(accessToken: "the_access_token"))
+            }
             return (response(status: 200), authCodeData(code: "auth0_ac_theCode"))
         }
         do {
-            let code = try await sut.verifyOtp("123456", type: .oob).start()
-            #expect(code.code == "auth0_ac_theCode")
+            let credentials = try await sut.verifyOtp("123456", type: .oob).start()
+            #expect(credentials.accessToken == "the_access_token")
         } catch {
             Issue.record("Unexpected error: \(error)")
         }
@@ -347,9 +383,12 @@ struct EmbeddedAuthClientTests {
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:verify:otp:v1"]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
 
-        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            if req.url?.path.hasSuffix("/oauth/token") == true {
+                return (response(status: 200), credentialsData())
+            }
             return (response(status: 200), authCodeData())
         }
         _ = try? await sut.verifyOtp("123456", type: .oob).start()
@@ -370,7 +409,7 @@ struct EmbeddedAuthClientTests {
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:verify:otp:v1"]]))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
 
         // Wrong OTP: server returns 403 insufficient_authorization again
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
@@ -381,6 +420,9 @@ struct EmbeddedAuthClientTests {
         // Retry should still work (session is updated to sess_002)
         var body: [String: Any]?
         EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            if req.url?.path.hasSuffix("/oauth/token") == true {
+                return (response(status: 200), credentialsData())
+            }
             body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
             return (response(status: 200), authCodeData())
         }
@@ -398,7 +440,7 @@ struct EmbeddedAuthClientTests {
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: verifyNextAction))
         }
-        _ = try? await sut.authorize().start()
+        _ = try? await sut.authorize(connection: "test-connection").start()
 
         // Step 2: verifyOtp returns terminal access_denied
         let terminalData = try! JSONSerialization.data(withJSONObject: [
@@ -411,7 +453,7 @@ struct EmbeddedAuthClientTests {
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
             #expect(error.isAccessDenied)
-            #expect(error.isTooManyAttempts)
+            #expect(error.isTooManyWrongOtpAttempts)
         } catch {
             Issue.record("Wrong error type: \(error)")
         }
@@ -419,20 +461,23 @@ struct EmbeddedAuthClientTests {
 
     // MARK: Sequential flow — full e2e with mock data
 
-    @Test func fullEmailOtpFlowReturnsAuthorizationCode() async throws {
+    @Test func fullEmailOtpFlowReturnsCredentials() async throws {
         let sut = makeClient()
         var callCount = 0
 
-        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            if req.url?.path.hasSuffix("/oauth/token") == true {
+                return (response(status: 200), credentialsData(accessToken: "final_access_token"))
+            }
             callCount += 1
             switch callCount {
             case 1:  // authorize()
                 return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
             case 2:  // identifyEmail()
-                return (response(status: 403), insufficientAuthData(session: "s2", nextActions: [["action": "action:challenge:email:v1"]]))
+                return (response(status: 403), insufficientAuthData(session: "s2", nextActions: [["action": "action:challenge:email:v1", "index": 0]]))
             case 3:  // challengeEmail()
                 return (response(status: 403), insufficientAuthData(session: "s3", nextActions: [["action": "action:verify:otp:v1", "channel": "email", "identifier": "al**@example.com"]]))
-            case 4:  // verifyOtp()
+            case 4:  // verifyOtp() — /e/authorize leg
                 return (response(status: 200), authCodeData(code: "auth0_ac_final"))
             default:
                 fatalError("Unexpected call \(callCount)")
@@ -440,7 +485,7 @@ struct EmbeddedAuthClientTests {
         }
 
         do {
-            _ = try await sut.authorize().start()
+            _ = try await sut.authorize(connection: "test-connection").start()
             Issue.record("authorize() should throw with nextActions")
         } catch let e as EmbeddedAuthError where e.isInsufficientAuthorization {
             #expect(e.nextActions.first == .identifyEmail)
@@ -450,11 +495,14 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.identifyEmail("alice@example.com").start()
             Issue.record("identifyEmail() should throw with nextActions")
         } catch let e as EmbeddedAuthError where e.isInsufficientAuthorization {
-            #expect(e.nextActions.first == .challengeEmail)
+            guard case .challengeEmail(let index, _) = e.nextActions.first else {
+                Issue.record("Expected .challengeEmail"); return
+            }
+            #expect(index == 0)
         } catch { Issue.record("Unexpected: \(error)") }
 
         do {
-            _ = try await sut.challengeEmail().start()
+            _ = try await sut.challengeEmail(index: 0).start()
             Issue.record("challengeEmail() should throw with nextActions")
         } catch let e as EmbeddedAuthError where e.isInsufficientAuthorization {
             if case .verifyOTP(let ch, let id) = e.nextActions.first {
@@ -465,8 +513,8 @@ struct EmbeddedAuthClientTests {
             }
         } catch { Issue.record("Unexpected: \(error)") }
 
-        let code = try await sut.verifyOtp("123456", type: .oob).start()
-        #expect(code.code == "auth0_ac_final")
+        let credentials = try await sut.verifyOtp("123456", type: .oob).start()
+        #expect(credentials.accessToken == "final_access_token")
         #expect(callCount == 4)
     }
 

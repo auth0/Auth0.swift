@@ -15,19 +15,23 @@ public struct EmbeddedAuthorizationCode: Sendable {
 
 // MARK: - NextAction
 
-/// A typed action the server will accept on the next ``EmbeddedAuthClient`` call.
+/// A typed action the server will accept on the next ``EmbeddedAuth`` call.
 public enum NextAction: Sendable, Equatable {
 
-    /// Server expects the caller to submit an email address via ``EmbeddedAuthClient/identifyEmail(_:)``.
+    /// Server expects the caller to submit an email address via ``EmbeddedAuth/identifyEmail(_:)``.
     case identifyEmail
 
-    /// Server expects the caller to submit a phone number via ``EmbeddedAuthClient/identifyPhone(_:)``.
+    /// Server expects the caller to submit a phone number via ``EmbeddedAuth/identifyPhone(_:)``.
     case identifyPhone
 
-    /// Server expects the caller to trigger an email OTP send via ``EmbeddedAuthClient/challengeEmail()``.
-    case challengeEmail
+    /// Server expects the caller to trigger an email OTP send via ``EmbeddedAuth/challengeEmail(index:)``.
+    ///
+    /// - Parameters:
+    ///   - index:      Zero-based index of this entry in the server's `next` array; pass it back to ``EmbeddedAuth/challengeEmail(index:)``.
+    ///   - identifier: Masked destination the server will deliver the OTP to (e.g. `"al**@example.com"`), if provided.
+    case challengeEmail(index: Int, identifier: String?)
 
-    /// Server expects a one-time code via ``EmbeddedAuthClient/verifyOtp(_:type:)``.
+    /// Server expects a one-time code via ``EmbeddedAuth/verifyOtp(_:type:)``.
     ///
     /// - Parameters:
     ///   - channel:    Delivery channel (e.g. `"email"`), if provided by the server.
@@ -60,7 +64,7 @@ public enum EmbeddedAction: String, Sendable, CaseIterable {
 
 // MARK: - EmbeddedCapability
 
-/// A capability the SDK advertises in the initial ``EmbeddedAuthClient/authorize(connection:capabilities:scope:audience:)`` call.
+/// A capability the SDK advertises in the initial ``EmbeddedAuth/authorize(connection:capabilities:scope:audience:)`` call.
 public enum EmbeddedCapability: Sendable, Equatable {
 
     /// SDK can identify a user by email.
@@ -91,7 +95,7 @@ public enum EmbeddedCapability: Sendable, Equatable {
 
 // MARK: - OtpType
 
-/// The type of one-time password used in ``EmbeddedAuthClient/verifyOtp(_:type:)``.
+/// The type of one-time password used in ``EmbeddedAuth/verifyOtp(_:type:)``.
 public enum OtpType: String, Sendable {
 
     /// An out-of-band code delivered over email, SMS, or voice.

@@ -30,7 +30,9 @@ struct ContentView: View {
                         .autocapitalization(.none)
                         #endif
                         .disableAutocorrection(true)
+                        #if !os(tvOS)
                         .textFieldStyle(.roundedBorder)
+                        #endif
                     Button {
                         Task { await viewModel.submitEmail(viewModel.email) }
                     } label: {
@@ -62,7 +64,9 @@ struct ContentView: View {
                         #if !os(macOS)
                         .keyboardType(.numberPad)
                         #endif
+                        #if !os(tvOS)
                         .textFieldStyle(.roundedBorder)
+                        #endif
                     if let otpError = viewModel.otpAttemptError {
                         Text(otpError)
                             .font(.caption)
