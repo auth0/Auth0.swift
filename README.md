@@ -1,26 +1,26 @@
-![Auth0.swift](https://cdn.auth0.com/website/sdks/banners/swift-banner.png)
+[![Auth0.swift](https://cdn.auth0.com/website/sdks/banners/swift-banner.png)
 
-![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat)
-![Build Status](https://img.shields.io/github/actions/workflow/status/auth0/Auth0.swift/main.yml?style=flat)
+[![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/auth0/Auth0.swift/main.yml?style=flat)
 [![Coverage Status](https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat)](https://codecov.io/github/auth0/Auth0.swift)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/auth0/Auth0.swift)
-![License](https://img.shields.io/github/license/auth0/Auth0.swift.svg?style=flat)
+[![License](https://img.shields.io/github/license/auth0/Auth0.swift.svg?style=flat)
 
 📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 💡 [**Examples**](#examples) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
 
-> [!IMPORTANT]
-> **🚀 v3 GA Available**
-> A new major version [`3.0.0`](https://github.com/auth0/Auth0.swift/releases/tag/3.0.0) of Auth0.swift is now available as GA. It includes breaking changes and improvements over v2.
->
-> We'd love for you to try it out and share your feedback! Please [open an issue](https://github.com/auth0/Auth0.swift/issues) if you encounter any problems or have suggestions.
->
-> 📚 [Migration Guide](https://github.com/auth0/Auth0.swift/blob/3.0.0/V3_MIGRATION_GUIDE.md) &nbsp;•&nbsp; 📦 [v3 Changelog](https://github.com/auth0/Auth0.swift/blob/3.0.0/CHANGELOG.md) &nbsp;•&nbsp; 🤖 [Auth0 Skill](https://github.com/auth0/agent-skills/blob/main/plugins/auth0/skills/auth0/SKILL.md)
->
-> **Skill for Coding Agents:** If you use coding agents such as Claude Code or Cursor, add the Auth0 skill to automate the upgrade:
-> ```
-> npx skills add auth0/agent-skills --skill auth0
-> ```
->
+!> [!IMPORTANT]
+!> **🚀 v3 GA Available**
+!> A new major version [`3.0.0`](https://github.com/auth0/Auth0.swift/releases/tag/3.0.0) of Auth0.swift is now available as GA. It includes breaking changes and improvements over v2.
+!>
+!> We'd love for you to try it out and share your feedback! Please [open an issue](https://github.com/auth0/Auth0.swift/issues) if you encounter any problems or have suggestions.
+!>
+!> 📚 [Migration Guide](https://github.com/auth0/Auth0.swift/blob/3.0.0/V3_MIGRATION_GUIDE.md) &nbsp;•&nbsp; 📦 [v3 Changelog](https://github.com/auth0/Auth0.swift/blob/3.0.0/CHANGELOG.md) &nbsp;•&nbsp; 🤖 [Auth0 Skill](https://github.com/auth0/agent-skills/blob/main/plugins/auth0/skills/auth0/SKILL.md)
+!>
+!> **Skill for Coding Agents:** If you use coding agents such as Claude Code or Cursor, add the Auth0 skill to automate the upgrade:
+!> ```
+!> npx skills add auth0/agent-skills --skill auth0
+!> ```
+!>
 
 ## Documentation
 
@@ -43,8 +43,8 @@
 - Xcode 26.x
 - Swift 6.0+
 
-> [!IMPORTANT]
-> Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
+!> [!IMPORTANT]
+!> Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
 
 ### Installation
 
@@ -88,15 +88,15 @@ Head to the [Auth0 Dashboard](https://manage.auth0.com/#/applications/) and crea
 
 Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details in the settings page of your Auth0 application. If you have a [custom domain](https://auth0.com/docs/customize/custom-domains), use your custom domain instead of the value from the settings page.
 
-> [!IMPORTANT]
-> Make sure that the Auth0 application type is **Native**. Otherwise, you might run into errors due to the different configuration of other application types.
+!> [!IMPORTANT]
+!> Make sure that the Auth0 application type is **Native**. Otherwise, you might run into errors due to the different configuration of other application types.
 
 #### Configure the Client ID and Domain with a plist
 
 Create a `plist` file named `Auth0.plist` in your app bundle with the following content:
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
+<!xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
