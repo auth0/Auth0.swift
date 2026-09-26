@@ -1,24 +1,25 @@
 import Foundation
 
 struct Auth0MFAClient: MFAClient {
-    var dpop: DPoP?
     let clientId: String
     let url: URL
-    var telemetry: Telemetry
+
+    var dpop: DPoP?
+    var auth0ClientInfo: Auth0ClientInfo
     var logger: Logger?
     let session: URLSession
 
     init(clientId: String,
          url: URL,
          session: URLSession = URLSession.shared,
-         telemetry: Telemetry = Telemetry()) {
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo()) {
         self.clientId = clientId
         self.url = url
         self.session = session
-        self.telemetry = telemetry
+        self.auth0ClientInfo = auth0ClientInfo
     }
 
-    func getAuthenticators(mfaToken: String, factorsAllowed: [String]) -> Request<[Authenticator], MfaListAuthenticatorsError> {
+    func getAuthenticators(mfaToken: String, factorsAllowed: [String]) -> any Requestable<[Authenticator], MfaListAuthenticatorsError> {
         let url = URL(string: "/mfa/authenticators", relativeTo: self.url)!
         return Request(session: session,
                        url: url,
@@ -27,11 +28,11 @@ struct Auth0MFAClient: MFAClient {
             listAuthenticatorsResponseMapper(factorsAllowed: factorsAllowed, result: result, callback: callback)
         }, headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
         .requestValidators([ListAuthenticatorsValidator(factorsAllowed: factorsAllowed)])
     }
 
-    func enroll(mfaToken: String, phoneNumber: String) -> Request<MFAEnrollmentChallenge, MfaEnrollmentError> {
+    func enroll(mfaToken: String, phoneNumber: String) -> any Requestable<MFAEnrollmentChallenge, MfaEnrollmentError> {
         let url = URL(string: "mfa/associate", relativeTo: self.url)!
         var payload: [String: Any] = [:]
         payload["authenticator_types"] = ["oob"]
@@ -44,10 +45,10 @@ struct Auth0MFAClient: MFAClient {
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
-    func challenge(with authenticatorId: String, mfaToken: String) -> Request<MFAChallenge, MfaChallengeError> {
+    func challenge(with authenticatorId: String, mfaToken: String) -> any Requestable<MFAChallenge, MfaChallengeError> {
         let url = URL(string: "mfa/challenge", relativeTo: self.url)!
         var payload: [String: Any] = [:]
         payload["client_id"] = clientId
@@ -60,22 +61,24 @@ struct Auth0MFAClient: MFAClient {
                        handle: mfaChallengeDecodable,
                        parameters: payload,
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError> {
         var parameters: [String: Any] = [:]
         parameters["oob_code"] = oobCode
         parameters["binding_code"] = bindingCode
         parameters["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-oob"
         parameters["mfa_token"] = mfaToken
-        return self.token()
-            .parameters(parameters)
+        return TokenRequest(request: self.token().parameters(parameters),
+                            audience: clientId,
+                            issuer: url.absoluteString,
+                            jwksRequest: jwks())
     }
 
-    func enroll(mfaToken: String) -> Request<OTPMFAEnrollmentChallenge, MfaEnrollmentError> {
+    func enroll(mfaToken: String) -> any Requestable<OTPMFAEnrollmentChallenge, MfaEnrollmentError> {
         let url = URL(string: "mfa/associate", relativeTo: self.url)!
         var payload: [String: Any] = [:]
         payload["authenticator_types"] = ["otp"]
@@ -86,29 +89,35 @@ struct Auth0MFAClient: MFAClient {
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
     func verify(otp: String,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["otp"] = otp
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-otp"
         payload["mfa_token"] = mfaToken
-        return self.token().parameters(payload)
+        return TokenRequest(request: self.token().parameters(payload),
+                            audience: clientId,
+                            issuer: url.absoluteString,
+                            jwksRequest: jwks())
     }
 
     func verify(recoveryCode: String,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any TokenRequestable<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["recovery_code"] = recoveryCode
         payload["mfa_token"] = mfaToken
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-recovery-code"
         payload["client_id"] = clientId
-        return token().parameters(payload)
+        return TokenRequest(request: token().parameters(payload),
+                            audience: clientId,
+                            issuer: url.absoluteString,
+                            jwksRequest: jwks())
     }
 
-    func enroll(mfaToken: String) -> Request<PushMFAEnrollmentChallenge, MfaEnrollmentError> {
+    func enroll(mfaToken: String) -> any Requestable<PushMFAEnrollmentChallenge, MfaEnrollmentError> {
         let url = URL(string: "mfa/associate", relativeTo: self.url)!
         var payload: [String: Any] = [:]
         payload["authenticator_types"] = ["oob"]
@@ -120,10 +129,10 @@ struct Auth0MFAClient: MFAClient {
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 
-    func enroll(mfaToken: String, email: String) -> Request<MFAEnrollmentChallenge, MfaEnrollmentError> {
+    func enroll(mfaToken: String, email: String) -> any Requestable<MFAEnrollmentChallenge, MfaEnrollmentError> {
         let url = URL(string: "mfa/associate", relativeTo: url)!
         var payload: [String: Any] = [:]
         payload["authenticator_types"] = ["oob"]
@@ -136,11 +145,21 @@ struct Auth0MFAClient: MFAClient {
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
-                       telemetry: telemetry)
+                       auth0ClientInfo: auth0ClientInfo)
     }
 }
 
 private extension Auth0MFAClient {
+    func jwks() -> any Requestable<JWKS, AuthenticationError> {
+        let jwksURL = URL(string: ".well-known/jwks.json", relativeTo: url)!
+        return Request(session: session,
+                       url: jwksURL,
+                       method: "GET",
+                       handle: authenticationDecodable,
+                       logger: logger,
+                       auth0ClientInfo: auth0ClientInfo)
+    }
+
     func token<T: Codable>() -> Request<T, MFAVerifyError> {
         let token = URL(string: "oauth/token", relativeTo: self.url)!
         let payload: [String: Any] = ["client_id": self.clientId]
@@ -151,7 +170,7 @@ private extension Auth0MFAClient {
                        handle: mfaVerifyDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
+                       auth0ClientInfo: self.auth0ClientInfo,
                        dpop: self.dpop)
     }
 }

@@ -40,7 +40,7 @@ class CredentialsSpec: QuickSpec {
                 expect(credentials.tokenType) == TokenType
                 expect(credentials.idToken) == IdToken
                 expect(credentials.refreshToken) == RefreshToken
-                expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                expect(credentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 expect(credentials.scope) == Scope
                 expect(credentials.recoveryCode) == RecoveryCode
             }
@@ -59,7 +59,7 @@ class CredentialsSpec: QuickSpec {
                 expect(credentials.tokenType) == TokenType
                 expect(credentials.idToken) == IdToken
                 expect(credentials.refreshToken).to(beNil())
-                expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                expect(credentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 expect(credentials.scope).to(beNil())
                 expect(credentials.recoveryCode).to(beNil())
             }
@@ -71,44 +71,44 @@ class CredentialsSpec: QuickSpec {
                 expect(credentials.tokenType) == ""
                 expect(credentials.idToken) == ""
                 expect(credentials.refreshToken).to(beNil())
-                expect(credentials.expiresIn).to(beCloseTo(Date(), within: 5))
+                expect(credentials.expiresAt).to(beCloseTo(Date(), within: 5))
                 expect(credentials.scope).to(beNil())
                 expect(credentials.recoveryCode).to(beNil())
             }
 
             context("expires_in") {
 
-                it("should have valid expiresIn from string") {
+                it("should have valid expiresAt from string") {
                     let json = """
                         {
                             "expires_in": "\(ExpiresIn)"
                         }
                     """.data(using: .utf8)!
                     let credentials = try decoder.decode(Credentials.self, from: json)
-                    expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                    expect(credentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 }
 
-                it("should have valid expiresIn from integer number") {
+                it("should have valid expiresAt from integer number") {
                     let json = """
                         {
                             "expires_in": \(Int(ExpiresIn))
                         }
                     """.data(using: .utf8)!
                     let credentials = try decoder.decode(Credentials.self, from: json)
-                    expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                    expect(credentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 }
 
-                it("should have valid expiresIn from floating point number") {
+                it("should have valid expiresAt from floating point number") {
                     let json = """
                         {
                             "expires_in": \(ExpiresIn)
                         }
                     """.data(using: .utf8)!
                     let credentials = try decoder.decode(Credentials.self, from: json)
-                    expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                    expect(credentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 }
 
-                it("should have valid expiresIn from ISO date") {
+                it("should have valid expiresAt from ISO date") {
                     let formatter = ISO8601DateFormatter()
                     let json = """
                             {
@@ -117,7 +117,7 @@ class CredentialsSpec: QuickSpec {
                         """.data(using: .utf8)!
                     decoder.dateDecodingStrategy = .iso8601
                     let credentials = try decoder.decode(Credentials.self, from: json)
-                    expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                    expect(credentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 }
 
             }
@@ -131,7 +131,7 @@ class CredentialsSpec: QuickSpec {
                                            tokenType: TokenType,
                                            idToken: IdToken,
                                            refreshToken: RefreshToken,
-                                           expiresIn: ExpiresInDate,
+                                           expiresAt: ExpiresInDate,
                                            scope: Scope,
                                            recoveryCode: RecoveryCode)
                 let data = try NSKeyedArchiver.archivedData(withRootObject: original, requiringSecureCoding: true)
@@ -144,7 +144,7 @@ class CredentialsSpec: QuickSpec {
                                            tokenType: TokenType,
                                            idToken: IdToken,
                                            refreshToken: RefreshToken,
-                                           expiresIn: ExpiresInDate,
+                                           expiresAt: ExpiresInDate,
                                            scope: Scope,
                                            recoveryCode: RecoveryCode)
                 let data = try NSKeyedArchiver.archivedData(withRootObject: original, requiringSecureCoding: true)
@@ -152,7 +152,7 @@ class CredentialsSpec: QuickSpec {
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == TokenType
                 expect(credentials.idToken) == IdToken
-                expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                expect(credentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 expect(credentials.scope) == Scope
                 expect(credentials.recoveryCode) == RecoveryCode
             }
@@ -161,14 +161,14 @@ class CredentialsSpec: QuickSpec {
                 let original = Credentials(accessToken: AccessToken,
                                            tokenType: TokenType,
                                            idToken: IdToken,
-                                           expiresIn: ExpiresInDate)
+                                           expiresAt: ExpiresInDate)
                 let data = try NSKeyedArchiver.archivedData(withRootObject: original, requiringSecureCoding: true)
                 let credentials = try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)!
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == TokenType
                 expect(credentials.idToken) == IdToken
                 expect(credentials.refreshToken).to(beNil())
-                expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                expect(credentials.expiresAt).to(beCloseTo(ExpiresInDate, within: 5))
                 expect(credentials.scope).to(beNil())
                 expect(credentials.recoveryCode).to(beNil())
             }
@@ -181,7 +181,7 @@ class CredentialsSpec: QuickSpec {
                 expect(credentials.tokenType) == ""
                 expect(credentials.idToken) == ""
                 expect(credentials.refreshToken).to(beNil())
-                expect(credentials.expiresIn).to(beCloseTo(Date(), within: 5))
+                expect(credentials.expiresAt).to(beCloseTo(Date(), within: 5))
                 expect(credentials.scope).to(beNil())
                 expect(credentials.recoveryCode).to(beNil())
             }
@@ -195,11 +195,11 @@ class CredentialsSpec: QuickSpec {
                                               tokenType: TokenType,
                                               idToken: IdToken,
                                               refreshToken: RefreshToken,
-                                              expiresIn: ExpiresInDate,
+                                              expiresAt: ExpiresInDate,
                                               scope: Scope,
                                               recoveryCode: RecoveryCode)
                 let description = "Credentials(accessToken: \"<REDACTED>\", tokenType: \"\(TokenType)\", idToken:"
-                    + " \"<REDACTED>\", refreshToken: Optional(\"<REDACTED>\"), expiresIn: \(ExpiresInDate), scope:"
+                    + " \"<REDACTED>\", refreshToken: Optional(\"<REDACTED>\"), expiresAt: \(ExpiresInDate), scope:"
                     + " Optional(\"\(Scope)\"), recoveryCode: Optional(\"<REDACTED>\"))"
                 expect(credentials.description) == description
                 expect(credentials.description).toNot(contain(AccessToken))
@@ -212,9 +212,9 @@ class CredentialsSpec: QuickSpec {
                 let credentials = Credentials(accessToken: AccessToken,
                                               tokenType: TokenType,
                                               idToken: IdToken,
-                                              expiresIn: ExpiresInDate)
+                                              expiresAt: ExpiresInDate)
                 let description = "Credentials(accessToken: \"<REDACTED>\", tokenType: \"\(TokenType)\", idToken:"
-                    + " \"<REDACTED>\", refreshToken: nil, expiresIn: \(ExpiresInDate), scope: nil, recoveryCode: nil)"
+                    + " \"<REDACTED>\", refreshToken: nil, expiresAt: \(ExpiresInDate), scope: nil, recoveryCode: nil)"
                 expect(credentials.description) == description
                 expect(credentials.description).toNot(contain(AccessToken))
                 expect(credentials.description).toNot(contain(IdToken))
@@ -222,5 +222,48 @@ class CredentialsSpec: QuickSpec {
 
         }
 
+        describe("session expiry") {
+
+            it("should read session_expiry from the id token") {
+                let sessionExpiry = 1_700_000_000
+                let credentials = Credentials(idToken: idTokenWithSessionExpiry(sessionExpiry))
+                expect(credentials.sessionExpiresAt) == Date(timeIntervalSince1970: TimeInterval(sessionExpiry))
+            }
+
+            it("should be nil when the claim is absent") {
+                let credentials = Credentials(idToken: idTokenWithSessionExpiry(nil))
+                expect(credentials.sessionExpiresAt).to(beNil())
+            }
+
+            it("should be nil when the id token is not a valid jwt") {
+                let credentials = Credentials(idToken: "not-a-jwt")
+                expect(credentials.sessionExpiresAt).to(beNil())
+            }
+
+            it("should be nil when the value is implausibly large (milliseconds)") {
+                let credentials = Credentials(idToken: idTokenWithSessionExpiry(1_700_000_000_000))
+                expect(credentials.sessionExpiresAt).to(beNil())
+            }
+
+        }
+
     }
+}
+
+/// Builds an unsigned JWT containing (or omitting) a `session_expiry` claim. JWTDecode does not
+/// validate signatures, so the signature can be arbitrary for unit tests.
+private func idTokenWithSessionExpiry(_ sessionExpiry: Int?) -> String {
+    var payload: [String: Any] = ["iss": "test", "sub": "sub|123", "aud": "audience"]
+    if let sessionExpiry = sessionExpiry {
+        payload["session_expiry"] = sessionExpiry
+    }
+    let headerJSON = try! JSONSerialization.data(withJSONObject: ["typ": "JWT", "alg": "HS256"])
+    let payloadJSON = try! JSONSerialization.data(withJSONObject: payload)
+    func encode(_ data: Data) -> String {
+        return data.base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+    }
+    return "\(encode(headerJSON)).\(encode(payloadJSON)).fakesig"
 }

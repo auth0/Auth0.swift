@@ -1,7 +1,7 @@
 import Foundation
 
 /// A Recovery code enrollment challenge.
-public struct RecoveryCodeEnrollmentChallenge {
+public struct RecoveryCodeEnrollmentChallenge: Sendable {
 
     /// The unique identifier for the authentication method.
     public let authenticationId: String

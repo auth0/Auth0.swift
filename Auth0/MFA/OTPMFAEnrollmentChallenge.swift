@@ -26,7 +26,7 @@ import Foundation
  - [Authenticate Using ROPG Flow with MFA](https://auth0.com/docs/secure/multi-factor-authentication/authenticate-using-ropg-flow-with-mfa)
  - [Key URI Format](https://github.com/google/google-authenticator/wiki/Key-Uri-Format)
  */
-public struct OTPMFAEnrollmentChallenge: Decodable {
+public struct OTPMFAEnrollmentChallenge: Decodable, Sendable {
     
     /// The type of MFA authenticator that was enrolled.
     ///

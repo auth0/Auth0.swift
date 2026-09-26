@@ -3,7 +3,7 @@ import Foundation
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
-    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void)
+    func credentials(from values: [String: String], callback: @escaping @MainActor @Sendable (WebAuthResult<Credentials>) -> Void)
     func values(fromComponents components: URLComponents) -> [String: String]
 }
 
@@ -63,33 +63,32 @@ struct PKCE: OAuth2Grant {
         self.defaults = newDefaults
     }
 
-    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    func credentials(from values: [String: String], callback: @escaping @MainActor @Sendable (WebAuthResult<Credentials>) -> Void) {
         guard let code = values["code"] else {
-            return callback(.failure(WebAuthError(code: .noAuthorizationCode(values))))
+            Task { @MainActor in callback(.failure(WebAuthError(code: .unknown("Authorization code missing from callback URL query parameters (\(values))")))) }
+            return
         }
         let authentication = self.authentication
         let verifier = self.verifier
         let redirectUrlString = self.redirectURL.absoluteString
-        let validatorContext = IDTokenValidatorContext(authentication: authentication,
-                                                       issuer: self.issuer,
-                                                       leeway: self.leeway,
-                                                       maxAge: self.maxAge,
-                                                       nonce: self.defaults["nonce"],
-                                                       organization: self.organization)
         authentication
             .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
+            .validateClaims()
+            .withIssuer(self.issuer)
+            .withLeeway(self.leeway)
+            .withNonce(self.defaults["nonce"])
+            .withMaxAge(self.maxAge)
+            .withOrganization(self.organization)
             .start { result in
                 switch result {
                 case .failure(let error) where error.localizedDescription == "Unauthorized":
-                    return callback(.failure(WebAuthError(code: .pkceNotAllowed)))
-                case .failure(let error): return callback(.failure(WebAuthError(code: .other, cause: error)))
+                    Task { @MainActor in callback(.failure(WebAuthError(code: .unknown("PKCE not allowed - Application Type must be 'Native' and Token Endpoint Authentication Method must be 'None'")))) }
+                case .failure(let error) where error.cause.map({ isIDTokenValidationError($0) }) == true:
+                    Task { @MainActor in callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error.cause))) }
+                case .failure(let error):
+                    Task { @MainActor in callback(.failure(WebAuthError(code: .codeExchangeFailed, cause: error))) }
                 case .success(let credentials):
-                    validate(idToken: credentials.idToken, with: validatorContext) { error in
-                        if let error = error {
-                            return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error)))
-                        }
-                        callback(.success(credentials))
-                    }
+                    Task { @MainActor in callback(.success(credentials)) }
                 }
             }
     }

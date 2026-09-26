@@ -1,11 +1,11 @@
 import Foundation
 
-protocol Barrier: AnyObject {
+protocol Barrier: AnyObject, Sendable {
     func raise() -> Bool
     func lower()
 }
 
-final class QueueBarrier: Barrier {
+final class QueueBarrier: Barrier, @unchecked Sendable {
     static let shared = QueueBarrier()
 
     private(set) var isRaised: Bool = false

@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 
 extension Array where Element == UInt8 {
@@ -19,4 +18,3 @@ extension Array where Element == UInt8 {
     }
 
 }
-#endif

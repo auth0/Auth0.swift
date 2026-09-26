@@ -84,7 +84,7 @@ class DPoPSpec: QuickSpec {
                                                    headerFields: headersWithNonce)!
                     DPoP.storeNonce(from: response)
 
-                    expect(DPoP.auth0Nonce) == DPoPNonce
+                    expect(DPoP.nonceStorage.nonce) == DPoPNonce
                 }
 
                 it("should not clear the stored nonce if the next response does not contain a nonce") {
@@ -100,7 +100,7 @@ class DPoPSpec: QuickSpec {
                                                       headerFields: headersWithoutNonce)!
                     DPoP.storeNonce(from: newResponse)
 
-                    expect(DPoP.auth0Nonce) == DPoPNonce
+                    expect(DPoP.nonceStorage.nonce) == DPoPNonce
                 }
 
             }

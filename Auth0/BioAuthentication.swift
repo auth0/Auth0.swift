@@ -47,7 +47,7 @@ struct BioAuthentication: Sendable {
         self.fallbackTitle = fallbackTitle
     }
 
-    func validateBiometric(callback: @escaping (Error?) -> Void) {
+    func validateBiometric(callback: @escaping @Sendable (Error?) -> Void) {
         let contextToUse: LAContext
         
         switch self.policy {

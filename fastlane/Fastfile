@@ -1,40 +1,83 @@
+require 'timeout'
+
 default_platform :ios
 
 platform :ios do
   desc "Tags the release and pushes the Podspec to CocoaPods"
+  # The GitHub Release is created by the workflow via softprops/action-gh-release;
+  # the Actions GITHUB_TOKEN is not accepted by the Releases API under Basic auth
+  # (returns 404), which is what the old auth0_shipper plugin used.
   lane :release do
-    perform_release target: 'Auth0.iOS'
-    publish_release(
-    repository: 'Auth0.swift',
-    pod_lint_allow_warnings: true
-  )
+    version = File.read('../Auth0/Version.swift')[/let\s+version\s*=\s*"([^"]+)"/, 1]
+    UI.user_error!('Could not read version from Auth0/Version.swift') if version.nil?
+    add_git_tag(tag: version)
+    push_git_tags
+    pod_lib_lint(allow_warnings: true)
+    pod_push(allow_warnings: true)
+    # pod trunk push can return a server error even when the publish succeeds.
+    # Trunk info can lag after a successful push, so retry with backoff before
+    # failing loudly.
+    max_attempts = 5
+    sleep_seconds = 15
+    published = false
+    max_attempts.times do |attempt|
+      trunk_info = begin
+        Timeout.timeout(30) { sh("pod trunk info Auth0", log: false, error_callback: ->(e) { UI.message("pod trunk info failed: #{e.message}") }) }
+      rescue Timeout::Error
+        UI.message("pod trunk info timed out after 30s")
+        nil
+      end
+      if trunk_info&.lines&.any? { |line| line.match?(/(?<![.\d])#{Regexp.escape(version)}(?![.\d-])/) }
+        published = true
+        break
+      end
+      if attempt < max_attempts - 1
+        UI.message("Auth0 #{version} not yet visible on trunk (attempt #{attempt + 1}/#{max_attempts}), retrying in #{sleep_seconds}s...")
+        sleep(sleep_seconds)
+      end
+    end
+    if published
+      UI.success "Auth0 #{version} is published on CocoaPods trunk ✓"
+    else
+      UI.user_error!("pod trunk push reported an error and Auth0 #{version} was NOT found on trunk after #{max_attempts} attempts. Manual intervention required.")
+    end
   end
 
-  desc 'Generate API documentation'
-  lane :build_docs do
+  desc 'Generate versioned API documentation into a temporary build directory'
+  lane :build_docs do |options|
     target = 'Auth0'
-    docs_dir = 'docs'
     docs_archive = 'docs.archive'
-    redirect_file = <<~HEREDOC
-      <!DOCTYPE html>
-        <head>
-          <meta http-equiv="refresh" content="0; url=documentation/#{target.downcase}/" />
-        </head>
-        <body>
-          <a href="documentation/#{target.downcase}/">Redirect</a>
-        </body>
-      </html>
-    HEREDOC
+    # Output directory for the freshly built static site. The DocsVersions tool
+    # folds this into the versioned gh-pages layout (defaults to ./docs_build).
+    output_dir = options[:output_dir] || 'docs_build'
+    # Output for the root-served copy of a stable release. Built with the bare
+    # base path so the default docs serve from the site root (version-less URL).
+    output_root_dir = options[:output_root_dir] || 'docs_build_root'
     # Work from project root (defaults to /fastlane)
     Dir.chdir('..') do
-      # Clear existing docs, or create docs folder if it doesn't already exist
-      Dir.exist?(docs_dir) ? FileUtils.rm_r(docs_dir) : FileUtils.mkdir(docs_dir)
-      # Generate the .doccarchive
+      version = File.read('Auth0/Version.swift')[/let\s+version\s*=\s*"([^"]+)"/, 1]
+      UI.user_error!('Could not read version from Auth0/Version.swift') if version.nil?
+      base_path = "#{target}.swift/v#{version}"
+      # A SemVer prerelease carries a hyphen (e.g. 3.0.0-beta.1); only stable
+      # releases are mirrored to the site root.
+      stable = !version.include?('-')
+      docc = "$(xcrun --find docc)"
+      archive = "#{docs_archive}/Build/Products/Release-iphoneos/#{target}.doccarchive"
+      # Clear any previous build output
+      FileUtils.rm_rf(output_dir)
+      FileUtils.rm_rf(output_root_dir)
+      # Generate the .doccarchive once; both transforms reuse it.
       sh "xcodebuild docbuild -scheme #{target}.iOS -configuration Release -destination 'generic/platform=iOS' -derivedDataPath #{docs_archive} FRAMEWORK_SEARCH_PATHS='Carthage/Build/**'"
-      # Generate the static site
-      sh "$(xcrun --find docc) process-archive transform-for-static-hosting #{docs_archive}/Build/Products/Release-iphoneos/#{target}.doccarchive --hosting-base-path #{target}.swift --output-path #{docs_dir}"
-      # Write redirect file
-      File.write("#{docs_dir}/index.html", redirect_file)
+      # Generate the static site with a version-scoped hosting base path so each
+      # version folder is fully self-contained when served from gh-pages.
+      sh "#{docc} process-archive transform-for-static-hosting #{archive} --hosting-base-path #{base_path} --output-path #{output_dir}"
+      UI.success "Built docs for v#{version} into #{output_dir}/ (base path: /#{base_path}/)"
+      # For a stable release, also transform with the bare base path so the
+      # DocsVersions tool can serve this version directly at the site root.
+      if stable
+        sh "#{docc} process-archive transform-for-static-hosting #{archive} --hosting-base-path #{target}.swift --output-path #{output_root_dir}"
+        UI.success "Built root copy for v#{version} into #{output_root_dir}/ (base path: /#{target}.swift/)"
+      end
     end
   end
 end

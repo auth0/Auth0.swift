@@ -33,24 +33,6 @@ class Auth0Spec: QuickSpec {
 
             }
 
-            context("users") {
-
-                it("should return users client with token & domain") {
-                    let users = Auth0.users(token: Token, domain: Domain)
-                    expect(users.token) == Token
-                    expect(users.url.absoluteString) == "https://\(Domain)/"
-                }
-
-                it("should return users client with token, domain & session") {
-                    let session = URLSession(configuration: URLSession.shared.configuration)
-                    let users = Auth0.users(token: Token,
-                                            domain: Domain,
-                                            session: session) as! Management
-                    expect(users.session).to(be(session))
-                }
-
-            }
-
             #if WEB_AUTH_PLATFORM
             context("web auth") {
 
@@ -66,6 +48,16 @@ class Auth0Spec: QuickSpec {
                                                 domain: Domain,
                                                 session: session) as! Auth0WebAuth
                     expect(webAuth.session).to(be(session))
+                }
+
+            }
+
+            context("authorize with request uri") {
+
+                it("should return PAR web auth client with client id & domain") {
+                    let par = Auth0.authorizeWithRequestUri(clientId: ClientId, domain: Domain)
+                    expect(par.clientId) == ClientId
+                    expect(par.url.absoluteString) == "https://\(Domain)/"
                 }
 
             }
@@ -86,11 +78,6 @@ class Auth0Spec: QuickSpec {
                     let session = URLSession(configuration: URLSession.shared.configuration)
                     let authentication = Auth0.authentication(session: session, bundle: bundle) as! Auth0Authentication
                     expect(authentication.session).to(be(session))
-                }
-
-                it("should return users client with bundle") {
-                    let users = Auth0.users(token: Token, bundle: bundle)
-                    expect(users.url.absoluteString) == "https://\(Domain)/"
                 }
 
                 #if WEB_AUTH_PLATFORM
@@ -118,10 +105,6 @@ class Auth0Spec: QuickSpec {
                 expect(Auth0.authentication(clientId: ClientId, domain: Domain).logger).to(beNil())
             }
 
-            it("should have no logging for management by default") {
-                expect(Auth0.users(token: Token, domain: Domain).logger).to(beNil())
-            }
-
             it("should enable default logger for auth") {
                 let auth = Auth0.authentication(clientId: ClientId, domain: Domain)
                 expect(auth.logging(enabled: true).logger).toNot(beNil())
@@ -132,26 +115,10 @@ class Auth0Spec: QuickSpec {
                 expect(auth.logging(enabled: false).logger).to(beNil())
             }
 
-            it("should enable default logger for users") {
-                let users = Auth0.users(token: Token, domain: Domain)
-                expect(users.logging(enabled: true).logger).toNot(beNil())
-            }
-
-            it("should not enable default logger for users") {
-                let users = Auth0.users(token: Token, domain: Domain)
-                expect(users.logging(enabled: false).logger).to(beNil())
-            }
-
             it("should enable custom logger for auth") {
                 let logger = MockLogger()
                 let auth = Auth0.authentication(clientId: ClientId, domain: Domain)
                 expect(auth.using(logger: logger).logger).toNot(beNil())
-            }
-
-            it("should enable custom logger for users") {
-                let logger = MockLogger()
-                let users = Auth0.users(token: Token, domain: Domain)
-                expect(users.using(logger: logger).logger).toNot(beNil())
             }
 
         }
@@ -185,11 +152,6 @@ class Auth0Spec: QuickSpec {
                     expect(auth.url.absoluteString) == "\(domain)/"
                 }
 
-                it("should return users endpoint") {
-                    let users = Auth0.users(token: Token, domain: Domain)
-                    expect(users.url.absoluteString) == "https://\(Domain)/"
-                }
-
             }
 
             context("with trailing slash") {
@@ -217,11 +179,6 @@ class Auth0Spec: QuickSpec {
                     let domain = "https://mycustomdomain.com/foo/bar/"
                     let auth = Auth0.authentication(clientId: ClientId, domain: domain)
                     expect(auth.url.absoluteString) == domain
-                }
-
-                it("should return users endpoint") {
-                    let users = Auth0.users(token: Token, domain: Domain)
-                    expect(users.url.absoluteString) == "https://\(Domain)/"
                 }
 
             }

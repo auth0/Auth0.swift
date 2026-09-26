@@ -1,0 +1,49 @@
+name: Create a GitHub release
+
+#
+# Creates a GitHub release for the given tag.
+#
+# Created here (rather than via the auth0_shipper fastlane plugin) because the
+# plugin authenticates the Releases API with Basic auth, which the Actions
+# GITHUB_TOKEN does not accept (returns 404).
+#
+
+inputs:
+  token:
+    required: true
+  files:
+    required: false
+  name:
+    required: true
+  body:
+    required: true
+  tag:
+    required: true
+  commit:
+    required: true
+  draft:
+    default: false
+    required: false
+  prerelease:
+    default: false
+    required: false
+  fail_on_unmatched_files:
+    default: true
+    required: false
+
+runs:
+  using: composite
+
+  steps:
+    - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+      with:
+        body: ${{ inputs.body }}
+        name: ${{ inputs.name }}
+        tag_name: ${{ inputs.tag }}
+        target_commitish: ${{ inputs.commit }}
+        draft: ${{ inputs.draft }}
+        prerelease: ${{ inputs.prerelease }}
+        fail_on_unmatched_files: ${{ inputs.fail_on_unmatched_files }}
+        files: ${{ inputs.files }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
