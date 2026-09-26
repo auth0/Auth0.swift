@@ -380,12 +380,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     #if PASSKEYS_PLATFORM
     /// Logs a user in using an existing passkey credential and the login challenge. This is the last part of the passkey login flow.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Usage
     ///
     /// ```swift
@@ -442,12 +436,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
     /// Requests a challenge for logging a user in with an existing passkey. This is the first part of the passkey login flow.
     ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
     /// ## Usage
     ///
     /// ```swift
@@ -503,12 +491,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                                organization: String?) -> any Requestable<PasskeyLoginChallenge, AuthenticationError>
 
     /// Logs a new user in using a signup passkey credential and the signup challenge. This is the last part of the passkey signup flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Usage
     ///
@@ -573,12 +555,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// By default, database connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers)
     /// for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These user
     /// identifiers can be required or optional and must match your Flexible Identifiers configuration.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Usage
     ///
@@ -669,20 +645,22 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      Auth0
          .authentication()
          .resetPassword(email: "support@auth0.com",
-                        connection: "Username-Password-Authentication")
+                        connection: "Username-Password-Authentication",
+                        organization: "org_aaAA1aa11aAAAA1a")
          .start { print($0) }
      ```
 
      - Parameters:
-       - email:      Email of the database user.
-       - connection: Name of the database connection.
+       - email:        Email of the database user.
+       - connection:   Name of the database connection.
+       - organization: Identifier of the organization associated with the user. Defaults to `nil`.
      - Returns: A request for resetting the password.
 
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/change-password/change-password)
      */
-    func resetPassword(email: String, connection: String) -> any Requestable<Void, AuthenticationError>
+    func resetPassword(email: String, connection: String, organization: String?) -> any Requestable<Void, AuthenticationError>
 
     /**
      Starts passwordless authentication by sending an email with an OTP code. This is the first part of the
@@ -830,12 +808,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /**
      Exchanges a user's refresh token for a session transfer token that can be used to perform web single sign-on
      (SSO).
-
-     ## Availability
-
-     This feature is currently available in
-     [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-     Please reach out to Auth0 support to get it enabled for your tenant.
 
      ## Usage
 
@@ -1227,6 +1199,10 @@ public extension Authentication {
 
     func signup(email: String, username: String? = nil, password: String, connection: String = "Username-Password-Authentication", userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> any Requestable<DatabaseUser, AuthenticationError> {
         return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
+    }
+
+    func resetPassword(email: String, connection: String, organization: String? = nil) -> any Requestable<Void, AuthenticationError> {
+        return self.resetPassword(email: email, connection: connection, organization: organization)
     }
 
     #if PASSKEYS_PLATFORM

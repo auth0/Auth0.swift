@@ -8,9 +8,10 @@ import Combine
 
 /// Generic test double for `Requestable`. Immediately delivers a predetermined result.
 struct MockRequestable<T: Sendable, E: Auth0APIError>: Requestable {
+    
     let result: Result<T, E>
-
-    func start(_ callback: @escaping (Result<T, E>) -> Void) {
+    
+    @MainActor func start(_ callback: @escaping @MainActor @Sendable (Result<T, E>) -> Void) {
         callback(result)
     }
 
@@ -23,7 +24,7 @@ struct MockRequestable<T: Sendable, E: Auth0APIError>: Requestable {
 
 /// A no-op requestable used for Authentication protocol methods not under test.
 private struct StubRequestable<T: Sendable, E: Auth0APIError>: Requestable {
-    func start(_ callback: @escaping (Result<T, E>) -> Void) {}
+    func start(_ callback: @escaping @MainActor @Sendable (Result<T, E>) -> Void) {}
     func parameters(_ extraParameters: [String: Any]) -> any Requestable<T, E> { self }
     func headers(_ extraHeaders: [String: String]) -> any Requestable<T, E> { self }
     func requestValidators(_ extraValidators: [RequestValidator]) -> any Requestable<T, E> { self }

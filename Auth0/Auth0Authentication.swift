@@ -76,7 +76,6 @@ struct Auth0Authentication: Authentication {
                              authentication: self)
     }
 
-
     func login(appleAuthorizationCode authorizationCode: String,
                fullName: PersonNameComponents?,
                profile: [String: Any]?,
@@ -299,12 +298,13 @@ struct Auth0Authentication: Authentication {
     }
     #endif
 
-    func resetPassword(email: String, connection: String) -> any Requestable<Void, AuthenticationError> {
-        let payload = [
+    func resetPassword(email: String, connection: String, organization: String?) -> any Requestable<Void, AuthenticationError> {
+        var payload: [String: Any] = [
             "email": email,
             "connection": connection,
             "client_id": self.clientId
         ]
+        payload["organization"] = organization
         let resetPassword = URL(string: "dbconnections/change_password", relativeTo: self.url)!
         return Request(session: session,
                        url: resetPassword,

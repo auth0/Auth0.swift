@@ -179,7 +179,7 @@ class PARWebAuthSpec: QuickSpec {
                 }
 
                 it("should produce a no bundle identifier error when redirect URL is missing") {
-                    let expectedError = WebAuthError(code: .noBundleIdentifier)
+                    let expectedError = WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))
                     var result: WebAuthResult<AuthorizationCode>?
                     // Use a URL with no host to make redirectURL return nil
                     let par = PARWebAuth(clientId: ClientId,
@@ -306,9 +306,9 @@ class PARWebAuthSpec: QuickSpec {
                     _ = TransactionStore.shared.resume(callbackURL)
                     expect(result).toEventuallyNot(beNil())
                     if case .failure(let error) = result {
-                        expect(error) == WebAuthError(code: .noAuthorizationCode(["state": "some-state"]))
+                        expect(error) == WebAuthError(code: .unknown("Authorization code missing from callback URL query parameters ([\"state\": \"some-state\"])"))
                     } else {
-                        fail("Expected noAuthorizationCode error")
+                        fail("Expected an unknown error for a missing authorization code")
                     }
                 }
             }

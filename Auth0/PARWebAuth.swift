@@ -152,7 +152,7 @@ struct PARWebAuth: PARAuth, Sendable {
 
         guard let redirectURL = self.redirectURL else {
             barrier.lower()
-            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            return callback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
         var additionalParameters: [String: String] = [:]

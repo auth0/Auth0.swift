@@ -14,13 +14,13 @@ concurrency:
 
 env:
   ruby: '3.3.1'
-  xcode: '16.1'
+  xcode: '26.6'
 
 jobs:
   release:
     name: Tag, publish to CocoaPods, and create GitHub Release
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release/'))
-    runs-on: macos-14
+    runs-on: macos-26
     environment: release
 
     permissions:
@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 

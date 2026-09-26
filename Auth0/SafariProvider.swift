@@ -100,8 +100,7 @@ final class SafariUserAgent: NSObject, WebAuthUserAgent, Sendable {
     }
 
     func finish(with result: WebAuthResult<Void>) {
-        Task { @MainActor [weak self] in
-            guard let self else { return }
+        Task { @MainActor in
             finishOnMain(with: result)
         }
     }

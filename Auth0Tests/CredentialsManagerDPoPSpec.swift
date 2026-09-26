@@ -25,6 +25,7 @@ private class DPoPSpyStorage: CredentialsStorage {
     }
     func setEntry(_ data: Data, forKey key: String) throws { store[key] = data }
     func deleteEntry(forKey key: String) throws { store.removeValue(forKey: key) }
+    func deleteAllEntries() throws { store.removeAll() }
 }
 
 class CredentialsManagerDPoPSpec: QuickSpec {
