@@ -31,6 +31,7 @@ jobs:
               - { os: tvOS, scheme: Auth0.tvOS }
             xcode: 
               - '26.6'
+              - '26.4'
 
         steps:
             - name: Checkout
@@ -67,6 +68,7 @@ jobs:
           matrix:
             xcode: 
               - '26.6'
+              - '26.4'
 
         steps:
             - name: Checkout
@@ -89,6 +91,7 @@ jobs:
           matrix:
             xcode: 
               - '26.6'
+              - '26.4'
 
         steps:
             - name: Checkout
