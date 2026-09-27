@@ -33,5 +33,8 @@ Pod::Spec.new do |s|
   s.visionos.deployment_target = '1.0'
   s.visionos.pod_target_xcconfig =  {
     'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM PASSKEYS_PLATFORM'
+  s.visionos.deployment_target = '1.0'
+  s.visionos.pod_target_xcconfig =  {
+    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM PASSKEYS_PLATFORM'
   }
 end
