@@ -171,13 +171,17 @@ struct OTPEntryView: View {
             .disabled(viewModel.isLoading || viewModel.otpDigits.joined().count < 6)
 
             HStack {
-                if !isPasskeyVerification {
-                    Button("Resend code") {
-                        Task { await viewModel.requestOTPChallenge() }
+                Button("Resend code") {
+                    Task {
+                        if isPasskeyVerification {
+                            await viewModel.resendPasskeyVerificationOTP()
+                        } else {
+                            await viewModel.requestOTPChallenge()
+                        }
                     }
-                    .font(.subheadline)
-                    .disabled(viewModel.isLoading)
                 }
+                .font(.subheadline)
+                .disabled(viewModel.isLoading)
                 Spacer()
                 Button("Cancel") {
                     viewModel.showOTPSheet = false

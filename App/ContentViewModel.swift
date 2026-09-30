@@ -203,6 +203,26 @@ final class ContentViewModel: ObservableObject {
         showOTPSheet = true
     }
 
+    func resendPasskeyVerificationOTP() async {
+        guard #available(iOS 16.6, *) else { return }
+        isLoading = true
+        errorMessage = nil
+        do {
+            let challenge = try await authenticationClient
+                .passkeySignupChallenge(
+                    email: email.isEmpty ? nil : email,
+                    phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber,
+                    connection: "Username-Password-Authentication",
+                    deliveryMethod: phoneNumber.isEmpty ? nil : .voice)
+                .start()
+            pendingPasskeySignupChallenge = challenge
+            otpDigits = Array(repeating: "", count: 6)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+
     func submitPasskeyVerificationOTP() async {
         guard case .passkeyVerification(let channel) = otpContext else { return }
         let code = otpDigits.joined()
