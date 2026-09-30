@@ -131,6 +131,14 @@ struct DiscoveryResponse: Decodable {
     let alternatives: [DiscoveryAlternativePayload]
 }
 
+struct AuthorizationCodeResponse: Decodable {
+    let authorizationCode: String
+
+    enum CodingKeys: String, CodingKey {
+        case authorizationCode = "authorization_code"
+    }
+}
+
 struct DiscoveryAlternativePayload: Decodable {
 
     let grantType: String
@@ -234,14 +242,19 @@ extension Auth0EmbeddedAuth {
         )
     }
 
-    /// Updates the flow's session after a step fails: on a continuation
-    /// (`insufficient_authorization`) the rotated `auth_session` becomes the active session so the
-    /// next step can proceed; on any terminal failure the session is cleared so a stray continuation
-    /// call is rejected locally rather than sent with a dead session.
+    /// Updates the flow's session after a step fails.
+    ///
+    /// - On a continuation (`insufficient_authorization`) the rotated `auth_session` becomes the
+    ///   active session so the next step can proceed.
+    /// - On a transient failure (network error, `429`, or `5xx` — see
+    ///   ``Auth0APIError/isRetryable``) the session is left untouched, since the server-side session
+    ///   may still be valid and the caller can retry the same step.
+    /// - On any other (terminal) failure the session is cleared so a stray continuation call is
+    ///   rejected locally rather than sent with a dead session.
     func updateSessionFromFailure(_ error: EmbeddedAuthError) {
         if error.isInsufficientAuthorization, let newSession = error.info["auth_session"] as? String {
             currentSession = newSession
-        } else {
+        } else if !error.isRetryable {
             currentSession = nil
         }
     }

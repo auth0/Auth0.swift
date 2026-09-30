@@ -50,10 +50,23 @@ extension Auth0EmbeddedAuth {
     /// Decodes a `verifyOtp` `/e/authorize` response and, on success, exchanges the authorization
     /// code for ``Credentials``.
     ///
-    /// Session bookkeeping on failure matches ``decodeAuthorizeResponse(_:callback:)``. On `200`
-    /// the returned code is exchanged via a chained ``exchange(code:)`` request, and the flow's
-    /// session is cleared only once that exchange succeeds.
+    /// A thin wrapper over ``decodeAuthorizationCodeResponse(_:callback:)``, shared by every step
+    /// that completes the flow by returning an `authorization_code`.
     func decodeVerifyOtpResponse(
+        _ result: Result<ResponseValue, EmbeddedAuthError>,
+        callback: @escaping @Sendable (Result<Credentials, EmbeddedAuthError>) -> Void
+    ) {
+        decodeAuthorizationCodeResponse(result, callback: callback)
+    }
+
+    /// Decodes an `/e/authorize` response that completes the flow with an `authorization_code` and
+    /// exchanges that code for ``Credentials``.
+    ///
+    /// Reusable by any step whose success response carries an `authorization_code`. Session
+    /// bookkeeping on failure matches ``decodeAuthorizeResponse(_:callback:)``. On `200` the
+    /// returned code is exchanged via a chained ``exchange(code:)`` request; the code is single-use,
+    /// so the flow's session is cleared once that exchange settles regardless of its outcome.
+    func decodeAuthorizationCodeResponse(
         _ result: Result<ResponseValue, EmbeddedAuthError>,
         callback: @escaping @Sendable (Result<Credentials, EmbeddedAuthError>) -> Void
     ) {
@@ -63,13 +76,13 @@ extension Auth0EmbeddedAuth {
             callback(.failure(error))
         case .success(let response):
             guard let data = response.data,
-                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let code = json["authorization_code"] as? String else {
+                  let body = try? JSONDecoder().decode(AuthorizationCodeResponse.self, from: data) else {
+                currentSession = nil
                 callback(.failure(EmbeddedAuthError(from: response)))
                 return
             }
-            exchange(code: code).start { [self] exchangeResult in
-                if case .success = exchangeResult { currentSession = nil }
+            exchange(code: body.authorizationCode).start { [self] exchangeResult in
+                currentSession = nil
                 callback(exchangeResult)
             }
         }

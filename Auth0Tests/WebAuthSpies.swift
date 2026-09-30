@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import AuthenticationServices
 
@@ -85,5 +84,4 @@ class SpySafariViewController: SFSafariViewController {
     }
 
 }
-#endif
 #endif

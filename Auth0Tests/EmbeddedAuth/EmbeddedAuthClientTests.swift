@@ -475,6 +475,62 @@ struct EmbeddedAuthClientTests {
         }
     }
 
+    @Test func transientFailureKeepsSessionForRetry() async {
+        let sut = makeClient()
+        // Establish session
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:identify:email:v1"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+
+        // A transient failure (429) must leave the session untouched so the step can be retried
+        // swiftlint:disable:next force_try
+        let rateLimitData = try! JSONSerialization.data(withJSONObject: [
+            "error": "too_many_requests",
+            "error_description": "too_many_logins"
+        ])
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in (response(status: 429), rateLimitData) }
+        _ = try? await sut.identifyEmail("alice@example.com").start()
+
+        // Retry reuses the same session
+        var body: [String: Any]?
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
+            return (response(status: 403), insufficientAuthData(session: "sess_002", nextActions: []))
+        }
+        _ = try? await sut.identifyEmail("alice@example.com").start()
+        #expect(body?["auth_session"] as? String == "sess_001")
+    }
+
+    @Test func terminalFailureClearsSession() async {
+        let sut = makeClient()
+        // Establish session
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:identify:email:v1"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+
+        // A terminal failure clears the session
+        // swiftlint:disable:next force_try
+        let terminalData = try! JSONSerialization.data(withJSONObject: ["error": "access_denied"])
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in (response(status: 403), terminalData) }
+        _ = try? await sut.identifyEmail("alice@example.com").start()
+
+        // The next step is rejected locally without hitting the network
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            Issue.record("No network call expected once the session is cleared")
+            return (response(status: 200), authCodeData())
+        }
+        do {
+            _ = try await sut.identifyEmail("alice@example.com").start()
+            Issue.record("Expected failure")
+        } catch let error as EmbeddedAuthError {
+            #expect(error.code == "no_active_session")
+        } catch {
+            Issue.record("Wrong error type: \(error)")
+        }
+    }
+
     @Test func authorizeResetsActiveSession() async {
         let sut = makeClient()
         // Establish a session via the first authorize call
@@ -499,7 +555,7 @@ struct EmbeddedAuthClientTests {
         #expect(body?["auth_session"] as? String == "sess_002")
     }
 
-    @Test func verifyOtpExchangeFailureDoesNotClearSession() async {
+    @Test func verifyOtpExchangeFailureClearsSession() async {
         let sut = makeClient()
         // Establish session
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
@@ -518,17 +574,21 @@ struct EmbeddedAuthClientTests {
         }
         _ = try? await sut.verifyOtp("123456", type: .oob).start()
 
-        // Session must still be active so the caller can retry verifyOtp
-        var body: [String: Any]?
-        EmbeddedAuthClientMockProtocol.requestHandler = { req in
-            if req.url?.path.hasSuffix("/oauth/token") == true {
-                return (response(status: 200), credentialsData())
-            }
-            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
+        // The authorization_code is single-use, so the flow is over: the session must be cleared.
+        // A subsequent step is rejected locally without hitting the network.
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            Issue.record("No network call expected once the session is cleared")
             return (response(status: 200), authCodeData())
         }
-        _ = try? await sut.verifyOtp("123456", type: .oob).start()
-        #expect(body?["auth_session"] as? String == "sess_001")
+        do {
+            _ = try await sut.verifyOtp("123456", type: .oob).start()
+            Issue.record("Expected failure")
+        } catch let error as EmbeddedAuthError {
+            #expect(error.code == "no_active_session")
+            #expect(error.statusCode == 0)
+        } catch {
+            Issue.record("Wrong error type: \(error)")
+        }
     }
 
     // MARK: Sequential flow — full e2e with mock data

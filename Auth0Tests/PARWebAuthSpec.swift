@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import Quick
 import Nimble
@@ -537,4 +536,3 @@ private class PARMockUserAgent: WebAuthUserAgent {
         self.callback(result)
     }
 }
-#endif

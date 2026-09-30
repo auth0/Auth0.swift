@@ -1,4 +1,3 @@
-#if PASSKEYS_PLATFORM
 import Foundation
 import Quick
 import Nimble
@@ -133,4 +132,3 @@ class PasskeyAuthenticationMethodSpec: QuickSpec {
 
     }
 }
-#endif

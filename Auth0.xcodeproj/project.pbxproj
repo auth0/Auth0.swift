@@ -425,10 +425,7 @@
 		D41DED402DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
 		D4545B82306A9197002957D8 /* Auth0ClientInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B39306A9197002957D8 /* Auth0ClientInfoSpec.swift */; };
 		D4545B83306A9197002957D8 /* ECPublicKeySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B49306A9197002957D8 /* ECPublicKeySpec.swift */; };
-		D4545B84306A9197002957D8 /* LogoutTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B5E306A9197002957D8 /* LogoutTransactionSpec.swift */; };
-		D4545B85306A9197002957D8 /* SafariProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B75306A9197002957D8 /* SafariProviderSpec.swift */; };
 		D4545B86306A9197002957D8 /* AuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B3C306A9197002957D8 /* AuthenticationSpec.swift */; };
-		D4545B87306A9197002957D8 /* TransactionStoreSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B7A306A9197002957D8 /* TransactionStoreSpec.swift */; };
 		D4545B88306A9197002957D8 /* CredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B44306A9197002957D8 /* CredentialsSpec.swift */; };
 		D4545B89306A9197002957D8 /* IDTokenSignatureValidatorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B56306A9197002957D8 /* IDTokenSignatureValidatorSpec.swift */; };
 		D4545B8A306A9197002957D8 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B6B306A9197002957D8 /* NetworkStub.swift */; };
@@ -436,60 +433,40 @@
 		D4545B8C306A9197002957D8 /* DPoPSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B48306A9197002957D8 /* DPoPSpec.swift */; };
 		D4545B8D306A9197002957D8 /* EmbeddedAuthClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B4E306A9197002957D8 /* EmbeddedAuthClientTests.swift */; };
 		D4545B8E306A9197002957D8 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B73306A9197002957D8 /* Responses.swift */; };
-		D4545B8F306A9197002957D8 /* PARTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B6D306A9197002957D8 /* PARTransactionSpec.swift */; };
 		D4545B90306A9197002957D8 /* IDTokenValidatorMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B58306A9197002957D8 /* IDTokenValidatorMocks.swift */; };
-		D4545B91306A9197002957D8 /* WebAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B7C306A9197002957D8 /* WebAuthenticationSpec.swift */; };
 		D4545B92306A9197002957D8 /* CredentialsManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B43306A9197002957D8 /* CredentialsManagerSpec.swift */; };
 		D4545B93306A9197002957D8 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B55306A9197002957D8 /* Generators.swift */; };
 		D4545B94306A9197002957D8 /* MyAccountSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B69306A9197002957D8 /* MyAccountSpec.swift */; };
 		D4545B95306A9197002957D8 /* APICredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B37306A9197002957D8 /* APICredentialsSpec.swift */; };
-		D4545B96306A9197002957D8 /* WebAuthErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B7D306A9197002957D8 /* WebAuthErrorSpec.swift */; };
-		D4545B97306A9197002957D8 /* BiometricPolicySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B3E306A9197002957D8 /* BiometricPolicySpec.swift */; };
 		D4545B98306A9197002957D8 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B63306A9197002957D8 /* Mocks.swift */; };
 		D4545B99306A9197002957D8 /* UserProfileSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B7B306A9197002957D8 /* UserProfileSpec.swift */; };
 		D4545B9A306A9197002957D8 /* CredentialsManagerDPoPSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B41306A9197002957D8 /* CredentialsManagerDPoPSpec.swift */; };
 		D4545B9B306A9197002957D8 /* SenderConstrainingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B4C306A9197002957D8 /* SenderConstrainingSpec.swift */; };
-		D4545B9C306A9197002957D8 /* PARWebAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B6F306A9197002957D8 /* PARWebAuthSpec.swift */; };
 		D4545B9D306A9197002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B4F306A9197002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift */; };
 		D4545B9E306A9197002957D8 /* KeychainKeyStoreSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B4A306A9197002957D8 /* KeychainKeyStoreSpec.swift */; };
-		D4545B9F306A9197002957D8 /* WebAuthSpies.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B80306A9197002957D8 /* WebAuthSpies.swift */; };
 		D4545BA0306A9197002957D8 /* SSOCredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B78306A9197002957D8 /* SSOCredentialsSpec.swift */; };
 		D4545BA1306A9197002957D8 /* Auth0MFAClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B60306A9197002957D8 /* Auth0MFAClientTests.swift */; };
 		D4545BA2306A9197002957D8 /* DPoPErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B46306A9197002957D8 /* DPoPErrorSpec.swift */; };
 		D4545BA3306A9197002957D8 /* CredentialsManagerErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B42306A9197002957D8 /* CredentialsManagerErrorSpec.swift */; };
 		D4545BA4306A9197002957D8 /* SensitiveDataRedactorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B76306A9197002957D8 /* SensitiveDataRedactorSpec.swift */; };
-		D4545BA5306A9197002957D8 /* WebViewProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B81306A9197002957D8 /* WebViewProviderSpec.swift */; };
 		D4545BA6306A9197002957D8 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B79306A9197002957D8 /* StubURLProtocol.swift */; };
 		D4545BA7306A9197002957D8 /* JWTAlgorithmSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B5B306A9197002957D8 /* JWTAlgorithmSpec.swift */; };
-		D4545BA8306A9197002957D8 /* LoginTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B5D306A9197002957D8 /* LoginTransactionSpec.swift */; };
-		D4545BA9306A9197002957D8 /* UIWindow+TopViewControllerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B53306A9197002957D8 /* UIWindow+TopViewControllerSpec.swift */; };
 		D4545BAA306A9197002957D8 /* MyAccountErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B68306A9197002957D8 /* MyAccountErrorSpec.swift */; };
 		D4545BAB306A9197002957D8 /* IDTokenValidatorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B59306A9197002957D8 /* IDTokenValidatorSpec.swift */; };
 		D4545BAC306A9197002957D8 /* JWKSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B5A306A9197002957D8 /* JWKSpec.swift */; };
 		D4545BAD306A9197002957D8 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B72306A9197002957D8 /* RequestSpec.swift */; };
-		D4545BAE306A9197002957D8 /* ASProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B38306A9197002957D8 /* ASProviderSpec.swift */; };
-		D4545BAF306A9197002957D8 /* PasskeyLoginChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B70306A9197002957D8 /* PasskeyLoginChallenge.swift */; };
 		D4545BB0306A9197002957D8 /* EmbeddedAuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B51306A9197002957D8 /* EmbeddedAuthTests.swift */; };
 		D4545BB1306A9197002957D8 /* MyAccountAuthenticationMethodsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B64306A9197002957D8 /* MyAccountAuthenticationMethodsSpec.swift */; };
-		D4545BB2306A9197002957D8 /* BioAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B3D306A9197002957D8 /* BioAuthenticationSpec.swift */; };
 		D4545BB3306A9197002957D8 /* IDTokenValidatorBaseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B57306A9197002957D8 /* IDTokenValidatorBaseSpec.swift */; };
 		D4545BB4306A9197002957D8 /* LoggerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B5C306A9197002957D8 /* LoggerSpec.swift */; };
-		D4545BB5306A9197002957D8 /* PasskeyAuthenticationMethodSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B65306A9197002957D8 /* PasskeyAuthenticationMethodSpec.swift */; };
 		D4545BB6306A9197002957D8 /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B5F306A9197002957D8 /* Matchers.swift */; };
 		D4545BB7306A9197002957D8 /* ResponseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B74306A9197002957D8 /* ResponseSpec.swift */; };
-		D4545BB8306A9197002957D8 /* PARUtilsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B6E306A9197002957D8 /* PARUtilsSpec.swift */; };
 		D4545BB9306A9197002957D8 /* DPoPProofGeneratorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B47306A9197002957D8 /* DPoPProofGeneratorSpec.swift */; };
 		D4545BBA306A9197002957D8 /* SpyCredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B77306A9197002957D8 /* SpyCredentialsStorage.swift */; };
-		D4545BBB306A9197002957D8 /* PasskeySignupChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B71306A9197002957D8 /* PasskeySignupChallengeSpec.swift */; };
-		D4545BBC306A9197002957D8 /* WebAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B7F306A9197002957D8 /* WebAuthSpec.swift */; };
 		D4545BBD306A9197002957D8 /* DPoPChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B45306A9197002957D8 /* DPoPChallengeSpec.swift */; };
 		D4545BBE306A9197002957D8 /* EmbeddedAuthErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B50306A9197002957D8 /* EmbeddedAuthErrorTests.swift */; };
-		D4545BBF306A9197002957D8 /* PasskeyEnrollmentChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B66306A9197002957D8 /* PasskeyEnrollmentChallengeSpec.swift */; };
-		D4545BC0306A9197002957D8 /* OAuth2GrantSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B6C306A9197002957D8 /* OAuth2GrantSpec.swift */; };
-		D4545BC1306A9197002957D8 /* WebAuthPresentationWindowSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B7E306A9197002957D8 /* WebAuthPresentationWindowSpec.swift */; };
 		D4545BC2306A9197002957D8 /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B3A306A9197002957D8 /* Auth0Spec.swift */; };
 		D4545BC3306A9197002957D8 /* SecureEnclaveKeyStoreSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B4B306A9197002957D8 /* SecureEnclaveKeyStoreSpec.swift */; };
-		D4545BC4306A9197002957D8 /* ChallengeGeneratorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B3F306A9197002957D8 /* ChallengeGeneratorSpec.swift */; };
 		D4545BC5306A9197002957D8 /* AuthenticationErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B3B306A9197002957D8 /* AuthenticationErrorSpec.swift */; };
 		D4545BC6306A9197002957D8 /* ClaimValidatorsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B40306A9197002957D8 /* ClaimValidatorsSpec.swift */; };
 		D4545BC7306A9197002957D8 /* Auth0ClientInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4545B39306A9197002957D8 /* Auth0ClientInfoSpec.swift */; };
@@ -3298,9 +3275,7 @@
 			files = (
 				D4545B82306A9197002957D8 /* Auth0ClientInfoSpec.swift in Sources */,
 				D4545B83306A9197002957D8 /* ECPublicKeySpec.swift in Sources */,
-				D4545B85306A9197002957D8 /* SafariProviderSpec.swift in Sources */,
 				D4545B86306A9197002957D8 /* AuthenticationSpec.swift in Sources */,
-				D4545B87306A9197002957D8 /* TransactionStoreSpec.swift in Sources */,
 				D4545B88306A9197002957D8 /* CredentialsSpec.swift in Sources */,
 				D4545B89306A9197002957D8 /* IDTokenSignatureValidatorSpec.swift in Sources */,
 				D4545B8A306A9197002957D8 /* NetworkStub.swift in Sources */,
@@ -3309,56 +3284,39 @@
 				D4545B8D306A9197002957D8 /* EmbeddedAuthClientTests.swift in Sources */,
 				D4545B8E306A9197002957D8 /* Responses.swift in Sources */,
 				D4545B90306A9197002957D8 /* IDTokenValidatorMocks.swift in Sources */,
-				D4545B91306A9197002957D8 /* WebAuthenticationSpec.swift in Sources */,
 				D4545B92306A9197002957D8 /* CredentialsManagerSpec.swift in Sources */,
 				D4545B93306A9197002957D8 /* Generators.swift in Sources */,
 				D4545B94306A9197002957D8 /* MyAccountSpec.swift in Sources */,
 				D4545B95306A9197002957D8 /* APICredentialsSpec.swift in Sources */,
-				D4545B96306A9197002957D8 /* WebAuthErrorSpec.swift in Sources */,
-				D4545B97306A9197002957D8 /* BiometricPolicySpec.swift in Sources */,
 				D4545B98306A9197002957D8 /* Mocks.swift in Sources */,
 				D4545B99306A9197002957D8 /* UserProfileSpec.swift in Sources */,
 				D4545B9A306A9197002957D8 /* CredentialsManagerDPoPSpec.swift in Sources */,
 				D4545B9B306A9197002957D8 /* SenderConstrainingSpec.swift in Sources */,
-				D4545B9C306A9197002957D8 /* PARWebAuthSpec.swift in Sources */,
 				D4545B9D306A9197002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */,
 				D4545B9E306A9197002957D8 /* KeychainKeyStoreSpec.swift in Sources */,
-				D4545B9F306A9197002957D8 /* WebAuthSpies.swift in Sources */,
 				D4545BA0306A9197002957D8 /* SSOCredentialsSpec.swift in Sources */,
 				D4545BA1306A9197002957D8 /* Auth0MFAClientTests.swift in Sources */,
 				D4545BA2306A9197002957D8 /* DPoPErrorSpec.swift in Sources */,
 				D4545BA3306A9197002957D8 /* CredentialsManagerErrorSpec.swift in Sources */,
 				D4545BA4306A9197002957D8 /* SensitiveDataRedactorSpec.swift in Sources */,
-				D4545BA5306A9197002957D8 /* WebViewProviderSpec.swift in Sources */,
 				D4545BA6306A9197002957D8 /* StubURLProtocol.swift in Sources */,
 				D4545BA7306A9197002957D8 /* JWTAlgorithmSpec.swift in Sources */,
 				D4545BAA306A9197002957D8 /* MyAccountErrorSpec.swift in Sources */,
 				D4545BAB306A9197002957D8 /* IDTokenValidatorSpec.swift in Sources */,
 				D4545BAC306A9197002957D8 /* JWKSpec.swift in Sources */,
 				D4545BAD306A9197002957D8 /* RequestSpec.swift in Sources */,
-				D4545BAE306A9197002957D8 /* ASProviderSpec.swift in Sources */,
-				D4545BAF306A9197002957D8 /* PasskeyLoginChallenge.swift in Sources */,
 				D4545BB0306A9197002957D8 /* EmbeddedAuthTests.swift in Sources */,
 				D4545BB1306A9197002957D8 /* MyAccountAuthenticationMethodsSpec.swift in Sources */,
-				D4545BB2306A9197002957D8 /* BioAuthenticationSpec.swift in Sources */,
 				D4545BB3306A9197002957D8 /* IDTokenValidatorBaseSpec.swift in Sources */,
 				D4545BB4306A9197002957D8 /* LoggerSpec.swift in Sources */,
-				D4545BB5306A9197002957D8 /* PasskeyAuthenticationMethodSpec.swift in Sources */,
 				D4545BB6306A9197002957D8 /* Matchers.swift in Sources */,
 				D4545BB7306A9197002957D8 /* ResponseSpec.swift in Sources */,
-				D4545BB8306A9197002957D8 /* PARUtilsSpec.swift in Sources */,
 				D4545BB9306A9197002957D8 /* DPoPProofGeneratorSpec.swift in Sources */,
 				D4545BBA306A9197002957D8 /* SpyCredentialsStorage.swift in Sources */,
-				D4545BBB306A9197002957D8 /* PasskeySignupChallengeSpec.swift in Sources */,
-				D4545BBC306A9197002957D8 /* WebAuthSpec.swift in Sources */,
 				D4545BBD306A9197002957D8 /* DPoPChallengeSpec.swift in Sources */,
 				D4545BBE306A9197002957D8 /* EmbeddedAuthErrorTests.swift in Sources */,
-				D4545BBF306A9197002957D8 /* PasskeyEnrollmentChallengeSpec.swift in Sources */,
-				D4545BC0306A9197002957D8 /* OAuth2GrantSpec.swift in Sources */,
-				D4545BC1306A9197002957D8 /* WebAuthPresentationWindowSpec.swift in Sources */,
 				D4545BC2306A9197002957D8 /* Auth0Spec.swift in Sources */,
 				D4545BC3306A9197002957D8 /* SecureEnclaveKeyStoreSpec.swift in Sources */,
-				D4545BC4306A9197002957D8 /* ChallengeGeneratorSpec.swift in Sources */,
 				D4545BC5306A9197002957D8 /* AuthenticationErrorSpec.swift in Sources */,
 				D4545BC6306A9197002957D8 /* ClaimValidatorsSpec.swift in Sources */,
 			);

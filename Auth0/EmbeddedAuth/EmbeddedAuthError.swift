@@ -126,9 +126,7 @@ public extension EmbeddedAuthError {
     var nextActions: [NextAction] {
         guard let nextArray = info["next"] as? [[String: Any]] else { return [] }
         return nextArray.compactMap { entry in
-            guard let actionString = entry["action"] as? String else {
-                return NextAction.unknown(rawAction: "")
-            }
+            guard let actionString = entry["action"] as? String else { return nil }
             switch EmbeddedAction(rawValue: actionString) {
             case .identifyEmail:  return .identifyEmail
             case .challengeEmail:
