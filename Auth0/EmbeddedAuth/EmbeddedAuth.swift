@@ -15,8 +15,7 @@ public enum IdentifierType {
 
 // MARK: - Protocol
 
-/// Client for Embedded Login, covering both discovery (`GET /e/discovery`) and the
-/// interactive authorization loop (`POST /e/authorize`).
+/// Client for Embedded Login's interactive authorization loop (`POST /e/authorize`).
 ///
 /// Obtain an instance via ``Auth0/embeddedAuth(clientId:domain:session:)`` or
 /// ``Auth0/embeddedAuth(session:bundle:)``.
@@ -26,10 +25,7 @@ public enum IdentifierType {
 /// ```swift
 /// let client = Auth0.embeddedAuth()
 ///
-/// // Discover the available login options
-/// let discovery = try await client.discover().start()
-///
-/// // Or drive the authorization loop
+/// // Drive the authorization loop
 /// do {
 ///     try await client.authorize(connection: "my-connection").start()
 /// } catch let error as EmbeddedAuthError where error.isInsufficientAuthorization {
@@ -39,19 +35,9 @@ public enum IdentifierType {
 /// ```
 ///
 /// ## See Also
-/// - ``DiscoveryResult``
 /// - ``EmbeddedAuthError``
 /// - ``NextAction``
 public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
-
-    /// Fetches the live set of login alternatives for this client.
-    ///
-    /// Calls `GET /e/discovery?client_id=<id>[&connection=<name>]`.
-    ///
-    /// - Parameter connection: Optional connection name to filter results to a single connection.
-    ///   Pass `nil` (the default) to retrieve all alternatives.
-    /// - Returns: A request that yields a ``DiscoveryResult``.
-    func discover(connection: String?) -> Request<DiscoveryResult, EmbeddedAuthError>
 
     /// Starts a new embedded authorization flow.
     ///
@@ -97,11 +83,6 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
 }
 
 public extension EmbeddedAuth {
-
-    /// Fetches all live login alternatives for this client (no connection filter).
-    func discover() -> Request<DiscoveryResult, EmbeddedAuthError> {
-        discover(connection: nil)
-    }
 
     /// Starts a new embedded authorization flow targeting the given connection using all default capabilities and the default scope.
     func authorize(connection: String) -> Request<Void, EmbeddedAuthError> {

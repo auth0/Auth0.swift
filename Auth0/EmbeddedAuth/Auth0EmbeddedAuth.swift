@@ -4,8 +4,7 @@ import Foundation
 
 /// Concrete implementation of ``EmbeddedAuth``.
 ///
-/// Handles both discovery (`GET /e/discovery`) and the interactive authorization
-/// loop (`POST /e/authorize`). Obtain instances via
+/// Runs the interactive authorization loop (`POST /e/authorize`). Obtain instances via
 /// ``Auth0/embeddedAuth(clientId:domain:session:)`` or ``Auth0/embeddedAuth(session:bundle:)``.
 ///
 /// A client tracks a single in-progress flow: calling ``authorize(connection:capabilities:scope:audience:)``
@@ -43,22 +42,6 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
         self.url = url
         self.session = session
         self.auth0ClientInfo = auth0ClientInfo
-    }
-
-    // MARK: Discovery
-
-    func discover(connection: String?) -> Request<DiscoveryResult, EmbeddedAuthError> {
-        var params: [String: Any] = ["client_id": clientId]
-        if let connection {
-            params["connection"] = connection
-        }
-        return Request(session: session,
-                       url: url.appending("e/discovery"),
-                       method: "GET",
-                       handle: decodeDiscoveryResult,
-                       parameters: params,
-                       logger: logger,
-                       auth0ClientInfo: auth0ClientInfo)
     }
 
     // MARK: Authorization loop
@@ -130,73 +113,12 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
 
 // MARK: - Wire types (Decodable)
 
-struct DiscoveryResponse: Decodable {
-    let alternatives: [DiscoveryAlternativePayload]
-}
-
 struct AuthorizationCodeResponse: Decodable {
     let authorizationCode: String
 
     enum CodingKeys: String, CodingKey {
         case authorizationCode = "authorization_code"
     }
-}
-
-struct DiscoveryAlternativePayload: Decodable {
-
-    let grantType: String
-    let connection: String?
-    let type: String?
-    let subjectTokenType: String?
-    let identifierTypes: [String]?
-    let realm: String?
-
-    enum CodingKeys: String, CodingKey {
-        case grantType = "grant_type"
-        case connection
-        case type
-        case subjectTokenType = "subject_token_type"
-        case identifierTypes = "identifier_types"
-        case realm
-    }
-
-    var loginOption: LoginOption? {
-        switch grantType {
-        case GrantTypeValue.authorizationCode:
-            return .authorizationCode(connection: connection, type: type)
-        case GrantTypeValue.tokenExchange:
-            if let subjectTokenType {
-                return .nativeSocial(subjectTokenType: subjectTokenType)
-            }
-        case GrantTypeValue.password:
-            return .password
-        case GrantTypeValue.webAuthn:
-            if let connection {
-                return .passkey(connection: connection)
-            }
-        case GrantTypeValue.passwordlessOTP:
-            if let identifierTypes, let connection = connection {
-                let identifiers: [PasswordlessIdentifier] = (identifierTypes).compactMap {
-                    switch $0 {
-                    case IdentifierTypeValue.email:       return .email
-                    case IdentifierTypeValue.phoneNumber: return .phoneNumber
-                    default:                              return nil
-                    }
-                }
-                return .passwordlessOtp(connection: connection,
-                                        identifiers: identifiers,
-                                        type: type == TypeValue.auth0 ? .auth0 : .legacy)
-            }
-        case GrantTypeValue.passwordRealm:
-            if let realm {
-                return .passwordRealm(realm: realm)
-            }
-        default:
-            return .unknown(rawGrantType: grantType, connection: connection)
-        }
-        return nil
-    }
-
 }
 
 // MARK: - Session state & requests (used cross-file by the response decoders)
