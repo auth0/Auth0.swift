@@ -203,7 +203,7 @@ class ASProviderSpec: QuickSpec {
                 }
             }
         }
-        
+
     }
-    
+
 }

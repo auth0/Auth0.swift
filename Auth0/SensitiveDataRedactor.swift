@@ -4,7 +4,7 @@ import Foundation
 struct SensitiveDataRedactor {
     
     /// List of sensitive keys that should be redacted.
-    private static let sensitiveKeys: Set<String> = ["access_token", "id_token", "refresh_token"]
+    private static let sensitiveKeys: Set<String> = ["access_token", "id_token", "refresh_token", "auth_session", "authorization_code", "otp"]
     
     /// Redacts sensitive fields from a JSON string in the response body.
     ///

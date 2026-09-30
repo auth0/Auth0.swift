@@ -5,9 +5,18 @@ import Foundation
 /// `Result` wrapper for Embedded Login operations.
 public typealias EmbeddedAuthResult<T> = Result<T, EmbeddedAuthError>
 
+// MARK: - IdentifierType
+
+/// The type of identifier a user submits during the identify step.
+public enum IdentifierType {
+    /// An email address.
+    case email
+}
+
 // MARK: - Protocol
 
-/// Client for the Embedded Login Discovery API.
+/// Client for Embedded Login, covering both discovery (`GET /e/discovery`) and the
+/// interactive authorization loop (`POST /e/authorize`).
 ///
 /// Obtain an instance via ``Auth0/embeddedAuth(clientId:domain:session:)`` or
 /// ``Auth0/embeddedAuth(session:bundle:)``.
@@ -15,12 +24,24 @@ public typealias EmbeddedAuthResult<T> = Result<T, EmbeddedAuthError>
 /// ## Usage
 ///
 /// ```swift
-/// let result = try await Auth0.embeddedAuth().discover().start()
+/// let client = Auth0.embeddedAuth()
+///
+/// // Discover the available login options
+/// let discovery = try await client.discover().start()
+///
+/// // Or drive the authorization loop
+/// do {
+///     try await client.authorize(connection: "my-connection").start()
+/// } catch let error as EmbeddedAuthError where error.isInsufficientAuthorization {
+///     // error.nextActions tells you which step to present
+/// }
+/// let credentials = try await client.verifyOtp("123456", type: .oob).start()
 /// ```
 ///
 /// ## See Also
 /// - ``DiscoveryResult``
 /// - ``EmbeddedAuthError``
+/// - ``NextAction``
 public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
 
     /// Fetches the live set of login alternatives for this client.
@@ -32,6 +53,47 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// - Returns: A request that yields a ``DiscoveryResult``.
     func discover(connection: String?) -> Request<DiscoveryResult, EmbeddedAuthError>
 
+    /// Starts a new embedded authorization flow.
+    ///
+    /// Calls `POST /e/authorize` with `capabilities` advertised.
+    /// Always throws ``EmbeddedAuthError`` with ``EmbeddedAuthError/isInsufficientAuthorization`` `true`
+    /// on the first call; read ``EmbeddedAuthError/nextActions`` to determine which step to present.
+    ///
+    /// - Parameters:
+    ///   - connection:   Connection name to target. Required by the server — a missing value yields `invalid_request`.
+    ///   - capabilities: Actions this SDK version supports. Defaults to ``EmbeddedCapability/all``.
+    ///   - scope:        OAuth scope string. Defaults to `"openid profile email offline_access"`.
+    ///   - audience:     Optional API audience.
+    func authorize(connection: String,
+                   capabilities: [EmbeddedCapability],
+                   scope: String,
+                   audience: String?) -> Request<Void, EmbeddedAuthError>
+
+    /// Submits a user identifier to continue the authorization flow.
+    ///
+    /// Requires an active session (``authorize(connection:capabilities:scope:audience:)`` must have been called first).
+    /// - Parameters:
+    ///   - identifier: The identifier value (e.g. an email address).
+    ///   - type: The type of identifier being submitted.
+    func identify(_ identifier: String, type: IdentifierType) -> Request<Void, EmbeddedAuthError>
+
+    /// Requests that the server send an email OTP challenge.
+    ///
+    /// Requires an active session.
+    /// - Parameter index: The zero-based index of the `challengeEmail` entry from ``EmbeddedAuthError/nextActions``.
+    func challengeEmail(index: Int) -> Request<Void, EmbeddedAuthError>
+
+    /// Submits a one-time password to verify the user's identity.
+    ///
+    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    ///
+    /// Requires an active session.
+    ///
+    /// - Parameters:
+    ///   - otp:  The one-time code entered by the user.
+    ///   - type: Whether the code is OOB (email/SMS) or TOTP.
+    func verifyOtp(_ otp: String, type: OtpType) -> Request<Credentials, EmbeddedAuthError>
+
 }
 
 public extension EmbeddedAuth {
@@ -41,11 +103,19 @@ public extension EmbeddedAuth {
         discover(connection: nil)
     }
 
+    /// Starts a new embedded authorization flow targeting the given connection using all default capabilities and the default scope.
+    func authorize(connection: String) -> Request<Void, EmbeddedAuthError> {
+        authorize(connection: connection,
+                  capabilities: EmbeddedCapability.all,
+                  scope: "openid profile email offline_access",
+                  audience: nil)
+    }
+
 }
 
 // MARK: - Factory
 
-/// Embedded Login Discovery client.
+/// Embedded Login client.
 ///
 /// ## Usage
 ///
@@ -57,7 +127,7 @@ public extension EmbeddedAuth {
 ///   - clientId: Client ID of your Auth0 application.
 ///   - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
 ///   - session:  `URLSession` instance used for networking. Defaults to `URLSession.shared`.
-/// - Returns: Embedded Login Discovery client.
+/// - Returns: Embedded Login client.
 public func embeddedAuth(clientId: String,
                          domain: String,
                          session: URLSession = .shared) -> EmbeddedAuth {
@@ -66,7 +136,7 @@ public func embeddedAuth(clientId: String,
                       session: session)
 }
 
-/// Embedded Login Discovery client.
+/// Embedded Login client.
 ///
 /// The Auth0 Client ID & Domain are loaded from the `Auth0.plist` file in your main bundle.
 ///
@@ -79,7 +149,7 @@ public func embeddedAuth(clientId: String,
 /// - Parameters:
 ///   - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
 ///   - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
-/// - Returns: Embedded Login Discovery client.
+/// - Returns: Embedded Login client.
 /// - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
 public func embeddedAuth(session: URLSession = .shared, bundle: Bundle = .main) -> EmbeddedAuth {
     let values = plistValues(bundle: bundle)!
