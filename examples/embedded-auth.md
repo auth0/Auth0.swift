@@ -1,9 +1,9 @@
-## Embedded Auth (iOS / macOS / tvOS / watchOS / visionOS) [EA]
+## Embedded Auth (iOS / macOS / tvOS / watchOS / visionOS) [Beta]
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/embeddedauth)**
 
 > [!IMPORTANT]
-> Embedded Login Discovery is currently in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant and application.
+> Embedded Login Discovery is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant and application.
 
 - [Discover login options](#discover-login-options)
 - [Filter by connection](#filter-by-connection)
@@ -177,7 +177,7 @@ Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/
 ### Embedded Authorization flow
 
 > [!IMPORTANT]
-> The embedded authorization flow is currently in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant and application.
+> The embedded authorization flow is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant and application.
 
 The same `EmbeddedAuth` client that performs discovery also runs the interactive `POST /e/authorize` loop. Each step returns an error whose `nextActions` array tells you what to present next. When `verifyOtp` succeeds, `Credentials` are returned directly — no manual code exchange required.
 

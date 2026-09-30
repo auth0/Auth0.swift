@@ -5,7 +5,7 @@ import Foundation
 /// A typed action the server will accept on the next ``EmbeddedAuth`` call.
 public enum NextAction: Sendable, Equatable {
 
-    /// Server expects the caller to submit an email address via ``EmbeddedAuth/identifyEmail(_:)``.
+    /// Server expects the caller to submit an email address via ``EmbeddedAuth/identify(_:type:)``.
     case identifyEmail
 
     /// Server expects the caller to trigger an email OTP send via ``EmbeddedAuth/challengeEmail(index:)``.

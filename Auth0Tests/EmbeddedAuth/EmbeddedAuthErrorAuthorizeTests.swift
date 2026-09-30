@@ -195,43 +195,31 @@ import Foundation
         #expect(identifier == "al**@example.com")
     }
 
-    @Test func nextActionsChallengeEmailDefaultsWhenMissingBothFields() {
+    @Test func nextActionsChallengeEmailDroppedWhenMissingBothFields() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1"]]
         ], statusCode: 403)
-        guard case .challengeEmail(let index, let identifier) = error.nextActions.first else {
-            Issue.record("Expected challengeEmail action"); return
-        }
-        #expect(index == 0)
-        #expect(identifier == "")
+        #expect(error.nextActions.isEmpty)
     }
 
-    @Test func nextActionsChallengeEmailDefaultsIndexWhenAbsent() {
+    @Test func nextActionsChallengeEmailDroppedWhenIndexAbsent() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1", "identifier": "al**@example.com"]]
         ], statusCode: 403)
-        guard case .challengeEmail(let index, let identifier) = error.nextActions.first else {
-            Issue.record("Expected challengeEmail action"); return
-        }
-        #expect(index == 0)
-        #expect(identifier == "al**@example.com")
+        #expect(error.nextActions.isEmpty)
     }
 
-    @Test func nextActionsChallengeEmailDefaultsIdentifierWhenAbsent() {
+    @Test func nextActionsChallengeEmailDroppedWhenIdentifierAbsent() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1", "index": 1]]
         ], statusCode: 403)
-        guard case .challengeEmail(let index, let identifier) = error.nextActions.first else {
-            Issue.record("Expected challengeEmail action"); return
-        }
-        #expect(index == 1)
-        #expect(identifier == "")
+        #expect(error.nextActions.isEmpty)
     }
 
     // MARK: nextActions — verifyOTP with channel and identifier

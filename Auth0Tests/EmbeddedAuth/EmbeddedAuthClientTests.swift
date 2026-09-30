@@ -200,13 +200,13 @@ struct EmbeddedAuthClientTests {
         }
     }
 
-    // MARK: identifyEmail — local session guard
+    // MARK: identify — local session guard
 
-    @Test func identifyEmailFailsLocallyWithNoSession() async {
+    @Test func identifyFailsLocallyWithNoSession() async {
         let sut = makeClient()
         // No network handler set — any network call would crash
         do {
-            _ = try await sut.identifyEmail("alice@example.com").start()
+            _ = try await sut.identify("alice@example.com", type: .email).start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
             #expect(error.code == "no_active_session")
@@ -216,9 +216,9 @@ struct EmbeddedAuthClientTests {
         }
     }
 
-    // MARK: identifyEmail — request body (after session established)
+    // MARK: identify — request body (after session established)
 
-    @Test func identifyEmailSendsCorrectBody() async throws {
+    @Test func identifySendsCorrectBody() async throws {
         let sut = makeClient()
 
         // First call: establish session
@@ -227,20 +227,20 @@ struct EmbeddedAuthClientTests {
         }
         _ = try? await sut.authorize(connection: "test-connection").start()
 
-        // Second call: capture identifyEmail body
+        // Second call: capture identify body
         var body: [String: Any]?
         EmbeddedAuthClientMockProtocol.requestHandler = { req in
             body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
             return (response(status: 403), insufficientAuthData(session: "sess_002", nextActions: [["action": "action:challenge:email:v1"]]))
         }
-        _ = try? await sut.identifyEmail("alice@example.com").start()
+        _ = try? await sut.identify("alice@example.com", type: .email).start()
 
         #expect(body?["action"] as? String == "action:identify:email:v1")
         #expect(body?["email"] as? String == "alice@example.com")
         #expect(body?["auth_session"] as? String == "sess_001")
     }
 
-    @Test func identifyEmailDoesNotExposeAuthSession() async {
+    @Test func identifyDoesNotExposeAuthSession() async {
         let sut = makeClient()
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:identify:email:v1"]]))
@@ -483,14 +483,14 @@ struct EmbeddedAuthClientTests {
         }
         _ = try? await sut.authorize(connection: "test-connection").start()
 
-        // A transient failure (429) must leave the session untouched so the step can be retried
+        // A transient failure (500) must leave the session untouched so the step can be retried
         // swiftlint:disable:next force_try
-        let rateLimitData = try! JSONSerialization.data(withJSONObject: [
-            "error": "too_many_requests",
-            "error_description": "too_many_logins"
+        let serverErrorData = try! JSONSerialization.data(withJSONObject: [
+            "error": "server_error",
+            "error_description": "internal server error"
         ])
-        EmbeddedAuthClientMockProtocol.requestHandler = { _ in (response(status: 429), rateLimitData) }
-        _ = try? await sut.identifyEmail("alice@example.com").start()
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in (response(status: 500), serverErrorData) }
+        _ = try? await sut.identify("alice@example.com", type: .email).start()
 
         // Retry reuses the same session
         var body: [String: Any]?
@@ -498,7 +498,7 @@ struct EmbeddedAuthClientTests {
             body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
             return (response(status: 403), insufficientAuthData(session: "sess_002", nextActions: []))
         }
-        _ = try? await sut.identifyEmail("alice@example.com").start()
+        _ = try? await sut.identify("alice@example.com", type: .email).start()
         #expect(body?["auth_session"] as? String == "sess_001")
     }
 
@@ -514,7 +514,7 @@ struct EmbeddedAuthClientTests {
         // swiftlint:disable:next force_try
         let terminalData = try! JSONSerialization.data(withJSONObject: ["error": "access_denied"])
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in (response(status: 403), terminalData) }
-        _ = try? await sut.identifyEmail("alice@example.com").start()
+        _ = try? await sut.identify("alice@example.com", type: .email).start()
 
         // The next step is rejected locally without hitting the network
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
@@ -522,7 +522,7 @@ struct EmbeddedAuthClientTests {
             return (response(status: 200), authCodeData())
         }
         do {
-            _ = try await sut.identifyEmail("alice@example.com").start()
+            _ = try await sut.identify("alice@example.com", type: .email).start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
             #expect(error.code == "no_active_session")
@@ -551,7 +551,7 @@ struct EmbeddedAuthClientTests {
             body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
             return (response(status: 403), insufficientAuthData(session: "sess_003", nextActions: []))
         }
-        _ = try? await sut.identifyEmail("alice@example.com").start()
+        _ = try? await sut.identify("alice@example.com", type: .email).start()
         #expect(body?["auth_session"] as? String == "sess_002")
     }
 
@@ -605,7 +605,7 @@ struct EmbeddedAuthClientTests {
             switch callCount {
             case 1:  // authorize()
                 return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
-            case 2:  // identifyEmail()
+            case 2:  // identify()
                 return (response(status: 403), insufficientAuthData(session: "s2", nextActions: [["action": "action:challenge:email:v1", "index": 0, "identifier": "al**@example.com"]]))
             case 3:  // challengeEmail()
                 return (response(status: 403), insufficientAuthData(session: "s3", nextActions: [["action": "action:verify:otp:v1", "channel": "email", "identifier": "al**@example.com"]]))
@@ -624,8 +624,8 @@ struct EmbeddedAuthClientTests {
         } catch { Issue.record("Unexpected: \(error)") }
 
         do {
-            _ = try await sut.identifyEmail("alice@example.com").start()
-            Issue.record("identifyEmail() should throw with nextActions")
+            _ = try await sut.identify("alice@example.com", type: .email).start()
+            Issue.record("identify() should throw with nextActions")
         } catch let e as EmbeddedAuthError where e.isInsufficientAuthorization {
             guard case .challengeEmail(let index, _) = e.nextActions.first else {
                 Issue.record("Expected .challengeEmail"); return

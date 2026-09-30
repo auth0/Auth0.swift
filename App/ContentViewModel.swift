@@ -55,7 +55,7 @@ final class ContentViewModel: ObservableObject {
     func submitEmail(_ email: String) async {
         isLoading = true
         do {
-            _ = try await embeddedAuthClient.identifyEmail(email).start()
+            _ = try await embeddedAuthClient.identify(email, type: .email).start()
         } catch let error as EmbeddedAuthError {
             handle(embeddedAuthError: error)
         } catch {

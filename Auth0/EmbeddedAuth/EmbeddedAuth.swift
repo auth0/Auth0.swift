@@ -5,6 +5,14 @@ import Foundation
 /// `Result` wrapper for Embedded Login operations.
 public typealias EmbeddedAuthResult<T> = Result<T, EmbeddedAuthError>
 
+// MARK: - IdentifierType
+
+/// The type of identifier a user submits during the identify step.
+public enum IdentifierType {
+    /// An email address.
+    case email
+}
+
 // MARK: - Protocol
 
 /// Client for Embedded Login, covering both discovery (`GET /e/discovery`) and the
@@ -61,11 +69,13 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
                    scope: String,
                    audience: String?) -> Request<Void, EmbeddedAuthError>
 
-    /// Submits an email address as the user's identifier.
+    /// Submits a user identifier to continue the authorization flow.
     ///
     /// Requires an active session (``authorize(connection:capabilities:scope:audience:)`` must have been called first).
-    /// - Parameter email: The email address to identify with.
-    func identifyEmail(_ email: String) -> Request<Void, EmbeddedAuthError>
+    /// - Parameters:
+    ///   - identifier: The identifier value (e.g. an email address).
+    ///   - type: The type of identifier being submitted.
+    func identify(_ identifier: String, type: IdentifierType) -> Request<Void, EmbeddedAuthError>
 
     /// Requests that the server send an email OTP challenge.
     ///

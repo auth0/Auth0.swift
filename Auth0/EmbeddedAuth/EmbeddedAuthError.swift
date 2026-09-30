@@ -130,11 +130,17 @@ public extension EmbeddedAuthError {
             switch EmbeddedAction(rawValue: actionString) {
             case .identifyEmail:  return .identifyEmail
             case .challengeEmail:
-                return .challengeEmail(index: entry["index"] as? Int ?? 0,
-                                       identifier: entry["identifier"] as? String ?? "")
+                guard let index = entry["index"] as? Int,
+                   let identifier = entry["identifier"] as? String else {
+                   return nil
+                }
+                return .challengeEmail(index: index,
+                                               identifier: identifier)
             case .verifyOTP:
                 guard let channelString = entry["channel"] as? String,
-                      let channel = OtpChannel(rawValue: channelString.lowercased()) else { return nil }
+                      let channel = OtpChannel(rawValue: channelString.lowercased()) else {
+                    return nil
+                }
                 return .verifyOTP(channel: channel, identifier: entry["identifier"] as? String)
             case .none:
                 return .unknown(rawAction: actionString)

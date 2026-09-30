@@ -79,15 +79,18 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
         return authorizeRequest(body: body)
     }
 
-    /// Submits an email address as the user's identifier.
-    func identifyEmail(_ email: String) -> Request<Void, EmbeddedAuthError> {
-        guard let currentSession else { return missingSessionRequest() }
-        return authorizeRequest(body: [
-            "client_id": clientId,
-            "action": EmbeddedAction.identifyEmail.rawValue,
-            "email": email,
-            "auth_session": currentSession
-        ])
+    /// Submits a user identifier to continue the authorization flow.
+    func identify(_ identifier: String, type: IdentifierType) -> Request<Void, EmbeddedAuthError> {
+        switch type {
+        case .email:
+            guard let currentSession else { return missingSessionRequest() }
+            return authorizeRequest(body: [
+                "client_id": clientId,
+                "action": EmbeddedAction.identifyEmail.rawValue,
+                "email": identifier,
+                "auth_session": currentSession
+            ])
+        }
     }
 
     /// Requests that the server send an email OTP challenge.
@@ -246,15 +249,14 @@ extension Auth0EmbeddedAuth {
     ///
     /// - On a continuation (`insufficient_authorization`) the rotated `auth_session` becomes the
     ///   active session so the next step can proceed.
-    /// - On a transient failure (network error, `429`, or `5xx` — see
-    ///   ``Auth0APIError/isRetryable``) the session is left untouched, since the server-side session
-    ///   may still be valid and the caller can retry the same step.
-    /// - On any other (terminal) failure the session is cleared so a stray continuation call is
-    ///   rejected locally rather than sent with a dead session.
+    /// - On a terminal failure (`access_denied`, `too_many_attempts`, or `too_many_logins`) the
+    ///   session is cleared so a stray continuation call is rejected locally.
+    /// - On any other failure (transient network errors, rate-limits, etc.) the session is left
+    ///   untouched so the caller can retry the same step.
     func updateSessionFromFailure(_ error: EmbeddedAuthError) {
         if error.isInsufficientAuthorization, let newSession = error.info["auth_session"] as? String {
             currentSession = newSession
-        } else if !error.isRetryable {
+        } else if error.isAccessDenied || error.isTooManyAttempts || error.isTooManyLogins {
             currentSession = nil
         }
     }
