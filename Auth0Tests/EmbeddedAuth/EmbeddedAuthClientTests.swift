@@ -102,6 +102,12 @@ struct EmbeddedAuthClientTests {
         #expect(client.session === URLSession.shared)
     }
 
+    @Test func factoryAcceptsCustomSession() throws {
+        let custom = URLSession(configuration: .ephemeral)
+        let client = try #require(Auth0.embeddedAuth(clientId: clientId, domain: domain, session: custom) as? Auth0EmbeddedAuth)
+        #expect(client.session === custom)
+    }
+
     // MARK: authorize() — request body
 
     @Test func authorizePostsToCorrectURL() async {

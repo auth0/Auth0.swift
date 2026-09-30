@@ -22,30 +22,6 @@ struct ContentView: View {
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading)
 
-                    Button {
-                        Task { await viewModel.discoverOptions() }
-                    } label: {
-                        Text("Discover Login Options")
-                    }
-                    .buttonStyle(SecondaryButtonStyle())
-                    .disabled(viewModel.isLoading)
-
-                case .discovered(let options):
-                    Text("Available login options:")
-                        .font(.subheadline.bold())
-                    ForEach(Array(options.enumerated()), id: \.offset) { _, option in
-                        Text("• \(loginOptionDescription(option))")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Button {
-                        Task { await viewModel.startEmbeddedFlow() }
-                    } label: {
-                        Text("Start Embedded Auth")
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-                    .disabled(viewModel.isLoading)
-
                 case .identifyEmail:
                     TextField("Email", text: $viewModel.email)
                         #if !os(macOS)
@@ -147,31 +123,6 @@ struct ContentView: View {
             }
             .padding()
         }
-    }
-}
-
-// MARK: - Helpers
-
-private func loginOptionDescription(_ option: LoginOption) -> String {
-    switch option {
-    case .password:
-        return "Password"
-    case .passwordRealm(let realm):
-        return "Password (realm: \(realm))"
-    case .passkey(let connection):
-        return "Passkey (\(connection))"
-    case .passwordlessOtp(let connection, let identifiers, let type):
-        let ids = identifiers.map { $0 == .email ? "email" : "phone" }.joined(separator: ", ")
-        let flowType = type == .auth0 ? "auth0" : "legacy"
-        return "Passwordless OTP (\(connection), \(ids), \(flowType))"
-    case .nativeSocial(let subjectTokenType):
-        return "Native Social (\(subjectTokenType))"
-    case .authorizationCode(let connection, let type):
-        let conn = connection ?? "—"
-        let typeStr = type ?? "—"
-        return "Authorization Code (\(conn), \(typeStr))"
-    case .unknown(let rawGrantType, _):
-        return "Unknown (\(rawGrantType))"
     }
 }
 

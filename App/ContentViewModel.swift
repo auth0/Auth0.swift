@@ -22,21 +22,6 @@ final class ContentViewModel: ObservableObject {
         self.embeddedAuthClient = embeddedAuthClient ?? Auth0.embeddedAuth().logging(enabled: true)
     }
 
-    // MARK: - Discovery
-
-    func discoverOptions() async {
-        isLoading = true
-        do {
-            let result = try await embeddedAuthClient.discover().start()
-            embeddedAuthUIState = .discovered(result.options)
-        } catch let error as EmbeddedAuthError {
-            embeddedAuthUIState = .failed("[\(error.code)] \(error.debugDescription)")
-        } catch {
-            embeddedAuthUIState = .failed(error.localizedDescription)
-        }
-        isLoading = false
-    }
-
     // MARK: - Embedded auth
 
     func startEmbeddedFlow() async {
@@ -120,7 +105,6 @@ final class ContentViewModel: ObservableObject {
 
 enum EmbeddedAuthUIState {
     case initial
-    case discovered([LoginOption])
     case identifyEmail
     case challengeEmail(index: Int, identifier: String)
     case verifyOTP(channel: OtpChannel, identifier: String?)
