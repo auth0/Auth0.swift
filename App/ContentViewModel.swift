@@ -76,11 +76,11 @@ final class ContentViewModel: ObservableObject {
     }
 
     private func handle(embeddedAuthError error: EmbeddedAuthError) {
-        guard error.isInsufficientAuthorization else {
+        guard case .insufficientAuthorization(let nextActions) = error.kind else {
             embeddedAuthUIState = .failed("[\(error.code)] \(error.debugDescription)")
             return
         }
-        for action in error.nextActions {
+        for action in nextActions {
             switch action {
             case .identifyEmail:
                 embeddedAuthUIState = .identifyEmail
@@ -90,7 +90,7 @@ final class ContentViewModel: ObservableObject {
                 return
             case .verifyOTP(let channel, let identifier):
                 otp = ""
-                otpAttemptError = error.isInvalidCode ? "Wrong code — try again" : nil
+                otpAttemptError = nil
                 embeddedAuthUIState = .verifyOTP(channel: channel, identifier: identifier)
                 return
             default:
