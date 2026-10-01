@@ -181,7 +181,117 @@ import Foundation
         #expect(actions[1] == .challengeEmail(index: 0, identifier: "al**@example.com"))
     }
 
-    // MARK: - kind: access_denied variants
+    // MARK: - reason: invalidCode
+
+    @Test func reasonIsInvalidCodeForInvalidCodeUnderInsufficientAuthorization() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "invalid_code"],
+            statusCode: 403
+        )
+        guard case .invalidCode = error.reason else {
+            Issue.record("Expected .invalidCode, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsInvalidCodeForInvalidIdentifierOrCodeUnderInsufficientAuthorization() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "invalid_identifier_or_code"],
+            statusCode: 403
+        )
+        guard case .invalidCode = error.reason else {
+            Issue.record("Expected .invalidCode, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsInvalidCodeForInvalidCodeUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "invalid_code"],
+            statusCode: 403
+        )
+        guard case .invalidCode = error.reason else {
+            Issue.record("Expected .invalidCode, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsInvalidCodeForInvalidIdentifierOrCodeUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "invalid_identifier_or_code"],
+            statusCode: 403
+        )
+        guard case .invalidCode = error.reason else {
+            Issue.record("Expected .invalidCode, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonInvalidCodeHasPriorityOverAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "invalid_code"],
+            statusCode: 403
+        )
+        if case .accessDenied = error.reason {
+            Issue.record("invalid_code must map to .invalidCode, not .accessDenied")
+        }
+    }
+
+    // MARK: - reason: invalidIdentifierOrPassword
+
+    @Test func reasonIsInvalidIdentifierOrPasswordForMatchingDescription() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "invalid_identifier_or_password"],
+            statusCode: 403
+        )
+        guard case .invalidIdentifierOrPassword = error.reason else {
+            Issue.record("Expected .invalidIdentifierOrPassword, got \(error.reason)"); return
+        }
+    }
+
+    // MARK: - reason: authorizationPending
+
+    @Test func reasonIsAuthorizationPendingForMatchingDescription() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "authorization_pending"],
+            statusCode: 403
+        )
+        guard case .authorizationPending = error.reason else {
+            Issue.record("Expected .authorizationPending, got \(error.reason)"); return
+        }
+    }
+
+    // MARK: - reason: slowDown
+
+    @Test func reasonIsSlowDownForMatchingDescription() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "slow_down"],
+            statusCode: 403
+        )
+        guard case .slowDown = error.reason else {
+            Issue.record("Expected .slowDown, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonInsufficientAuthorizationStillCatchesUnclassifiedDescriptions() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "some_future_description"],
+            statusCode: 403
+        )
+        guard case .insufficientAuthorization = error.reason else {
+            Issue.record("Expected .insufficientAuthorization for unknown description, got \(error.reason)"); return
+        }
+    }
+
+    // MARK: - reason: invalidRequest
+
+    @Test func reasonIsInvalidRequestForInvalidRequestCode() {
+        let error = EmbeddedAuthError(
+            info: ["error": "invalid_request", "error_description": "Missing required parameter."],
+            statusCode: 400
+        )
+        guard case .invalidRequest = error.reason else {
+            Issue.record("Expected .invalidRequest, got \(error.reason)"); return
+        }
+    }
+
+    // MARK: - reason: access_denied variants
 
     @Test func kindIsTooManyWrongOtpAttemptsWhenBothFieldsMatch() {
         let error = EmbeddedAuthError(
@@ -328,10 +438,10 @@ import Foundation
         }
     }
 
-    @Test func kindIsUnknownForInvalidRequest() {
+    @Test func reasonIsUnknownForUnclassifiedServerError() {
         let error = EmbeddedAuthError(
-            info: ["error": "invalid_request", "error_description": "Bad request."],
-            statusCode: 400
+            info: ["error": "server_error", "error_description": "Something else."],
+            statusCode: 503
         )
         guard case .unknown = error.reason else {
             Issue.record("Expected .unknown, got \(error.reason)"); return

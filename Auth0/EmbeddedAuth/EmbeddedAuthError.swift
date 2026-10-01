@@ -77,9 +77,18 @@ public extension EmbeddedAuthError {
     ///     // Terminal — start over with authorize().
     /// }
     /// ```
-    var reason: EmbeddedAuthErrorKind {
+    var reason: EmbeddedAuthErrorReason {
         let desc = info["error_description"] as? String
         switch (statusCode, code, desc) {
+        case (_, "insufficient_authorization", "invalid_code"),
+             (_, "insufficient_authorization", "invalid_identifier_or_code"):
+            return .invalidCode
+        case (_, "insufficient_authorization", "invalid_identifier_or_password"):
+            return .invalidIdentifierOrPassword
+        case (_, "insufficient_authorization", "authorization_pending"):
+            return .authorizationPending
+        case (_, "insufficient_authorization", "slow_down"):
+            return .slowDown
         case (_, "insufficient_authorization", _):
             return .insufficientAuthorization(nextActions: parsedNextActions)
         case (_, "access_denied", "too_many_wrong_otp_attempts"):
@@ -96,6 +105,8 @@ public extension EmbeddedAuthError {
             return .sessionExpired
         case (_, "no_active_session", _):
             return .noActiveSession
+        case (_, "invalid_request", _):
+            return .invalidRequest
         default:
             return isNetworkError ? .network : .unknown
         }

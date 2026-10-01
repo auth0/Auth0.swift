@@ -7,10 +7,30 @@ import Foundation
 /// mean the flow has ended and a new ``EmbeddedAuth/authorize(connection:)`` call is required
 /// (except ``network``, where retrying the same step is safe).
 ///
-public enum EmbeddedAuthErrorKind: Sendable {
+public enum EmbeddedAuthErrorReason: Sendable {
 
     /// Flow is non-terminal; act on one of `nextActions` to continue.
     case insufficientAuthorization(nextActions: [NextAction])
+
+    /// Terminal: the OTP or identifier+code pair entered by the user was incorrect.
+    ///
+    /// Distinct from ``challengeExpired``, which means the challenge window closed.
+    /// Restart the flow with ``EmbeddedAuth/authorize(connection:)``.
+    case invalidCode
+
+    /// Terminal: the identifier and password combination was incorrect.
+    case invalidIdentifierOrPassword
+
+    /// The server is still waiting for the user to complete an out-of-band step.
+    ///
+    /// Poll again after a short delay.
+    case authorizationPending
+
+    /// The client is polling too fast; back off before retrying.
+    case slowDown
+
+    /// Terminal: the request was malformed (missing or invalid parameters).
+    case invalidRequest
 
     /// Terminal: too many wrong OTP submissions. Restart the flow.
     case tooManyWrongOtpAttempts
