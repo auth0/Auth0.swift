@@ -2,35 +2,24 @@ import Foundation
 
 /// Strongly-typed classification of an ``EmbeddedAuthError``.
 ///
-/// Branch on ``EmbeddedAuthError/kind`` with an exhaustive `switch` to handle each case.
-/// Only ``insufficientAuthorization(nextActions:)`` is non-terminal; all other cases
+/// Branch on ``EmbeddedAuthError/reason`` with an exhaustive `switch` to handle each case.
+/// Only ``insufficientAuthorization(reason:nextActions:)`` is non-terminal; all other cases
 /// mean the flow has ended and a new ``EmbeddedAuth/authorize(connection:)`` call is required
 /// (except ``network``, where retrying the same step is safe).
 ///
 public enum EmbeddedAuthErrorReason: Sendable {
 
-    /// Flow is non-terminal; act on one of `nextActions` to continue.
-    case insufficientAuthorization(nextActions: [NextAction])
-
-    /// Terminal: the OTP or identifier+code pair entered by the user was incorrect.
+    /// Flow is non-terminal: the server returned `insufficient_authorization`.
     ///
-    /// Distinct from ``challengeExpired``, which means the challenge window closed.
-    /// Restart the flow with ``EmbeddedAuth/authorize(connection:)``.
-    case invalidCode
-
-    /// Terminal: the identifier and password combination was incorrect.
-    case invalidIdentifierOrPassword
-
-    /// The server is still waiting for the user to complete an out-of-band step.
+    /// Act on one of `nextActions` to continue. The associated `reason` refines *why* the server
+    /// still needs more — for example, ``InsufficientAuthorization/invalidCode`` when the user's
+    /// last OTP was wrong but they may retry.
     ///
-    /// Poll again after a short delay.
-    case authorizationPending
-
-    /// The client is polling too fast; back off before retrying.
-    case slowDown
-
-    /// Terminal: the request was malformed (missing or invalid parameters).
-    case invalidRequest
+    /// - Parameters:
+    ///   - reason:      The specific `insufficient_authorization` sub-reason, or
+    ///     ``InsufficientAuthorization/none`` for a plain continuation with no error.
+    ///   - nextActions: The actions the caller may take to continue the flow.
+    case insufficientAuthorization(reason: InsufficientAuthorization, nextActions: [NextAction])
 
     /// Terminal: too many wrong OTP submissions. Restart the flow.
     case tooManyWrongOtpAttempts
@@ -42,6 +31,9 @@ public enum EmbeddedAuthErrorReason: Sendable {
     ///
     /// Read ``EmbeddedAuthError/debugDescription`` for specifics.
     case accessDenied
+
+    /// Terminal: the request was malformed (missing or invalid parameters).
+    case invalidRequest
 
     /// Terminal: rate-limited by attack-protection (BFP / SIPT).
     case tooManyAttempts
@@ -68,4 +60,26 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// Read ``EmbeddedAuthError/code``, ``EmbeddedAuthError/debugDescription``, and
     /// ``EmbeddedAuthError/statusCode`` to diagnose.
     case unknown
+
+    /// Sub-reasons carried by ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)``.
+    public enum InsufficientAuthorization: Sendable {
+
+        /// A plain continuation: the server advanced the flow without a specific error.
+        case none
+
+        /// The OTP the user entered was incorrect. They may retry via `nextActions`.
+        case invalidCode
+
+        /// The identifier+code pair the user entered was incorrect. They may retry via `nextActions`.
+        case invalidIdentifierOrCode
+
+        /// The authorization is still pending — the user has not yet completed the out-of-band step.
+        case authorizationPending
+
+        /// The client is polling too frequently and should back off before retrying.
+        case slowDown
+
+        /// The identifier+password pair the user entered was incorrect. They may retry via `nextActions`.
+        case invalidIdentifierOrPassword
+    }
 }

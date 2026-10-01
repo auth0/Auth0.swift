@@ -4,40 +4,40 @@ import Foundation
 
 @Suite struct EmbeddedAuthErrorAuthorizeTests {
 
-    // MARK: - kind type-check (added in Task 1)
+    // MARK: - reason type-check
 
-    @Test func embeddedAuthErrorKindTypeExists() {
-        let _: EmbeddedAuthErrorKind = .unknown
+    @Test func embeddedAuthErrorReasonTypeExists() {
+        let _: EmbeddedAuthErrorReason = .unknown
     }
 
-    // MARK: - kind: insufficientAuthorization
+    // MARK: - reason: insufficientAuthorization (nextActions parsing)
 
-    @Test func kindIsInsufficientAuthorizationForCorrectCode() {
+    @Test func reasonIsInsufficientAuthorizationForCorrectCode() {
         let error = EmbeddedAuthError(info: ["error": "insufficient_authorization"], statusCode: 403)
-        guard case .insufficientAuthorization = error.reason else {
-            Issue.record("Expected .insufficientAuthorization, got \(error.reason)"); return
+        guard case .insufficientAuthorization(.none, _) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization(.none, _), got \(error.reason)"); return
         }
     }
 
-    @Test func kindInsufficientAuthorizationParsesIdentifyEmail() {
+    @Test func reasonInsufficientAuthorizationParsesIdentifyEmail() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:identify:email:v1"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason else {
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions == [.identifyEmail])
     }
 
-    @Test func kindInsufficientAuthorizationParsesChallengeEmail() {
+    @Test func reasonInsufficientAuthorizationParsesChallengeEmail() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1", "index": 2, "identifier": "al**@example.com"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason,
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
               case .challengeEmail(let index, let id) = actions.first else {
             Issue.record("Expected .challengeEmail"); return
         }
@@ -45,49 +45,49 @@ import Foundation
         #expect(id == "al**@example.com")
     }
 
-    @Test func kindInsufficientAuthorizationDropsChallengeEmailMissingIndex() {
+    @Test func reasonInsufficientAuthorizationDropsChallengeEmailMissingIndex() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1", "identifier": "al**@example.com"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason else {
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
     }
 
-    @Test func kindInsufficientAuthorizationDropsChallengeEmailMissingIdentifier() {
+    @Test func reasonInsufficientAuthorizationDropsChallengeEmailMissingIdentifier() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1", "index": 1]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason else {
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
     }
 
-    @Test func kindInsufficientAuthorizationDropsChallengeEmailMissingBothFields() {
+    @Test func reasonInsufficientAuthorizationDropsChallengeEmailMissingBothFields() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason else {
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
     }
 
-    @Test func kindInsufficientAuthorizationParsesVerifyOTPWithChannelAndIdentifier() {
+    @Test func reasonInsufficientAuthorizationParsesVerifyOTPWithChannelAndIdentifier() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1", "channel": "email", "identifier": "al**@example.com"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason,
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
               case .verifyOTP(let channel, let id) = actions.first else {
             Issue.record("Expected .verifyOTP"); return
         }
@@ -95,77 +95,77 @@ import Foundation
         #expect(id == "al**@example.com")
     }
 
-    @Test func kindInsufficientAuthorizationParsesVerifyOTPChannelCaseInsensitively() {
+    @Test func reasonInsufficientAuthorizationParsesVerifyOTPChannelCaseInsensitively() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1", "channel": "EMAIL"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason,
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
               case .verifyOTP(let channel, _) = actions.first else {
             Issue.record("Expected .verifyOTP"); return
         }
         #expect(channel == .email)
     }
 
-    @Test func kindInsufficientAuthorizationDropsVerifyOTPWhenChannelAbsent() {
+    @Test func reasonInsufficientAuthorizationDropsVerifyOTPWhenChannelAbsent() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason else {
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
     }
 
-    @Test func kindInsufficientAuthorizationDropsVerifyOTPWhenChannelUnknown() {
+    @Test func reasonInsufficientAuthorizationDropsVerifyOTPWhenChannelUnknown() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1", "channel": "carrier_pigeon"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason else {
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
     }
 
-    @Test func kindInsufficientAuthorizationDecodesSmsChannel() {
+    @Test func reasonInsufficientAuthorizationDecodesSmsChannel() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1", "channel": "sms"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason,
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
               case .verifyOTP(let channel, _) = actions.first else {
             Issue.record("Expected .verifyOTP"); return
         }
         #expect(channel == .sms)
     }
 
-    @Test func kindInsufficientAuthorizationDecodesUnknownAction() {
+    @Test func reasonInsufficientAuthorizationDecodesUnknownAction() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "next": [["action": "action:future:v99"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason,
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
               case .unknown(let raw) = actions.first else {
             Issue.record("Expected .unknown action"); return
         }
         #expect(raw == "action:future:v99")
     }
 
-    @Test func kindInsufficientAuthorizationYieldsEmptyActionsWhenNextKeyAbsent() {
+    @Test func reasonInsufficientAuthorizationYieldsEmptyActionsWhenNextKeyAbsent() {
         let error = EmbeddedAuthError(info: ["error": "insufficient_authorization"], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason else {
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
     }
 
-    @Test func kindInsufficientAuthorizationDecodesMultipleActions() {
+    @Test func reasonInsufficientAuthorizationDecodesMultipleActions() {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "next": [
@@ -173,7 +173,7 @@ import Foundation
                 ["action": "action:challenge:email:v1", "index": 0, "identifier": "al**@example.com"]
             ]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.reason else {
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.count == 2)
@@ -181,101 +181,118 @@ import Foundation
         #expect(actions[1] == .challengeEmail(index: 0, identifier: "al**@example.com"))
     }
 
-    // MARK: - reason: invalidCode
+    // MARK: - reason: insufficientAuthorization sub-reasons
 
-    @Test func reasonIsInvalidCodeForInvalidCodeUnderInsufficientAuthorization() {
+    @Test func reasonIsInvalidCodeUnderInsufficientAuthorization() {
         let error = EmbeddedAuthError(
             info: ["error": "insufficient_authorization", "error_description": "invalid_code"],
             statusCode: 403
         )
-        guard case .invalidCode = error.reason else {
-            Issue.record("Expected .invalidCode, got \(error.reason)"); return
+        guard case .insufficientAuthorization(.invalidCode, _) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization(.invalidCode, _), got \(error.reason)"); return
         }
     }
 
-    @Test func reasonIsInvalidCodeForInvalidIdentifierOrCodeUnderInsufficientAuthorization() {
+    @Test func reasonIsInvalidIdentifierOrCodeUnderInsufficientAuthorization() {
         let error = EmbeddedAuthError(
             info: ["error": "insufficient_authorization", "error_description": "invalid_identifier_or_code"],
             statusCode: 403
         )
-        guard case .invalidCode = error.reason else {
-            Issue.record("Expected .invalidCode, got \(error.reason)"); return
+        guard case .insufficientAuthorization(.invalidIdentifierOrCode, _) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization(.invalidIdentifierOrCode, _), got \(error.reason)"); return
         }
     }
 
-    @Test func reasonIsInvalidCodeForInvalidCodeUnderAccessDenied() {
-        let error = EmbeddedAuthError(
-            info: ["error": "access_denied", "error_description": "invalid_code"],
-            statusCode: 403
-        )
-        guard case .invalidCode = error.reason else {
-            Issue.record("Expected .invalidCode, got \(error.reason)"); return
-        }
-    }
-
-    @Test func reasonIsInvalidCodeForInvalidIdentifierOrCodeUnderAccessDenied() {
-        let error = EmbeddedAuthError(
-            info: ["error": "access_denied", "error_description": "invalid_identifier_or_code"],
-            statusCode: 403
-        )
-        guard case .invalidCode = error.reason else {
-            Issue.record("Expected .invalidCode, got \(error.reason)"); return
-        }
-    }
-
-    @Test func reasonInvalidCodeHasPriorityOverAccessDenied() {
-        let error = EmbeddedAuthError(
-            info: ["error": "access_denied", "error_description": "invalid_code"],
-            statusCode: 403
-        )
-        if case .accessDenied = error.reason {
-            Issue.record("invalid_code must map to .invalidCode, not .accessDenied")
-        }
-    }
-
-    // MARK: - reason: invalidIdentifierOrPassword
-
-    @Test func reasonIsInvalidIdentifierOrPasswordForMatchingDescription() {
-        let error = EmbeddedAuthError(
-            info: ["error": "insufficient_authorization", "error_description": "invalid_identifier_or_password"],
-            statusCode: 403
-        )
-        guard case .invalidIdentifierOrPassword = error.reason else {
-            Issue.record("Expected .invalidIdentifierOrPassword, got \(error.reason)"); return
-        }
-    }
-
-    // MARK: - reason: authorizationPending
-
-    @Test func reasonIsAuthorizationPendingForMatchingDescription() {
+    @Test func reasonIsAuthorizationPendingUnderInsufficientAuthorization() {
         let error = EmbeddedAuthError(
             info: ["error": "insufficient_authorization", "error_description": "authorization_pending"],
             statusCode: 403
         )
-        guard case .authorizationPending = error.reason else {
-            Issue.record("Expected .authorizationPending, got \(error.reason)"); return
+        guard case .insufficientAuthorization(.authorizationPending, _) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization(.authorizationPending, _), got \(error.reason)"); return
         }
     }
 
-    // MARK: - reason: slowDown
-
-    @Test func reasonIsSlowDownForMatchingDescription() {
+    @Test func reasonIsSlowDownUnderInsufficientAuthorization() {
         let error = EmbeddedAuthError(
             info: ["error": "insufficient_authorization", "error_description": "slow_down"],
             statusCode: 403
         )
-        guard case .slowDown = error.reason else {
-            Issue.record("Expected .slowDown, got \(error.reason)"); return
+        guard case .insufficientAuthorization(.slowDown, _) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization(.slowDown, _), got \(error.reason)"); return
         }
     }
 
-    @Test func reasonInsufficientAuthorizationStillCatchesUnclassifiedDescriptions() {
+    @Test func reasonIsInvalidIdentifierOrPasswordUnderInsufficientAuthorization() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "invalid_identifier_or_password"],
+            statusCode: 403
+        )
+        guard case .insufficientAuthorization(.invalidIdentifierOrPassword, _) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization(.invalidIdentifierOrPassword, _), got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsNoneForUnclassifiedInsufficientAuthorizationDescription() {
         let error = EmbeddedAuthError(
             info: ["error": "insufficient_authorization", "error_description": "some_future_description"],
             statusCode: 403
         )
-        guard case .insufficientAuthorization = error.reason else {
-            Issue.record("Expected .insufficientAuthorization for unknown description, got \(error.reason)"); return
+        guard case .insufficientAuthorization(.none, _) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization(.none, _), got \(error.reason)"); return
+        }
+    }
+
+    // A sub-reason and nextActions are carried together: a wrong OTP still ships retry actions.
+    @Test func reasonCarriesSubReasonAndNextActionsTogether() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "error_description": "invalid_code",
+            "next": [["action": "action:verify:otp:v1", "channel": "email"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(.invalidCode, let actions) = error.reason,
+              case .verifyOTP(let channel, _) = actions.first else {
+            Issue.record("Expected .invalidCode with a verifyOTP action, got \(error.reason)"); return
+        }
+        #expect(channel == .email)
+    }
+
+    // MARK: - reason: access_denied
+
+    @Test func reasonIsTooManyWrongOtpAttemptsUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "too_many_wrong_otp_attempts"],
+            statusCode: 403
+        )
+        guard case .tooManyWrongOtpAttempts = error.reason else {
+            Issue.record("Expected .tooManyWrongOtpAttempts, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsChallengeExpiredUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "challenge_expired"],
+            statusCode: 403
+        )
+        guard case .challengeExpired = error.reason else {
+            Issue.record("Expected .challengeExpired, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsAccessDeniedForOtherDescription() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "some_future_denial"],
+            statusCode: 403
+        )
+        guard case .accessDenied = error.reason else {
+            Issue.record("Expected .accessDenied for other access_denied description, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsAccessDeniedWithoutDescription() {
+        let error = EmbeddedAuthError(info: ["error": "access_denied"], statusCode: 403)
+        guard case .accessDenied = error.reason else {
+            Issue.record("Expected .accessDenied for access_denied without description, got \(error.reason)"); return
         }
     }
 
@@ -291,72 +308,9 @@ import Foundation
         }
     }
 
-    // MARK: - reason: access_denied variants
+    // MARK: - reason: too_many_requests variants
 
-    @Test func kindIsTooManyWrongOtpAttemptsWhenBothFieldsMatch() {
-        let error = EmbeddedAuthError(
-            info: ["error": "access_denied", "error_description": "too_many_wrong_otp_attempts"],
-            statusCode: 403
-        )
-        guard case .tooManyWrongOtpAttempts = error.reason else {
-            Issue.record("Expected .tooManyWrongOtpAttempts, got \(error.reason)"); return
-        }
-    }
-
-    @Test func kindIsChallengeExpiredWhenBothFieldsMatch() {
-        let error = EmbeddedAuthError(
-            info: ["error": "access_denied", "error_description": "challenge_expired"],
-            statusCode: 403
-        )
-        guard case .challengeExpired = error.reason else {
-            Issue.record("Expected .challengeExpired, got \(error.reason)"); return
-        }
-    }
-
-    @Test func kindIsAccessDeniedForOtherAccessDeniedDescriptions() {
-        for desc in ["consent_required", "no_next_steps", "authorization_rejected", "no_eligible_factors"] {
-            let error = EmbeddedAuthError(
-                info: ["error": "access_denied", "error_description": desc],
-                statusCode: 403
-            )
-            guard case .accessDenied = error.reason else {
-                Issue.record("Expected .accessDenied for desc '\(desc)', got \(error.reason)"); return
-            }
-        }
-    }
-
-    @Test func kindIsAccessDeniedWhenNoDescription() {
-        let error = EmbeddedAuthError(info: ["error": "access_denied"], statusCode: 403)
-        guard case .accessDenied = error.reason else {
-            Issue.record("Expected .accessDenied, got \(error.reason)"); return
-        }
-    }
-
-    // Ordering guard: too_many_wrong_otp_attempts must NOT fall through to .accessDenied
-    @Test func kindTooManyWrongOtpAttemptsHasPriorityOverAccessDenied() {
-        let error = EmbeddedAuthError(
-            info: ["error": "access_denied", "error_description": "too_many_wrong_otp_attempts"],
-            statusCode: 403
-        )
-        if case .accessDenied = error.reason {
-            Issue.record("too_many_wrong_otp_attempts must map to .tooManyWrongOtpAttempts, not .accessDenied")
-        }
-    }
-
-    // Ordering guard: challenge_expired must NOT fall through to .accessDenied
-    @Test func kindChallengeExpiredHasPriorityOverAccessDenied() {
-        let error = EmbeddedAuthError(
-            info: ["error": "access_denied", "error_description": "challenge_expired"],
-            statusCode: 403
-        )
-        if case .accessDenied = error.reason {
-            Issue.record("challenge_expired must map to .challengeExpired, not .accessDenied")
-        }
-    }
-
-    // MARK: - kind: too_many_requests variants
-
-    @Test func kindIsTooManyAttemptsFor429AndCorrectDescription() {
+    @Test func reasonIsTooManyAttemptsFor429AndCorrectDescription() {
         let error = EmbeddedAuthError(
             info: ["error": "too_many_requests", "error_description": "too_many_attempts"],
             statusCode: 429
@@ -366,7 +320,7 @@ import Foundation
         }
     }
 
-    @Test func kindIsTooManyLoginsFor429AndCorrectDescription() {
+    @Test func reasonIsTooManyLoginsFor429AndCorrectDescription() {
         let error = EmbeddedAuthError(
             info: ["error": "too_many_requests", "error_description": "too_many_logins"],
             statusCode: 429
@@ -376,7 +330,7 @@ import Foundation
         }
     }
 
-    @Test func kindIsUnknownFor429TooManyRequestsWithWrongStatusCode() {
+    @Test func reasonIsUnknownFor429TooManyRequestsWithWrongStatusCode() {
         let error = EmbeddedAuthError(
             info: ["error": "too_many_requests", "error_description": "too_many_attempts"],
             statusCode: 400   // wrong status code
@@ -386,9 +340,9 @@ import Foundation
         }
     }
 
-    // MARK: - kind: sessionExpired
+    // MARK: - reason: sessionExpired
 
-    @Test func kindIsSessionExpiredForInvalidGrant() {
+    @Test func reasonIsSessionExpiredForInvalidGrant() {
         let error = EmbeddedAuthError(
             info: ["error": "invalid_grant", "error_description": "The auth_session has expired."],
             statusCode: 400
@@ -398,9 +352,9 @@ import Foundation
         }
     }
 
-    // MARK: - kind: noActiveSession
+    // MARK: - reason: noActiveSession
 
-    @Test func kindIsNoActiveSessionForSyntheticCode() {
+    @Test func reasonIsNoActiveSessionForSyntheticCode() {
         let error = EmbeddedAuthError(
             info: ["error": "no_active_session", "error_description": "No active embedded auth session."],
             statusCode: 0
@@ -410,25 +364,25 @@ import Foundation
         }
     }
 
-    // MARK: - kind: network
+    // MARK: - reason: network
 
-    @Test func kindIsNetworkForURLError() {
+    @Test func reasonIsNetworkForURLError() {
         let error = EmbeddedAuthError(cause: URLError(.notConnectedToInternet), statusCode: 0)
         guard case .network = error.reason else {
             Issue.record("Expected .network, got \(error.reason)"); return
         }
     }
 
-    @Test func kindIsNetworkForTimedOutError() {
+    @Test func reasonIsNetworkForTimedOutError() {
         let error = EmbeddedAuthError(cause: URLError(.timedOut), statusCode: 0)
         guard case .network = error.reason else {
             Issue.record("Expected .network, got \(error.reason)"); return
         }
     }
 
-    // MARK: - kind: unknown
+    // MARK: - reason: unknown
 
-    @Test func kindIsUnknownForUnrecognisedCode() {
+    @Test func reasonIsUnknownForUnrecognisedCode() {
         let error = EmbeddedAuthError(
             info: ["error": "server_error", "error_description": "Something went wrong."],
             statusCode: 500

@@ -69,7 +69,7 @@ public extension EmbeddedAuthError {
     /// Use an exhaustive `switch` to handle all cases:
     /// ```swift
     /// switch error.reason {
-    /// case .insufficientAuthorization(let nextActions):
+    /// case .insufficientAuthorization(_, let nextActions):
     ///     // Flow is live — present the first action's UI.
     /// case .network:
     ///     // Retry the same step.
@@ -80,17 +80,18 @@ public extension EmbeddedAuthError {
     var reason: EmbeddedAuthErrorReason {
         let desc = info["error_description"] as? String
         switch (statusCode, code, desc) {
-        case (_, "insufficient_authorization", "invalid_code"),
-             (_, "insufficient_authorization", "invalid_identifier_or_code"):
-            return .invalidCode
-        case (_, "insufficient_authorization", "invalid_identifier_or_password"):
-            return .invalidIdentifierOrPassword
+        case (_, "insufficient_authorization", "invalid_code"):
+            return .insufficientAuthorization(reason: .invalidCode, nextActions: parsedNextActions)
+        case (_, "insufficient_authorization", "invalid_identifier_or_code"):
+            return .insufficientAuthorization(reason: .invalidIdentifierOrCode, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "authorization_pending"):
-            return .authorizationPending
+            return .insufficientAuthorization(reason: .authorizationPending, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "slow_down"):
-            return .slowDown
+            return .insufficientAuthorization(reason: .slowDown, nextActions: parsedNextActions)
+        case (_, "insufficient_authorization", "invalid_identifier_or_password"):
+            return .insufficientAuthorization(reason: .invalidIdentifierOrPassword, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", _):
-            return .insufficientAuthorization(nextActions: parsedNextActions)
+            return .insufficientAuthorization(reason: .none, nextActions: parsedNextActions)
         case (_, "access_denied", "too_many_wrong_otp_attempts"):
             return .tooManyWrongOtpAttempts
         case (_, "access_denied", "challenge_expired"):

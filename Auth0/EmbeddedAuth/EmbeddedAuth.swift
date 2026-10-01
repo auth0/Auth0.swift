@@ -29,7 +29,7 @@ public enum IdentifierType {
 /// do {
 ///     try await client.authorize(connection: "my-connection").start()
 /// } catch let error as EmbeddedAuthError {
-///     if case .insufficientAuthorization(let nextActions) = error.reason {
+///     if case .insufficientAuthorization(_, let nextActions) = error.reason {
 ///         // nextActions tells you which step to present
 ///     }
 /// }
@@ -45,7 +45,7 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///
     /// Calls `POST /e/authorize` with `capabilities` advertised.
     /// Always throws ``EmbeddedAuthError`` with ``EmbeddedAuthError/reason`` equal to
-    /// ``EmbeddedAuthErrorKind/insufficientAuthorization(nextActions:)``
+    /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)``
     /// on the first call; read its associated `nextActions` to determine which step to present.
     ///
     /// - Parameters:
@@ -70,7 +70,7 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///
     /// Requires an active session.
     /// - Parameter index: The zero-based index of the `challengeEmail` entry from the
-    ///   `nextActions` associated value of ``EmbeddedAuthErrorKind/insufficientAuthorization(nextActions:)``.
+    ///   `nextActions` associated value of ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)``.
     func challengeEmail(index: Int) -> Request<Void, EmbeddedAuthError>
 
     /// Submits a one-time password to verify the user's identity.

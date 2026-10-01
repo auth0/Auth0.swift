@@ -199,7 +199,7 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.authorize(connection: "test-connection").start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
-            guard case .insufficientAuthorization(let actions) = error.reason else {
+            guard case .insufficientAuthorization(_, let actions) = error.reason else {
                 Issue.record("Expected .insufficientAuthorization, got \(error.reason)"); return
             }
             #expect(actions == [.identifyEmail])
@@ -722,7 +722,7 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.authorize(connection: "test-connection").start()
             Issue.record("authorize() should throw with nextActions")
         } catch let e as EmbeddedAuthError {
-            guard case .insufficientAuthorization(let actions) = e.reason else {
+            guard case .insufficientAuthorization(_, let actions) = e.reason else {
                 Issue.record("Expected .insufficientAuthorization, got \(e.reason)"); return
             }
             #expect(actions.first == .identifyEmail)
@@ -732,7 +732,7 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.identify("alice@example.com", type: .email).start()
             Issue.record("identify() should throw with nextActions")
         } catch let e as EmbeddedAuthError {
-            guard case .insufficientAuthorization(let actions) = e.reason else {
+            guard case .insufficientAuthorization(_, let actions) = e.reason else {
                 Issue.record("Expected .insufficientAuthorization, got \(e.reason)"); return
             }
             guard case .challengeEmail(let index, _) = actions.first else {
@@ -745,7 +745,7 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.challengeEmail(index: 0).start()
             Issue.record("challengeEmail() should throw with nextActions")
         } catch let e as EmbeddedAuthError {
-            guard case .insufficientAuthorization(let actions) = e.reason else {
+            guard case .insufficientAuthorization(_, let actions) = e.reason else {
                 Issue.record("Expected .insufficientAuthorization, got \(e.reason)"); return
             }
             if case .verifyOTP(let ch, let id) = actions.first {

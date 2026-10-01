@@ -11,7 +11,7 @@
 > [!IMPORTANT]
 > The embedded authorization flow is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta). Please reach out to Auth0 support to get it enabled for your tenant and application.
 
-The `EmbeddedAuth` client runs the interactive `POST /e/authorize` loop. Each step throws an `EmbeddedAuthError` whose `kind` property (an `EmbeddedAuthErrorKind`) tells you whether the flow can continue — and when it can, carries the `nextActions` to present — until `verifyOtp` succeeds and returns `Credentials` directly.
+The `EmbeddedAuth` client runs the interactive `POST /e/authorize` loop. Each step throws an `EmbeddedAuthError` whose `reason` property (an `EmbeddedAuthErrorReason`) tells you whether the flow can continue — and when it can, carries the `nextActions` to present — until `verifyOtp` succeeds and returns `Credentials` directly.
 
 #### Obtain a client
 
@@ -33,7 +33,7 @@ func runEmbeddedAuth(connection: String) async throws -> Credentials {
         try await client.authorize(connection: connection).start()
         fatalError("authorize always throws on the first call")
     } catch let error as EmbeddedAuthError {
-        guard case .insufficientAuthorization(let nextActions) = error.reason else {
+        guard case .insufficientAuthorization(_, let nextActions) = error.reason else {
             throw error
         }
         return try await handleNextActions(nextActions)
@@ -74,7 +74,7 @@ Auth0.embeddedAuth()
             // authorize() always fails on the first call — unreachable in practice
             break
         case .failure(let error):
-            if case .insufficientAuthorization(let nextActions) = error.reason,
+            if case .insufficientAuthorization(_, let nextActions) = error.reason,
                case .identifyEmail = nextActions.first {
                 // Show email input
             } else {
@@ -93,19 +93,27 @@ do {
     // Use credentials
 } catch let error as EmbeddedAuthError {
     switch error.reason {
-    case .insufficientAuthorization(let nextActions):
+    case .insufficientAuthorization(_, let nextActions):
         // Flow is still live — present the next action's UI.
         _ = nextActions
     case .challengeExpired:
         // Challenge timed out — call challengeEmail again.
+        break
     case .tooManyWrongOtpAttempts:
         // Too many wrong attempts — start over with authorize().
+        break
+    case .accessDenied:
+        // Other terminal denial — start over with authorize().
+        break
     case .tooManyAttempts, .tooManyLogins:
         // Rate-limited — ask the user to wait and retry.
+        break
     case .sessionExpired:
         // The grant expired — start over with authorize().
+        break
     case .network:
         // Transient failure — retry the same step.
+        break
     default:
         print("Failed with: \(error)")
     }
