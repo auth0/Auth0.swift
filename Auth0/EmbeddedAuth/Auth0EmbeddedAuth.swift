@@ -169,16 +169,21 @@ extension Auth0EmbeddedAuth {
 
     /// Updates the flow's session after a step fails.
     ///
-    /// - On a continuation (`insufficient_authorization`) the rotated `auth_session` becomes the
+    /// - On a continuation (`.insufficientAuthorization`) the rotated `auth_session` becomes the
     ///   active session so the next step can proceed.
-    /// - On a terminal failure (`access_denied`, `too_many_attempts`, or `too_many_logins`) the
-    ///   session is cleared so a stray continuation call is rejected locally.
-    /// - On any other failure (transient network errors, rate-limits, etc.) the session is left
-    ///   untouched so the caller can retry the same step.
+    /// - On a network failure (`.network`) the session is preserved so the caller can retry the
+    ///   same step.
+    /// - On all other failures the session is cleared; any follow-on step will fail locally with
+    ///   `.noActiveSession`.
     func updateSessionFromFailure(_ error: EmbeddedAuthError) {
-        if error.isInsufficientAuthorization, let newSession = error.info["auth_session"] as? String {
-            currentSession = newSession
-        } else if error.isAccessDenied || error.isTooManyAttempts || error.isTooManyLogins {
+        switch error.kind {
+        case .insufficientAuthorization:
+            if let newSession = error.info["auth_session"] as? String {
+                currentSession = newSession
+            }
+        case .network:
+            break
+        default:
             currentSession = nil
         }
     }

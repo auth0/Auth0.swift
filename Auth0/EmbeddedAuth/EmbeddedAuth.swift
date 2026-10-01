@@ -28,8 +28,10 @@ public enum IdentifierType {
 /// // Drive the authorization loop
 /// do {
 ///     try await client.authorize(connection: "my-connection").start()
-/// } catch let error as EmbeddedAuthError where error.isInsufficientAuthorization {
-///     // error.nextActions tells you which step to present
+/// } catch let error as EmbeddedAuthError {
+///     if case .insufficientAuthorization(let nextActions) = error.kind {
+///         // nextActions tells you which step to present
+///     }
 /// }
 /// let credentials = try await client.verifyOtp("123456", type: .oob).start()
 /// ```
@@ -42,8 +44,9 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// Starts a new embedded authorization flow.
     ///
     /// Calls `POST /e/authorize` with `capabilities` advertised.
-    /// Always throws ``EmbeddedAuthError`` with ``EmbeddedAuthError/isInsufficientAuthorization`` `true`
-    /// on the first call; read ``EmbeddedAuthError/nextActions`` to determine which step to present.
+    /// Always throws ``EmbeddedAuthError`` with ``EmbeddedAuthError/kind`` equal to
+    /// ``EmbeddedAuthErrorKind/insufficientAuthorization(nextActions:)``
+    /// on the first call; read its associated `nextActions` to determine which step to present.
     ///
     /// - Parameters:
     ///   - connection:   Connection name to target. Required by the server — a missing value yields `invalid_request`.
@@ -66,7 +69,8 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// Requests that the server send an email OTP challenge.
     ///
     /// Requires an active session.
-    /// - Parameter index: The zero-based index of the `challengeEmail` entry from ``EmbeddedAuthError/nextActions``.
+    /// - Parameter index: The zero-based index of the `challengeEmail` entry from the
+    ///   `nextActions` associated value of ``EmbeddedAuthErrorKind/insufficientAuthorization(nextActions:)``.
     func challengeEmail(index: Int) -> Request<Void, EmbeddedAuthError>
 
     /// Submits a one-time password to verify the user's identity.
