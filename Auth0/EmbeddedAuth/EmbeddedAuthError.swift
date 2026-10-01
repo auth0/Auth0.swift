@@ -24,21 +24,6 @@ public struct EmbeddedAuthError: Auth0APIError, @unchecked Sendable {
         info["error"] as? String ?? unknownError
     }
 
-    /// Whether the tenant `embedded_discovery` feature flag is off (bare `404` with no JSON body).
-    public var isFeatureDisabled: Bool {
-        statusCode == 404
-    }
-
-    /// Whether the request was malformed or per-client `embedded_discovery` is disabled (`invalid_request`).
-    public var isInvalidRequest: Bool {
-        code == "invalid_request"
-    }
-
-    /// Whether the `client_id` does not resolve for the tenant (`invalid_client`).
-    public var isInvalidClient: Bool {
-        code == "invalid_client"
-    }
-
     /// A textual representation for debugging purposes.
     ///
     /// - Important: Do not show this to end users — it is for **debugging** only.
@@ -93,8 +78,8 @@ public extension EmbeddedAuthError {
     /// }
     /// ```
     ///
-    /// > Note: Discovery errors (`isFeatureDisabled`, `isInvalidRequest`, `isInvalidClient`)
-    /// > are not covered by `kind`; they remain as dedicated properties.
+    /// > Note: Discovery errors (`isFeatureDisabled`) are not covered by `kind`;
+    /// > they remain as a dedicated property.
     var kind: EmbeddedAuthErrorKind {
         let desc = info["error_description"] as? String
         switch (statusCode, code, desc) {

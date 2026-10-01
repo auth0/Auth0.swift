@@ -102,7 +102,7 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
             session: session,
             url: url.appending("e/authorize"),
             method: "POST",
-            handle: { [self] result, callback in decodeVerifyOtpResponse(result, callback: callback) },
+            handle: { [self] result, callback in decodeAuthorizationCodeResponse(result, callback: callback) },
             parameters: body,
             logger: logger,
             auth0ClientInfo: auth0ClientInfo

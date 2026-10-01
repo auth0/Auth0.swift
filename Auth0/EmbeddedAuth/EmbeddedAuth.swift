@@ -49,7 +49,7 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// on the first call; read its associated `nextActions` to determine which step to present.
     ///
     /// - Parameters:
-    ///   - connection:   Connection name to target. Required by the server — a missing value yields `invalid_request`.
+    ///   - connection:   Connection name to target.
     ///   - capabilities: Actions this SDK version supports. Defaults to ``EmbeddedCapability/all``.
     ///   - scope:        OAuth scope string. Defaults to `"openid profile email offline_access"`.
     ///   - audience:     Optional API audience.

@@ -7,8 +7,8 @@ import Foundation
 /// mean the flow has ended and a new ``EmbeddedAuth/authorize(connection:)`` call is required
 /// (except ``network``, where retrying the same step is safe).
 ///
-/// > Note: Discovery-layer errors (`isFeatureDisabled`, `isInvalidRequest`, `isInvalidClient`)
-/// > are not covered here; they remain as dedicated properties on ``EmbeddedAuthError``.
+/// > Note: Discovery-layer errors (`isFeatureDisabled`) are not covered here;
+/// > they remain as dedicated properties on ``EmbeddedAuthError``.
 public enum EmbeddedAuthErrorKind: Sendable {
 
     /// Flow is non-terminal; act on one of `nextActions` to continue.
