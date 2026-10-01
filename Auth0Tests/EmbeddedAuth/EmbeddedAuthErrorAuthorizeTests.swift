@@ -14,8 +14,8 @@ import Foundation
 
     @Test func kindIsInsufficientAuthorizationForCorrectCode() {
         let error = EmbeddedAuthError(info: ["error": "insufficient_authorization"], statusCode: 403)
-        guard case .insufficientAuthorization = error.kind else {
-            Issue.record("Expected .insufficientAuthorization, got \(error.kind)"); return
+        guard case .insufficientAuthorization = error.reason else {
+            Issue.record("Expected .insufficientAuthorization, got \(error.reason)"); return
         }
     }
 
@@ -25,7 +25,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:identify:email:v1"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind else {
+        guard case .insufficientAuthorization(let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions == [.identifyEmail])
@@ -37,7 +37,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1", "index": 2, "identifier": "al**@example.com"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind,
+        guard case .insufficientAuthorization(let actions) = error.reason,
               case .challengeEmail(let index, let id) = actions.first else {
             Issue.record("Expected .challengeEmail"); return
         }
@@ -51,7 +51,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1", "identifier": "al**@example.com"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind else {
+        guard case .insufficientAuthorization(let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
@@ -63,7 +63,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1", "index": 1]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind else {
+        guard case .insufficientAuthorization(let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
@@ -75,7 +75,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:challenge:email:v1"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind else {
+        guard case .insufficientAuthorization(let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
@@ -87,7 +87,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1", "channel": "email", "identifier": "al**@example.com"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind,
+        guard case .insufficientAuthorization(let actions) = error.reason,
               case .verifyOTP(let channel, let id) = actions.first else {
             Issue.record("Expected .verifyOTP"); return
         }
@@ -101,7 +101,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1", "channel": "EMAIL"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind,
+        guard case .insufficientAuthorization(let actions) = error.reason,
               case .verifyOTP(let channel, _) = actions.first else {
             Issue.record("Expected .verifyOTP"); return
         }
@@ -114,7 +114,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind else {
+        guard case .insufficientAuthorization(let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
@@ -126,7 +126,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1", "channel": "carrier_pigeon"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind else {
+        guard case .insufficientAuthorization(let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
@@ -138,7 +138,7 @@ import Foundation
             "auth_session": "sess_abc",
             "next": [["action": "action:verify:otp:v1", "channel": "sms"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind,
+        guard case .insufficientAuthorization(let actions) = error.reason,
               case .verifyOTP(let channel, _) = actions.first else {
             Issue.record("Expected .verifyOTP"); return
         }
@@ -150,7 +150,7 @@ import Foundation
             "error": "insufficient_authorization",
             "next": [["action": "action:future:v99"]]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind,
+        guard case .insufficientAuthorization(let actions) = error.reason,
               case .unknown(let raw) = actions.first else {
             Issue.record("Expected .unknown action"); return
         }
@@ -159,7 +159,7 @@ import Foundation
 
     @Test func kindInsufficientAuthorizationYieldsEmptyActionsWhenNextKeyAbsent() {
         let error = EmbeddedAuthError(info: ["error": "insufficient_authorization"], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind else {
+        guard case .insufficientAuthorization(let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.isEmpty)
@@ -173,7 +173,7 @@ import Foundation
                 ["action": "action:challenge:email:v1", "index": 0, "identifier": "al**@example.com"]
             ]
         ], statusCode: 403)
-        guard case .insufficientAuthorization(let actions) = error.kind else {
+        guard case .insufficientAuthorization(let actions) = error.reason else {
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions.count == 2)
@@ -188,8 +188,8 @@ import Foundation
             info: ["error": "access_denied", "error_description": "too_many_wrong_otp_attempts"],
             statusCode: 403
         )
-        guard case .tooManyWrongOtpAttempts = error.kind else {
-            Issue.record("Expected .tooManyWrongOtpAttempts, got \(error.kind)"); return
+        guard case .tooManyWrongOtpAttempts = error.reason else {
+            Issue.record("Expected .tooManyWrongOtpAttempts, got \(error.reason)"); return
         }
     }
 
@@ -198,8 +198,8 @@ import Foundation
             info: ["error": "access_denied", "error_description": "challenge_expired"],
             statusCode: 403
         )
-        guard case .challengeExpired = error.kind else {
-            Issue.record("Expected .challengeExpired, got \(error.kind)"); return
+        guard case .challengeExpired = error.reason else {
+            Issue.record("Expected .challengeExpired, got \(error.reason)"); return
         }
     }
 
@@ -209,16 +209,16 @@ import Foundation
                 info: ["error": "access_denied", "error_description": desc],
                 statusCode: 403
             )
-            guard case .accessDenied = error.kind else {
-                Issue.record("Expected .accessDenied for desc '\(desc)', got \(error.kind)"); return
+            guard case .accessDenied = error.reason else {
+                Issue.record("Expected .accessDenied for desc '\(desc)', got \(error.reason)"); return
             }
         }
     }
 
     @Test func kindIsAccessDeniedWhenNoDescription() {
         let error = EmbeddedAuthError(info: ["error": "access_denied"], statusCode: 403)
-        guard case .accessDenied = error.kind else {
-            Issue.record("Expected .accessDenied, got \(error.kind)"); return
+        guard case .accessDenied = error.reason else {
+            Issue.record("Expected .accessDenied, got \(error.reason)"); return
         }
     }
 
@@ -228,7 +228,7 @@ import Foundation
             info: ["error": "access_denied", "error_description": "too_many_wrong_otp_attempts"],
             statusCode: 403
         )
-        if case .accessDenied = error.kind {
+        if case .accessDenied = error.reason {
             Issue.record("too_many_wrong_otp_attempts must map to .tooManyWrongOtpAttempts, not .accessDenied")
         }
     }
@@ -239,7 +239,7 @@ import Foundation
             info: ["error": "access_denied", "error_description": "challenge_expired"],
             statusCode: 403
         )
-        if case .accessDenied = error.kind {
+        if case .accessDenied = error.reason {
             Issue.record("challenge_expired must map to .challengeExpired, not .accessDenied")
         }
     }
@@ -251,8 +251,8 @@ import Foundation
             info: ["error": "too_many_requests", "error_description": "too_many_attempts"],
             statusCode: 429
         )
-        guard case .tooManyAttempts = error.kind else {
-            Issue.record("Expected .tooManyAttempts, got \(error.kind)"); return
+        guard case .tooManyAttempts = error.reason else {
+            Issue.record("Expected .tooManyAttempts, got \(error.reason)"); return
         }
     }
 
@@ -261,8 +261,8 @@ import Foundation
             info: ["error": "too_many_requests", "error_description": "too_many_logins"],
             statusCode: 429
         )
-        guard case .tooManyLogins = error.kind else {
-            Issue.record("Expected .tooManyLogins, got \(error.kind)"); return
+        guard case .tooManyLogins = error.reason else {
+            Issue.record("Expected .tooManyLogins, got \(error.reason)"); return
         }
     }
 
@@ -271,8 +271,8 @@ import Foundation
             info: ["error": "too_many_requests", "error_description": "too_many_attempts"],
             statusCode: 400   // wrong status code
         )
-        guard case .unknown = error.kind else {
-            Issue.record("Expected .unknown for wrong statusCode, got \(error.kind)"); return
+        guard case .unknown = error.reason else {
+            Issue.record("Expected .unknown for wrong statusCode, got \(error.reason)"); return
         }
     }
 
@@ -283,8 +283,8 @@ import Foundation
             info: ["error": "invalid_grant", "error_description": "The auth_session has expired."],
             statusCode: 400
         )
-        guard case .sessionExpired = error.kind else {
-            Issue.record("Expected .sessionExpired, got \(error.kind)"); return
+        guard case .sessionExpired = error.reason else {
+            Issue.record("Expected .sessionExpired, got \(error.reason)"); return
         }
     }
 
@@ -295,8 +295,8 @@ import Foundation
             info: ["error": "no_active_session", "error_description": "No active embedded auth session."],
             statusCode: 0
         )
-        guard case .noActiveSession = error.kind else {
-            Issue.record("Expected .noActiveSession, got \(error.kind)"); return
+        guard case .noActiveSession = error.reason else {
+            Issue.record("Expected .noActiveSession, got \(error.reason)"); return
         }
     }
 
@@ -304,15 +304,15 @@ import Foundation
 
     @Test func kindIsNetworkForURLError() {
         let error = EmbeddedAuthError(cause: URLError(.notConnectedToInternet), statusCode: 0)
-        guard case .network = error.kind else {
-            Issue.record("Expected .network, got \(error.kind)"); return
+        guard case .network = error.reason else {
+            Issue.record("Expected .network, got \(error.reason)"); return
         }
     }
 
     @Test func kindIsNetworkForTimedOutError() {
         let error = EmbeddedAuthError(cause: URLError(.timedOut), statusCode: 0)
-        guard case .network = error.kind else {
-            Issue.record("Expected .network, got \(error.kind)"); return
+        guard case .network = error.reason else {
+            Issue.record("Expected .network, got \(error.reason)"); return
         }
     }
 
@@ -323,8 +323,8 @@ import Foundation
             info: ["error": "server_error", "error_description": "Something went wrong."],
             statusCode: 500
         )
-        guard case .unknown = error.kind else {
-            Issue.record("Expected .unknown, got \(error.kind)"); return
+        guard case .unknown = error.reason else {
+            Issue.record("Expected .unknown, got \(error.reason)"); return
         }
     }
 
@@ -333,8 +333,8 @@ import Foundation
             info: ["error": "invalid_request", "error_description": "Bad request."],
             statusCode: 400
         )
-        guard case .unknown = error.kind else {
-            Issue.record("Expected .unknown, got \(error.kind)"); return
+        guard case .unknown = error.reason else {
+            Issue.record("Expected .unknown, got \(error.reason)"); return
         }
     }
 }

@@ -29,7 +29,7 @@ public enum IdentifierType {
 /// do {
 ///     try await client.authorize(connection: "my-connection").start()
 /// } catch let error as EmbeddedAuthError {
-///     if case .insufficientAuthorization(let nextActions) = error.kind {
+///     if case .insufficientAuthorization(let nextActions) = error.reason {
 ///         // nextActions tells you which step to present
 ///     }
 /// }
@@ -44,7 +44,7 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// Starts a new embedded authorization flow.
     ///
     /// Calls `POST /e/authorize` with `capabilities` advertised.
-    /// Always throws ``EmbeddedAuthError`` with ``EmbeddedAuthError/kind`` equal to
+    /// Always throws ``EmbeddedAuthError`` with ``EmbeddedAuthError/reason`` equal to
     /// ``EmbeddedAuthErrorKind/insufficientAuthorization(nextActions:)``
     /// on the first call; read its associated `nextActions` to determine which step to present.
     ///

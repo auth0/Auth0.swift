@@ -176,7 +176,7 @@ extension Auth0EmbeddedAuth {
     /// - On all other failures the session is cleared; any follow-on step will fail locally with
     ///   `.noActiveSession`.
     func updateSessionFromFailure(_ error: EmbeddedAuthError) {
-        switch error.kind {
+        switch error.reason {
         case .insufficientAuthorization:
             if let newSession = error.info["auth_session"] as? String {
                 currentSession = newSession

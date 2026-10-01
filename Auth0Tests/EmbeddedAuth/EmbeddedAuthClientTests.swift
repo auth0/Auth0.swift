@@ -199,8 +199,8 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.authorize(connection: "test-connection").start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
-            guard case .insufficientAuthorization(let actions) = error.kind else {
-                Issue.record("Expected .insufficientAuthorization, got \(error.kind)"); return
+            guard case .insufficientAuthorization(let actions) = error.reason else {
+                Issue.record("Expected .insufficientAuthorization, got \(error.reason)"); return
             }
             #expect(actions == [.identifyEmail])
         } catch {
@@ -476,8 +476,8 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.verifyOtp("000000", type: .oob).start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
-            guard case .tooManyWrongOtpAttempts = error.kind else {
-                Issue.record("Expected .tooManyWrongOtpAttempts, got \(error.kind)"); return
+            guard case .tooManyWrongOtpAttempts = error.reason else {
+                Issue.record("Expected .tooManyWrongOtpAttempts, got \(error.reason)"); return
             }
         } catch {
             Issue.record("Wrong error type: \(error)")
@@ -558,8 +558,8 @@ struct EmbeddedAuthClientTests {
         do {
             _ = try await sut.identify("alice@example.com", type: .email).start()
         } catch let error as EmbeddedAuthError {
-            guard case .network = error.kind else {
-                Issue.record("Expected .network, got \(error.kind)"); return
+            guard case .network = error.reason else {
+                Issue.record("Expected .network, got \(error.reason)"); return
             }
         } catch { Issue.record("Wrong error type: \(error)") }
 
@@ -591,8 +591,8 @@ struct EmbeddedAuthClientTests {
         do {
             _ = try await sut.challengeEmail(index: 0).start()
         } catch let error as EmbeddedAuthError {
-            guard case .sessionExpired = error.kind else {
-                Issue.record("Expected .sessionExpired, got \(error.kind)"); return
+            guard case .sessionExpired = error.reason else {
+                Issue.record("Expected .sessionExpired, got \(error.reason)"); return
             }
         } catch { Issue.record("Wrong error type: \(error)") }
 
@@ -722,8 +722,8 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.authorize(connection: "test-connection").start()
             Issue.record("authorize() should throw with nextActions")
         } catch let e as EmbeddedAuthError {
-            guard case .insufficientAuthorization(let actions) = e.kind else {
-                Issue.record("Expected .insufficientAuthorization, got \(e.kind)"); return
+            guard case .insufficientAuthorization(let actions) = e.reason else {
+                Issue.record("Expected .insufficientAuthorization, got \(e.reason)"); return
             }
             #expect(actions.first == .identifyEmail)
         } catch { Issue.record("Unexpected: \(error)") }
@@ -732,8 +732,8 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.identify("alice@example.com", type: .email).start()
             Issue.record("identify() should throw with nextActions")
         } catch let e as EmbeddedAuthError {
-            guard case .insufficientAuthorization(let actions) = e.kind else {
-                Issue.record("Expected .insufficientAuthorization, got \(e.kind)"); return
+            guard case .insufficientAuthorization(let actions) = e.reason else {
+                Issue.record("Expected .insufficientAuthorization, got \(e.reason)"); return
             }
             guard case .challengeEmail(let index, _) = actions.first else {
                 Issue.record("Expected .challengeEmail"); return
@@ -745,8 +745,8 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.challengeEmail(index: 0).start()
             Issue.record("challengeEmail() should throw with nextActions")
         } catch let e as EmbeddedAuthError {
-            guard case .insufficientAuthorization(let actions) = e.kind else {
-                Issue.record("Expected .insufficientAuthorization, got \(e.kind)"); return
+            guard case .insufficientAuthorization(let actions) = e.reason else {
+                Issue.record("Expected .insufficientAuthorization, got \(e.reason)"); return
             }
             if case .verifyOTP(let ch, let id) = actions.first {
                 #expect(ch == .email)

@@ -68,7 +68,7 @@ public extension EmbeddedAuthError {
     ///
     /// Use an exhaustive `switch` to handle all cases:
     /// ```swift
-    /// switch error.kind {
+    /// switch error.reason {
     /// case .insufficientAuthorization(let nextActions):
     ///     // Flow is live — present the first action's UI.
     /// case .network:
@@ -77,10 +77,7 @@ public extension EmbeddedAuthError {
     ///     // Terminal — start over with authorize().
     /// }
     /// ```
-    ///
-    /// > Note: Discovery errors (`isFeatureDisabled`) are not covered by `kind`;
-    /// > they remain as a dedicated property.
-    var kind: EmbeddedAuthErrorKind {
+    var reason: EmbeddedAuthErrorKind {
         let desc = info["error_description"] as? String
         switch (statusCode, code, desc) {
         case (_, "insufficient_authorization", _):

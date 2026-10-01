@@ -33,7 +33,7 @@ func runEmbeddedAuth(connection: String) async throws -> Credentials {
         try await client.authorize(connection: connection).start()
         fatalError("authorize always throws on the first call")
     } catch let error as EmbeddedAuthError {
-        guard case .insufficientAuthorization(let nextActions) = error.kind else {
+        guard case .insufficientAuthorization(let nextActions) = error.reason else {
             throw error
         }
         return try await handleNextActions(nextActions)
@@ -74,7 +74,7 @@ Auth0.embeddedAuth()
             // authorize() always fails on the first call — unreachable in practice
             break
         case .failure(let error):
-            if case .insufficientAuthorization(let nextActions) = error.kind,
+            if case .insufficientAuthorization(let nextActions) = error.reason,
                case .identifyEmail = nextActions.first {
                 // Show email input
             } else {
@@ -92,7 +92,7 @@ do {
     let credentials = try await client.verifyOtp(otp, type: .oob).start()
     // Use credentials
 } catch let error as EmbeddedAuthError {
-    switch error.kind {
+    switch error.reason {
     case .insufficientAuthorization(let nextActions):
         // Flow is still live — present the next action's UI.
         _ = nextActions

@@ -76,7 +76,7 @@ final class ContentViewModel: ObservableObject {
     }
 
     private func handle(embeddedAuthError error: EmbeddedAuthError) {
-        guard case .insufficientAuthorization(let nextActions) = error.kind else {
+        guard case .insufficientAuthorization(let nextActions) = error.reason else {
             embeddedAuthUIState = .failed("[\(error.code)] \(error.debugDescription)")
             return
         }
