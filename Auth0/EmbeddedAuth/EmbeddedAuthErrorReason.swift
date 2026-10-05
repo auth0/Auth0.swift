@@ -78,8 +78,5 @@ public enum EmbeddedAuthErrorReason: Sendable {
 
         /// The client is polling too frequently and should back off before retrying.
         case slowDown
-
-        /// The identifier+password pair the user entered was incorrect. They may retry via `nextActions`.
-        case invalidIdentifierOrPassword
     }
 }

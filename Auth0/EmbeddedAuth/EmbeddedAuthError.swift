@@ -88,8 +88,6 @@ public extension EmbeddedAuthError {
             return .insufficientAuthorization(reason: .authorizationPending, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "slow_down"):
             return .insufficientAuthorization(reason: .slowDown, nextActions: parsedNextActions)
-        case (_, "insufficient_authorization", "invalid_identifier_or_password"):
-            return .insufficientAuthorization(reason: .invalidIdentifierOrPassword, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", _):
             return .insufficientAuthorization(reason: .none, nextActions: parsedNextActions)
         case (_, "access_denied", "too_many_wrong_otp_attempts"):

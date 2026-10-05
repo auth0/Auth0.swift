@@ -223,16 +223,6 @@ import Foundation
         }
     }
 
-    @Test func reasonIsInvalidIdentifierOrPasswordUnderInsufficientAuthorization() {
-        let error = EmbeddedAuthError(
-            info: ["error": "insufficient_authorization", "error_description": "invalid_identifier_or_password"],
-            statusCode: 403
-        )
-        guard case .insufficientAuthorization(.invalidIdentifierOrPassword, _) = error.reason else {
-            Issue.record("Expected .insufficientAuthorization(.invalidIdentifierOrPassword, _), got \(error.reason)"); return
-        }
-    }
-
     @Test func reasonIsNoneForUnclassifiedInsufficientAuthorizationDescription() {
         let error = EmbeddedAuthError(
             info: ["error": "insufficient_authorization", "error_description": "some_future_description"],

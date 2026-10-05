@@ -11,8 +11,6 @@
 > [!IMPORTANT]
 > The embedded authorization flow is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta). Please reach out to Auth0 support to get it enabled for your tenant and application.
 
-The `EmbeddedAuth` client runs the interactive `POST /e/authorize` loop. Each step throws an `EmbeddedAuthError` whose `reason` property (an `EmbeddedAuthErrorReason`) tells you whether the flow can continue — and when it can, carries the `nextActions` to present — until `verifyOtp` succeeds and returns `Credentials` directly.
-
 #### Obtain a client
 
 ```swift
@@ -29,7 +27,7 @@ let client = Auth0.embeddedAuth()
 ```swift
 func runEmbeddedAuth(connection: String) async throws -> Credentials {
     do {
-        // This always throws — read kind to know what to present.
+        // This always throws — read reason to know what to present.
         try await client.authorize(connection: connection).start()
         fatalError("authorize always throws on the first call")
     } catch let error as EmbeddedAuthError {
