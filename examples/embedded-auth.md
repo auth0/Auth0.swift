@@ -11,8 +11,6 @@
 > [!IMPORTANT]
 > The embedded authorization flow is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta). Please reach out to Auth0 support to get it enabled for your tenant and application.
 
-The `EmbeddedAuth` client runs the interactive `POST /e/authorize` loop. Each step returns an error whose `nextActions` array tells you what to present next. When `verifyOtp` succeeds, `Credentials` are returned directly — no manual code exchange required.
-
 #### Obtain a client
 
 ```swift
@@ -29,11 +27,14 @@ let client = Auth0.embeddedAuth()
 ```swift
 func runEmbeddedAuth(connection: String) async throws -> Credentials {
     do {
-        // This always throws — read nextActions to know what to present.
+        // This always throws — read reason to know what to present.
         try await client.authorize(connection: connection).start()
         fatalError("authorize always throws on the first call")
-    } catch let error as EmbeddedAuthError where error.isInsufficientAuthorization {
-        return try await handleNextActions(error.nextActions)
+    } catch let error as EmbeddedAuthError {
+        guard case .insufficientAuthorization(_, let nextActions) = error.reason else {
+            throw error
+        }
+        return try await handleNextActions(nextActions)
     }
 }
 
@@ -70,13 +71,13 @@ Auth0.embeddedAuth()
         case .success:
             // authorize() always fails on the first call — unreachable in practice
             break
-        case .failure(let error) where error.isInsufficientAuthorization:
-            // Read error.nextActions and present the first action's UI
-            if case .identifyEmail = error.nextActions.first {
-                // Show email input
-            }
         case .failure(let error):
-            print("Failed with: \(error)")
+            if case .insufficientAuthorization(_, let nextActions) = error.reason,
+               case .identifyEmail = nextActions.first {
+                // Show email input
+            } else {
+                print("Failed with: \(error)")
+            }
         }
     }
 ```
@@ -88,16 +89,32 @@ Auth0.embeddedAuth()
 do {
     let credentials = try await client.verifyOtp(otp, type: .oob).start()
     // Use credentials
-} catch let error as EmbeddedAuthError where error.isInvalidCode {
-    // Wrong OTP — session is still alive, let the user retry
-} catch let error as EmbeddedAuthError where error.isChallengeExpired {
-    // Challenge timed out — call challengeEmail again
-} catch let error as EmbeddedAuthError where error.isTooManyWrongOtpAttempts {
-    // Too many wrong attempts — start over with authorize()
-} catch let error as EmbeddedAuthError where error.isTooManyAttempts {
-    // Rate-limited — ask the user to wait and retry
 } catch let error as EmbeddedAuthError {
-    print("Failed with: \(error)")
+    switch error.reason {
+    case .insufficientAuthorization(_, let nextActions):
+        // Flow is still live — present the next action's UI.
+        _ = nextActions
+    case .challengeExpired:
+        // Challenge timed out — call challengeEmail again.
+        break
+    case .tooManyWrongOtpAttempts:
+        // Too many wrong attempts — start over with authorize().
+        break
+    case .accessDenied:
+        // Other terminal denial — start over with authorize().
+        break
+    case .tooManyAttempts, .tooManyLogins:
+        // Rate-limited — ask the user to wait and retry.
+        break
+    case .sessionExpired:
+        // The grant expired — start over with authorize().
+        break
+    case .network:
+        // Transient failure — retry the same step.
+        break
+    default:
+        print("Failed with: \(error)")
+    }
 }
 ```
 

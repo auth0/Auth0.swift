@@ -24,18 +24,6 @@ extension Auth0EmbeddedAuth {
         }
     }
 
-    /// Decodes a `verifyOtp` `/e/authorize` response and, on success, exchanges the authorization
-    /// code for ``Credentials``.
-    ///
-    /// A thin wrapper over ``decodeAuthorizationCodeResponse(_:callback:)``, shared by every step
-    /// that completes the flow by returning an `authorization_code`.
-    func decodeVerifyOtpResponse(
-        _ result: Result<ResponseValue, EmbeddedAuthError>,
-        callback: @escaping @Sendable (Result<Credentials, EmbeddedAuthError>) -> Void
-    ) {
-        decodeAuthorizationCodeResponse(result, callback: callback)
-    }
-
     /// Decodes an `/e/authorize` response that completes the flow with an `authorization_code` and
     /// exchanges that code for ``Credentials``.
     ///

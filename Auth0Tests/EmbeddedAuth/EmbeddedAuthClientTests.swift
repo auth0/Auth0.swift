@@ -199,8 +199,10 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.authorize(connection: "test-connection").start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
-            #expect(error.isInsufficientAuthorization)
-            #expect(error.nextActions == [.identifyEmail])
+            guard case .insufficientAuthorization(_, let actions) = error.reason else {
+                Issue.record("Expected .insufficientAuthorization, got \(error.reason)"); return
+            }
+            #expect(actions == [.identifyEmail])
         } catch {
             Issue.record("Wrong error type: \(error)")
         }
@@ -474,14 +476,15 @@ struct EmbeddedAuthClientTests {
             _ = try await sut.verifyOtp("000000", type: .oob).start()
             Issue.record("Expected failure")
         } catch let error as EmbeddedAuthError {
-            #expect(error.isAccessDenied)
-            #expect(error.isTooManyWrongOtpAttempts)
+            guard case .tooManyWrongOtpAttempts = error.reason else {
+                Issue.record("Expected .tooManyWrongOtpAttempts, got \(error.reason)"); return
+            }
         } catch {
             Issue.record("Wrong error type: \(error)")
         }
     }
 
-    @Test func transientFailureKeepsSessionForRetry() async {
+    @Test func unknownErrorClearsSession() async {
         let sut = makeClient()
         // Establish session
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
@@ -489,7 +492,7 @@ struct EmbeddedAuthClientTests {
         }
         _ = try? await sut.authorize(connection: "test-connection").start()
 
-        // A transient failure (500) must leave the session untouched so the step can be retried
+        // A 500 server_error maps to .unknown → session cleared
         // swiftlint:disable:next force_try
         let serverErrorData = try! JSONSerialization.data(withJSONObject: [
             "error": "server_error",
@@ -498,14 +501,19 @@ struct EmbeddedAuthClientTests {
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in (response(status: 500), serverErrorData) }
         _ = try? await sut.identify("alice@example.com", type: .email).start()
 
-        // Retry reuses the same session
-        var body: [String: Any]?
-        EmbeddedAuthClientMockProtocol.requestHandler = { req in
-            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
-            return (response(status: 403), insufficientAuthData(session: "sess_002", nextActions: []))
+        // Session is cleared — the next step fails locally
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            Issue.record("No network call expected once the session is cleared")
+            return (response(status: 200), authCodeData())
         }
-        _ = try? await sut.identify("alice@example.com", type: .email).start()
-        #expect(body?["auth_session"] as? String == "sess_001")
+        do {
+            _ = try await sut.identify("alice@example.com", type: .email).start()
+            Issue.record("Expected failure")
+        } catch let error as EmbeddedAuthError {
+            #expect(error.code == "no_active_session")
+        } catch {
+            Issue.record("Wrong error type: \(error)")
+        }
     }
 
     @Test func terminalFailureClearsSession() async {
@@ -535,6 +543,94 @@ struct EmbeddedAuthClientTests {
         } catch {
             Issue.record("Wrong error type: \(error)")
         }
+    }
+
+    @Test func networkErrorPreservesSession() async {
+        let sut = makeClient()
+        // Establish session
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:identify:email:v1"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+
+        // A network-layer failure (URLError) must preserve the session for retry
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in throw URLError(.notConnectedToInternet) }
+        do {
+            _ = try await sut.identify("alice@example.com", type: .email).start()
+        } catch let error as EmbeddedAuthError {
+            guard case .network = error.reason else {
+                Issue.record("Expected .network, got \(error.reason)"); return
+            }
+        } catch { Issue.record("Wrong error type: \(error)") }
+
+        // Session still active — retry reaches the network again, not the local guard
+        var body: [String: Any]?
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
+            return (response(status: 403), insufficientAuthData(session: "sess_002", nextActions: []))
+        }
+        _ = try? await sut.identify("alice@example.com", type: .email).start()
+        #expect(body?["auth_session"] as? String == "sess_001")
+    }
+
+    @Test func sessionExpiredClearsSession() async {
+        let sut = makeClient()
+        // Establish session
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:challenge:email:v1", "index": 0, "identifier": "al**@example.com"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+
+        // Server returns invalid_grant (expired auth_session)
+        // swiftlint:disable:next force_try
+        let expiredData = try! JSONSerialization.data(withJSONObject: [
+            "error": "invalid_grant",
+            "error_description": "The auth_session has expired."
+        ])
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in (response(status: 400), expiredData) }
+        do {
+            _ = try await sut.challengeEmail(index: 0).start()
+        } catch let error as EmbeddedAuthError {
+            guard case .sessionExpired = error.reason else {
+                Issue.record("Expected .sessionExpired, got \(error.reason)"); return
+            }
+        } catch { Issue.record("Wrong error type: \(error)") }
+
+        // Session cleared — next step fails locally
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            Issue.record("No network call expected after sessionExpired")
+            return (response(status: 200), authCodeData())
+        }
+        do {
+            _ = try await sut.challengeEmail(index: 0).start()
+            Issue.record("Expected failure")
+        } catch let error as EmbeddedAuthError {
+            #expect(error.code == "no_active_session")
+        } catch {
+            Issue.record("Wrong error type: \(error)")
+        }
+    }
+
+    @Test func insufficientAuthorizationRotatesSession() async {
+        let sut = makeClient()
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:identify:email:v1"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            (response(status: 403), insufficientAuthData(session: "sess_002", nextActions: [["action": "action:challenge:email:v1", "index": 0, "identifier": "al**@example.com"]]))
+        }
+        _ = try? await sut.identify("alice@example.com", type: .email).start()
+
+        // Next step must send the rotated sess_002, not the original sess_001
+        var body: [String: Any]?
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
+            return (response(status: 403), insufficientAuthData(session: "sess_003", nextActions: []))
+        }
+        _ = try? await sut.challengeEmail(index: 0).start()
+        #expect(body?["auth_session"] as? String == "sess_002")
     }
 
     @Test func authorizeResetsActiveSession() async {
@@ -625,15 +721,21 @@ struct EmbeddedAuthClientTests {
         do {
             _ = try await sut.authorize(connection: "test-connection").start()
             Issue.record("authorize() should throw with nextActions")
-        } catch let e as EmbeddedAuthError where e.isInsufficientAuthorization {
-            #expect(e.nextActions.first == .identifyEmail)
+        } catch let e as EmbeddedAuthError {
+            guard case .insufficientAuthorization(_, let actions) = e.reason else {
+                Issue.record("Expected .insufficientAuthorization, got \(e.reason)"); return
+            }
+            #expect(actions.first == .identifyEmail)
         } catch { Issue.record("Unexpected: \(error)") }
 
         do {
             _ = try await sut.identify("alice@example.com", type: .email).start()
             Issue.record("identify() should throw with nextActions")
-        } catch let e as EmbeddedAuthError where e.isInsufficientAuthorization {
-            guard case .challengeEmail(let index, _) = e.nextActions.first else {
+        } catch let e as EmbeddedAuthError {
+            guard case .insufficientAuthorization(_, let actions) = e.reason else {
+                Issue.record("Expected .insufficientAuthorization, got \(e.reason)"); return
+            }
+            guard case .challengeEmail(let index, _) = actions.first else {
                 Issue.record("Expected .challengeEmail"); return
             }
             #expect(index == 0)
@@ -642,8 +744,11 @@ struct EmbeddedAuthClientTests {
         do {
             _ = try await sut.challengeEmail(index: 0).start()
             Issue.record("challengeEmail() should throw with nextActions")
-        } catch let e as EmbeddedAuthError where e.isInsufficientAuthorization {
-            if case .verifyOTP(let ch, let id) = e.nextActions.first {
+        } catch let e as EmbeddedAuthError {
+            guard case .insufficientAuthorization(_, let actions) = e.reason else {
+                Issue.record("Expected .insufficientAuthorization, got \(e.reason)"); return
+            }
+            if case .verifyOTP(let ch, let id) = actions.first {
                 #expect(ch == .email)
                 #expect(id == "al**@example.com")
             } else {

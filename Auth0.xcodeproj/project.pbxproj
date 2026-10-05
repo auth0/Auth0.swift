@@ -665,6 +665,11 @@
 		D45462D6306CE50E002957D8 /* EmbeddedAuthErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C7306CE50E002957D8 /* EmbeddedAuthErrorTests.swift */; };
 		D45462D8306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C6306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift */; };
 		D45462D9306CE50E002957D8 /* EmbeddedAuthClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C5306CE50E002957D8 /* EmbeddedAuthClientTests.swift */; };
+		D4546443306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */; };
+		D4546444306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */; };
+		D4546445306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */; };
+		D4546446306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */; };
+		D4546447306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */; };
 		D46390912F18F29100FD84D7 /* RequestValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46390902F18F28700FD84D7 /* RequestValidator.swift */; };
 		D46390922F18F29100FD84D7 /* RequestValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46390902F18F28700FD84D7 /* RequestValidator.swift */; };
 		D46390932F18F29100FD84D7 /* RequestValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46390902F18F28700FD84D7 /* RequestValidator.swift */; };
@@ -1184,6 +1189,7 @@
 		D45462C5306CE50E002957D8 /* EmbeddedAuthClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthClientTests.swift; sourceTree = "<group>"; };
 		D45462C6306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthErrorAuthorizeTests.swift; sourceTree = "<group>"; };
 		D45462C7306CE50E002957D8 /* EmbeddedAuthErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthErrorTests.swift; sourceTree = "<group>"; };
+		D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthErrorReason.swift; sourceTree = "<group>"; };
 		D46390902F18F28700FD84D7 /* RequestValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestValidator.swift; sourceTree = "<group>"; };
 		D46D5E032F62B934001ECC7B /* TokenRequestable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestable.swift; sourceTree = "<group>"; };
 		D4919A752F55A3BD007EA4B0 /* AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1876,6 +1882,7 @@
 				D4546294306CE4DC002957D8 /* Auth0EmbeddedAuth.swift */,
 				D4546296306CE4DC002957D8 /* EmbeddedAuth.swift */,
 				D4546298306CE4DC002957D8 /* EmbeddedAuthError.swift */,
+				D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */,
 				D4546299306CE4DC002957D8 /* EmbeddedAuthHandlers.swift */,
 				D454629A306CE4DC002957D8 /* EmbeddedAuthNextAction.swift */,
 				D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */,
@@ -2697,6 +2704,7 @@
 				5C354C04276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				D40B77242F5AA7B2000F5F90 /* TokenRequest.swift in Sources */,
 				5FCAB1711D09005A00331C84 /* NSURLComponents+OAuth2.swift in Sources */,
+				D4546445306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */,
 				5CFB82632D6D221F009FD237 /* Barrier.swift in Sources */,
 				5FDE876D1D8A424700EA27DC /* AuthenticationHandlers.swift in Sources */,
 				5C38EA232DA4611B0085AC31 /* MyAccount.swift in Sources */,
@@ -2881,6 +2889,7 @@
 				D4AC0ED72FF67AF6001C54C1 /* Auth0MFAClient.swift in Sources */,
 				D4AC0ED82FF67AF6001C54C1 /* DeliveryMethod.swift in Sources */,
 				D4AC0ED92FF67AF6001C54C1 /* ActClaim.swift in Sources */,
+				D4546443306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */,
 				D4AC0EDA2FF67AF6001C54C1 /* ListAuthenticatorsValidator.swift in Sources */,
 				5C41F6CF244F970E00252548 /* IDTokenValidatorContext.swift in Sources */,
 				5C41F6DB244F97AB00252548 /* Auth0WebAuth.swift in Sources */,
@@ -3133,6 +3142,7 @@
 				5C6513AA2791CDDE004EBC22 /* Version.swift in Sources */,
 				5C505FD32E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C505FAD2E216677005D0757 /* DPoPError.swift in Sources */,
+				D4546446306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */,
 				5B1748761EF2D3A70060E653 /* Shared.swift in Sources */,
 				5C80980E275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
 				D45462B5306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */,
@@ -3235,6 +3245,7 @@
 				5C6513A92791CDDE004EBC22 /* Version.swift in Sources */,
 				5C505FD22E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C505FAC2E216677005D0757 /* DPoPError.swift in Sources */,
+				D4546447306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */,
 				5B1748771EF2D3A90060E653 /* Shared.swift in Sources */,
 				5C80980D275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
 				D45462BD306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */,
@@ -3438,6 +3449,7 @@
 				D45462A0306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */,
 				D45462A2306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */,
 				D45462A3306CE4DC002957D8 /* EmbeddedAuthHandlers.swift in Sources */,
+				D4546444306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */,
 				C1B3BA232C24B6D4004A32A4 /* Auth0.swift in Sources */,
 				C1B3BA242C24B6D4004A32A4 /* Auth0Error.swift in Sources */,
 				C1B3BA252C24B6D4004A32A4 /* Version.swift in Sources */,
