@@ -27,7 +27,9 @@ struct ContentView: View {
                 TextField(text: $viewModel.email) {
                     Text("email")
                 }
+                #if !os(tvOS)
                 .textFieldStyle(.roundedBorder)
+                #endif
                 #if os(iOS)
                 .textInputAutocapitalization(.never)
                 .keyboardType(.emailAddress)
@@ -38,7 +40,9 @@ struct ContentView: View {
                 TextField(text: $viewModel.phoneNumber) {
                     Text("phone number (e.g. +14155552671)")
                 }
+                #if !os(tvOS)
                 .textFieldStyle(.roundedBorder)
+                #endif
                 #if os(iOS)
                 .textInputAutocapitalization(.never)
                 .keyboardType(.phonePad)
@@ -60,8 +64,18 @@ struct ContentView: View {
                 }
                 #endif
 
-                // Inline OTP entry — shown while collecting the 6-digit
-                // identifier-verification code during passkey signup.
+                // MARK: Send Email Code (passwordless)
+
+                Button {
+                    Task { await viewModel.requestOTPChallenge() }
+                } label: {
+                    Label("Send email code", systemImage: "envelope")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .disabled(viewModel.isLoading || viewModel.email.isEmpty)
+
+                // Inline OTP entry — shown during passkey identifier verification
+                // or when logging in via passwordless email code.
                 if viewModel.showOTPSheet {
                     OTPEntryView(viewModel: viewModel)
                 }
@@ -136,7 +150,9 @@ struct OTPEntryView: View {
     private func submitAction() {
         Task {
             if isPasskeyVerification {
+                #if PASSKEYS_PLATFORM
                 await viewModel.submitPasskeyVerificationOTP()
+                #endif
             } else {
                 await viewModel.loginWithOTP()
             }
@@ -174,7 +190,9 @@ struct OTPEntryView: View {
                 Button("Resend code") {
                     Task {
                         if isPasskeyVerification {
+                            #if PASSKEYS_PLATFORM
                             await viewModel.resendPasskeyVerificationOTP()
+                            #endif
                         } else {
                             await viewModel.requestOTPChallenge()
                         }
@@ -190,7 +208,13 @@ struct OTPEntryView: View {
             }
         }
         .padding(16)
-        .background(Color(.secondarySystemBackground))
+        #if os(iOS)
+        .background(Color(UIColor.secondarySystemBackground))
+        #elseif os(macOS)
+        .background(Color(NSColor.windowBackgroundColor))
+        #else
+        .background(Color.secondary.opacity(0.1))
+        #endif
         .cornerRadius(12)
     }
 }
@@ -206,10 +230,19 @@ struct OTPInputView: View {
         HStack(spacing: 10) {
             ForEach(0..<6, id: \.self) { index in
                 TextField("", text: $digits[index])
+                    #if os(iOS)
                     .keyboardType(.numberPad)
+                    .textContentType(.oneTimeCode)
+                    #endif
                     .multilineTextAlignment(.center)
                     .frame(width: 44, height: 54)
-                    .background(Color(.systemGray6))
+                    #if os(iOS)
+                    .background(Color(UIColor.systemGray6))
+                    #elseif os(macOS)
+                    .background(Color(NSColor.controlBackgroundColor))
+                    #else
+                    .background(Color.secondary.opacity(0.15))
+                    #endif
                     .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
@@ -220,17 +253,27 @@ struct OTPInputView: View {
                     .onChange(of: digits[index]) { newValue in
                         let filtered = newValue.filter { $0.isNumber }
                         if filtered.count > 1 {
-                            digits[index] = String(filtered.last!)
-                        } else {
-                            digits[index] = filtered
+                            // Distribute pasted code across fields starting at this index
+                            let chars = Array(filtered.prefix(6 - index))
+                            for (offset, char) in chars.enumerated() {
+                                digits[index + offset] = String(char)
+                            }
+                            let nextIndex = min(index + chars.count, 5)
+                            focusedIndex = digits[nextIndex].isEmpty ? nextIndex : nil
+                            if digits.allSatisfy({ $0.count == 1 }) { onComplete() }
+                            return
                         }
-                        if digits[index].count == 1 {
+                        guard filtered != digits[index] else { return }
+                        digits[index] = filtered
+                        if filtered.isEmpty {
+                            if index > 0 { focusedIndex = index - 1 }
+                        } else {
                             if index < 5 {
                                 focusedIndex = index + 1
                             } else {
                                 focusedIndex = nil
-                                onComplete()
                             }
+                            if digits.allSatisfy({ $0.count == 1 }) { onComplete() }
                         }
                     }
             }

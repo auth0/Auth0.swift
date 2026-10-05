@@ -602,8 +602,15 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// authController.performRequests()
     /// ```
     ///
-    /// Then, call ``login(passkey:challenge:connection:audience:scope:)-4q8i0`` with the created
+    /// Then, call ``login(passkey:challenge:connection:audience:scope:organization:verification:)`` with the created
     /// passkey credential and the challenge to log the new user in.
+    ///
+    /// If ``PasskeySignupChallenge/verificationRequired`` is non-nil, the server delivers OTP codes to each
+    /// listed channel before the passkey can be used. To resend an OTP — for example when the user taps
+    /// "Resend code" — call `passkeySignupChallenge` again with the **same** `email`, `phoneNumber`, and
+    /// `deliveryMethod` values. The server issues a new challenge and a fresh OTP. Use that new challenge
+    /// (including its updated `auth_session`) when calling
+    /// ``login(passkey:challenge:connection:audience:scope:organization:verification:)``.
     ///
     /// - Parameters:
     ///   - email:          Email address of the user. Defaults to `nil`.

@@ -110,23 +110,12 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
 
         let request = mutableRequest
         logger?.trace(request: request, session: self.session)
-        #if DEBUG
-        print(request.curlString)
-        #endif
 
         let task = session.dataTask(with: request,
                                     completionHandler: { [logger, handle] data, response, error in
             if error == nil, let response = response {
                 logger?.trace(response: response, data: data)
             }
-            #if DEBUG
-            if let data = data,
-               let jsonObject = try? JSONSerialization.jsonObject(with: data),
-               let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
-               let prettyString = String(data: prettyData, encoding: .utf8) {
-                print(prettyString)
-            }
-            #endif
 
             let response = Response<E>(data: data, response: response as? HTTPURLResponse, error: error)
             DPoP.storeNonce(from: response.response)
@@ -210,20 +199,3 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
     }
 }
 
-#if DEBUG
-private extension URLRequest {
-    var curlString: String {
-        guard let url = url else { return "curl -X \(httpMethod ?? "GET") <unknown URL>" }
-        var components = ["curl -v -X \(httpMethod ?? "GET")"]
-        allHTTPHeaderFields?.sorted { $0.key < $1.key }.forEach { key, value in
-            components.append("-H '\(key): \(value)'")
-        }
-        if let body = httpBody, let bodyString = String(data: body, encoding: .utf8) {
-            let escaped = bodyString.replacingOccurrences(of: "'", with: "'\\''")
-            components.append("-d '\(escaped)'")
-        }
-        components.append("'\(url.absoluteString)'")
-        return components.joined(separator: " \\\n  ")
-    }
-}
-#endif

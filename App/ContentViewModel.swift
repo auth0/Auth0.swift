@@ -216,6 +216,9 @@ final class ContentViewModel: ObservableObject {
                     deliveryMethod: phoneNumber.isEmpty ? nil : .voice)
                 .start()
             pendingPasskeySignupChallenge = challenge
+            pendingVerificationChannels = challenge.verificationRequired ?? []
+            collectedVerificationCodes = [:]
+            pendingSignupPasskey = nil
             otpDigits = Array(repeating: "", count: 6)
         } catch {
             errorMessage = error.localizedDescription
