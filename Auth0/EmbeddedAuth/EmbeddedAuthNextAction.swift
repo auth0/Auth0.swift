@@ -44,7 +44,7 @@ public enum OtpChannel: String, Sendable, CaseIterable {
 // MARK: - EmbeddedAction
 
 /// Wire strings used in request bodies and for parsing `next` menus.
-public enum EmbeddedAction: String, Sendable, CaseIterable {
+enum EmbeddedAction: String, Sendable, CaseIterable {
 
     /// Identify by email.
     case identifyEmail  = "action:identify:email:v1"

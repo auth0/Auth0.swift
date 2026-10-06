@@ -188,6 +188,31 @@ struct EmbeddedAuthClientTests {
         #expect(caps?.contains("action:verify:otp:v1") == true)
     }
 
+    @Test func authorizeSendsAudienceInBody() async {
+        let sut = makeClient()
+        var body: [String: Any]?
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
+            return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection",
+                                     capabilities: EmbeddedCapability.all,
+                                     scope: "openid profile email offline_access",
+                                     audience: "https://my-api/").start()
+        #expect(body?["audience"] as? String == "https://my-api/")
+    }
+
+    @Test func authorizeOmitsAudienceWhenNil() async {
+        let sut = makeClient()
+        var body: [String: Any]?
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
+            return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+        #expect(body?["audience"] == nil)
+    }
+
     // MARK: authorize() — response parsing
 
     @Test func authorizeThrowsInsufficientAuthorizationWith403() async {
@@ -248,17 +273,19 @@ struct EmbeddedAuthClientTests {
         #expect(body?["auth_session"] as? String == "sess_001")
     }
 
-    @Test func identifyDoesNotExposeAuthSession() async {
+    @Test func sessionStoredInInternalProperty() async {
         let sut = makeClient()
         EmbeddedAuthClientMockProtocol.requestHandler = { _ in
             return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:identify:email:v1"]]))
         }
         _ = try? await sut.authorize(connection: "test-connection").start()
-        // auth_session is stored internally — there is no public accessor on EmbeddedAuth
-        // This test documents the invariant: the protocol has no authSession property
-        let mirror = Mirror(reflecting: sut)
-        let hasPublicSession = mirror.children.contains { $0.label == "authSession" }
-        #expect(!hasPublicSession)
+        // Session is stored in the internal `currentSession` property, not accessible via the EmbeddedAuth protocol.
+        // The protocol-typed `sut` has no `authSession` accessor — that is a compile-time guarantee.
+        guard let concrete = sut as? Auth0EmbeddedAuth else {
+            Issue.record("Expected Auth0EmbeddedAuth instance")
+            return
+        }
+        #expect(concrete.currentSession == "sess_001")
     }
 
     // MARK: challengeEmail

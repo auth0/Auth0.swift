@@ -22,6 +22,9 @@ let client = Auth0.embeddedAuth()
 
 #### Start the flow and step through next actions
 
+> [!NOTE]
+> The Email OTP flow (`.challengeEmail` / `.verifyOTP`) is supported only for **existing users** who have already signed up. It does not work for fresh / new user sign-ups.
+
 `authorize(connection:)` uses a default scope of `"openid profile email offline_access"`, which ensures `Credentials.idToken` is populated after a successful `verifyOtp`. Pass a custom `scope:` to the full `authorize(connection:capabilities:scope:audience:)` overload if needed.
 
 ```swift
