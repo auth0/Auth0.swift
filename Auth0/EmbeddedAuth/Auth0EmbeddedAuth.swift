@@ -32,6 +32,10 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     /// ``EmbeddedAuth`` protocol, so callers cannot read the session. The flow is strictly
     /// sequential — each step starts only after the previous one delivers its result — so this
     /// value is never touched concurrently.
+    ///
+    /// - Warning: Never call another step while a prior step's network request is still in-flight
+    ///   (e.g. retrying `authorize()` inside a loop). A concurrent `exchange(code:)` completion
+    ///   will clear `currentSession` and overwrite whatever the new `authorize()` established.
     var currentSession: String?
 
     init(clientId: String,
