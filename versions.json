@@ -2,14 +2,14 @@
   "stable" : "v3.1.0",
   "versions" : [
     {
+      "name" : "v4.0.0-beta.0",
+      "path" : "v4.0.0-beta.0",
+      "version" : "4.0.0-beta.0"
+    },
+    {
       "name" : "v3.1.0",
       "path" : "v3.1.0",
       "version" : "3.1.0"
-    },
-    {
-      "name" : "v2.25.0",
-      "path" : "v2.25.0",
-      "version" : "2.25.0"
     }
   ]
 }
