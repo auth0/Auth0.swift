@@ -1,5 +1,10 @@
 # Change Log
 
+## [Next]
+
+**Added**
+- feat(embedded-auth): MFA support — phone OTP, push notification polling, and recovery code flows for `POST /e/authorize`
+
 ## [4.0.0-beta.0](https://github.com/auth0/Auth0.swift/tree/4.0.0-beta.0) (2026-10-07)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.1.0...4.0.0-beta.0)
 

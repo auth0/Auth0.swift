@@ -77,7 +77,85 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
                 "email": identifier,
                 "auth_session": currentSession
             ])
+        case .phone:
+            guard let currentSession else { return missingSessionRequest() }
+            return authorizeRequest(body: [
+                "client_id": clientId,
+                "action": EmbeddedAction.identifyPhone.rawValue,
+                "phone": identifier,
+                "auth_session": currentSession
+            ])
         }
+    }
+
+    /// Requests that the server send a phone OTP challenge.
+    func challengePhone(index: Int, deliveryMethod: PhoneDeliveryMethod) -> Request<Void, EmbeddedAuthError> {
+        guard let currentSession else { return missingSessionRequest() }
+        return authorizeRequest(body: [
+            "client_id": clientId,
+            "action": EmbeddedAction.challengePhone.rawValue,
+            "index": index,
+            "delivery_method": deliveryMethod.rawValue,
+            "auth_session": currentSession
+        ])
+    }
+
+    /// Requests that the server send a push notification to the user's enrolled device.
+    func challengePush(index: Int) -> Request<Void, EmbeddedAuthError> {
+        guard let currentSession else { return missingSessionRequest() }
+        return authorizeRequest(body: [
+            "client_id": clientId,
+            "action": EmbeddedAction.challengePush.rawValue,
+            "index": index,
+            "auth_session": currentSession
+        ])
+    }
+
+    /// Polls for push notification approval.
+    func verifyOob() -> Request<Credentials, EmbeddedAuthError> {
+        guard let currentSession else { return missingSessionRequest() }
+        return Request(
+            session: session,
+            url: url.appending("e/authorize"),
+            method: "POST",
+            handle: { [self] result, callback in decodeAuthorizationCodeResponse(result, callback: callback) },
+            parameters: [
+                "client_id": clientId,
+                "action": EmbeddedAction.verifyOob.rawValue,
+                "auth_session": currentSession
+            ],
+            logger: logger,
+            auth0ClientInfo: auth0ClientInfo
+        )
+    }
+
+    /// Submits a recovery code to verify the user's identity.
+    func verifyRecoveryCode(_ code: String) -> Request<Void, EmbeddedAuthError> {
+        guard let currentSession else { return missingSessionRequest() }
+        return authorizeRequest(body: [
+            "client_id": clientId,
+            "action": EmbeddedAction.verifyRecoveryCode.rawValue,
+            "code": code,
+            "auth_session": currentSession
+        ])
+    }
+
+    /// Confirms the user has recorded their rotated recovery code.
+    func confirmRecoveryCode() -> Request<Credentials, EmbeddedAuthError> {
+        guard let currentSession else { return missingSessionRequest() }
+        return Request(
+            session: session,
+            url: url.appending("e/authorize"),
+            method: "POST",
+            handle: { [self] result, callback in decodeAuthorizationCodeResponse(result, callback: callback) },
+            parameters: [
+                "client_id": clientId,
+                "action": EmbeddedAction.confirmRecoveryCode.rawValue,
+                "auth_session": currentSession
+            ],
+            logger: logger,
+            auth0ClientInfo: auth0ClientInfo
+        )
     }
 
     /// Requests that the server send an email OTP challenge.

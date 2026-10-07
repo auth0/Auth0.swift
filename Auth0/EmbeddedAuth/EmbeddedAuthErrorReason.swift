@@ -27,6 +27,12 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// Terminal: the OTP challenge expired before it was verified. Restart the flow.
     case challengeExpired
 
+    /// Terminal: the user rejected or cancelled the push notification. Restart the flow.
+    case authorizationRejected
+
+    /// Terminal: no eligible MFA factors are enrolled. Enrol a factor and restart the flow.
+    case noEligibleFactors
+
     /// Terminal: access denied for a reason not modelled as its own case.
     ///
     /// Read ``EmbeddedAuthError/debugDescription`` for specifics.

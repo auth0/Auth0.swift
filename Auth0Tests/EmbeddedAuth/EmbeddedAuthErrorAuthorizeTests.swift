@@ -391,4 +391,209 @@ import Foundation
             Issue.record("Expected .unknown, got \(error.reason)"); return
         }
     }
+
+    // MARK: - reason: MFA terminal errors
+
+    @Test func reasonIsAuthorizationRejectedUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "authorization_rejected"],
+            statusCode: 403
+        )
+        guard case .authorizationRejected = error.reason else {
+            Issue.record("Expected .authorizationRejected, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsNoEligibleFactorsUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "no_eligible_factors"],
+            statusCode: 403
+        )
+        guard case .noEligibleFactors = error.reason else {
+            Issue.record("Expected .noEligibleFactors, got \(error.reason)"); return
+        }
+    }
+
+    // MARK: - next parsing: MFA actions
+
+    @Test func reasonParsesIdentifyPhone() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:identify:phone:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions == [.identifyPhone])
+    }
+
+    @Test func reasonParsesChallengePhoneWithDeliveryMethods() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:challenge:phone:v1", "index": 0, "identifier": "+1*****567", "delivery_methods": ["text", "voice"]]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
+              case .challengePhone(let index, let identifier, let methods) = actions.first else {
+            Issue.record("Expected .challengePhone"); return
+        }
+        #expect(index == 0)
+        #expect(identifier == "+1*****567")
+        #expect(methods == [.text, .voice])
+    }
+
+    @Test func reasonParsesChallengePhoneWithEmptyDeliveryMethods() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:challenge:phone:v1", "index": 0, "identifier": "+1*****567", "delivery_methods": []]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
+              case .challengePhone(_, _, let methods) = actions.first else {
+            Issue.record("Expected .challengePhone"); return
+        }
+        #expect(methods.isEmpty)
+    }
+
+    @Test func reasonDropsChallengePhoneMissingIndex() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:challenge:phone:v1", "identifier": "+1*****567", "delivery_methods": ["text"]]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions.isEmpty)
+    }
+
+    @Test func reasonDropsChallengePhoneMissingIdentifier() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:challenge:phone:v1", "index": 0, "delivery_methods": ["text"]]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions.isEmpty)
+    }
+
+    @Test func reasonParsesChallengePush() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:challenge:push:v1", "index": 0, "name": "Diego's iPhone"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
+              case .challengePush(let index, let name) = actions.first else {
+            Issue.record("Expected .challengePush"); return
+        }
+        #expect(index == 0)
+        #expect(name == "Diego's iPhone")
+    }
+
+    @Test func reasonDropsChallengePushMissingIndex() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:challenge:push:v1", "name": "Diego's iPhone"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions.isEmpty)
+    }
+
+    @Test func reasonDropsChallengePushMissingName() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:challenge:push:v1", "index": 0]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions.isEmpty)
+    }
+
+    @Test func reasonParsesVerifyOobWithPollInMs() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:verify:oob:v1", "poll_in_ms": 2000]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
+              case .verifyOob(let pollInMs) = actions.first else {
+            Issue.record("Expected .verifyOob"); return
+        }
+        #expect(pollInMs == 2000)
+    }
+
+    @Test func reasonDropsVerifyOobMissingPollInMs() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:verify:oob:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions.isEmpty)
+    }
+
+    @Test func reasonParsesVerifyRecoveryCode() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:verify:recovery-code:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions == [.verifyRecoveryCode])
+    }
+
+    @Test func reasonParsesConfirmRecoveryCodeWithNewCode() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:confirm:recovery-code:v1", "new_code": "EFGH-5678"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason,
+              case .confirmRecoveryCode(let newCode) = actions.first else {
+            Issue.record("Expected .confirmRecoveryCode"); return
+        }
+        #expect(newCode == "EFGH-5678")
+    }
+
+    @Test func reasonDropsConfirmRecoveryCodeMissingNewCode() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:confirm:recovery-code:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions.isEmpty)
+    }
+
+    @Test func reasonDecodesMixedEmailAndMfaActions() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [
+                ["action": "action:verify:otp:v1", "channel": "totp"],
+                ["action": "action:challenge:push:v1", "index": 0, "name": "My Phone"],
+                ["action": "action:challenge:phone:v1", "index": 0, "identifier": "+1*****89", "delivery_methods": ["text", "voice"]]
+            ]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions.count == 3)
+        guard case .verifyOTP(let ch, _) = actions[0] else {
+            Issue.record("Expected .verifyOTP at index 0"); return
+        }
+        #expect(ch == .totp)
+        guard case .challengePush(let idx, let name) = actions[1] else {
+            Issue.record("Expected .challengePush at index 1"); return
+        }
+        #expect(idx == 0)
+        #expect(name == "My Phone")
+        guard case .challengePhone(let phoneIdx, _, let methods) = actions[2] else {
+            Issue.record("Expected .challengePhone at index 2"); return
+        }
+        #expect(phoneIdx == 0)
+        #expect(methods.contains(.text))
+        #expect(methods.contains(.voice))
+    }
 }
