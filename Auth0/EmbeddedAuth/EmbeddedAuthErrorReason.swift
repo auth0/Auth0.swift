@@ -24,8 +24,14 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// Terminal: too many wrong OTP submissions. Restart the flow.
     case tooManyWrongOtpAttempts
 
-    /// Terminal: the OTP challenge expired before it was verified. Restart the flow.
+    /// Terminal: the push (out-of-band) challenge expired or could not be found. Restart the flow.
     case challengeExpired
+
+    /// Terminal: the user explicitly denied the push notification. Restart the flow.
+    case authorizationRejected
+
+    /// Terminal: a second factor is required but the user has no eligible factor. Fall back to a redirect-based flow.
+    case noEligibleFactors
 
     /// Terminal: access denied for a reason not modelled as its own case.
     ///
@@ -67,7 +73,8 @@ public enum EmbeddedAuthErrorReason: Sendable {
         /// A plain continuation: the server advanced the flow without a specific error.
         case none
 
-        /// The OTP the user entered was incorrect. They may retry via `nextActions`.
+        /// The one-time code or recovery code the user entered was incorrect, for a user the server has already
+        /// identified. They may retry via `nextActions`.
         case invalidCode
 
         /// The identifier+code pair the user entered was incorrect. They may retry via `nextActions`.

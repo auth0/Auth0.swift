@@ -11,6 +11,8 @@ public typealias EmbeddedAuthResult<T> = Result<T, EmbeddedAuthError>
 public enum IdentifierType {
     /// An email address.
     case email
+    /// A phone number.
+    case phone
 }
 
 // MARK: - Protocol
@@ -69,8 +71,9 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// Requests that the server send an email OTP challenge.
     ///
     /// Requires an active session.
-    /// - Parameter index: The zero-based index of the `challengeEmail` entry from the
-    ///   `nextActions` associated value of ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)``.
+    /// - Parameter index: The `index` of the ``NextAction/challengeEmail(index:identifier:)`` you are acting on.
+    ///   It selects one of the user's enrolled email authenticators; it is not a position in the `nextActions` array.
+    ///   Pass it back unchanged.
     func challengeEmail(index: Int) -> Request<Void, EmbeddedAuthError>
 
     /// Submits a one-time password to verify the user's identity.
@@ -83,6 +86,55 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///   - otp:  The one-time code entered by the user.
     ///   - type: Whether the code is OOB (email/SMS) or TOTP.
     func verifyOtp(_ otp: String, type: OtpType) -> Request<Credentials, EmbeddedAuthError>
+
+    /// Requests that the server send a phone OTP challenge via SMS or voice.
+    ///
+    /// Requires an active session.
+    ///
+    /// - Parameters:
+    ///   - index:          The `index` of the ``NextAction/challengePhone(index:identifier:deliveryMethods:)`` you are acting on.
+    ///     It selects one of the user's enrolled phone authenticators; it is not a position in the `nextActions` array.
+    ///     Pass it back unchanged.
+    ///   - deliveryMethod: Whether to deliver the code via SMS or voice call.
+    func challengePhone(index: Int, deliveryMethod: PhoneDeliveryMethod) -> Request<Void, EmbeddedAuthError>
+
+    /// Requests that the server send a push notification to the user's enrolled device.
+    ///
+    /// Poll the result with ``verifyOob()`` at the interval specified by ``NextAction/verifyOob(pollInMs:)``.
+    ///
+    /// Requires an active session.
+    ///
+    /// - Parameter index: The `index` of the ``NextAction/challengePush(index:name:)`` you are acting on.
+    ///   It selects one of the user's enrolled push authenticators; it is not a position in the `nextActions` array.
+    ///   Pass it back unchanged.
+    func challengePush(index: Int) -> Request<Void, EmbeddedAuthError>
+
+    /// Polls for push notification approval.
+    ///
+    /// Call this method repeatedly at the interval given by ``NextAction/verifyOob(pollInMs:)`` until it returns
+    /// ``Credentials`` (approved) or throws a terminal error (rejected or expired).
+    ///
+    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    ///
+    /// Requires an active session.
+    func verifyOob() -> Request<Credentials, EmbeddedAuthError>
+
+    /// Submits a recovery code to verify the user's identity.
+    ///
+    /// On success, the server rotates the recovery code and returns a ``NextAction/confirmRecoveryCode(newCode:)``
+    /// continuation. Present `newCode` to the user, then call ``confirmRecoveryCode()`` to complete the flow.
+    ///
+    /// Requires an active session.
+    ///
+    /// - Parameter code: The recovery code entered by the user.
+    func verifyRecoveryCode(_ code: String) -> Request<Void, EmbeddedAuthError>
+
+    /// Confirms the user has recorded their rotated recovery code and completes the flow.
+    ///
+    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    ///
+    /// Requires an active session.
+    func confirmRecoveryCode() -> Request<Credentials, EmbeddedAuthError>
 
 }
 
