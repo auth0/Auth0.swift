@@ -140,9 +140,11 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
 
     /// Identifier verification methods still required after a failed passkey token exchange (e.g. `["email", "phone"]`).
     ///
-    /// Non-`nil` only when the token exchange returned `invalid_grant` and the session is still retryable.
+    /// Non-`nil` only when the token exchange returned `invalid_grant` and the session is still retryable
+    /// (i.e. ``isPasskeyVerificationRetryable`` is `true`).
     /// Use together with ``passkeyAuthSession`` to retry the exchange with the corrected OTP codes.
     public var passkeyVerificationRequired: [String]? {
+        guard isPasskeyVerificationRetryable else { return nil }
         return self.info["verification_required"] as? [String]
     }
 
@@ -150,7 +152,7 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
     ///
     /// When this is non-`nil` inside an `invalid_grant` error, the session is still alive — retry by passing
     /// the corrected OTP codes to ``Authentication/login(passkey:challenge:connection:audience:scope:organization:verification:)``.
-    /// When `nil`, the session is terminal and a fresh ``Authentication/passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:)``
+    /// When `nil`, the session is terminal and a fresh ``Authentication/passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``
     /// call is required.
     public var passkeyAuthSession: String? {
         return self.info["auth_session"] as? String

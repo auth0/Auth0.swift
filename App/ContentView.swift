@@ -147,8 +147,13 @@ struct OTPEntryView: View {
             : "Enter the 6-digit code sent to\n\(viewModel.email)"
     }
 
+    @State private var isSubmitting = false
+
     private func submitAction() {
+        guard !isSubmitting else { return }
+        isSubmitting = true
         Task {
+            defer { isSubmitting = false }
             if isPasskeyVerification {
                 #if PASSKEYS_PLATFORM
                 await viewModel.submitPasskeyVerificationOTP()

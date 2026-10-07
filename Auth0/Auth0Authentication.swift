@@ -259,6 +259,48 @@ struct Auth0Authentication: Authentication {
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: any SignupPasskey,
+               challenge: PasskeySignupChallenge,
+               connection: String?,
+               audience: String?,
+               scope: String,
+               organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> {
+        return self.login(passkey: passkey,
+                          challenge: challenge,
+                          connection: connection,
+                          audience: audience,
+                          scope: scope,
+                          organization: organization,
+                          verification: nil)
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String?,
+                                username: String?,
+                                name: String?,
+                                givenName: String?,
+                                familyName: String?,
+                                nickname: String?,
+                                picture: String?,
+                                userMetadata: [String: String]?,
+                                connection: String?,
+                                organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           givenName: givenName,
+                                           familyName: familyName,
+                                           nickname: nickname,
+                                           picture: picture,
+                                           userMetadata: userMetadata,
+                                           connection: connection,
+                                           organization: organization,
+                                           deliveryMethod: nil)
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeySignupChallenge(email: String?,
                                 phoneNumber: String?,
                                 username: String?,

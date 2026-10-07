@@ -198,4 +198,3 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
                        dpop: dpop)
     }
 }
-

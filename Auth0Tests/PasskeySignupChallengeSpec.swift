@@ -50,55 +50,6 @@ class PasskeySignupChallengeSpec: QuickSpec {
                 expect(challenge.challengeData) == Challenge.a0_decodeBase64URLSafe()
             }
 
-            it("should decode verification_required when present") {
-                let json = """
-                    {
-                        "auth_session": "\(AuthenticationSession)",
-                        "verification_required": ["email"],
-                        "authn_params_public_key": {
-                            "rp": {
-                                "id": "\(RelyingPartyIdentifier)",
-                                "name": "Foo"
-                            },
-                            "user": {
-                                "id": "\(UserIdentifier)",
-                                "name": "\(UserName)",
-                                "displayName": "Bar"
-                            },
-                            "challenge": "\(Challenge)",
-                            "pubKeyCredParams": [{ "type": "public-key", "alg": -257 }]
-                        }
-                    }
-                """.data(using: .utf8)!
-                let challenge = try decoder.decode(PasskeySignupChallenge.self, from: json)
-
-                expect(challenge.verificationRequired) == ["email"]
-            }
-
-            it("should have nil verification_required when absent") {
-                let json = """
-                    {
-                        "auth_session": "\(AuthenticationSession)",
-                        "authn_params_public_key": {
-                            "rp": {
-                                "id": "\(RelyingPartyIdentifier)",
-                                "name": "Foo"
-                            },
-                            "user": {
-                                "id": "\(UserIdentifier)",
-                                "name": "\(UserName)",
-                                "displayName": "Bar"
-                            },
-                            "challenge": "\(Challenge)",
-                            "pubKeyCredParams": [{ "type": "public-key", "alg": -257 }]
-                        }
-                    }
-                """.data(using: .utf8)!
-                let challenge = try decoder.decode(PasskeySignupChallenge.self, from: json)
-
-                expect(challenge.verificationRequired).to(beNil())
-            }
-
             it("should fail when the user id is invalid") {
                 let json = """
                     {

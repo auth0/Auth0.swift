@@ -368,7 +368,46 @@ class AuthenticationSpec: QuickSpec {
                         auth
                             .login(passkey: signupPasskey,
                                    challenge: signupChallenge,
+                                   connection: nil,
+                                   audience: nil,
+                                   scope: defaultScope,
+                                   organization: nil,
                                    verification: ["email": "123456", "phone": "654321"])
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                            }
+                    }
+                }
+
+                it("should login with signup passkey and single-channel email verification") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession,
+                            "verification": ["email": "123456"],
+                            "authn_response": [
+                                "authenticatorAttachment": authenticatorAttachment,
+                                "type": credentialType,
+                                "response": [
+                                    "attestationObject": attestationObject,
+                                    "clientDataJSON": clientData
+                                ]
+                            ]
+                        ])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   connection: nil,
+                                   audience: nil,
+                                   scope: defaultScope,
+                                   organization: nil,
+                                   verification: ["email": "123456"])
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
                                 done()
@@ -614,7 +653,18 @@ class AuthenticationSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         auth
-                            .passkeySignupChallenge(email: Email, deliveryMethod: .text)
+                            .passkeySignupChallenge(email: Email,
+                                                    phoneNumber: nil,
+                                                    username: nil,
+                                                    name: nil,
+                                                    givenName: nil,
+                                                    familyName: nil,
+                                                    nickname: nil,
+                                                    picture: nil,
+                                                    userMetadata: nil,
+                                                    connection: nil,
+                                                    organization: nil,
+                                                    deliveryMethod: .text)
                             .start { result in
                                 expect(result).to(havePasskeySignupChallenge(identifier: Email))
                                 done()
@@ -637,7 +687,18 @@ class AuthenticationSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         auth
-                            .passkeySignupChallenge(email: Email, deliveryMethod: .voice)
+                            .passkeySignupChallenge(email: Email,
+                                                    phoneNumber: nil,
+                                                    username: nil,
+                                                    name: nil,
+                                                    givenName: nil,
+                                                    familyName: nil,
+                                                    nickname: nil,
+                                                    picture: nil,
+                                                    userMetadata: nil,
+                                                    connection: nil,
+                                                    organization: nil,
+                                                    deliveryMethod: .voice)
                             .start { result in
                                 expect(result).to(havePasskeySignupChallenge(identifier: Email))
                                 done()
@@ -803,7 +864,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
 
-                it("should surface retryable invalid_request when verification code is missing") {
+                it("should surface non-retryable invalid_request when verification code is missing") {
                     NetworkStub.addStub(condition: {
                         $0.isToken(PasskeyDomain) &&
                         $0.hasAtLeast([
@@ -824,6 +885,7 @@ class AuthenticationSpec: QuickSpec {
                                 if case .failure(let error) = result {
                                     expect(error.code) == "invalid_request"
                                     expect(error.statusCode) == 400
+                                    expect(error.isPasskeyVerificationRetryable) == false
                                 } else {
                                     fail("Expected failure")
                                 }

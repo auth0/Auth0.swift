@@ -531,6 +531,35 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
     ///   - organization: Identifier of an organization the user is a member of.
+    /// - Returns: A request that will yield Auth0 user's credentials.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-new-user)
+    /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
+    /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: SignupPasskey,
+               challenge: PasskeySignupChallenge,
+               connection: String?,
+               audience: String?,
+               scope: String,
+               organization: String?) -> any TokenRequestable<Credentials, AuthenticationError>
+
+    /// Logs a new user in using a signup passkey credential with identifier verification.
+    ///
+    /// Extend ``login(passkey:challenge:connection:audience:scope:organization:)`` by passing OTP codes
+    /// collected during identifier verification. Conformers that do not need to support identifier
+    /// verification may omit this overload — the default implementation drops `verification` and
+    /// forwards to the base overload.
+    ///
+    /// - Parameters:
+    ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
+    ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
+    ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
+    ///   - organization: Identifier of an organization the user is a member of.
     ///   - verification: OTP codes required to verify ownership of identifiers returned in ``PasskeySignupChallenge/verificationRequired``. For example, `["email": "123456", "phone": "654321"]`. Pass only the keys that are applicable.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
@@ -611,6 +640,45 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// `deliveryMethod` values. The server issues a new challenge and a fresh OTP. Use that new challenge
     /// (including its updated `auth_session`) when calling
     /// ``login(passkey:challenge:connection:audience:scope:organization:verification:)``.
+    ///
+    /// - Parameters:
+    ///   - email:        Email address of the user. Defaults to `nil`.
+    ///   - phoneNumber:  Phone number of the user. Defaults to `nil`.
+    ///   - username:     Username of the user. Defaults to `nil`.
+    ///   - name:         Display name of the user. Defaults to `nil`.
+    ///   - givenName:    First name of the user. Defaults to `nil`.
+    ///   - familyName:   Last name of the user. Defaults to `nil`.
+    ///   - nickname:     Preferred nickname of the user. Defaults to `nil`.
+    ///   - picture:      URL pointing to the user's profile picture. Defaults to `nil`.
+    ///   - userMetadata: Additional user metadata as key-value pairs. Defaults to `nil`.
+    ///   - connection:   Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - organization: Identifier of an organization the user is a member of.
+    /// - Returns: A request that will yield a passkey signup challenge.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#request-signup-challenge)
+    /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
+    /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String?,
+                                username: String?,
+                                name: String?,
+                                givenName: String?,
+                                familyName: String?,
+                                nickname: String?,
+                                picture: String?,
+                                userMetadata: [String: String]?,
+                                connection: String?,
+                                organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError>
+
+    /// Requests a passkey signup challenge with an explicit OTP delivery channel for phone verification.
+    ///
+    /// Extends ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:)``
+    /// with a `deliveryMethod` parameter that controls how the OTP is delivered when phone verification is required.
+    /// Conformers that do not need to control OTP delivery may omit this overload — the default implementation
+    /// drops `deliveryMethod` and forwards to the base overload.
     ///
     /// - Parameters:
     ///   - email:          Email address of the user. Defaults to `nil`.

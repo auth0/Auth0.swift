@@ -519,10 +519,23 @@ class AuthenticationErrorSpec: QuickSpec {
                 let values: [String: Any] = [
                     "error": "invalid_request",
                     "error_description": "Missing required parameter",
-                    "auth_session": "pas_sess_123"
+                    "auth_session": "pas_sess_123",
+                    "verification_required": ["email"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
                 expect(error.isPasskeyVerificationRetryable) == false
+                expect(error.passkeyVerificationRequired).to(beNil())
+            }
+
+            it("should return nil passkeyVerificationRequired for terminal invalid_grant with verification_required present") {
+                let values: [String: Any] = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid or expired session",
+                    "verification_required": ["email"]
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.isPasskeyVerificationRetryable) == false
+                expect(error.passkeyVerificationRequired).to(beNil())
             }
 
             it("should decode mfa required payload without mfa_requirements") {

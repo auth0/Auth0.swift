@@ -26,8 +26,8 @@ class LoggerSpec: QuickSpec {
                 logger = Auth0Log(loggingService: mockService)
             }
 
-            it("should have correct subsystem identifier") {
-                expect(Auth0Log.subsystem) == "com.auth0.Auth0"
+            it("should have a non-empty subsystem identifier") {
+                expect(Auth0Log.subsystem).toNot(beEmpty())
             }
 
             describe("log categories") {

@@ -220,6 +220,9 @@ final class ContentViewModel: ObservableObject {
             collectedVerificationCodes = [:]
             pendingSignupPasskey = nil
             otpDigits = Array(repeating: "", count: 6)
+            if #available(iOS 16.6, *) {
+                presentNextPasskeyVerificationChannel()
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -234,6 +237,7 @@ final class ContentViewModel: ObservableObject {
             return
         }
         collectedVerificationCodes[channel] = code
+        guard !pendingVerificationChannels.isEmpty else { return }
         pendingVerificationChannels.removeFirst()
         showOTPSheet = false
 
@@ -284,10 +288,21 @@ final class ContentViewModel: ObservableObject {
             clearPendingPasskeySignup()
             isAuthenticated = true
         } catch let error as AuthenticationError where error.isPasskeyVerificationRetryable {
-            // Wrong OTP or a missing code — the session is still alive. Ask only for the failed channels. 
+            // Wrong OTP — the session is still alive. Refresh the auth_session so the next attempt
+            // uses the server-issued session token from this response (the original is now invalid).
             let failedChannels = error.passkeyVerificationRequired ?? pendingVerificationChannels
             pendingVerificationChannels = failedChannels.uniqued()
             collectedVerificationCodes = [:]
+            if let newSession = error.passkeyAuthSession, let existing = pendingPasskeySignupChallenge {
+                pendingPasskeySignupChallenge = PasskeySignupChallenge(
+                    authenticationSession: newSession,
+                    relyingPartyId: existing.relyingPartyId,
+                    userId: existing.userId,
+                    userName: existing.userName,
+                    challengeData: existing.challengeData,
+                    verificationRequired: failedChannels.isEmpty ? nil : failedChannels
+                )
+            }
             isRetryingPasskeyVerification = true
             errorMessage = "Incorrect code. Please try again."
             isLoading = false
@@ -295,6 +310,8 @@ final class ContentViewModel: ObservableObject {
             return
         } catch let error as CredentialsManagerError {
             errorMessage = handleCredentialsManagerError(error)
+        } catch let error as AuthenticationError where error.isNetworkError {
+            errorMessage = error.localizedDescription
         } catch {
             // Terminal (exhausted attempts, expired session, unknown session).
             clearPendingPasskeySignup()
@@ -425,7 +442,6 @@ final class ContentViewModel: ObservableObject {
 
     func checkAuthentication() async {
         do {
-            try await credentialsManager.clearAll()
             _ = try await credentialsManager.credentials()
             isAuthenticated = true
         } catch let error as CredentialsManagerError {
