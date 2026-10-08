@@ -51,7 +51,7 @@ struct DefaultLogger: Logger {
             output.log(message: "\(method) \(url) HTTP/1.1")
             session.configuration.httpAdditionalHeaders?.forEach { key, value in output.log(message: "\(key): \(value)") }
             request.allHTTPHeaderFields?.forEach { key, value in output.log(message: "\(key): \(value)") }
-            if let data = request.httpBody, let string = String(data: data, encoding: .utf8) {
+            if let data = request.httpBody, let string = SensitiveDataRedactor.redact(data) {
                 output.newLine()
                 output.log(message: string)
             }
