@@ -1217,6 +1217,25 @@ do {
 ```
 </details>
 
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .getUserProfile()
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { profile in
+        print("Got profile: \(profile)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
 Use `GetUserProfileOptions` to filter the returned fields:
 
 ```swift
@@ -1273,6 +1292,25 @@ do {
 } catch {
     print("Failed with: \(error)")
 }
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .updateUserProfile(UpdateUserProfileRequest(nickname: "wonderland_alice"))
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { profile in
+        print("Updated profile: \(profile)")
+    })
+    .store(in: &cancellables)
 ```
 </details>
 
