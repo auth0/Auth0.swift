@@ -4,6 +4,7 @@
 
 - [Obtain a client](#obtain-a-client)
 - [Start the flow and step through next actions](#start-the-flow-and-step-through-next-actions)
+- [MFA flows](#mfa-flows)
 - [Error handling during the flow](#error-handling-during-the-flow)
 
 ### Embedded Authorization flow
@@ -50,13 +51,35 @@ func handleNextActions(_ actions: [NextAction]) async throws -> Credentials {
         let email = // … collect email from your UI …
         try await client.identify(email, type: .email).start()
         throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
+    case .identifyPhone:
+        let phone = // … collect phone number from your UI …
+        try await client.identify(phone, type: .phone).start()
+        throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
     case .challengeEmail(let index, let identifier):
         // identifier is the masked destination, e.g. "al**@example.com"
         try await client.challengeEmail(index: index).start()
         throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
+    case .challengePhone(let index, let identifier, let deliveryMethods):
+        // Pick a delivery method from deliveryMethods and show identifier to the user
+        let method = deliveryMethods.first ?? .text
+        try await client.challengePhone(index: index, deliveryMethod: method).start()
+        throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
+    case .challengePush(let index, let name):
+        // name is the display name of the push device, e.g. "Diego's iPhone"
+        try await client.challengePush(index: index).start()
+        throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
     case .verifyOTP(let channel, let identifier):
         let otp = // … collect OTP from your UI (shown at: identifier ?? "") …
         return try await client.verifyOtp(otp, type: channel == .totp ? .totp : .oob).start()
+    case .verifyOob(let pollInMs):
+        return try await pollForPushApproval(pollInMs: pollInMs)
+    case .verifyRecoveryCode:
+        let code = // … collect recovery code from your UI …
+        try await client.verifyRecoveryCode(code).start()
+        throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
+    case .confirmRecoveryCode(let newCode):
+        // Display newCode to the user so they can record it before continuing.
+        return try await client.confirmRecoveryCode().start()
     case .unknown:
         throw EmbeddedAuthError(info: ["error": "unsupported_action"], statusCode: 0)
     }
@@ -86,6 +109,53 @@ Auth0.embeddedAuth()
 ```
 </details>
 
+#### MFA flows
+
+After the primary factor succeeds the server may require a second factor. The `nextActions` in the continuation will include the user's eligible MFA factors. Handle them just like any other continuation step.
+
+**Push notification (polling)**
+
+```swift
+func pollForPushApproval(pollInMs: Int) async throws -> Credentials {
+    while true {
+        do {
+            return try await client.verifyOob().start()
+        } catch let error as EmbeddedAuthError {
+            switch error.reason {
+            case .insufficientAuthorization(.authorizationPending, let next):
+                // Still waiting — sleep and try again using the updated poll interval.
+                let intervalMs = next.compactMap {
+                    if case .verifyOob(let ms) = $0 { return ms } else { return nil }
+                }.first ?? pollInMs
+                try await Task.sleep(nanoseconds: UInt64(intervalMs) * 1_000_000)
+            case .insufficientAuthorization(.slowDown, _):
+                // Polling too fast — back off before retrying.
+                try await Task.sleep(nanoseconds: UInt64(pollInMs) * 2 * 1_000_000)
+            default:
+                throw error
+            }
+        }
+    }
+}
+```
+
+**Recovery code (with rotation)**
+
+```swift
+// Step 1: submit the current recovery code
+do {
+    try await client.verifyRecoveryCode(currentCode).start()
+} catch let error as EmbeddedAuthError {
+    if case .insufficientAuthorization(_, let next) = error.reason,
+       case .confirmRecoveryCode(let newCode) = next.first {
+        // Step 2: show newCode to the user so they record it
+        showNewRecoveryCode(newCode)
+        // Step 3: confirm and receive credentials
+        let credentials = try await client.confirmRecoveryCode().start()
+    }
+}
+```
+
 #### Error handling during the flow
 
 ```swift
@@ -98,10 +168,16 @@ do {
         // Flow is still live — present the next action's UI.
         _ = nextActions
     case .challengeExpired:
-        // Challenge timed out — call challengeEmail again.
+        // Challenge timed out — call challengeEmail/challengePhone/challengePush again.
         break
     case .tooManyWrongOtpAttempts:
         // Too many wrong attempts — start over with authorize().
+        break
+    case .authorizationRejected:
+        // Push notification was denied — start over with authorize().
+        break
+    case .noEligibleFactors:
+        // User has no enrolled MFA factors — fall back to a redirect-based flow.
         break
     case .accessDenied:
         // Other terminal denial — start over with authorize().
