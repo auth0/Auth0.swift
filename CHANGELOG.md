@@ -1,5 +1,10 @@
 # Change Log
 
+## [Next](https://github.com/auth0/Auth0.swift/compare/3.1.0...HEAD)
+
+**Added**
+- feat: add My Account Profile GET and PATCH APIs (`getUserProfile`, `updateUserProfile`) with `MyAccountProfile`, `GetUserProfileOptions`, and `UpdateUserProfileRequest` types [\#0](https://github.com/auth0/Auth0.swift/pull/0) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [3.1.0](https://github.com/auth0/Auth0.swift/tree/3.1.0) (2026-08-19)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.2...3.1.0)
 

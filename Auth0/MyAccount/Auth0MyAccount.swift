@@ -33,4 +33,37 @@ struct Auth0MyAccount: MyAccount {
         self.logger = logger
     }
 
+    // MARK: - Profile
+
+    func getUserProfile(options: GetUserProfileOptions?) -> any Requestable<MyAccountProfile, MyAccountError> {
+        var parameters: [String: Any] = [:]
+        if let fields = options?.fields, !fields.isEmpty {
+            parameters["fields"] = fields.joined(separator: ",")
+            if let includeFields = options?.includeFields {
+                parameters["include_fields"] = includeFields ? "true" : "false"
+            }
+        }
+        return Request(session: session,
+                       url: url.appending("profile"),
+                       method: "GET",
+                       handle: { @Sendable result, callback in myAcccountDecodable(result: result, callback: callback) },
+                       parameters: parameters,
+                       headers: defaultHeaders,
+                       logger: logger,
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
+    }
+
+    func updateUserProfile(_ request: UpdateUserProfileRequest) -> any Requestable<MyAccountProfile, MyAccountError> {
+        return Request(session: session,
+                       url: url.appending("profile"),
+                       method: "PATCH",
+                       handle: { @Sendable result, callback in myAcccountDecodable(result: result, callback: callback) },
+                       parameters: request.toPayload,
+                       headers: defaultHeaders,
+                       logger: logger,
+                       auth0ClientInfo: auth0ClientInfo,
+                       dpop: self.dpop)
+    }
+
 }
