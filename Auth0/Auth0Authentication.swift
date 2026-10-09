@@ -218,7 +218,7 @@ struct Auth0Authentication: Authentication {
                audience: String?,
                scope: String,
                organization: String?,
-               verification: [String: String]?) -> any TokenRequestable<Credentials, AuthenticationError> {
+               verification: [String: String]) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -245,7 +245,9 @@ struct Auth0Authentication: Authentication {
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
         payload["organization"] = organization
-        payload["verification"] = verification
+        if !verification.isEmpty {
+            payload["verification"] = verification
+        }
 
         return TokenRequest(request: Request(session: session,
                                                           url: url,
@@ -271,7 +273,7 @@ struct Auth0Authentication: Authentication {
                           audience: audience,
                           scope: scope,
                           organization: organization,
-                          verification: nil)
+                          verification: [:])
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)

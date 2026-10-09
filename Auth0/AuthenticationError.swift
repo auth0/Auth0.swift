@@ -138,14 +138,14 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
         return self.code == DPoP.nonceRequiredErrorCode
     }
 
-    /// Identifier verification methods still required after a failed passkey token exchange (e.g. `["email", "phone"]`).
+    /// Identifiers that still require a correct one-time code after a failed passkey token exchange (e.g. `[.phone]`).
     ///
     /// Non-`nil` only when the token exchange returned `invalid_grant` and the session is still retryable
     /// (i.e. ``isPasskeyVerificationRetryable`` is `true`).
     /// Use together with ``passkeyAuthSession`` to retry the exchange with the corrected OTP codes.
-    public var passkeyVerificationRequired: [String]? {
+    public var passkeyVerificationRequired: [PasskeyVerificationMethod]? {
         guard isPasskeyVerificationRetryable else { return nil }
-        return self.info["verification_required"] as? [String]
+        return (self.info["verification_required"] as? [String])?.map(PasskeyVerificationMethod.init(rawValue:))
     }
 
     /// The passkey `auth_session` returned in a retryable token-exchange failure.
@@ -160,8 +160,9 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
 
     /// Whether a failed passkey token exchange can be retried on the same session.
     ///
-    /// `true` when `auth_session` is present in an `invalid_grant` response, meaning verification codes were
-    /// wrong or missing but the session still has remaining attempts. `false` when the session is terminal.
+    /// `true` when `auth_session` is present in an `invalid_grant` response, meaning one or more verification codes
+    /// were wrong but the session still has remaining attempts. `false` when the session is terminal. A missing code
+    /// is reported as `invalid_request` instead; resubmit with the same challenge and the missing code included.
     public var isPasskeyVerificationRetryable: Bool {
         return self.code == "invalid_grant" && self.passkeyAuthSession != nil
     }

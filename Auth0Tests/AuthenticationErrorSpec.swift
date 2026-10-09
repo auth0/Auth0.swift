@@ -442,7 +442,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "verification_required": ["email"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.passkeyVerificationRequired) == ["email"]
+                expect(error.passkeyVerificationRequired) == [.email]
             }
 
             it("should expose passkeyVerificationRequired for multiple methods") {
@@ -453,7 +453,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "verification_required": ["email", "phone"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.passkeyVerificationRequired) == ["email", "phone"]
+                expect(error.passkeyVerificationRequired) == [.email, .phone]
             }
 
             it("should return nil passkeyVerificationRequired when absent") {
@@ -527,7 +527,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.passkeyVerificationRequired).to(beNil())
             }
 
-            it("should return nil passkeyVerificationRequired for terminal invalid_grant with verification_required present") {
+            it("should return nil passkeyVerificationRequired when invalid_grant is terminal despite verification_required") {
                 let values: [String: Any] = [
                     "error": "invalid_grant",
                     "error_description": "Invalid or expired session",

@@ -526,7 +526,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///
     /// - Parameters:
     ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
-    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
+    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
@@ -555,12 +555,12 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///
     /// - Parameters:
     ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
-    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
+    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
     ///   - organization: Identifier of an organization the user is a member of.
-    ///   - verification: OTP codes required to verify ownership of identifiers returned in ``PasskeySignupChallenge/verificationRequired``. For example, `["email": "123456", "phone": "654321"]`. Pass only the keys that are applicable.
+    ///   - verification: One-time codes that verify ownership of the identifiers listed in ``PasskeySignupChallenge/verificationRequired``, keyed by ``PasskeyVerificationMethod/rawValue``. For example, `["email": "123456", "phone": "654321"]`. When retrying after a retryable failure, include only the identifiers listed in ``AuthenticationError/passkeyVerificationRequired``. Defaults to an empty dictionary, in which case no `verification` object is sent.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -575,7 +575,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                audience: String?,
                scope: String,
                organization: String?,
-               verification: [String: String]?) -> any TokenRequestable<Credentials, AuthenticationError>
+               verification: [String: String]) -> any TokenRequestable<Credentials, AuthenticationError>
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
@@ -1312,7 +1312,7 @@ public extension Authentication {
                audience: String? = nil,
                scope: String = defaultScope,
                organization: String? = nil,
-               verification: [String: String]? = nil) -> any TokenRequestable<Credentials, AuthenticationError> {
+               verification: [String: String] = [:]) -> any TokenRequestable<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
