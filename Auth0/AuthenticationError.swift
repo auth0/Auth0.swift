@@ -138,6 +138,35 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
         return self.code == DPoP.nonceRequiredErrorCode
     }
 
+    /// Identifiers that still require a correct one-time code after a failed passkey token exchange (e.g. `[.phone]`).
+    ///
+    /// Non-`nil` only when the token exchange returned `invalid_grant` and the session is still retryable
+    /// (i.e. ``isPasskeyVerificationRetryable`` is `true`).
+    /// Use together with ``passkeyAuthSession`` to retry the exchange with the corrected OTP codes.
+    public var passkeyVerificationRequired: [PasskeyVerificationMethod]? {
+        guard isPasskeyVerificationRetryable else { return nil }
+        return (self.info["verification_required"] as? [String])?.map(PasskeyVerificationMethod.init(rawValue:))
+    }
+
+    /// The passkey `auth_session` returned in a retryable token-exchange failure.
+    ///
+    /// When this is non-`nil` inside an `invalid_grant` error, the session is still alive — retry by passing
+    /// the corrected OTP codes to ``Authentication/login(passkey:challenge:connection:audience:scope:organization:verification:)``.
+    /// When `nil`, the session is terminal and a fresh ``Authentication/passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``
+    /// call is required.
+    public var passkeyAuthSession: String? {
+        return self.info["auth_session"] as? String
+    }
+
+    /// Whether a failed passkey token exchange can be retried on the same session.
+    ///
+    /// `true` when `auth_session` is present in an `invalid_grant` response, meaning one or more verification codes
+    /// were wrong but the session still has remaining attempts. `false` when the session is terminal. A missing code
+    /// is reported as `invalid_request` instead; resubmit with the same challenge and the missing code included.
+    public var isPasskeyVerificationRetryable: Bool {
+        return self.code == "invalid_grant" && self.passkeyAuthSession != nil
+    }
+
 }
 
 // MARK: - Error Messages

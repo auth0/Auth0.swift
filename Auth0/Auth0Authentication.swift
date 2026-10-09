@@ -217,7 +217,8 @@ struct Auth0Authentication: Authentication {
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> {
+               organization: String?,
+               verification: [String: String]) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -244,6 +245,9 @@ struct Auth0Authentication: Authentication {
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
         payload["organization"] = organization
+        if !verification.isEmpty {
+            payload["verification"] = verification
+        }
 
         return TokenRequest(request: Request(session: session,
                                                           url: url,
@@ -254,6 +258,22 @@ struct Auth0Authentication: Authentication {
                                                           auth0ClientInfo: self.auth0ClientInfo,
                                                           dpop: self.dpop),
                              authentication: self)
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: any SignupPasskey,
+               challenge: PasskeySignupChallenge,
+               connection: String?,
+               audience: String?,
+               scope: String,
+               organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> {
+        return self.login(passkey: passkey,
+                          challenge: challenge,
+                          connection: connection,
+                          audience: audience,
+                          scope: scope,
+                          organization: organization,
+                          verification: [:])
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -268,6 +288,33 @@ struct Auth0Authentication: Authentication {
                                 userMetadata: [String: String]?,
                                 connection: String?,
                                 organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           givenName: givenName,
+                                           familyName: familyName,
+                                           nickname: nickname,
+                                           picture: picture,
+                                           userMetadata: userMetadata,
+                                           connection: connection,
+                                           organization: organization,
+                                           deliveryMethod: nil)
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String?,
+                                username: String?,
+                                name: String?,
+                                givenName: String?,
+                                familyName: String?,
+                                nickname: String?,
+                                picture: String?,
+                                userMetadata: [String: String]?,
+                                connection: String?,
+                                organization: String?,
+                                deliveryMethod: DeliveryMethod?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
         let url = URL(string: "passkey/register", relativeTo: self.url)!
 
         var userProfile: [String: Any] = [:]
@@ -287,6 +334,7 @@ struct Auth0Authentication: Authentication {
         payload["realm"] = connection
         payload["organization"] = organization
         payload["user_metadata"] = userMetadata
+        payload["delivery_method"] = deliveryMethod?.rawValue
 
         return Request(session: session,
                        url: url,

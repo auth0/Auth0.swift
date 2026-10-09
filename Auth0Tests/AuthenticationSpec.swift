@@ -11,6 +11,8 @@ import AuthenticationServices
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 private let DomainURL = URL(string: "https://\(Domain)")!
+private let PasskeyDomain = "passkeystestdomain.acmetest.org"
+private let PasskeyDomainURL = URL(string: "http://\(PasskeyDomain)")!
 private let Audience = "https://example.com/api"
 private let Scope = "openid email offline_access"
 private let ExpiresIn: TimeInterval = 3600
@@ -76,6 +78,8 @@ class AuthenticationSpec: QuickSpec {
 
         #if PASSKEYS_PLATFORM
         if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
+            let auth: Authentication = Auth0Authentication(clientId: ClientId, url: PasskeyDomainURL)
+
             struct MockLoginPasskey: LoginPasskey {
                 var userID: Data!
                 var credentialID: Data
@@ -104,14 +108,14 @@ class AuthenticationSpec: QuickSpec {
                                            rawAuthenticatorData: authenticatorData.a0_decodeBase64URLSafe(),
                                            signature: signature.a0_decodeBase64URLSafe())
             let challenge = PasskeyLoginChallenge(authenticationSession: authSession,
-                                                  relyingPartyId: Domain,
+                                                  relyingPartyId: PasskeyDomain,
                                                   challengeData: challengeData)
 
             describe("login with passkey") {
 
                 it("should login with passkey and default parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) &&
+                        $0.isToken(PasskeyDomain) &&
                         $0.hasAtLeast([
                             "client_id": ClientId,
                             "grant_type": PasskeysGrantType,
@@ -143,7 +147,7 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should login with passkey and all parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) &&
+                        $0.isToken(PasskeyDomain) &&
                         $0.hasAtLeast([
                             "client_id": ClientId,
                             "grant_type": PasskeysGrantType,
@@ -184,7 +188,7 @@ class AuthenticationSpec: QuickSpec {
                 }
 
                 it("should use DPoP when it is enabled") {
-                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let auth = Auth0Authentication(clientId: ClientId, url: PasskeyDomainURL).useDPoP()
                     let request = auth.login(passkey: passkey,
                                              challenge: challenge,
                                              connection: ConnectionName,
@@ -210,7 +214,7 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should request passkey login challenge with default parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isPasskeyLoginChallenge(Domain) && $0.hasAtLeast(["client_id": ClientId])
+                        $0.isPasskeyLoginChallenge(PasskeyDomain) && $0.hasAtLeast(["client_id": ClientId])
                     }, response: passkeyLoginChallengeResponse())
 
                     waitUntil(timeout: Timeout) { done in
@@ -225,7 +229,7 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should request passkey login challenge with all parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isPasskeyLoginChallenge(Domain) && $0.hasAtLeast([
+                        $0.isPasskeyLoginChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
                             "realm": ConnectionName,
                             "organization": OrganizationId
@@ -244,7 +248,7 @@ class AuthenticationSpec: QuickSpec {
                 }
 
                 it("should not use DPoP") {
-                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let auth = Auth0Authentication(clientId: ClientId, url: PasskeyDomainURL).useDPoP()
                     let request = auth.passkeyLoginChallenge(connection: ConnectionName)
 
                     expect((request as? Request<PasskeyLoginChallenge, AuthenticationError>)?.dpop).to(beNil())
@@ -267,7 +271,7 @@ class AuthenticationSpec: QuickSpec {
                                                   rawAttestationObject: attestationObject.a0_decodeBase64URLSafe(),
                                                   rawClientDataJSON: clientData.a0_decodeBase64URLSafe()!)
             let signupChallenge = PasskeySignupChallenge(authenticationSession: authSession,
-                                                         relyingPartyId: Domain,
+                                                         relyingPartyId: PasskeyDomain,
                                                          userId: userId.a0_decodeBase64URLSafe()!,
                                                          userName: Email,
                                                          challengeData: challengeData)
@@ -276,7 +280,7 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should login with signup passkey and default parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) &&
+                        $0.isToken(PasskeyDomain) &&
                         $0.hasAtLeast([
                             "client_id": ClientId,
                             "grant_type": PasskeysGrantType,
@@ -305,7 +309,7 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should login with signup passkey and all parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) &&
+                        $0.isToken(PasskeyDomain) &&
                         $0.hasAtLeast([
                             "client_id": ClientId,
                             "grant_type": PasskeysGrantType,
@@ -341,8 +345,101 @@ class AuthenticationSpec: QuickSpec {
 
                 }
 
+                it("should login with signup passkey and verification codes") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession,
+                            "verification": ["email": "123456", "phone": "654321"],
+                            "authn_response": [
+                                "authenticatorAttachment": authenticatorAttachment,
+                                "type": credentialType,
+                                "response": [
+                                    "attestationObject": attestationObject,
+                                    "clientDataJSON": clientData
+                                ]
+                            ]
+                        ])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   connection: nil,
+                                   audience: nil,
+                                   scope: defaultScope,
+                                   organization: nil,
+                                   verification: ["email": "123456", "phone": "654321"])
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                            }
+                    }
+                }
+
+                it("should login with signup passkey when a single email verification code is provided") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession,
+                            "verification": ["email": "123456"],
+                            "authn_response": [
+                                "authenticatorAttachment": authenticatorAttachment,
+                                "type": credentialType,
+                                "response": [
+                                    "attestationObject": attestationObject,
+                                    "clientDataJSON": clientData
+                                ]
+                            ]
+                        ])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   connection: nil,
+                                   audience: nil,
+                                   scope: defaultScope,
+                                   organization: nil,
+                                   verification: ["email": "123456"])
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                            }
+                    }
+                }
+
+                it("should not send verification when no verification codes are provided") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ]) &&
+                        $0.hasNoneOf(["verification"])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   verification: [:])
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                            }
+                    }
+                }
+
                 it("should use DPoP when it is enabled") {
-                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let auth = Auth0Authentication(clientId: ClientId, url: PasskeyDomainURL).useDPoP()
                     let request = auth.login(passkey: signupPasskey,
                                              challenge: signupChallenge,
                                              connection: ConnectionName,
@@ -368,12 +465,12 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should request passkey signup challenge with email and default parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
                             "user_profile": ["email": Email]
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
-                                                                rpId: Domain,
+                                                                rpId: PasskeyDomain,
                                                                 userId: userId,
                                                                 userName: Email,
                                                                 challenge: challengeString))
@@ -390,12 +487,12 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should request passkey signup challenge with phone number and default parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
                             "user_profile": ["phone_number": Phone]
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
-                                                                rpId: Domain,
+                                                                rpId: PasskeyDomain,
                                                                 userId: userId,
                                                                 userName: Phone,
                                                                 challenge: challengeString))
@@ -412,12 +509,12 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should request passkey signup challenge with username and default parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
                             "user_profile": ["username": Username]
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
-                                                                rpId: Domain,
+                                                                rpId: PasskeyDomain,
                                                                 userId: userId,
                                                                 userName: Username,
                                                                 challenge: challengeString))
@@ -434,14 +531,14 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should request passkey signup challenge with all parameters") {
                     NetworkStub.addStub(condition: {
-                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
                             "realm": ConnectionName,
                             "organization": OrganizationId,
                             "user_profile": ["email": Email, "phone_number": Phone, "username": Username, "name": Name]
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
-                                                                rpId: Domain,
+                                                                rpId: PasskeyDomain,
                                                                 userId: userId,
                                                                 userName: Email,
                                                                 userDisplayName: Name,
@@ -465,7 +562,7 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should request passkey signup challenge with additional profile fields") {
                     NetworkStub.addStub(condition: {
-                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
                             "user_profile": [
                                 "email": Email,
@@ -476,7 +573,7 @@ class AuthenticationSpec: QuickSpec {
                             ]
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
-                                                                rpId: Domain,
+                                                                rpId: PasskeyDomain,
                                                                 userId: userId,
                                                                 userName: Email,
                                                                 challenge: challengeString))
@@ -497,13 +594,13 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should request passkey signup challenge with user metadata") {
                     NetworkStub.addStub(condition: {
-                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
                             "user_profile": ["email": Email],
                             "user_metadata": ["signup_source": "ios_app"]
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
-                                                                rpId: Domain,
+                                                                rpId: PasskeyDomain,
                                                                 userId: userId,
                                                                 userName: Email,
                                                                 challenge: challengeString))
@@ -521,7 +618,7 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should request passkey signup challenge with all fields including user metadata") {
                     NetworkStub.addStub(condition: {
-                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
                             "realm": ConnectionName,
                             "organization": OrganizationId,
@@ -538,7 +635,7 @@ class AuthenticationSpec: QuickSpec {
                             "user_metadata": ["key1": "value1"]
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
-                                                                rpId: Domain,
+                                                                rpId: PasskeyDomain,
                                                                 userId: userId,
                                                                 userName: Email,
                                                                 userDisplayName: Name,
@@ -564,8 +661,184 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
 
+                it("should send delivery_method text when specified") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email, "phone_number": Phone],
+                            "delivery_method": "text"
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email,
+                                                    phoneNumber: Phone,
+                                                    username: nil,
+                                                    name: nil,
+                                                    givenName: nil,
+                                                    familyName: nil,
+                                                    nickname: nil,
+                                                    picture: nil,
+                                                    userMetadata: nil,
+                                                    connection: nil,
+                                                    organization: nil,
+                                                    deliveryMethod: .text)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+                }
+
+                it("should send delivery_method voice when specified") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email, "phone_number": Phone],
+                            "delivery_method": "voice"
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email,
+                                                    phoneNumber: Phone,
+                                                    username: nil,
+                                                    name: nil,
+                                                    givenName: nil,
+                                                    familyName: nil,
+                                                    nickname: nil,
+                                                    picture: nil,
+                                                    userMetadata: nil,
+                                                    connection: nil,
+                                                    organization: nil,
+                                                    deliveryMethod: .voice)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+                }
+
+                it("should decode verification_required when present in the challenge response") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email]
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString,
+                                                                verificationRequired: ["email"]))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email)
+                            .start { result in
+                                if case .success(let challenge) = result {
+                                    expect(challenge.verificationRequired) == [.email]
+                                } else {
+                                    fail("Expected success")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should decode verification_required for email and phone") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email]
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString,
+                                                                verificationRequired: ["email", "phone"]))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email)
+                            .start { result in
+                                if case .success(let challenge) = result {
+                                    expect(challenge.verificationRequired) == [.email, .phone]
+                                } else {
+                                    fail("Expected success")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should decode unrecognized verification_required values as unknown") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email]
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString,
+                                                                verificationRequired: ["email", "username"]))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email)
+                            .start { result in
+                                if case .success(let challenge) = result {
+                                    expect(challenge.verificationRequired) == [.email, .unknown("username")]
+                                    expect(challenge.verificationRequired?.map(\.rawValue)) == ["email", "username"]
+                                } else {
+                                    fail("Expected success")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should have nil verificationRequired when absent from challenge response") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email]
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email)
+                            .start { result in
+                                if case .success(let challenge) = result {
+                                    expect(challenge.verificationRequired).to(beNil())
+                                } else {
+                                    fail("Expected success")
+                                }
+                                done()
+                            }
+                    }
+                }
+
                 it("should not use DPoP") {
-                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let auth = Auth0Authentication(clientId: ClientId, url: PasskeyDomainURL).useDPoP()
                     let request = auth.passkeySignupChallenge(email: Email,
                                                               phoneNumber: Phone,
                                                               username: Username,
@@ -573,6 +846,134 @@ class AuthenticationSpec: QuickSpec {
                                                               connection: ConnectionName)
 
                     expect((request as? Request<PasskeySignupChallenge, AuthenticationError>)?.dpop).to(beNil())
+                }
+
+            }
+
+            describe("passkey signup token exchange errors") {
+
+                it("should surface retryable invalid_grant with verification_required and auth_session") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "invalid_grant",
+                        "error_description": "Invalid or expired session",
+                        "auth_session": authSession,
+                        "verification_required": ["email"]
+                    ], statusCode: 400))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge)
+                            .start { result in
+                                if case .failure(let error) = result {
+                                    expect(error.code) == "invalid_grant"
+                                    expect(error.passkeyVerificationRequired) == [.email]
+                                    expect(error.passkeyAuthSession) == authSession
+                                    expect(error.isPasskeyVerificationRetryable) == true
+                                } else {
+                                    fail("Expected failure")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should surface terminal invalid_grant without auth_session") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "invalid_grant",
+                        "error_description": "Invalid or expired session"
+                    ], statusCode: 400))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge)
+                            .start { result in
+                                if case .failure(let error) = result {
+                                    expect(error.code) == "invalid_grant"
+                                    expect(error.passkeyAuthSession).to(beNil())
+                                    expect(error.isPasskeyVerificationRetryable) == false
+                                } else {
+                                    fail("Expected failure")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should surface non-retryable invalid_request when verification code is missing") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "invalid_request",
+                        "error_description": "Missing required parameter: verification"
+                    ], statusCode: 400))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge)
+                            .start { result in
+                                if case .failure(let error) = result {
+                                    expect(error.code) == "invalid_request"
+                                    expect(error.statusCode) == 400
+                                    expect(error.isPasskeyVerificationRetryable) == false
+                                } else {
+                                    fail("Expected failure")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should surface terminal invalid_grant with 403 for unknown or consumed session") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "invalid_grant",
+                        "error_description": "Invalid or expired session"
+                    ], statusCode: 403))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge)
+                            .start { result in
+                                if case .failure(let error) = result {
+                                    expect(error.code) == "invalid_grant"
+                                    expect(error.statusCode) == 403
+                                    expect(error.passkeyAuthSession).to(beNil())
+                                    expect(error.isPasskeyVerificationRetryable) == false
+                                } else {
+                                    fail("Expected failure")
+                                }
+                                done()
+                            }
+                    }
                 }
 
             }

@@ -11,6 +11,9 @@ Signing a user up with a passkey is a three-step process. First, you request a s
 
 Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#before-you-begin) for more information.
 
+> [!NOTE]
+> If your database connection requires email or phone verification, the signup challenge will list the identifiers to verify in `verificationRequired`. See [Sign up with passkey and identifier verification](signup-passkey-verification.md) to learn how to collect and send the one-time codes.
+
 #### 1. Request a signup challenge
 
 You need to provide at least one user identifier when requesting the challenge, along with an optional user display name, and an optional database connection name. If a connection name is not specified, your tenant's default directory will be used.

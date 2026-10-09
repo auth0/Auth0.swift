@@ -1,19 +1,53 @@
 import SwiftUI
 import Auth0
 import Combine
+#if PASSKEYS_PLATFORM
+import AuthenticationServices
+#endif
 
 @MainActor
 final class ContentViewModel: ObservableObject {
     @Published var email: String = ""
+    @Published var phoneNumber: String = ""
     @Published var password: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var isAuthenticated: Bool = false
-    private let credentialsManager: CredentialsManager
+    @Published var showOTPSheet: Bool = false
+    @Published var otpDigits: [String] = Array(repeating: "", count: 6)
+    @Published var otpContext: OTPContext = .passwordless
+    @Published var isRetryingPasskeyVerification: Bool = false
 
+    enum OTPContext {
+        case passwordless
+        case passkeyVerification(channel: PasskeyVerificationMethod)
+    }
+
+    private var pendingPasswordlessChallenge: PasswordlessChallenge?
+    private let credentialsManager: CredentialsManager
     private let authenticationClient: Authentication
+
+    #if PASSKEYS_PLATFORM
+    private var pendingPasskeySignupChallenge: PasskeySignupChallenge?
+    private var pendingVerificationChannels: [PasskeyVerificationMethod] = []
+    private var collectedVerificationCodes: [String: String] = [:]
+    private var pendingPasskeyWindow: UIWindow?
+    // Stored after ASAuthorizationController succeeds so the same credential is reused across OTP retries.
+    private var pendingSignupPasskey: AnyObject?
+    #endif
+
     #if WEB_AUTH_PLATFORM
     private let webAuth: WebAuth
+    #endif
+
+    #if PASSKEYS_PLATFORM
+    private var _passkeyController: Any?
+
+    @available(iOS 16.6, *)
+    private var passkeyController: PasskeyController {
+        if _passkeyController == nil { _passkeyController = PasskeyController() }
+        return _passkeyController as! PasskeyController
+    }
     #endif
 
     init(email: String = "",
@@ -37,6 +71,8 @@ final class ContentViewModel: ObservableObject {
         #endif
     }
 
+    // MARK: - Password Login
+
     func login() async {
         isLoading = true
         errorMessage = nil
@@ -55,16 +91,16 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
+    // MARK: - Web Auth
+
     #if WEB_AUTH_PLATFORM
     func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
-
         do {
             _ = try await webAuth
                 .scope("openid profile email offline_access")
                 .start()
-
             isAuthenticated = true
         } catch let error as CredentialsManagerError {
             errorMessage = handleCredentialsManagerError(error)
@@ -73,7 +109,6 @@ final class ContentViewModel: ObservableObject {
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
-
         isLoading = false
     }
 
@@ -81,13 +116,11 @@ final class ContentViewModel: ObservableObject {
     func webViewLogin() async {
         isLoading = true
         errorMessage = nil
-
         do {
             _ = try await webAuth
                 .provider(WebAuthentication.webViewProvider(style: .pageSheet))
                 .scope("openid profile email offline_access")
                 .start()
-
             isAuthenticated = true
         } catch let error as CredentialsManagerError {
             errorMessage = handleCredentialsManagerError(error)
@@ -96,7 +129,6 @@ final class ContentViewModel: ObservableObject {
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
-
         isLoading = false
     }
     #endif
@@ -114,10 +146,305 @@ final class ContentViewModel: ObservableObject {
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
-
         isLoading = false
     }
     #endif
+
+    // MARK: - Passkeys
+
+    #if PASSKEYS_PLATFORM
+    @available(iOS 16.6, *)
+    func signupWithPasskey(window: UIWindow?) async {
+        guard !email.isEmpty || !phoneNumber.isEmpty else {
+            errorMessage = "Please enter an email or phone number to sign up with a passkey"
+            return
+        }
+        isLoading = true
+        errorMessage = nil
+        do {
+            let challenge = try await authenticationClient
+                .passkeySignupChallenge(
+                    email: email.isEmpty ? nil : email,
+                    phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber,
+                    connection: "Username-Password-Authentication",
+                    deliveryMethod: phoneNumber.isEmpty ? nil : .voice)
+                .start()
+
+            if let channels = challenge.verificationRequired, !channels.isEmpty {
+                pendingPasskeySignupChallenge = challenge
+                pendingPasskeyWindow = window
+                pendingVerificationChannels = channels
+                collectedVerificationCodes = [:]
+                isLoading = false
+                presentNextPasskeyVerificationChannel()
+                return
+            }
+
+            try await completePasskeySignup(challenge: challenge, window: window)
+        } catch let error as ASAuthorizationError where error.code == .canceled {
+            print(error)
+        } catch let error as CredentialsManagerError {
+            print(error)
+            errorMessage = handleCredentialsManagerError(error)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    @available(iOS 16.6, *)
+    private func presentNextPasskeyVerificationChannel() {
+        guard let channel = pendingVerificationChannels.first else {
+            Task { await finalizePasskeySignupVerification() }
+            return
+        }
+        otpDigits = Array(repeating: "", count: 6)
+        otpContext = .passkeyVerification(channel: channel)
+        showOTPSheet = true
+    }
+
+    func resendPasskeyVerificationOTP() async {
+        guard #available(iOS 16.6, *) else { return }
+        isLoading = true
+        errorMessage = nil
+        do {
+            let challenge = try await authenticationClient
+                .passkeySignupChallenge(
+                    email: email.isEmpty ? nil : email,
+                    phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber,
+                    connection: "Username-Password-Authentication",
+                    deliveryMethod: phoneNumber.isEmpty ? nil : .voice)
+                .start()
+            pendingPasskeySignupChallenge = challenge
+            pendingVerificationChannels = challenge.verificationRequired ?? []
+            collectedVerificationCodes = [:]
+            pendingSignupPasskey = nil
+            otpDigits = Array(repeating: "", count: 6)
+            if #available(iOS 16.6, *) {
+                presentNextPasskeyVerificationChannel()
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    func submitPasskeyVerificationOTP() async {
+        guard case .passkeyVerification(let channel) = otpContext else { return }
+        let code = otpDigits.joined()
+        guard code.count == 6 else {
+            errorMessage = "Please enter all 6 digits"
+            return
+        }
+        collectedVerificationCodes[channel.rawValue] = code
+        guard !pendingVerificationChannels.isEmpty else { return }
+        pendingVerificationChannels.removeFirst()
+        showOTPSheet = false
+
+        if #available(iOS 16.6, *) {
+            presentNextPasskeyVerificationChannel()
+        }
+    }
+
+    @available(iOS 16.6, *)
+    private func finalizePasskeySignupVerification() async {
+        guard let challenge = pendingPasskeySignupChallenge else { return }
+
+        isLoading = true
+        errorMessage = nil
+
+        // Create the passkey credential once (only after all OTPs are collected), then reuse it across retries.
+        let passkey: any SignupPasskey
+        if let existing = pendingSignupPasskey as? ASAuthorizationPlatformPublicKeyCredentialRegistration {
+            passkey = existing
+        } else {
+            do {
+                passkeyController.window = pendingPasskeyWindow
+                let registration = try await passkeyController.presentRegistration(challenge: challenge)
+                pendingSignupPasskey = registration
+                passkey = registration
+            } catch let error as ASAuthorizationError where error.code == .canceled {
+                clearPendingPasskeySignup()
+                isLoading = false
+                return
+            } catch {
+                errorMessage = error.localizedDescription
+                isLoading = false
+                return
+            }
+        }
+
+        do {
+            let credentials = try await authenticationClient
+                .login(passkey: passkey,
+                       challenge: challenge,
+                       connection: "Username-Password-Authentication",
+                       scope: "openid profile email offline_access",
+                       verification: collectedVerificationCodes)
+                .validateClaims()
+                .start()
+            try credentialsManager.store(credentials: credentials)
+            // Success — clear all pending state.
+            clearPendingPasskeySignup()
+            isAuthenticated = true
+        } catch let error as AuthenticationError where error.isPasskeyVerificationRetryable {
+            // Wrong OTP — the session is still alive. Reuse the auth_session echoed in this response.
+            let failedChannels = error.passkeyVerificationRequired ?? pendingPasskeySignupChallenge?.verificationRequired ?? []
+            guard !failedChannels.isEmpty else {
+                clearPendingPasskeySignup()
+                errorMessage = "Verification failed. Please try signing up again."
+                isLoading = false
+                return
+            }
+            pendingVerificationChannels = failedChannels.uniqued()
+            collectedVerificationCodes = [:]
+            if let newSession = error.passkeyAuthSession, let existing = pendingPasskeySignupChallenge {
+                pendingPasskeySignupChallenge = PasskeySignupChallenge(
+                    authenticationSession: newSession,
+                    relyingPartyId: existing.relyingPartyId,
+                    userId: existing.userId,
+                    userName: existing.userName,
+                    challengeData: existing.challengeData,
+                    verificationRequired: failedChannels
+                )
+            }
+            isRetryingPasskeyVerification = true
+            errorMessage = "Incorrect code. Please try again."
+            isLoading = false
+            presentNextPasskeyVerificationChannel()
+            return
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
+        } catch let error as AuthenticationError where error.isNetworkError {
+            errorMessage = error.localizedDescription
+        } catch {
+            // Terminal (exhausted attempts, expired session, unknown session).
+            clearPendingPasskeySignup()
+            errorMessage = "Session expired. Please try signing up again."
+        }
+        isLoading = false
+    }
+
+    @available(iOS 16.6, *)
+    private func clearPendingPasskeySignup() {
+        pendingPasskeySignupChallenge = nil
+        pendingSignupPasskey = nil
+        pendingPasskeyWindow = nil
+        pendingVerificationChannels = []
+        collectedVerificationCodes = [:]
+        isRetryingPasskeyVerification = false
+    }
+
+    @available(iOS 16.6, *)
+    private func completePasskeySignup(challenge: PasskeySignupChallenge,
+                                       window: UIWindow?,
+                                       verification: [String: String] = [:]) async throws {
+        passkeyController.window = window
+        let passkey = try await passkeyController.presentRegistration(challenge: challenge)
+        let credentials = try await authenticationClient
+            .login(passkey: passkey,
+                   challenge: challenge,
+                   connection: "Username-Password-Authentication",
+                   scope: "openid profile email offline_access",
+                   verification: verification)
+            .validateClaims()
+            .start()
+        try credentialsManager.store(credentials: credentials)
+        isAuthenticated = true
+    }
+
+    @available(iOS 16.6, *)
+    func loginWithPasskey(window: UIWindow?) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            let challenge = try await authenticationClient
+                .passkeyLoginChallenge(connection: "Username-Password-Authentication")
+                .start()
+            passkeyController.window = window
+            let passkey = try await passkeyController.presentAssertion(challenge: challenge)
+            let credentials = try await authenticationClient
+                .login(passkey: passkey,
+                       challenge: challenge,
+                       connection: "Username-Password-Authentication",
+                       scope: "openid profile email offline_access")
+                .validateClaims()
+                .start()
+            try credentialsManager.store(credentials: credentials)
+            isAuthenticated = true
+        } catch let error as ASAuthorizationError where error.code == .canceled {
+            // user dismissed the sheet — not an error
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+    #endif
+
+    // MARK: - OTP
+
+    func requestOTPChallenge() async {
+        guard !email.isEmpty else {
+            errorMessage = "Please enter your email to receive a passwordless code"
+            return
+        }
+        isLoading = true
+        errorMessage = nil
+        do {
+            let challenge = try await authenticationClient
+                .passwordlessChallenge(email: email, connection: "Username-Password-Authentication", allowSignup: true)
+                .start()
+            pendingPasswordlessChallenge = challenge
+            otpDigits = Array(repeating: "", count: 6)
+            otpContext = .passwordless
+            showOTPSheet = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    func loginWithOTP() async {
+        guard let challenge = pendingPasswordlessChallenge else { return }
+        let code = otpDigits.joined()
+        guard code.count == 6 else {
+            errorMessage = "Please enter all 6 digits"
+            return
+        }
+        isLoading = true
+        errorMessage = nil
+        do {
+            let credentials = try await authenticationClient
+                .login(otp: code, challenge: challenge, scope: "openid profile email offline_access")
+                .validateClaims()
+                .start()
+            try credentialsManager.store(credentials: credentials)
+            showOTPSheet = false
+            pendingPasswordlessChallenge = nil
+            isAuthenticated = true
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    // MARK: - Session
+
+    func clearCredentials() {
+        errorMessage = nil
+        do {
+            try credentialsManager.clear()
+            isAuthenticated = false
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 
     func checkAuthentication() async {
         do {
@@ -131,6 +458,8 @@ final class ContentViewModel: ObservableObject {
             isAuthenticated = false
         }
     }
+
+    // MARK: - Error Handling
 
     private func handleCredentialsManagerError(_ error: CredentialsManagerError) -> String {
         switch error {
@@ -160,3 +489,80 @@ extension Array where Element: Hashable {
         return filter { seen.insert($0).inserted }
     }
 }
+
+// MARK: - PasskeyController
+
+#if PASSKEYS_PLATFORM
+@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+final class PasskeyController: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+
+    var window: UIWindow?
+
+    private var registrationContinuation: CheckedContinuation<ASAuthorizationPlatformPublicKeyCredentialRegistration, Error>?
+    private var assertionContinuation: CheckedContinuation<ASAuthorizationPlatformPublicKeyCredentialAssertion, Error>?
+    private var authController: ASAuthorizationController?
+
+    func presentRegistration(challenge: PasskeySignupChallenge) async throws -> ASAuthorizationPlatformPublicKeyCredentialRegistration {
+        try await withCheckedThrowingContinuation { continuation in
+            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+                relyingPartyIdentifier: challenge.relyingPartyId
+            )
+            let request = provider.createCredentialRegistrationRequest(
+                challenge: challenge.challengeData,
+                name: challenge.userName,
+                userID: challenge.userId
+            )
+            registrationContinuation = continuation
+            let controller = ASAuthorizationController(authorizationRequests: [request])
+            controller.delegate = self
+            controller.presentationContextProvider = self
+            authController = controller
+            controller.performRequests()
+        }
+    }
+
+    func presentAssertion(challenge: PasskeyLoginChallenge) async throws -> ASAuthorizationPlatformPublicKeyCredentialAssertion {
+        try await withCheckedThrowingContinuation { continuation in
+            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+                relyingPartyIdentifier: challenge.relyingPartyId
+            )
+            let request = provider.createCredentialAssertionRequest(challenge: challenge.challengeData)
+            assertionContinuation = continuation
+            let controller = ASAuthorizationController(authorizationRequests: [request])
+            controller.delegate = self
+            controller.presentationContextProvider = self
+            authController = controller
+            controller.performRequests()
+        }
+    }
+
+    // MARK: ASAuthorizationControllerPresentationContextProviding
+
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        window ?? UIWindow()
+    }
+
+    // MARK: ASAuthorizationControllerDelegate
+
+    func authorizationController(controller: ASAuthorizationController,
+                                 didCompleteWithAuthorization authorization: ASAuthorization) {
+        defer { authController = nil }
+        if let cred = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration {
+            registrationContinuation?.resume(returning: cred)
+            registrationContinuation = nil
+        } else if let cred = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion {
+            assertionContinuation?.resume(returning: cred)
+            assertionContinuation = nil
+        }
+    }
+
+    func authorizationController(controller: ASAuthorizationController,
+                                 didCompleteWithError error: Error) {
+        defer { authController = nil }
+        registrationContinuation?.resume(throwing: error)
+        registrationContinuation = nil
+        assertionContinuation?.resume(throwing: error)
+        assertionContinuation = nil
+    }
+}
+#endif
