@@ -526,7 +526,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///
     /// - Parameters:
     ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
-    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
+    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
@@ -548,19 +548,24 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
     /// Logs a new user in using a signup passkey credential with identifier verification.
     ///
-    /// Extend ``login(passkey:challenge:connection:audience:scope:organization:)`` by passing OTP codes
-    /// collected during identifier verification. Conformers that do not need to support identifier
-    /// verification may omit this overload — the default implementation drops `verification` and
-    /// forwards to the base overload.
+    /// Extends ``login(passkey:challenge:connection:audience:scope:organization:)`` by passing the one-time codes
+    /// collected during identifier verification.
+    ///
+    /// Conformers must implement this requirement to support identifier verification. A conformer that doesn't
+    /// implement it keeps working for signups that need no verification, because when `verification` is empty the
+    /// default implementation forwards to the base overload. The default implementation has nothing to forward
+    /// non-empty codes to, so a conformer that can receive codes must implement this requirement.
     ///
     /// - Parameters:
     ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
-    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
+    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
     ///   - organization: Identifier of an organization the user is a member of.
-    ///   - verification: OTP codes required to verify ownership of identifiers returned in ``PasskeySignupChallenge/verificationRequired``. For example, `["email": "123456", "phone": "654321"]`. Pass only the keys that are applicable.
+    ///   - verification: One-time codes that verify ownership of the identifiers listed in ``PasskeySignupChallenge/verificationRequired``, keyed by ``PasskeyVerificationMethod``. For example, `[.email: "123456", .phone: "654321"]`.
+    ///                  When retrying after a wrong code, include only the identifiers listed in ``AuthenticationError/passkeyVerificationRequired``.
+    ///                  Every identifier in ``PasskeySignupChallenge/verificationRequired`` needs a non-empty code, otherwise the request fails with an `invalid_request` error (see ``AuthenticationError/isPasskeyVerificationCodeMissing``). Defaults to an empty dictionary, in which case no `verification` object is sent.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -575,7 +580,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                audience: String?,
                scope: String,
                organization: String?,
-               verification: [String: String]?) -> any TokenRequestable<Credentials, AuthenticationError>
+               verification: [PasskeyVerificationMethod: String]) -> any TokenRequestable<Credentials, AuthenticationError>
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
@@ -634,12 +639,12 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// Then, call ``login(passkey:challenge:connection:audience:scope:organization:verification:)`` with the created
     /// passkey credential and the challenge to log the new user in.
     ///
-    /// If ``PasskeySignupChallenge/verificationRequired`` is non-nil, the server delivers OTP codes to each
-    /// listed channel before the passkey can be used. To resend an OTP — for example when the user taps
-    /// "Resend code" — call `passkeySignupChallenge` again with the **same** `email`, `phoneNumber`, and
-    /// `deliveryMethod` values. The server issues a new challenge and a fresh OTP. Use that new challenge
-    /// (including its updated `auth_session`) when calling
+    /// If ``PasskeySignupChallenge/verificationRequired`` is non-nil, the server delivers a one-time code to each
+    /// listed identifier, and the codes must be sent along with the passkey in
     /// ``login(passkey:challenge:connection:audience:scope:organization:verification:)``.
+    /// To start over — for example when the user asks for new codes — request a new signup challenge. A new challenge
+    /// comes with its own `auth_session` and challenge data, so create a new passkey credential from it as well; a
+    /// passkey created for a previous challenge can't be used with it.
     ///
     /// - Parameters:
     ///   - email:        Email address of the user. Defaults to `nil`.
@@ -677,8 +682,10 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///
     /// Extends ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:)``
     /// with a `deliveryMethod` parameter that controls how the OTP is delivered when phone verification is required.
-    /// Conformers that do not need to control OTP delivery may omit this overload — the default implementation
-    /// drops `deliveryMethod` and forwards to the base overload.
+    ///
+    /// Conformers must implement this requirement to honor a delivery method. A conformer that doesn't implement it
+    /// keeps working when `deliveryMethod` is `nil`, because the default implementation then forwards to the base
+    /// overload. The default implementation has nothing to forward a delivery method to.
     ///
     /// - Parameters:
     ///   - email:          Email address of the user. Defaults to `nil`.
@@ -1312,7 +1319,17 @@ public extension Authentication {
                audience: String? = nil,
                scope: String = defaultScope,
                organization: String? = nil,
-               verification: [String: String]? = nil) -> any TokenRequestable<Credentials, AuthenticationError> {
+               verification: [PasskeyVerificationMethod: String] = [:]) -> any TokenRequestable<Credentials, AuthenticationError> {
+        // Without codes, forward to the base requirement. Conformers written before `verification` existed implement
+        // only that one; calling the requirement below on them would reach this very method again.
+        if verification.isEmpty {
+            return self.login(passkey: passkey,
+                              challenge: challenge,
+                              connection: connection,
+                              audience: audience,
+                              scope: scope,
+                              organization: organization)
+        }
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
@@ -1335,6 +1352,20 @@ public extension Authentication {
                                 connection: String? = nil,
                                 organization: String? = nil,
                                 deliveryMethod: DeliveryMethod? = nil) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
+        // Without a delivery method, forward to the base requirement (see `login(passkey:...verification:)`).
+        if deliveryMethod == nil {
+            return self.passkeySignupChallenge(email: email,
+                                               phoneNumber: phoneNumber,
+                                               username: username,
+                                               name: name,
+                                               givenName: givenName,
+                                               familyName: familyName,
+                                               nickname: nickname,
+                                               picture: picture,
+                                               userMetadata: userMetadata,
+                                               connection: connection,
+                                               organization: organization)
+        }
         return self.passkeySignupChallenge(email: email,
                                            phoneNumber: phoneNumber,
                                            username: username,

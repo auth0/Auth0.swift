@@ -10,6 +10,7 @@
 - [Reset a password](reset-password.md#reset-a-password)
 - [Log in with passkey](login-passkey.md#log-in-with-passkey)
 - [Sign up with passkey](signup-passkey.md#sign-up-with-passkey)
+- [Sign up with passkey and identifier verification](signup-passkey-verification.md#sign-up-with-passkey-and-identifier-verification)
 - [Passwordless login](passwordless.md#passwordless-login)
 - [Passwordless login with a database connection [EA]](passwordless-database.md#passwordless-login-with-a-database-connection-ea)
 - [Retrieve user information](user-information.md#retrieve-user-information)

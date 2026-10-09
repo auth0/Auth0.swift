@@ -372,7 +372,7 @@ class AuthenticationSpec: QuickSpec {
                                    audience: nil,
                                    scope: defaultScope,
                                    organization: nil,
-                                   verification: ["email": "123456", "phone": "654321"])
+                                   verification: [.email: "123456", .phone: "654321"])
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
                                 done()
@@ -380,7 +380,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
 
-                it("should login with signup passkey and single-channel email verification") {
+                it("should login with signup passkey when a single email verification code is provided") {
                     NetworkStub.addStub(condition: {
                         $0.isToken(PasskeyDomain) &&
                         $0.hasAtLeast([
@@ -407,7 +407,30 @@ class AuthenticationSpec: QuickSpec {
                                    audience: nil,
                                    scope: defaultScope,
                                    organization: nil,
-                                   verification: ["email": "123456"])
+                                   verification: [.email: "123456"])
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                            }
+                    }
+                }
+
+                it("should not send verification when no verification codes are provided") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ]) &&
+                        $0.hasNoneOf(["verification"])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   verification: [:])
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
                                 done()
@@ -638,11 +661,35 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
 
+                it("should not send delivery_method when it is not specified") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email]
+                        ]) &&
+                        $0.hasNoneOf(["delivery_method"])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+                }
+
                 it("should send delivery_method text when specified") {
                     NetworkStub.addStub(condition: {
                         $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
-                            "user_profile": ["email": Email],
+                            "user_profile": ["email": Email, "phone_number": Phone],
                             "delivery_method": "text"
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
@@ -654,7 +701,7 @@ class AuthenticationSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         auth
                             .passkeySignupChallenge(email: Email,
-                                                    phoneNumber: nil,
+                                                    phoneNumber: Phone,
                                                     username: nil,
                                                     name: nil,
                                                     givenName: nil,
@@ -676,7 +723,7 @@ class AuthenticationSpec: QuickSpec {
                     NetworkStub.addStub(condition: {
                         $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
                             "client_id": ClientId,
-                            "user_profile": ["email": Email],
+                            "user_profile": ["email": Email, "phone_number": Phone],
                             "delivery_method": "voice"
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
@@ -688,7 +735,7 @@ class AuthenticationSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         auth
                             .passkeySignupChallenge(email: Email,
-                                                    phoneNumber: nil,
+                                                    phoneNumber: Phone,
                                                     username: nil,
                                                     name: nil,
                                                     givenName: nil,
@@ -724,7 +771,7 @@ class AuthenticationSpec: QuickSpec {
                             .passkeySignupChallenge(email: Email)
                             .start { result in
                                 if case .success(let challenge) = result {
-                                    expect(challenge.verificationRequired) == ["email"]
+                                    expect(challenge.verificationRequired) == [.email]
                                 } else {
                                     fail("Expected success")
                                 }
@@ -751,7 +798,35 @@ class AuthenticationSpec: QuickSpec {
                             .passkeySignupChallenge(email: Email)
                             .start { result in
                                 if case .success(let challenge) = result {
-                                    expect(challenge.verificationRequired) == ["email", "phone"]
+                                    expect(challenge.verificationRequired) == [.email, .phone]
+                                } else {
+                                    fail("Expected success")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should decode unrecognized verification_required values as unknown") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email]
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString,
+                                                                verificationRequired: ["email", "username"]))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email)
+                            .start { result in
+                                if case .success(let challenge) = result {
+                                    expect(challenge.verificationRequired) == [.email, .unknown("username")]
+                                    expect(challenge.verificationRequired?.map(\.rawValue)) == ["email", "username"]
                                 } else {
                                     fail("Expected success")
                                 }
@@ -823,9 +898,9 @@ class AuthenticationSpec: QuickSpec {
                             .start { result in
                                 if case .failure(let error) = result {
                                     expect(error.code) == "invalid_grant"
-                                    expect(error.passkeyVerificationRequired) == ["email"]
+                                    expect(error.passkeyVerificationRequired) == [.email]
                                     expect(error.passkeyAuthSession) == authSession
-                                    expect(error.isPasskeyVerificationRetryable) == true
+                                    expect(error.isPasskeyVerificationCodeInvalid) == true
                                 } else {
                                     fail("Expected failure")
                                 }
@@ -855,7 +930,7 @@ class AuthenticationSpec: QuickSpec {
                                 if case .failure(let error) = result {
                                     expect(error.code) == "invalid_grant"
                                     expect(error.passkeyAuthSession).to(beNil())
-                                    expect(error.isPasskeyVerificationRetryable) == false
+                                    expect(error.isPasskeyVerificationCodeInvalid) == false
                                 } else {
                                     fail("Expected failure")
                                 }
@@ -864,7 +939,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
 
-                it("should surface non-retryable invalid_request when verification code is missing") {
+                it("should report a missing verification code as invalid_request without a session") {
                     NetworkStub.addStub(condition: {
                         $0.isToken(PasskeyDomain) &&
                         $0.hasAtLeast([
@@ -874,7 +949,7 @@ class AuthenticationSpec: QuickSpec {
                         ])
                     }, response: apiFailureResponse(json: [
                         "error": "invalid_request",
-                        "error_description": "Missing required parameter: verification"
+                        "error_description": "Missing required parameter: verification.email"
                     ], statusCode: 400))
 
                     waitUntil(timeout: Timeout) { done in
@@ -885,7 +960,156 @@ class AuthenticationSpec: QuickSpec {
                                 if case .failure(let error) = result {
                                     expect(error.code) == "invalid_request"
                                     expect(error.statusCode) == 400
-                                    expect(error.isPasskeyVerificationRetryable) == false
+                                    expect(error.isPasskeyVerificationCodeMissing) == true
+                                    expect(error.isPasskeyVerificationCodeInvalid) == false
+                                    expect(error.passkeyAuthSession).to(beNil())
+                                } else {
+                                    fail("Expected failure")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should report an empty verification code as invalid_request without a session") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession,
+                            "verification": ["email": ""]
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "invalid_request",
+                        "error_description": "\"verification.email\" is not allowed to be empty"
+                    ], statusCode: 400))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   verification: [.email: ""])
+                            .start { result in
+                                if case .failure(let error) = result {
+                                    expect(error.code) == "invalid_request"
+                                    expect(error.isPasskeyVerificationCodeMissing) == true
+                                    expect(error.isPasskeyVerificationCodeInvalid) == false
+                                    expect(error.passkeyAuthSession).to(beNil())
+                                } else {
+                                    fail("Expected failure")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should not report other invalid_request errors as a missing verification code") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "invalid_request",
+                        "error_description": "realm mismatch"
+                    ], statusCode: 400))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge)
+                            .start { result in
+                                if case .failure(let error) = result {
+                                    expect(error.code) == "invalid_request"
+                                    expect(error.isPasskeyVerificationCodeMissing) == false
+                                    expect(error.isPasskeyVerificationCodeInvalid) == false
+                                } else {
+                                    fail("Expected failure")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should accept the corrected code on the same session after a wrong code") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession,
+                            "verification": ["email": "000000"]
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "invalid_grant",
+                        "error_description": "Invalid or expired session",
+                        "auth_session": authSession,
+                        "verification_required": ["email"]
+                    ], statusCode: 400))
+
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession,
+                            "verification": ["email": "123456"]
+                        ])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   verification: [.email: "000000"])
+                            .start { first in
+                                guard case .failure(let wrongCodeError) = first else {
+                                    fail("Expected failure")
+                                    return done()
+                                }
+                                expect(wrongCodeError.isPasskeyVerificationCodeInvalid) == true
+                                expect(wrongCodeError.passkeyAuthSession) == authSession
+                                expect(wrongCodeError.passkeyVerificationRequired) == [.email]
+
+                                // Same challenge, same passkey, corrected code
+                                auth
+                                    .login(passkey: signupPasskey,
+                                           challenge: signupChallenge,
+                                           verification: [.email: "123456"])
+                                    .start { second in
+                                        expect(second).to(haveCredentials(AccessToken, IdToken))
+                                        done()
+                                    }
+                            }
+                    }
+                }
+
+                it("should surface a rate limit response from the token endpoint") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "too_many_requests",
+                        "error_description": "Rate limit exceeded"
+                    ], statusCode: 429))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge)
+                            .start { result in
+                                if case .failure(let error) = result {
+                                    expect(error.statusCode) == 429
+                                    expect(error.code) == "too_many_requests"
+                                    expect(error.isPasskeyVerificationCodeInvalid) == false
+                                    expect(error.isPasskeyVerificationCodeMissing) == false
                                 } else {
                                     fail("Expected failure")
                                 }
@@ -916,13 +1140,221 @@ class AuthenticationSpec: QuickSpec {
                                     expect(error.code) == "invalid_grant"
                                     expect(error.statusCode) == 403
                                     expect(error.passkeyAuthSession).to(beNil())
-                                    expect(error.isPasskeyVerificationRetryable) == false
+                                    expect(error.isPasskeyVerificationCodeInvalid) == false
                                 } else {
                                     fail("Expected failure")
                                 }
                                 done()
                             }
                     }
+                }
+
+                it("should surface mfa_required with an mfa_token once verification has passed") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "mfa_required",
+                        "error_description": "Multifactor authentication required",
+                        "mfa_token": "test-mfa-token"
+                    ], statusCode: 403))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   verification: [.email: "123456"])
+                            .start { result in
+                                if case .failure(let error) = result {
+                                    expect(error.code) == "mfa_required"
+                                    expect(error.statusCode) == 403
+                                    expect(error.isMultifactorRequired) == true
+                                    expect(error.localizedDescription) == "Multifactor authentication required"
+                                    // The MFA token is what the MFA API needs to continue
+                                    expect(error.mfaRequiredErrorPayload?.mfaToken) == "test-mfa-token"
+                                    // Verification passed, so there is nothing left to retry on the passkey session
+                                    expect(error.passkeyAuthSession).to(beNil())
+                                    expect(error.passkeyVerificationRequired).to(beNil())
+                                    expect(error.isPasskeyVerificationCodeInvalid) == false
+                                } else {
+                                    fail("Expected failure")
+                                }
+                                done()
+                            }
+                    }
+                }
+
+                it("should pass verification and reach mfa_required when a missing code is retried on the same session") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ]) &&
+                        $0.hasNoneOf(["verification"])
+                    }, response: apiFailureResponse(json: [
+                        "error": "invalid_request",
+                        "error_description": "Missing required parameter: verification.email"
+                    ], statusCode: 400))
+
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession,
+                            "verification": ["email": "123456"]
+                        ])
+                    }, response: apiFailureResponse(json: [
+                        "error": "mfa_required",
+                        "error_description": "Multifactor authentication required",
+                        "mfa_token": "test-mfa-token"
+                    ], statusCode: 403))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge)
+                            .start { first in
+                                guard case .failure(let missingCodeError) = first else {
+                                    fail("Expected failure")
+                                    return done()
+                                }
+                                expect(missingCodeError.code) == "invalid_request"
+                                expect(missingCodeError.passkeyAuthSession).to(beNil())
+
+                                // Same challenge, same passkey: the session is still usable, now with the code
+                                auth
+                                    .login(passkey: signupPasskey,
+                                           challenge: signupChallenge,
+                                           verification: [.email: "123456"])
+                                    .start { second in
+                                        if case .failure(let error) = second {
+                                            // mfa_required means the code was accepted
+                                            expect(error.isMultifactorRequired) == true
+                                            expect(error.mfaRequiredErrorPayload?.mfaToken) == "test-mfa-token"
+                                        } else {
+                                            fail("Expected failure")
+                                        }
+                                        done()
+                                    }
+                            }
+                    }
+                }
+
+            }
+
+            describe("conformers written before passkey identifier verification") {
+
+                // These conformers implement neither `login(...verification:)` nor `passkeySignupChallenge(...deliveryMethod:)`.
+                // Calls that don't use the new parameters must reach the requirements they do implement, not recurse.
+
+                it("should forward login without verification to the base requirement") {
+                    let recorder = CallRecorder()
+                    let legacy: Authentication = LegacyAuthentication(
+                        wrapped: Auth0Authentication(clientId: ClientId, url: PasskeyDomainURL),
+                        recorder: recorder
+                    )
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession
+                        ]) &&
+                        $0.hasNoneOf(["verification"])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        legacy
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge)
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                expect(recorder.calls) == ["login(passkey:challenge:connection:audience:scope:organization:)"]
+                                done()
+                            }
+                    }
+                }
+
+                it("should forward login with an empty verification to the base requirement") {
+                    let recorder = CallRecorder()
+                    let legacy: Authentication = LegacyAuthentication(
+                        wrapped: Auth0Authentication(clientId: ClientId, url: PasskeyDomainURL),
+                        recorder: recorder
+                    )
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(PasskeyDomain) && $0.hasNoneOf(["verification"])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        legacy
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
+                                   verification: [:])
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                expect(recorder.calls) == ["login(passkey:challenge:connection:audience:scope:organization:)"]
+                                done()
+                            }
+                    }
+                }
+
+                it("should forward passkeySignupChallenge without a delivery method to the base requirement") {
+                    let recorder = CallRecorder()
+                    let legacy: Authentication = LegacyAuthentication(
+                        wrapped: Auth0Authentication(clientId: ClientId, url: PasskeyDomainURL),
+                        recorder: recorder
+                    )
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(PasskeyDomain) && $0.hasNoneOf(["delivery_method"])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: PasskeyDomain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
+
+                    waitUntil(timeout: Timeout) { done in
+                        legacy
+                            .passkeySignupChallenge(email: Email)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                expect(recorder.calls) == ["passkeySignupChallenge(...organization:)"]
+                                done()
+                            }
+                    }
+                }
+
+            }
+
+            describe("PasskeyVerificationMethod") {
+
+                it("should expose the raw values used by the Authentication API") {
+                    expect(PasskeyVerificationMethod.email.rawValue) == "email"
+                    expect(PasskeyVerificationMethod.phone.rawValue) == "phone"
+                    expect(PasskeyVerificationMethod.unknown("username").rawValue) == "username"
+                }
+
+                it("should map raw values to known cases and keep unrecognized ones") {
+                    expect(PasskeyVerificationMethod(rawValue: "email")) == .email
+                    expect(PasskeyVerificationMethod(rawValue: "phone")) == .phone
+                    expect(PasskeyVerificationMethod(rawValue: "username")) == .unknown("username")
+                }
+
+                it("should compare and hash by raw value") {
+                    expect(PasskeyVerificationMethod.unknown("email")) == PasskeyVerificationMethod.email
+                    expect(Set([PasskeyVerificationMethod.email, .unknown("email"), .phone]).count) == 2
+                }
+
+                it("should decode from a string") {
+                    let data = Data(#"["email","phone","sms"]"#.utf8)
+                    let methods = try? JSONDecoder().decode([PasskeyVerificationMethod].self, from: data)
+                    expect(methods) == [.email, .phone, .unknown("sms")]
                 }
 
             }
@@ -2594,3 +3026,154 @@ class AuthenticationSpec: QuickSpec {
 
     }
 }
+
+#if PASSKEYS_PLATFORM
+
+/// Records which requirements a ``LegacyAuthentication`` received.
+private final class CallRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var recorded: [String] = []
+
+    var calls: [String] {
+        lock.lock()
+        defer { lock.unlock() }
+        return recorded
+    }
+
+    func record(_ call: String) {
+        lock.lock()
+        defer { lock.unlock() }
+        recorded.append(call)
+    }
+}
+
+/// An `Authentication` conformer written before `login(passkey:...verification:)` and
+/// `passkeySignupChallenge(...deliveryMethod:)` existed: it implements every requirement except those two, so it gets
+/// their default implementations. Only the two base requirements it receives are recorded and forwarded to a real client.
+///
+/// Generated from the protocol: when a requirement is added to `Authentication`, this type has to implement it too.
+private struct LegacyAuthentication: Authentication {
+    let wrapped: any Authentication
+    let recorder: CallRecorder
+    var dpop: DPoP?
+    var auth0ClientInfo = Auth0ClientInfo()
+    var logger: Logger?
+
+    let clientId = "CLIENT_ID"
+    let url = URL(string: "http://passkeystestdomain.acmetest.org")!
+    func login(email: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func login(appleAuthorizationCode authorizationCode: String,
+               fullName: PersonNameComponents?,
+               profile: [String: Any]?,
+               audience: String?,
+               scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func login(facebookSessionAccessToken sessionAccessToken: String,
+               profile: [String: Any],
+               audience: String?,
+               scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> any Requestable<DatabaseUser, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    #if PASSKEYS_PLATFORM
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: LoginPasskey,
+               challenge: PasskeyLoginChallenge,
+               connection: String?,
+               audience: String?,
+               scope: String,
+               organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeyLoginChallenge(connection: String?,
+                               organization: String?) -> any Requestable<PasskeyLoginChallenge, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: SignupPasskey,
+               challenge: PasskeySignupChallenge,
+               connection: String?,
+               audience: String?,
+               scope: String,
+               organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> {
+        recorder.record("login(passkey:challenge:connection:audience:scope:organization:)")
+        return wrapped.login(passkey: passkey, challenge: challenge, connection: connection, audience: audience, scope: scope, organization: organization)
+    }
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String?,
+                                username: String?,
+                                name: String?,
+                                givenName: String?,
+                                familyName: String?,
+                                nickname: String?,
+                                picture: String?,
+                                userMetadata: [String: String]?,
+                                connection: String?,
+                                organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
+        recorder.record("passkeySignupChallenge(...organization:)")
+        return wrapped.passkeySignupChallenge(email: email, phoneNumber: phoneNumber, username: username, name: name, givenName: givenName, familyName: familyName, nickname: nickname, picture: picture, userMetadata: userMetadata, connection: connection, organization: organization)
+    }
+    #endif
+    func resetPassword(email: String, connection: String, organization: String?) -> any Requestable<Void, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func startPasswordless(email: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func userInfo(withAccessToken accessToken: String, tokenType: String) -> any Requestable<UserProfile, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func ssoExchange(withRefreshToken refreshToken: String) -> any TokenRequestable<SSOCredentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func revoke(refreshToken: String) -> any Requestable<Void, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func jwks() -> any Requestable<JWKS, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func customTokenExchange(subjectToken: String,
+                             subjectTokenType: String,
+                             audience: String?,
+                             scope: String,
+                             organization: String?,
+                             parameters: [String: Any]) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func passwordlessChallenge(email: String, connection: String, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func passwordlessChallenge(phoneNumber: String, connection: String, deliveryMethod: DeliveryMethod, allowSignup: Bool) -> any Requestable<PasswordlessChallenge, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+    func login(otp: String, challenge: PasswordlessChallenge, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> {
+        fatalError("Not used by this test")
+    }
+}
+
+#endif

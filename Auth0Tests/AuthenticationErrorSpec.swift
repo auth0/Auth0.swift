@@ -442,7 +442,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "verification_required": ["email"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.passkeyVerificationRequired) == ["email"]
+                expect(error.passkeyVerificationRequired) == [.email]
             }
 
             it("should expose passkeyVerificationRequired for multiple methods") {
@@ -453,7 +453,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "verification_required": ["email", "phone"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.passkeyVerificationRequired) == ["email", "phone"]
+                expect(error.passkeyVerificationRequired) == [.email, .phone]
             }
 
             it("should return nil passkeyVerificationRequired when absent") {
@@ -486,7 +486,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.passkeyAuthSession).to(beNil())
             }
 
-            it("should be retryable when invalid_grant has auth_session") {
+            it("should report an invalid code when invalid_grant has auth_session") {
                 let values: [String: Any] = [
                     "error": "invalid_grant",
                     "error_description": "Invalid or expired session",
@@ -494,28 +494,28 @@ class AuthenticationErrorSpec: QuickSpec {
                     "verification_required": ["email"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationRetryable) == true
+                expect(error.isPasskeyVerificationCodeInvalid) == true
             }
 
-            it("should not be retryable when invalid_grant has no auth_session") {
+            it("should not report an invalid code when invalid_grant has no auth_session") {
                 let values = [
                     "error": "invalid_grant",
                     "error_description": "Invalid or expired session"
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationRetryable) == false
+                expect(error.isPasskeyVerificationCodeInvalid) == false
             }
 
-            it("should not be retryable when 403 invalid_grant has no auth_session") {
+            it("should not report an invalid code when 403 invalid_grant has no auth_session") {
                 let values = [
                     "error": "invalid_grant",
                     "error_description": "Invalid or expired session"
                 ]
                 let error = AuthenticationError(info: values, statusCode: 403)
-                expect(error.isPasskeyVerificationRetryable) == false
+                expect(error.isPasskeyVerificationCodeInvalid) == false
             }
 
-            it("should not be retryable for non-invalid_grant errors even with auth_session") {
+            it("should not report an invalid code for non-invalid_grant errors even with auth_session") {
                 let values: [String: Any] = [
                     "error": "invalid_request",
                     "error_description": "Missing required parameter",
@@ -523,19 +523,73 @@ class AuthenticationErrorSpec: QuickSpec {
                     "verification_required": ["email"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationRetryable) == false
+                expect(error.isPasskeyVerificationCodeInvalid) == false
                 expect(error.passkeyVerificationRequired).to(beNil())
             }
 
-            it("should return nil passkeyVerificationRequired for terminal invalid_grant with verification_required present") {
+            it("should return nil passkeyVerificationRequired when invalid_grant is terminal despite verification_required") {
                 let values: [String: Any] = [
                     "error": "invalid_grant",
                     "error_description": "Invalid or expired session",
                     "verification_required": ["email"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationRetryable) == false
+                expect(error.isPasskeyVerificationCodeInvalid) == false
                 expect(error.passkeyVerificationRequired).to(beNil())
+            }
+
+            it("should detect a missing passkey verification code") {
+                let values = [
+                    "error": "invalid_request",
+                    "error_description": "Missing required parameter: verification.email"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.isPasskeyVerificationCodeMissing) == true
+                expect(error.isPasskeyVerificationCodeInvalid) == false
+                expect(error.passkeyAuthSession).to(beNil())
+            }
+
+            it("should detect a missing passkey verification object") {
+                let values = [
+                    "error": "invalid_request",
+                    "error_description": "Missing required parameter: verification"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.isPasskeyVerificationCodeMissing) == true
+            }
+
+            it("should detect an empty passkey verification code") {
+                let values = [
+                    "error": "invalid_request",
+                    "error_description": "\"verification.email\" is not allowed to be empty"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.isPasskeyVerificationCodeMissing) == true
+                expect(error.isPasskeyVerificationCodeInvalid) == false
+            }
+
+            it("should not detect other invalid_request errors as a missing passkey verification code") {
+                let descriptions = [
+                    "realm mismatch",
+                    "client_id mismatch",
+                    "Missing required parameter: auth_session",
+                    "\"verification.email\" length must be less than or equal to 10 characters long",
+                    "\"authn_response\" is not allowed to be empty"
+                ]
+                for description in descriptions {
+                    let values = ["error": "invalid_request", "error_description": description]
+                    let error = AuthenticationError(info: values, statusCode: 400)
+                    expect(error.isPasskeyVerificationCodeMissing) == false
+                }
+            }
+
+            it("should not detect a missing passkey verification code for other error codes") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Missing required parameter: verification.email"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.isPasskeyVerificationCodeMissing) == false
             }
 
             it("should decode mfa required payload without mfa_requirements") {
@@ -550,6 +604,20 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(payload?.mfaToken) == "test-mfa-token"
                 expect(payload?.mfaRequirements.enroll).to(beNil())
                 expect(payload?.mfaRequirements.challenge).to(beNil())
+            }
+
+            it("should treat mfa required from a passkey token exchange as verification passed") {
+                let values: [String: Any] = [
+                    "error": "mfa_required",
+                    "error_description": "Multifactor authentication required",
+                    "mfa_token": "test-mfa-token"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                expect(error.isMultifactorRequired) == true
+                expect(error.mfaRequiredErrorPayload?.mfaToken) == "test-mfa-token"
+                expect(error.isPasskeyVerificationCodeInvalid) == false
+                expect(error.passkeyAuthSession).to(beNil())
+                expect(error.passkeyVerificationRequired).to(beNil())
             }
 
         }

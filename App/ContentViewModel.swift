@@ -20,7 +20,7 @@ final class ContentViewModel: ObservableObject {
 
     enum OTPContext {
         case passwordless
-        case passkeyVerification(channel: String)
+        case passkeyVerification(channel: PasskeyVerificationMethod)
     }
 
     private var pendingPasswordlessChallenge: PasswordlessChallenge?
@@ -29,8 +29,8 @@ final class ContentViewModel: ObservableObject {
 
     #if PASSKEYS_PLATFORM
     private var pendingPasskeySignupChallenge: PasskeySignupChallenge?
-    private var pendingVerificationChannels: [String] = []
-    private var collectedVerificationCodes: [String: String] = [:]
+    private var pendingVerificationChannels: [PasskeyVerificationMethod] = []
+    private var collectedVerificationCodes: [PasskeyVerificationMethod: String] = [:]
     private var pendingPasskeyWindow: UIWindow?
     // Stored after ASAuthorizationController succeeds so the same credential is reused across OTP retries.
     private var pendingSignupPasskey: AnyObject?
@@ -180,7 +180,7 @@ final class ContentViewModel: ObservableObject {
                 return
             }
 
-            try await completePasskeySignup(challenge: challenge, window: window, verification: nil)
+            try await completePasskeySignup(challenge: challenge, window: window)
         } catch let error as ASAuthorizationError where error.code == .canceled {
             print(error)
         } catch let error as CredentialsManagerError {
@@ -280,17 +280,22 @@ final class ContentViewModel: ObservableObject {
                        challenge: challenge,
                        connection: "Username-Password-Authentication",
                        scope: "openid profile email offline_access",
-                       verification: collectedVerificationCodes.isEmpty ? nil : collectedVerificationCodes)
+                       verification: collectedVerificationCodes)
                 .validateClaims()
                 .start()
             try credentialsManager.store(credentials: credentials)
             // Success — clear all pending state.
             clearPendingPasskeySignup()
             isAuthenticated = true
-        } catch let error as AuthenticationError where error.isPasskeyVerificationRetryable {
-            // Wrong OTP — the session is still alive. Refresh the auth_session so the next attempt
-            // uses the server-issued session token from this response (the original is now invalid).
-            let failedChannels = error.passkeyVerificationRequired ?? pendingVerificationChannels
+        } catch let error as AuthenticationError where error.isPasskeyVerificationCodeInvalid {
+            // Wrong OTP — the session is still alive. Reuse the auth_session echoed in this response.
+            let failedChannels = error.passkeyVerificationRequired ?? pendingPasskeySignupChallenge?.verificationRequired ?? []
+            guard !failedChannels.isEmpty else {
+                clearPendingPasskeySignup()
+                errorMessage = "Verification failed. Please try signing up again."
+                isLoading = false
+                return
+            }
             pendingVerificationChannels = failedChannels.uniqued()
             collectedVerificationCodes = [:]
             if let newSession = error.passkeyAuthSession, let existing = pendingPasskeySignupChallenge {
@@ -300,7 +305,7 @@ final class ContentViewModel: ObservableObject {
                     userId: existing.userId,
                     userName: existing.userName,
                     challengeData: existing.challengeData,
-                    verificationRequired: failedChannels.isEmpty ? nil : failedChannels
+                    verificationRequired: failedChannels
                 )
             }
             isRetryingPasskeyVerification = true
@@ -333,7 +338,7 @@ final class ContentViewModel: ObservableObject {
     @available(iOS 16.6, *)
     private func completePasskeySignup(challenge: PasskeySignupChallenge,
                                        window: UIWindow?,
-                                       verification: [String: String]?) async throws {
+                                       verification: [PasskeyVerificationMethod: String] = [:]) async throws {
         passkeyController.window = window
         let passkey = try await passkeyController.presentRegistration(challenge: challenge)
         let credentials = try await authenticationClient
@@ -393,6 +398,7 @@ final class ContentViewModel: ObservableObject {
                 .start()
             pendingPasswordlessChallenge = challenge
             otpDigits = Array(repeating: "", count: 6)
+            otpContext = .passwordless
             showOTPSheet = true
         } catch {
             errorMessage = error.localizedDescription

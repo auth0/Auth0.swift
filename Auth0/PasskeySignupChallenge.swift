@@ -19,8 +19,9 @@ public struct PasskeySignupChallenge: Sendable {
     /// Signup challenge data.
     public let challengeData: Data
 
-    /// Verification methods required before the passkey can be used, if any (e.g. `["email"]`).
-    public let verificationRequired: [String]?
+    /// Identifiers whose ownership must be verified with a one-time code before the signup can complete, if any
+    /// (e.g. `[.email]`). Auth0 sends a code to each listed identifier. `nil` when no verification is required.
+    public let verificationRequired: [PasskeyVerificationMethod]?
 
     /// Creates a new ``PasskeySignupChallenge`` instance.
     ///
@@ -30,13 +31,13 @@ public struct PasskeySignupChallenge: Sendable {
     ///   - userId: Generated unique identifier of the user.
     ///   - userName: A user identifier, like the user's email.
     ///   - challengeData: Signup challenge data.
-    ///   - verificationRequired: Verification methods required before the passkey can be used, if any.
+    ///   - verificationRequired: Identifiers that must be verified with a one-time code, if any.
     public init(authenticationSession: String,
                 relyingPartyId: String,
                 userId: Data,
                 userName: String,
                 challengeData: Data,
-                verificationRequired: [String]? = nil) {
+                verificationRequired: [PasskeyVerificationMethod]? = nil) {
         self.authenticationSession = authenticationSession
         self.relyingPartyId = relyingPartyId
         self.userId = userId
@@ -66,7 +67,7 @@ extension PasskeySignupChallenge: Decodable {
         userId = credentialOptions.user.id
         userName = credentialOptions.user.name
         challengeData = credentialOptions.challengeData
-        verificationRequired = try values.decodeIfPresent([String].self, forKey: .verificationRequired)
+        verificationRequired = try values.decodeIfPresent([PasskeyVerificationMethod].self, forKey: .verificationRequired)
     }
 
 }

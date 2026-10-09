@@ -138,32 +138,58 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
         return self.code == DPoP.nonceRequiredErrorCode
     }
 
-    /// Identifier verification methods still required after a failed passkey token exchange (e.g. `["email", "phone"]`).
+    /// Identifiers that still require a correct one-time code after a failed passkey token exchange (e.g. `[.phone]`).
     ///
-    /// Non-`nil` only when the token exchange returned `invalid_grant` and the session is still retryable
-    /// (i.e. ``isPasskeyVerificationRetryable`` is `true`).
-    /// Use together with ``passkeyAuthSession`` to retry the exchange with the corrected OTP codes.
-    public var passkeyVerificationRequired: [String]? {
-        guard isPasskeyVerificationRetryable else { return nil }
-        return self.info["verification_required"] as? [String]
+    /// Non-`nil` only when ``isPasskeyVerificationCodeInvalid`` is `true`. Use together with ``passkeyAuthSession`` to
+    /// retry the exchange with the corrected codes.
+    ///
+    /// - Note: This is unrelated to ``isVerificationRequired``, which reports the `requires_verification` error.
+    public var passkeyVerificationRequired: [PasskeyVerificationMethod]? {
+        guard isPasskeyVerificationCodeInvalid else { return nil }
+        return (self.info["verification_required"] as? [String])?.map(PasskeyVerificationMethod.init(rawValue:))
     }
 
-    /// The passkey `auth_session` returned in a retryable token-exchange failure.
+    /// The passkey `auth_session` that Auth0 returned together with a failed token exchange, if any.
     ///
-    /// When this is non-`nil` inside an `invalid_grant` error, the session is still alive — retry by passing
-    /// the corrected OTP codes to ``Authentication/login(passkey:challenge:connection:audience:scope:organization:verification:)``.
-    /// When `nil`, the session is terminal and a fresh ``Authentication/passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``
+    /// Auth0 returns it when one or more verification codes were wrong (see ``isPasskeyVerificationCodeInvalid``). It is
+    /// the same session that was sent, and it is still usable: retry by passing the corrected codes to
+    /// ``Authentication/login(passkey:challenge:connection:audience:scope:organization:verification:)``.
+    ///
+    /// `nil` only means that Auth0 didn't return a session with this error. It doesn't mean the session is lost: a missing
+    /// or empty code (see ``isPasskeyVerificationCodeMissing``) is reported without a session too, and the existing
+    /// challenge can still be used. The session is lost when an `invalid_grant` error comes without a session. In that
+    /// case, a fresh ``Authentication/passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``
     /// call is required.
     public var passkeyAuthSession: String? {
         return self.info["auth_session"] as? String
     }
 
-    /// Whether a failed passkey token exchange can be retried on the same session.
+    /// When a one-time code sent for passkey identifier verification was wrong.
     ///
-    /// `true` when `auth_session` is present in an `invalid_grant` response, meaning verification codes were
-    /// wrong or missing but the session still has remaining attempts. `false` when the session is terminal.
-    public var isPasskeyVerificationRetryable: Bool {
+    /// `true` when an `invalid_grant` error includes the `auth_session`: one or more codes were wrong, but the session
+    /// still has remaining attempts. Ask the user again for the codes listed in ``passkeyVerificationRequired``, and retry
+    /// with the **same** passkey credential and ``passkeyAuthSession``.
+    ///
+    /// `false` for an `invalid_grant` error without a session, which is terminal. Also `false` when a code was missing or
+    /// empty; check ``isPasskeyVerificationCodeMissing`` for that.
+    public var isPasskeyVerificationCodeInvalid: Bool {
         return self.code == "invalid_grant" && self.passkeyAuthSession != nil
+    }
+
+    /// When a one-time code required for passkey identifier verification was missing or empty.
+    ///
+    /// Auth0 reports it as an `invalid_request` error without an `auth_session`, for example
+    /// `Missing required parameter: verification.email` or `"verification.email" is not allowed to be empty`.
+    /// The session is still usable: ask the user for the code, and retry with the **same** challenge and passkey
+    /// credential, including the code.
+    ///
+    /// Other `invalid_request` errors, such as a client or realm mismatch, are not covered by this property and can't be
+    /// fixed by providing a code.
+    public var isPasskeyVerificationCodeMissing: Bool {
+        guard self.code == "invalid_request" else { return false }
+        let description = self.localizedDescription
+        return description.hasPrefix("Missing required parameter: verification")
+            || (description.hasPrefix("\"verification.") && description.hasSuffix("is not allowed to be empty"))
     }
 
 }

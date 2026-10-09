@@ -61,6 +61,16 @@ struct ContentView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading || (viewModel.email.isEmpty && viewModel.phoneNumber.isEmpty))
+
+                    Button {
+                        Task {
+                            await viewModel.loginWithPasskey(window: window)
+                        }
+                    } label: {
+                        Label("Login with Passkey", systemImage: "key")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .disabled(viewModel.isLoading)
                 }
                 #endif
 
@@ -129,7 +139,7 @@ struct OTPEntryView: View {
 
     private var channelLabel: String {
         if case .passkeyVerification(let channel) = viewModel.otpContext {
-            return channel == "phone" ? "phone" : "email"
+            return channel == .phone ? "phone" : "email"
         }
         return "email"
     }
@@ -268,8 +278,10 @@ struct OTPInputView: View {
                             if digits.allSatisfy({ $0.count == 1 }) { onComplete() }
                             return
                         }
-                        guard filtered != digits[index] else { return }
-                        digits[index] = filtered
+                        if filtered != newValue {
+                            digits[index] = filtered
+                            return
+                        }
                         if filtered.isEmpty {
                             if index > 0 { focusedIndex = index - 1 }
                         } else {
