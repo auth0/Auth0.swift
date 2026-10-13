@@ -86,6 +86,22 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///   - type: Whether the code is OOB (email/SMS) or TOTP.
     func verifyOtp(_ otp: String, type: OtpType) -> Request<Credentials, EmbeddedAuthError>
 
+    /// Submits the user's password to verify their identity.
+    ///
+    /// Call this when ``NextAction/verifyPassword`` is among the `nextActions`.
+    ///
+    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    /// If a second factor is also required, the request instead fails with
+    /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the MFA actions in `nextActions`.
+    ///
+    /// A wrong password fails with ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidIdentifierOrPassword``;
+    /// the flow stays live, so the user may retry.
+    ///
+    /// Requires an active session.
+    ///
+    /// - Parameter password: The password entered by the user.
+    func verifyPassword(_ password: String) -> Request<Credentials, EmbeddedAuthError>
+
     /// Requests that the server send a phone OTP challenge via SMS or voice.
     ///
     /// Requires an active session.

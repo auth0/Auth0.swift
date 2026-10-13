@@ -79,6 +79,11 @@ public enum EmbeddedAuthErrorReason: Sendable {
         /// The identifier+code pair the user entered was incorrect. They may retry via `nextActions`.
         case invalidIdentifierOrCode
 
+        /// The username or password the user entered was rejected. They may retry via `nextActions`.
+        ///
+        /// Deliberately ambiguous: a wrong password and an unknown user are indistinguishable.
+        case invalidIdentifierOrPassword
+
         /// The authorization is still pending — the user has not yet completed the out-of-band step.
         case authorizationPending
 

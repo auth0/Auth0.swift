@@ -73,6 +73,9 @@ func handleNextActions(_ actions: [NextAction]) async throws -> Credentials {
         return try await client.verifyOtp(otp, type: channel == .totp ? .totp : .oob).start()
     case .verifyOob(let pollInMs):
         return try await pollForPushApproval(pollInMs: pollInMs)
+    case .verifyPassword:
+        let password = // … collect password from your UI …
+        return try await client.verifyPassword(password).start()
     case .verifyRecoveryCode:
         let code = // … collect recovery code from your UI …
         try await client.verifyRecoveryCode(code).start()
@@ -108,6 +111,31 @@ Auth0.embeddedAuth()
     }
 ```
 </details>
+
+#### Password
+
+When `nextActions` contains `.verifyPassword`, submit the user's password with `verifyPassword(_:)`. Like `verifyOtp`, it returns `Credentials` on success. If the user has to complete a second factor, it instead fails with `.insufficientAuthorization` and the MFA actions in `nextActions` (see below).
+
+A wrong password fails with `.insufficientAuthorization(.invalidIdentifierOrPassword, _)`. The flow stays live, so let the user try again. The server deliberately does not say whether the password or the user was wrong.
+
+```swift
+func signIn(password: String) async throws -> Credentials {
+    do {
+        return try await client.verifyPassword(password).start()
+    } catch let error as EmbeddedAuthError {
+        switch error.reason {
+        case .insufficientAuthorization(.invalidIdentifierOrPassword, _):
+            // Show "incorrect username or password" and let the user retry.
+            throw error
+        case .insufficientAuthorization(_, let nextActions):
+            // Password accepted, a second factor is required.
+            return try await handleNextActions(nextActions)
+        default:
+            throw error
+        }
+    }
+}
+```
 
 #### MFA flows
 
@@ -164,6 +192,9 @@ do {
     // Use credentials
 } catch let error as EmbeddedAuthError {
     switch error.reason {
+    case .insufficientAuthorization(.invalidIdentifierOrPassword, _):
+        // Wrong username or password — let the user retry verifyPassword.
+        break
     case .insufficientAuthorization(_, let nextActions):
         // Flow is still live — present the next action's UI.
         _ = nextActions

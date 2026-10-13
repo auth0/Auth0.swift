@@ -88,6 +88,26 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
         }
     }
 
+    /// Submits the user's password to verify their identity.
+    /// On success, internally exchanges the authorization code for ``Credentials``.
+    func verifyPassword(_ password: String) -> Request<Credentials, EmbeddedAuthError> {
+        guard let currentSession else { return missingSessionRequest() }
+        return Request(
+            session: session,
+            url: url.appending("e/authorize"),
+            method: "POST",
+            handle: { [self] result, callback in decodeAuthorizationCodeResponse(result, callback: callback) },
+            parameters: [
+                "client_id": clientId,
+                "action": EmbeddedAction.verifyPassword.rawValue,
+                "password": password,
+                "auth_session": currentSession
+            ],
+            logger: logger,
+            auth0ClientInfo: auth0ClientInfo
+        )
+    }
+
     /// Requests that the server send a phone OTP challenge.
     func challengePhone(index: Int, deliveryMethod: PhoneDeliveryMethod) -> Request<Void, EmbeddedAuthError> {
         guard let currentSession else { return missingSessionRequest() }
