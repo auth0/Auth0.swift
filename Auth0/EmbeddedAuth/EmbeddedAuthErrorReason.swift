@@ -39,6 +39,9 @@ public enum EmbeddedAuthErrorReason: Sendable {
     case accessDenied
 
     /// Terminal: the request was malformed (missing or invalid parameters).
+    ///
+    /// The exception is input the SDK rejects locally before sending anything, such as an empty password
+    /// passed to ``EmbeddedAuth/verifyPassword(_:)``. The session is kept, so the same step can be retried.
     case invalidRequest
 
     /// Terminal: rate-limited by attack-protection (BFP / SIPT).
@@ -78,6 +81,11 @@ public enum EmbeddedAuthErrorReason: Sendable {
 
         /// The identifier+code pair the user entered was incorrect. They may retry via `nextActions`.
         case invalidIdentifierOrCode
+
+        /// The username or password the user entered was rejected. They may retry via `nextActions`.
+        ///
+        /// Deliberately ambiguous: a wrong password and an unknown user are indistinguishable.
+        case invalidIdentifierOrPassword
 
         /// The authorization is still pending — the user has not yet completed the out-of-band step.
         case authorizationPending

@@ -6,7 +6,7 @@ struct SensitiveDataRedactor {
     /// List of sensitive keys that should be redacted at any nesting depth.
     private static let sensitiveKeys: Set<String> = [
         "access_token", "id_token", "refresh_token", "auth_session",
-        "authorization_code", "otp", "code", "new_code"
+        "authorization_code", "otp", "code", "new_code", "password"
     ]
 
     /// Redacts sensitive fields from a JSON body (request or response).

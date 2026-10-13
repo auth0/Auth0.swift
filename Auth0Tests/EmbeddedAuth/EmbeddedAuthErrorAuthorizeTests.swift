@@ -596,4 +596,54 @@ import Foundation
         #expect(methods.contains(.text))
         #expect(methods.contains(.voice))
     }
+
+    // MARK: - verify password
+
+    @Test func reasonIsInvalidIdentifierOrPasswordUnderInsufficientAuthorization() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "invalid_identifier_or_password"],
+            statusCode: 403
+        )
+        guard case .insufficientAuthorization(.invalidIdentifierOrPassword, _) = error.reason else {
+            Issue.record("Expected .invalidIdentifierOrPassword, got \(error.reason)"); return
+        }
+    }
+
+    @Test func invalidIdentifierOrPasswordCarriesNextActions() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "error_description": "invalid_identifier_or_password",
+            "auth_session": "sess_abc",
+            "next": [["action": "action:verify:password:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(.invalidIdentifierOrPassword, let actions) = error.reason else {
+            Issue.record("Expected .invalidIdentifierOrPassword, got \(error.reason)"); return
+        }
+        #expect(actions == [.verifyPassword])
+    }
+
+    @Test func reasonParsesVerifyPassword() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:verify:password:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions == [.verifyPassword])
+    }
+
+    @Test func reasonDecodesVerifyPasswordAlongsideOtherActions() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [
+                ["action": "action:verify:password:v1"],
+                ["action": "action:challenge:email:v1", "index": 0, "identifier": "al**@example.com"]
+            ]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions == [.verifyPassword, .challengeEmail(index: 0, identifier: "al**@example.com")])
+    }
 }

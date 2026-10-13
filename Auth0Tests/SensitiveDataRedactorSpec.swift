@@ -163,6 +163,25 @@ class SensitiveDataRedactorSpec: QuickSpec {
                     expect(result).to(contain("action"))
                 }
 
+                it("should redact password (verify password request body)") {
+                    let json = """
+                    {
+                        "action": "action:verify:password:v1",
+                        "password": "hunter2-super-secret",
+                        "client_id": "abc123"
+                    }
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).toNot(contain("hunter2-super-secret"))
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).to(contain("action:verify:password:v1"))
+                    expect(result).to(contain("client_id"))
+                }
+
                 it("should redact new_code nested inside next array") {
                     let json = """
                     {

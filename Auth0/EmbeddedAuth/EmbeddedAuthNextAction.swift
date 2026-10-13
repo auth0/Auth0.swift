@@ -45,6 +45,9 @@ public enum NextAction: Sendable, Equatable {
     /// - Parameter pollInMs: Milliseconds to wait before calling ``EmbeddedAuth/verifyOob()`` again.
     case verifyOob(pollInMs: Int)
 
+    /// Server expects the user's password via ``EmbeddedAuth/verifyPassword(_:)``.
+    case verifyPassword
+
     /// Server expects a recovery code via ``EmbeddedAuth/verifyRecoveryCode(_:)``.
     case verifyRecoveryCode
 
@@ -108,6 +111,9 @@ enum EmbeddedAction: String, Sendable, CaseIterable {
     /// Poll for push notification approval.
     case verifyOob      = "action:verify:oob:v1"
 
+    /// Submit the user's password.
+    case verifyPassword = "action:verify:password:v1"
+
     /// Submit a recovery code.
     case verifyRecoveryCode  = "action:verify:recovery-code:v1"
 
@@ -142,6 +148,9 @@ public enum EmbeddedCapability: Sendable, Equatable {
     /// SDK can poll for push notification approval.
     case verifyOob
 
+    /// SDK can verify a password.
+    case verifyPassword
+
     /// SDK can submit a recovery code.
     case verifyRecoveryCode
 
@@ -152,7 +161,7 @@ public enum EmbeddedCapability: Sendable, Equatable {
     public static let all: [EmbeddedCapability] = [
         .identifyEmail, .identifyPhone,
         .challengeEmail, .challengePhone, .challengePush,
-        .verifyOTP, .verifyOob,
+        .verifyOTP, .verifyOob, .verifyPassword,
         .verifyRecoveryCode, .confirmRecoveryCode
     ]
 
@@ -165,6 +174,7 @@ public enum EmbeddedCapability: Sendable, Equatable {
         case .challengePush:       return .challengePush
         case .verifyOTP:           return .verifyOTP
         case .verifyOob:           return .verifyOob
+        case .verifyPassword:      return .verifyPassword
         case .verifyRecoveryCode:  return .verifyRecoveryCode
         case .confirmRecoveryCode: return .confirmRecoveryCode
         }
