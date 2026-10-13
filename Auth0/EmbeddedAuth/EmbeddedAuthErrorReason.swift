@@ -39,6 +39,9 @@ public enum EmbeddedAuthErrorReason: Sendable {
     case accessDenied
 
     /// Terminal: the request was malformed (missing or invalid parameters).
+    ///
+    /// The exception is input the SDK rejects locally before sending anything, such as an empty password
+    /// passed to ``EmbeddedAuth/verifyPassword(_:)``. The session is kept, so the same step can be retried.
     case invalidRequest
 
     /// Terminal: rate-limited by attack-protection (BFP / SIPT).

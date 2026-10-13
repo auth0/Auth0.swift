@@ -4,6 +4,7 @@
 
 - [Obtain a client](#obtain-a-client)
 - [Start the flow and step through next actions](#start-the-flow-and-step-through-next-actions)
+- [Password](#password)
 - [MFA flows](#mfa-flows)
 - [Error handling during the flow](#error-handling-during-the-flow)
 
@@ -118,6 +119,8 @@ When `nextActions` contains `.verifyPassword`, submit the user's password with `
 
 A wrong password fails with `.insufficientAuthorization(.invalidIdentifierOrPassword, _)`. The flow stays live, so let the user try again. The server deliberately does not say whether the password or the user was wrong.
 
+An empty password is rejected locally with `.invalidRequest` before any request is sent, and the flow stays live. Disabling the submit button while the field is empty avoids the round trip.
+
 ```swift
 func signIn(password: String) async throws -> Credentials {
     do {
@@ -192,9 +195,6 @@ do {
     // Use credentials
 } catch let error as EmbeddedAuthError {
     switch error.reason {
-    case .insufficientAuthorization(.invalidIdentifierOrPassword, _):
-        // Wrong username or password — let the user retry verifyPassword.
-        break
     case .insufficientAuthorization(_, let nextActions):
         // Flow is still live — present the next action's UI.
         _ = nextActions

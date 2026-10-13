@@ -97,6 +97,9 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// A wrong password fails with ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidIdentifierOrPassword``;
     /// the flow stays live, so the user may retry.
     ///
+    /// An empty password fails locally with ``EmbeddedAuthErrorReason/invalidRequest`` before any request is sent.
+    /// The session is kept, so the user may retry.
+    ///
     /// Requires an active session.
     ///
     /// - Parameter password: The password entered by the user.

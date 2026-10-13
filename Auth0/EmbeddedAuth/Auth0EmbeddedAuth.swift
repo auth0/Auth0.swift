@@ -92,6 +92,13 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     /// On success, internally exchanges the authorization code for ``Credentials``.
     func verifyPassword(_ password: String) -> Request<Credentials, EmbeddedAuthError> {
         guard let currentSession else { return missingSessionRequest() }
+        guard !password.isEmpty else {
+            return locallyFailedRequest(EmbeddedAuthError(
+                info: ["error": "invalid_request",
+                       "error_description": "The password must not be empty."],
+                statusCode: 0
+            ))
+        }
         return Request(
             session: session,
             url: url.appending("e/authorize"),
@@ -294,7 +301,30 @@ extension Auth0EmbeddedAuth {
 
 // MARK: - Private
 
+private struct LocalFailureValidator: RequestValidator {
+
+    let failure: EmbeddedAuthError
+
+    func validate() throws {
+        throw failure
+    }
+
+}
+
 private extension Auth0EmbeddedAuth {
+
+    /// A request that fails with `failure` before any network call, leaving ``currentSession`` untouched.
+    func locallyFailedRequest<T: Sendable>(_ failure: EmbeddedAuthError) -> Request<T, EmbeddedAuthError> {
+        Request(
+            session: session,
+            url: url.appending("e/authorize"),
+            method: "POST",
+            requestValidator: [LocalFailureValidator(failure: failure)],
+            handle: { _, callback in callback(.failure(failure)) },
+            logger: logger,
+            auth0ClientInfo: auth0ClientInfo
+        )
+    }
 
     func missingSessionRequest<T: Sendable>() -> Request<T, EmbeddedAuthError> {
         Request(
