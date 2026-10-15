@@ -20,7 +20,7 @@ public struct PasskeySignupChallenge: Sendable {
     public let challengeData: Data
 
     /// Identifiers whose ownership must be verified with a one-time code before the signup can complete, if any
-    /// (e.g. `[.email]`). Auth0 sends a code to each listed identifier. `nil` when no verification is required.
+    /// (e.g. `[.email]`). Auth0 sends a code to each listed identifier. `nil`, or empty, when no verification is required.
     public let verificationRequired: [PasskeyVerificationMethod]?
 
     /// Creates a new ``PasskeySignupChallenge`` instance.

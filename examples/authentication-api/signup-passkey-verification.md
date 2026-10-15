@@ -14,7 +14,10 @@ The flow is the same as a regular passkey signup, with two additions:
 
 Request the signup challenge as usual. When verifying a phone number, you can use the `deliveryMethod` parameter to choose whether the code is sent by text message (`.text`) or voice call (`.voice`). If you don't set it, Auth0 uses the only method your tenant supports, or text message if it supports both or neither.
 
-If the `deliveryMethod` you request isn't supported for the connection, Auth0 rejects the request with an `invalid_request` error (`The requested media is not supported for this connection`).
+`deliveryMethod` only applies to the **phone** code. If only an email address has to be verified, it is ignored: the request succeeds without an error, even with `.voice`, and the code is sent to the email address as usual. If a phone code has to be sent and the channel you request isn't enabled for the tenant, Auth0 rejects the request with an `invalid_request` error (`The requested media is not supported for this connection`).
+
+> [!IMPORTANT]
+> If you pass an `organization`, use the organization **ID** (`org_…`), not its name. `/passkey/register` rejects a name with `authorization request parameter organization must be an organization id`. Pass the same ID to `login(passkey:…)`.
 
 ```swift
 Auth0
@@ -81,7 +84,9 @@ for method in signupChallenge.verificationRequired ?? [] {
 // e.g. [.email: "123456", .phone: "654321"]
 ```
 
-Every identifier in `verificationRequired` needs a non-empty code. If a code is missing or is an empty string, the login request fails with an `invalid_request` error, which you can detect with `isPasskeyVerificationCodeMissing` (see [Handle verification errors](#5-handle-verification-errors)).
+Only `.email` and `.phone` are accepted as keys by Auth0. A `.unknown` key is rejected by the server as an invalid request.
+
+Every identifier in `verificationRequired` needs a non-empty code. If a code is missing or is an empty string, the login request fails with an `invalid_request` error, so make sure every code is filled in before you call `login` (see [Handle verification errors](#5-handle-verification-errors)).
 
 > [!TIP]
 > Collect the codes **before** creating the passkey credential. That way the user doesn't create a passkey on their device for a signup that never completes.
@@ -162,16 +167,21 @@ Auth0
 
 #### 5. Handle verification errors
 
-If the login request fails, use these `AuthenticationError` properties to decide what to do next:
+If the login request fails, use these `AuthenticationError` properties to decide what to do next.
+
+Auth0 keeps the session, so you can retry on it, when it returns an `auth_session` with an `invalid_grant` or an `invalid_request` error. `isPasskeyVerificationRetryable` is `true` for both, so one check is enough to decide whether to ask for the codes again. `isPasskeyVerificationCodeInvalid` tells you that a code was wrong (`invalid_grant`). Auth0 currently sends the `auth_session` only with `invalid_grant`; the `invalid_request` case is covered so that the check keeps working if that changes.
 
 | Error | Condition | What to do |
 |:------|:----------|:-----------|
-| Wrong code | `isPasskeyVerificationCodeInvalid` is `true` | Ask the user again for the codes of the identifiers listed in `passkeyVerificationRequired`. Retry with the **same** passkey credential and the same `auth_session`, which Auth0 echoes back in `passkeyAuthSession`. |
-| Missing or empty code | `isPasskeyVerificationCodeMissing` is `true` | A code for a required identifier was not sent, or was an empty string. The session stays valid. Ask the user for the code, then retry with the **same** challenge and passkey credential. |
+| Wrong code | `isPasskeyVerificationRetryable` and `isPasskeyVerificationCodeInvalid` are `true` | Ask the user again for the codes of the identifiers listed in `passkeyVerificationRequired`. Retry with the **same** passkey credential and the same `auth_session`, which Auth0 echoes back in `passkeyAuthSession`. Auth0 limits how many wrong codes it accepts, but the response doesn't say how many attempts are left. Once Auth0 ends the session, you get an `invalid_grant` without an `auth_session` (see "Session no longer valid"). Also cap the number of retries in your app, then request a new signup challenge. |
+| Retryable `invalid_request` | `isPasskeyVerificationRetryable` is `true` and `isPasskeyVerificationCodeInvalid` is `false` | An `invalid_request` error that comes with an `auth_session` (Auth0 doesn't send this today). The session is still usable: ask for the codes listed in `passkeyVerificationRequired` and retry with the **same** challenge and passkey credential. |
+| Missing or empty code | `code == "invalid_request"`, when your request had no code, or an empty one, for an identifier in `verificationRequired` | The session stays valid, but Auth0 doesn't send an `auth_session` back, so `isPasskeyVerificationRetryable` is `false`. Ask the user for the code, then retry with the **same** challenge and passkey credential. You can avoid this error by checking every code before you call `login`. |
 | MFA required | `isMultifactorRequired` is `true` (HTTP 403) | Verification passed: the codes were accepted, including after a retry. The tenant requires multifactor authentication before it issues tokens, and the error carries an `mfa_token`. See [Handle MFA required](#6-handle-mfa-required). |
-| Session no longer valid | `code == "invalid_grant"` and `isPasskeyVerificationCodeInvalid` is `false` | The session is expired, used up, or has run out of attempts. Request a new signup challenge and start over. |
+| Too many attempts | `isTooManyAttempts` is `true` (HTTP 429) | Auth0 is rate limiting the requests, per IP address or per tenant, or brute force protection has blocked the user. The body can be plain text (the per-IP limit of `/passkey/register` and `/passkey/challenge`) or JSON, with a code such as `too_many_requests` (tenant-wide limit), `access_denied` (`/oauth/token`) or `too_many_attempts` (brute force protection), so check `isTooManyAttempts` instead of the error code. Wrong codes entered too many times are not reported as a 429: see the wrong code row. Don't retry right away: ask the user to try again later. |
+| Session no longer valid | `code == "invalid_grant"` and `isPasskeyVerificationCodeInvalid` is `false` | The session is expired or already used. Request a new signup challenge and start over. A `403 invalid_grant` without a session is also returned when the user is blocked or the passkey is invalid, and starting over won't help in those cases. |
+| Temporary server error | HTTP 5xx (`server_error`) | Auth0 couldn't check the code against its backend. The session is kept, so retry the same request later. |
 
-A wrong code and a missing code are both retryable on the same session, but they are reported differently. A missing or empty code comes as an `invalid_request` error without an `auth_session`, so `passkeyAuthSession` is `nil` for it. That doesn't mean the session is lost: keep using the `auth_session` of the challenge you already have. For example:
+What Auth0 returns when the `verification` codes have a problem:
 
 | Request | Response | `error_description` |
 |:--------|:---------|:--------------------|
@@ -180,9 +190,9 @@ A wrong code and a missing code are both retryable on the same session, but they
 | `verification` has a wrong `email` code | `400 invalid_grant`, with `auth_session` and `verification_required` | `Invalid or expired session` |
 
 > [!IMPORTANT]
-> Don't check for `code == "invalid_request"` alone to detect a missing code. `invalid_request` is also returned for other problems that providing a code can't fix, such as a client or realm mismatch, or an invalid request body. Use `isPasskeyVerificationCodeMissing`, which only matches the missing and empty code errors.
+> `invalid_request` is also returned for problems that providing a code can't fix, such as a client or realm mismatch, or an invalid request body. Only treat it as a missing code when you know that your request had no code, or an empty one, for an identifier in `verificationRequired`.
 >
-> The error description (available through `localizedDescription`) is meant for debugging. Don't show it to the user, and don't use it to tell a wrong code from an expired session: both can read `Invalid or expired session`. Use `isPasskeyVerificationCodeInvalid` instead, which is `true` only when Auth0 sent back an `auth_session`.
+> Never branch on `error_description`, or on any other message text. It is meant for debugging: don't show it to the user, and don't use it to tell a wrong code from an expired session, because both can read `Invalid or expired session`. Use `isPasskeyVerificationCodeInvalid` or `isPasskeyVerificationRetryable` instead, which only look at the error code and at whether Auth0 sent back an `auth_session`.
 
 The samples below run in an async context, and assume `signupChallenge` is declared with `var`.
 
@@ -214,12 +224,16 @@ do {
 
     // Ask the user again for the codes of `methodsToRetry` only, then retry the login request
     // with the same `signupPasskey`
-} catch let error as AuthenticationError where error.isPasskeyVerificationCodeMissing {
-    // A required code is missing or empty; include it and retry with the same challenge and passkey credential
+} catch let error as AuthenticationError where error.isPasskeyVerificationRetryable {
+    // Auth0 kept the session: ask for the codes in `error.passkeyVerificationRequired` and retry with the same
+    // challenge and passkey credential
     print("Failed with: \(error)")
 } catch let error as AuthenticationError where error.isMultifactorRequired {
     // The codes were accepted, but MFA is required before tokens are issued (see "Handle MFA required")
     print("MFA required")
+} catch let error as AuthenticationError where error.isTooManyAttempts {
+    // Auth0 is rate limiting the requests; ask the user to try again later
+    print("Too many attempts: \(error)")
 } catch let error as AuthenticationError where error.code == "invalid_grant" {
     // The session is no longer valid; request a new signup challenge and start over
     print("Failed with: \(error)")
@@ -249,12 +263,16 @@ Auth0
             print("Wrong code for: \(methodsToRetry)")
             // Update the challenge with `error.passkeyAuthSession`, ask the user again for the codes
             // of `methodsToRetry` only, and retry the login request with the same `signupPasskey`
-        case .failure(let error) where error.isPasskeyVerificationCodeMissing:
-            // A required code is missing or empty; include it and retry with the same challenge and passkey credential
+        case .failure(let error) where error.isPasskeyVerificationRetryable:
+            // Auth0 kept the session: ask for the codes in `error.passkeyVerificationRequired` and retry with the same
+            // challenge and passkey credential
             print("Failed with: \(error)")
         case .failure(let error) where error.isMultifactorRequired:
             // The codes were accepted, but MFA is required before tokens are issued (see "Handle MFA required")
             print("MFA required")
+        case .failure(let error) where error.isTooManyAttempts:
+            // Auth0 is rate limiting the requests; ask the user to try again later
+            print("Too many attempts: \(error)")
         case .failure(let error):
             // e.g. the session is no longer valid; request a new signup challenge and start over
             print("Failed with: \(error)")
@@ -297,3 +315,6 @@ func logIn() async throws -> Credentials? {
     }
 }
 ```
+
+> [!NOTE]
+> If you implement the `Authentication` protocol yourself, for example in a mock or a wrapper, also implement `login(passkey:challenge:connection:audience:scope:organization:verification:)` and `passkeySignupChallenge(…deliveryMethod:)`. A type that doesn't implement them can't be given verification codes or a delivery method.

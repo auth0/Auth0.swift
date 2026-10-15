@@ -298,6 +298,86 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isTooManyAttempts) == true
             }
 
+            it("should detect too many attempts from a rate limited plain text response") {
+                // The body is not JSON, so there is no error code to match: only the status code identifies the response
+                let error = AuthenticationError(description: "Too Many Requests", statusCode: 429)
+                expect(error.code) == nonJSONError
+                expect(error.isTooManyAttempts) == true
+            }
+
+            it("should detect too many attempts from a rate limited response with no body") {
+                let error = AuthenticationError(description: nil, statusCode: 429)
+                expect(error.code) == emptyBodyError
+                expect(error.isTooManyAttempts) == true
+            }
+
+            it("should detect too many attempts from a rate limited JSON response") {
+                let values = [
+                    // Hypothetical body taken from the PRD, not observed from the server (the /oauth/token limiter sends access_denied)
+                    "error": "too_many_requests",
+                    "error_description": "Too many verification attempts. Please try again later."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 429)
+                expect(error.code) == "too_many_requests"
+                expect(error.isTooManyAttempts) == true
+            }
+
+            it("should detect too many attempts from a rate limited JSON response with another error code") {
+                // What the /oauth/token rate limiter sends
+                let values = [
+                    "error": "access_denied",
+                    "error_description": "Too Many Requests"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 429)
+                expect(error.isTooManyAttempts) == true
+            }
+
+            it("should not detect too many attempts from responses that are not rate limited") {
+                expect(AuthenticationError(description: "Too Many Requests", statusCode: 400).isTooManyAttempts) == false
+                expect(AuthenticationError(description: nil, statusCode: 500).isTooManyAttempts) == false
+                expect(AuthenticationError(info: ["error": "too_many_requests"], statusCode: 400).isTooManyAttempts) == false
+                expect(AuthenticationError(info: ["error": "access_denied"], statusCode: 403).isTooManyAttempts) == false
+            }
+
+            describe("the three responses to an attempt limit") {
+
+                it("should detect the brute force block sent as JSON") {
+                    let values = [
+                        "error": "too_many_attempts",
+                        "error_description": "Your account has been blocked after multiple consecutive login attempts. We've sent you a notification via your preferred contact method with instructions on how to unblock it."
+                    ]
+                    let error = AuthenticationError(info: values, statusCode: 429)
+                    expect(error.code) == "too_many_attempts"
+                    expect(error.isTooManyAttempts) == true
+                    expect(error.isPasskeyVerificationCodeInvalid) == false
+                }
+
+                it("should detect the rate limit sent as plain text") {
+                    let error = AuthenticationError(description: "Too Many Requests", statusCode: 429)
+                    expect(error.code) == nonJSONError
+                    expect(error.localizedDescription) == "Too Many Requests"
+                    expect(error.isTooManyAttempts) == true
+                    expect(error.isPasskeyVerificationCodeInvalid) == false
+                }
+
+                it("should detect a wrong code for several identifiers as an invalid code that keeps its session") {
+                    // Not a 429, and nothing in the body says how many attempts are left
+                    let values: [String: Any] = [
+                        "auth_session": "pas_sess_123",
+                        "verification_required": ["email", "phone"],
+                        "error": "invalid_grant",
+                        "error_description": "Invalid or expired session"
+                    ]
+                    let error = AuthenticationError(info: values, statusCode: 400)
+                    expect(error.isPasskeyVerificationCodeInvalid) == true
+                    expect(error.isPasskeyVerificationRetryable) == true
+                    expect(error.passkeyAuthSession) == "pas_sess_123"
+                    expect(error.passkeyVerificationRequired) == [.email, .phone]
+                    expect(error.isTooManyAttempts) == false
+                }
+
+            }
+
             it("should detect invalid credentials") {
                 let values = [
                     "error": "invalid_grant",
@@ -495,6 +575,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
                 expect(error.isPasskeyVerificationCodeInvalid) == true
+                expect(error.isPasskeyVerificationRetryable) == true
             }
 
             it("should not report an invalid code when invalid_grant has no auth_session") {
@@ -515,7 +596,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isPasskeyVerificationCodeInvalid) == false
             }
 
-            it("should not report an invalid code for non-invalid_grant errors even with auth_session") {
+            it("should treat invalid_request with auth_session as retryable but not as a wrong code") {
                 let values: [String: Any] = [
                     "error": "invalid_request",
                     "error_description": "Missing required parameter",
@@ -523,8 +604,83 @@ class AuthenticationErrorSpec: QuickSpec {
                     "verification_required": ["email"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.isPasskeyVerificationRetryable) == true
                 expect(error.isPasskeyVerificationCodeInvalid) == false
-                expect(error.passkeyVerificationRequired).to(beNil())
+                expect(error.passkeyAuthSession) == "pas_sess_123"
+                expect(error.passkeyVerificationRequired) == [.email]
+            }
+
+            describe("isPasskeyVerificationRetryable") {
+
+                it("should be true for invalid_grant with auth_session") {
+                    let values: [String: Any] = [
+                        "error": "invalid_grant",
+                        "error_description": "Invalid or expired session",
+                        "auth_session": "pas_sess_123",
+                        "verification_required": ["email", "phone"]
+                    ]
+                    let error = AuthenticationError(info: values, statusCode: 400)
+                    expect(error.isPasskeyVerificationRetryable) == true
+                }
+
+                it("should be true for invalid_request with auth_session") {
+                    let values: [String: Any] = [
+                        "error": "invalid_request",
+                        "error_description": "Some description",
+                        "auth_session": "pas_sess_123"
+                    ]
+                    let error = AuthenticationError(info: values, statusCode: 400)
+                    expect(error.isPasskeyVerificationRetryable) == true
+                }
+
+                it("should not use the error description to decide") {
+                    // Auth0 sends a missing or empty code without an auth_session. Only the error code and the
+                    // auth_session are looked at, never the description.
+                    let descriptions = [
+                        "Missing required parameter: verification.email",
+                        "\"verification.email\" is not allowed to be empty"
+                    ]
+                    for description in descriptions {
+                        let values = ["error": "invalid_request", "error_description": description]
+                        expect(AuthenticationError(info: values, statusCode: 400).isPasskeyVerificationRetryable) == false
+                    }
+                }
+
+                it("should be false when the session is gone") {
+                    let values = [
+                        "error": "invalid_grant",
+                        "error_description": "Invalid or expired session"
+                    ]
+                    expect(AuthenticationError(info: values, statusCode: 400).isPasskeyVerificationRetryable) == false
+                    expect(AuthenticationError(info: values, statusCode: 403).isPasskeyVerificationRetryable) == false
+                }
+
+                it("should be false for other invalid_request errors without auth_session") {
+                    let values = [
+                        "error": "invalid_request",
+                        "error_description": "realm mismatch"
+                    ]
+                    expect(AuthenticationError(info: values, statusCode: 400).isPasskeyVerificationRetryable) == false
+                }
+
+                it("should be false for other error codes, even with auth_session") {
+                    let values: [String: Any] = [
+                        "error": "access_denied",
+                        "error_description": "Denied",
+                        "auth_session": "pas_sess_123"
+                    ]
+                    expect(AuthenticationError(info: values, statusCode: 403).isPasskeyVerificationRetryable) == false
+                }
+
+                it("should be false for mfa required and for rate limits") {
+                    let mfa = ["error": "mfa_required", "error_description": "Multifactor authentication required", "mfa_token": "token"]
+                    expect(AuthenticationError(info: mfa, statusCode: 403).isPasskeyVerificationRetryable) == false
+
+                    let bruteForce = ["error": "too_many_attempts", "error_description": "Your account has been blocked"]
+                    expect(AuthenticationError(info: bruteForce, statusCode: 429).isPasskeyVerificationRetryable) == false
+                    expect(AuthenticationError(description: "Too Many Requests", statusCode: 429).isPasskeyVerificationRetryable) == false
+                }
+
             }
 
             it("should return nil passkeyVerificationRequired when invalid_grant is terminal despite verification_required") {
@@ -536,60 +692,6 @@ class AuthenticationErrorSpec: QuickSpec {
                 let error = AuthenticationError(info: values, statusCode: 400)
                 expect(error.isPasskeyVerificationCodeInvalid) == false
                 expect(error.passkeyVerificationRequired).to(beNil())
-            }
-
-            it("should detect a missing passkey verification code") {
-                let values = [
-                    "error": "invalid_request",
-                    "error_description": "Missing required parameter: verification.email"
-                ]
-                let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationCodeMissing) == true
-                expect(error.isPasskeyVerificationCodeInvalid) == false
-                expect(error.passkeyAuthSession).to(beNil())
-            }
-
-            it("should detect a missing passkey verification object") {
-                let values = [
-                    "error": "invalid_request",
-                    "error_description": "Missing required parameter: verification"
-                ]
-                let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationCodeMissing) == true
-            }
-
-            it("should detect an empty passkey verification code") {
-                let values = [
-                    "error": "invalid_request",
-                    "error_description": "\"verification.email\" is not allowed to be empty"
-                ]
-                let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationCodeMissing) == true
-                expect(error.isPasskeyVerificationCodeInvalid) == false
-            }
-
-            it("should not detect other invalid_request errors as a missing passkey verification code") {
-                let descriptions = [
-                    "realm mismatch",
-                    "client_id mismatch",
-                    "Missing required parameter: auth_session",
-                    "\"verification.email\" length must be less than or equal to 10 characters long",
-                    "\"authn_response\" is not allowed to be empty"
-                ]
-                for description in descriptions {
-                    let values = ["error": "invalid_request", "error_description": description]
-                    let error = AuthenticationError(info: values, statusCode: 400)
-                    expect(error.isPasskeyVerificationCodeMissing) == false
-                }
-            }
-
-            it("should not detect a missing passkey verification code for other error codes") {
-                let values = [
-                    "error": "invalid_grant",
-                    "error_description": "Missing required parameter: verification.email"
-                ]
-                let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationCodeMissing) == false
             }
 
             it("should decode mfa required payload without mfa_requirements") {
@@ -604,6 +706,17 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(payload?.mfaToken) == "test-mfa-token"
                 expect(payload?.mfaRequirements.enroll).to(beNil())
                 expect(payload?.mfaRequirements.challenge).to(beNil())
+            }
+
+            it("should detect mfa required from a passkey token exchange that carries no mfa token") {
+                let values = [
+                    "error": "mfa_required",
+                    "error_description": "Multifactor authentication required"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                expect(error.isMultifactorRequired) == true
+                expect(error.mfaRequiredErrorPayload).to(beNil())
+                expect(error.isPasskeyVerificationCodeInvalid) == false
             }
 
             it("should treat mfa required from a passkey token exchange as verification passed") {

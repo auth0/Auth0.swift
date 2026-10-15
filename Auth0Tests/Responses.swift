@@ -93,6 +93,18 @@ func apiFailureResponse(string: String, statusCode: Int) -> RequestResponse {
     }
 }
 
+/// A failure response whose body is plain text, such as the `Too Many Requests` the passkey rate limiter sends.
+func plainTextFailureResponse(_ text: String, statusCode: Int) -> RequestResponse {
+    return { request in
+        let data = text.data(using: .utf8)
+        let response = HTTPURLResponse(url: request.url!,
+                                       statusCode: statusCode,
+                                       httpVersion: nil,
+                                       headerFields: ["Content-Type": "text/plain; charset=utf-8"])!
+        return (data, response, nil)
+    }
+}
+
 func dpopErrorResponse(url: URL, nonce: String) -> RequestResponse {
     return { request in
         let headers = ["Content-Type": "application/json", "DPoP-Nonce": nonce]
