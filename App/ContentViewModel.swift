@@ -57,7 +57,7 @@ final class ContentViewModel: ObservableObject {
         self.errorMessage = errorMessage
         self.isAuthenticated = isAuthenticated
         self.authenticationClient = authenticationClient
-        self.credentialsManager = credentialsManager ?? CredentialsManager(authentication: Auth0.authentication().using(logger: ConsolePrintLogger()))
+        self.credentialsManager = credentialsManager ?? CredentialsManager(authentication: Auth0.authentication())
         #if WEB_AUTH_PLATFORM
         self.webAuth = Auth0
             .webAuth()
