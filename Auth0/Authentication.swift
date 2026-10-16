@@ -557,7 +557,9 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///   - organization: Identifier of an organization the user is a member of.
     ///   - verification: One-time codes that verify ownership of the identifiers listed in ``PasskeySignupChallenge/verificationRequired``, keyed by ``PasskeyVerificationMethod``. For example, `[.email: "123456", .phone: "654321"]`.
     ///                  When retrying after a wrong code, include only the identifiers listed in ``AuthenticationError/passkeyVerificationRequired``.
-    ///                  Every identifier in ``PasskeySignupChallenge/verificationRequired`` needs a non-empty code, otherwise the request fails with an `invalid_request` error. Auth0 keeps the session in that case: provide the missing code and retry with the same challenge and passkey credential. Defaults to an empty dictionary, in which case no `verification` object is sent.
+    ///                  Every identifier in ``PasskeySignupChallenge/verificationRequired`` needs a non-empty code, otherwise the request fails with an `invalid_request` error. Auth0 keeps the session in that case: provide the missing code and retry with the same challenge and passkey credential.
+    ///                  Two mistakes are rejected before the request is sent, with an `invalid_request` error: an empty dictionary (`Missing required parameter: verification must have atleast one identifier otp code`) and an email or phone code that is an empty string (`"verification.email" is not allowed to be empty`, or `"verification.phone" is not allowed to be empty`, as Auth0 returns for it).
+    ///                  Defaults to `nil`, in which case no `verification` object is sent. Pass `nil`, not an empty dictionary, when no verification is required.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -572,7 +574,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                audience: String?,
                scope: String,
                organization: String?,
-               verification: [PasskeyVerificationMethod: String]) -> any TokenRequestable<Credentials, AuthenticationError>
+               verification: [PasskeyVerificationMethod: String]?) -> any TokenRequestable<Credentials, AuthenticationError>
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
@@ -1304,7 +1306,7 @@ public extension Authentication {
                audience: String? = nil,
                scope: String = defaultScope,
                organization: String? = nil,
-               verification: [PasskeyVerificationMethod: String] = [:]) -> any TokenRequestable<Credentials, AuthenticationError> {
+               verification: [PasskeyVerificationMethod: String]? = nil) -> any TokenRequestable<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,

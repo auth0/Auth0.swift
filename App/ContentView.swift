@@ -12,9 +12,7 @@ import Auth0
 struct ContentView: View {
     @StateObject private var viewModel = ContentViewModel(authenticationClient: Auth0.authentication())
 
-    #if os(macOS)
-    @State private var currentWindow: Auth0WindowRepresentable?
-    #else
+    #if !os(macOS)
     @Environment(\.window) private var window
     #endif
 
@@ -61,34 +59,33 @@ struct ContentView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading || (viewModel.email.isEmpty && viewModel.phoneNumber.isEmpty))
-
-                    Button {
-                        Task {
-                            await viewModel.loginWithPasskey(window: window)
-                        }
-                    } label: {
-                        Label("Login with Passkey", systemImage: "key")
-                    }
-                    .buttonStyle(SecondaryButtonStyle())
-                    .disabled(viewModel.isLoading)
                 }
                 #endif
 
-                // MARK: Send Email Code (passwordless)
-
-                Button {
-                    Task { await viewModel.requestOTPChallenge() }
-                } label: {
-                    Label("Send email code", systemImage: "envelope")
-                }
-                .buttonStyle(SecondaryButtonStyle())
-                .disabled(viewModel.isLoading || viewModel.email.isEmpty)
-
-                // Inline OTP entry — shown during passkey identifier verification
-                // or when logging in via passwordless email code.
+                // Inline OTP entry — shown during passkey identifier verification.
                 if viewModel.showOTPSheet {
                     OTPEntryView(viewModel: viewModel)
                 }
+
+                // MARK: Web Login and Logout
+
+                #if WEB_AUTH_PLATFORM
+                Button {
+                    Task { await viewModel.webLogin() }
+                } label: {
+                    Label("Web Login", systemImage: "globe")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .disabled(viewModel.isLoading)
+
+                Button {
+                    Task { await viewModel.webLogout() }
+                } label: {
+                    Label("Web Logout", systemImage: "rectangle.portrait.and.arrow.right")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .disabled(viewModel.isLoading)
+                #endif
 
                 // MARK: Clear Credentials
 
@@ -119,11 +116,6 @@ struct ContentView: View {
         .task {
             await viewModel.checkAuthentication()
         }
-        #if os(macOS)
-        .onAppear {
-            currentWindow = getCurrentWindow()
-        }
-        #endif
     }
 }
 
@@ -132,46 +124,29 @@ struct ContentView: View {
 struct OTPEntryView: View {
     @ObservedObject var viewModel: ContentViewModel
 
-    private var isPasskeyVerification: Bool {
-        if case .passkeyVerification = viewModel.otpContext { return true }
-        return false
-    }
-
     private var channelLabel: String {
-        if case .passkeyVerification(let channel) = viewModel.otpContext {
-            return channel == .phone ? "phone" : "email"
-        }
-        return "email"
+        viewModel.otpChannel == .phone ? "phone" : "email"
     }
 
     private var title: String {
-        if isPasskeyVerification {
-            return viewModel.isRetryingPasskeyVerification ? "Retry \(channelLabel) verification" : "Verify \(channelLabel)"
-        }
-        return "Verify Email"
+        viewModel.isRetryingPasskeyVerification ? "Retry \(channelLabel) verification" : "Verify \(channelLabel)"
     }
 
     private var subtitle: String {
-        isPasskeyVerification
-            ? "Enter the 6-digit code sent to your \(channelLabel) to continue passkey registration."
-            : "Enter the 6-digit code sent to\n\(viewModel.email)"
+        "Enter the 6-digit code sent to your \(channelLabel) to continue passkey registration."
     }
 
     @State private var isSubmitting = false
 
     private func submitAction() {
+        #if PASSKEYS_PLATFORM
         guard !isSubmitting else { return }
         isSubmitting = true
         Task {
             defer { isSubmitting = false }
-            if isPasskeyVerification {
-                #if PASSKEYS_PLATFORM
-                await viewModel.submitPasskeyVerificationOTP()
-                #endif
-            } else {
-                await viewModel.loginWithOTP()
-            }
+            await viewModel.submitPasskeyVerificationOTP()
         }
+        #endif
     }
 
     var body: some View {
@@ -203,15 +178,11 @@ struct OTPEntryView: View {
 
             HStack {
                 Button("Resend code") {
+                    #if PASSKEYS_PLATFORM
                     Task {
-                        if isPasskeyVerification {
-                            #if PASSKEYS_PLATFORM
-                            await viewModel.resendPasskeyVerificationOTP()
-                            #endif
-                        } else {
-                            await viewModel.requestOTPChallenge()
-                        }
+                        await viewModel.resendPasskeyVerificationOTP()
                     }
+                    #endif
                 }
                 .font(.subheadline)
                 .disabled(viewModel.isLoading)
@@ -329,20 +300,7 @@ struct SecondaryButtonStyle: ButtonStyle {
     }
 }
 
-#if os(macOS)
-private func getCurrentWindow() -> NSWindow? {
-    if let keyWindow = NSApplication.shared.keyWindow {
-        return keyWindow
-    }
-
-    if let mainWindow = NSApplication.shared.mainWindow {
-        return mainWindow
-    }
-
-    return NSApplication.shared.windows.first
-}
-
-#else
+#if !os(macOS)
 private struct WindowKey: EnvironmentKey {
     static let defaultValue: UIWindow? = nil
 }

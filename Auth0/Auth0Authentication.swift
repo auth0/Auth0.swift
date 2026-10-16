@@ -218,7 +218,7 @@ struct Auth0Authentication: Authentication {
                audience: String?,
                scope: String,
                organization: String?,
-               verification: [PasskeyVerificationMethod: String]) -> any TokenRequestable<Credentials, AuthenticationError> {
+               verification: [PasskeyVerificationMethod: String]?) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -245,18 +245,19 @@ struct Auth0Authentication: Authentication {
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
         payload["organization"] = organization
-        if !verification.isEmpty {
+        if let verification = verification {
             payload["verification"] = verification.reduce(into: [String: String]()) { $0[$1.key.rawValue] = $1.value }
         }
 
         return TokenRequest(request: Request(session: session,
                                                           url: url,
                                                           method: "POST",
-                                                          handle: authenticationDecodable,
+                                                          handle: authenticationValidatedDecodable,
                                                           parameters: payload,
                                                           logger: self.logger,
                                                           auth0ClientInfo: self.auth0ClientInfo,
-                                                          dpop: self.dpop),
+                                                          dpop: self.dpop)
+            .requestValidators([PasskeyVerificationValidator(verification: verification)]),
                              authentication: self)
     }
 
@@ -273,7 +274,7 @@ struct Auth0Authentication: Authentication {
                           audience: audience,
                           scope: scope,
                           organization: organization,
-                          verification: [:])
+                          verification: nil)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)

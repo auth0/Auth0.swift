@@ -28,6 +28,7 @@
 		4BB16993DDF6AA30E97A5B66 /* PARWebAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42370625A7B309DDD4F5A840 /* PARWebAuthSpec.swift */; };
 		4DA2D382B2A64A809FF7AC30 /* Quick in Frameworks */ = {isa = PBXBuildFile; productRef = C5F5F3AEAC454B56A586D024 /* Quick */; };
 		4DB1A784D5BF4CD9C14E9926 /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF978746AFDAE6595E37F3A2 /* AuthorizationCode.swift */; };
+		54E27F6343FED3E1F3F5C2BC /* PasskeyVerificationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF3C9D42C16D88EA09E52F96 /* PasskeyVerificationValidator.swift */; };
 		5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5B16D88E1F7141A0009476A5 /* ASProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* ASProvider.swift */; };
@@ -425,10 +426,13 @@
 		5FDE875D1D8A424700EA27DC /* AuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE874B1D8A424700EA27DC /* AuthenticationError.swift */; };
 		33B3B88876620C8D765524F5 /* PasskeyVerificationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F6DC41338FAFA48EB49CB8 /* PasskeyVerificationMethod.swift */; };
 		5FDE875E1D8A424700EA27DC /* AuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE874B1D8A424700EA27DC /* AuthenticationError.swift */; };
+		9B47AA4B4B524246597C602A /* PasskeyVerificationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF3C9D42C16D88EA09E52F96 /* PasskeyVerificationValidator.swift */; };
 		9D6BAAD5A27A2B857AD1E64E /* PasskeyVerificationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F6DC41338FAFA48EB49CB8 /* PasskeyVerificationMethod.swift */; };
 		5FDE875F1D8A424700EA27DC /* AuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE874B1D8A424700EA27DC /* AuthenticationError.swift */; };
 		A941D36D922B752AB2B31FB1 /* PasskeyVerificationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F6DC41338FAFA48EB49CB8 /* PasskeyVerificationMethod.swift */; };
 		5FDE87601D8A424700EA27DC /* AuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE874B1D8A424700EA27DC /* AuthenticationError.swift */; };
+		C4B65A21E941E6B75DA3BBDD /* PasskeyVerificationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF3C9D42C16D88EA09E52F96 /* PasskeyVerificationValidator.swift */; };
+		C61CF08519D367DA237EB41C /* PasskeyVerificationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF3C9D42C16D88EA09E52F96 /* PasskeyVerificationValidator.swift */; };
 		D428289A5BA6CCCC6B3FDB59 /* PasskeyVerificationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F6DC41338FAFA48EB49CB8 /* PasskeyVerificationMethod.swift */; };
 		5FDE87691D8A424700EA27DC /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE874E1D8A424700EA27DC /* Credentials.swift */; };
 		5FDE876A1D8A424700EA27DC /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE874E1D8A424700EA27DC /* Credentials.swift */; };
@@ -523,6 +527,7 @@
 		C1B3B9EE2C24B6D4004A32A4 /* Auth0Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE87491D8A424700EA27DC /* Auth0Authentication.swift */; };
 		C1B3B9EF2C24B6D4004A32A4 /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE874A1D8A424700EA27DC /* Authentication.swift */; };
 		C1B3B9F02C24B6D4004A32A4 /* AuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE874B1D8A424700EA27DC /* AuthenticationError.swift */; };
+		FDE4B11CCEDC6F5BFECBD043 /* PasskeyVerificationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF3C9D42C16D88EA09E52F96 /* PasskeyVerificationValidator.swift */; };
 		FFC2F17DEE342FEA32213AA7 /* PasskeyVerificationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F6DC41338FAFA48EB49CB8 /* PasskeyVerificationMethod.swift */; };
 		C1B3B9F12C24B6D4004A32A4 /* PasswordlessType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C354C03276CE1A500ADBC86 /* PasswordlessType.swift */; };
 		C1B3B9F22C24B6D4004A32A4 /* MultifactorChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* MultifactorChallenge.swift */; };
@@ -1107,6 +1112,7 @@
 		5FDE87491D8A424700EA27DC /* Auth0Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0Authentication.swift; sourceTree = "<group>"; };
 		5FDE874A1D8A424700EA27DC /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
 		5FDE874B1D8A424700EA27DC /* AuthenticationError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationError.swift; sourceTree = "<group>"; };
+		DF3C9D42C16D88EA09E52F96 /* PasskeyVerificationValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeyVerificationValidator.swift; sourceTree = "<group>"; };
 		F4F6DC41338FAFA48EB49CB8 /* PasskeyVerificationMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeyVerificationMethod.swift; sourceTree = "<group>"; };
 		5FDE874E1D8A424700EA27DC /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
 		5FDE874F1D8A424700EA27DC /* AuthenticationHandlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationHandlers.swift; sourceTree = "<group>"; };
@@ -1758,6 +1764,7 @@
 				5FDE874A1D8A424700EA27DC /* Authentication.swift */,
 				5FDE874B1D8A424700EA27DC /* AuthenticationError.swift */,
 				F4F6DC41338FAFA48EB49CB8 /* PasskeyVerificationMethod.swift */,
+				DF3C9D42C16D88EA09E52F96 /* PasskeyVerificationValidator.swift */,
 				5FDE874F1D8A424700EA27DC /* AuthenticationHandlers.swift */,
 				5C354C03276CE1A500ADBC86 /* PasswordlessType.swift */,
 				D4AC0ECC2FF67AF6001C54C1 /* PasswordlessChallenge.swift */,
@@ -2719,6 +2726,7 @@
 				5C505FD02E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5FDE875D1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				33B3B88876620C8D765524F5 /* PasskeyVerificationMethod.swift in Sources */,
+				C61CF08519D367DA237EB41C /* PasskeyVerificationValidator.swift in Sources */,
 				5CB41D4023D0BA2C00074024 /* IDTokenValidatorContext.swift in Sources */,
 				F3BF86253442D57B0585700C /* PARAuth.swift in Sources */,
 				B5C46C7A0B145497D1A06610 /* PARWebAuth.swift in Sources */,
@@ -2783,6 +2791,7 @@
 				5CDF67522DD3DB5400A9B513 /* MyAccountHandlers.swift in Sources */,
 				5FDE875E1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				9D6BAAD5A27A2B857AD1E64E /* PasskeyVerificationMethod.swift in Sources */,
+				9B47AA4B4B524246597C602A /* PasskeyVerificationValidator.swift in Sources */,
 				5FDE876E1D8A424700EA27DC /* AuthenticationHandlers.swift in Sources */,
 				D4EDCFC02E740299008E02F8 /* PreferredAuthenticationMethod.swift in Sources */,
 				5C3D87F32DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */,
@@ -3058,6 +3067,7 @@
 				5C354C07276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5FDE875F1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				A941D36D922B752AB2B31FB1 /* PasskeyVerificationMethod.swift in Sources */,
+				54E27F6343FED3E1F3F5C2BC /* PasskeyVerificationValidator.swift in Sources */,
 				5C6513AA2791CDDE004EBC22 /* Version.swift in Sources */,
 				5C505FD32E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C505FAD2E216677005D0757 /* DPoPError.swift in Sources */,
@@ -3155,6 +3165,7 @@
 				5C354C06276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5FDE87601D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				D428289A5BA6CCCC6B3FDB59 /* PasskeyVerificationMethod.swift in Sources */,
+				C4B65A21E941E6B75DA3BBDD /* PasskeyVerificationValidator.swift in Sources */,
 				5C6513A92791CDDE004EBC22 /* Version.swift in Sources */,
 				5C505FD22E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C505FAC2E216677005D0757 /* DPoPError.swift in Sources */,
@@ -3245,6 +3256,7 @@
 				C1B3B9EF2C24B6D4004A32A4 /* Authentication.swift in Sources */,
 				C1B3B9F02C24B6D4004A32A4 /* AuthenticationError.swift in Sources */,
 				FFC2F17DEE342FEA32213AA7 /* PasskeyVerificationMethod.swift in Sources */,
+				FDE4B11CCEDC6F5BFECBD043 /* PasskeyVerificationValidator.swift in Sources */,
 				C1B3B9F12C24B6D4004A32A4 /* PasswordlessType.swift in Sources */,
 				C1B3B9F22C24B6D4004A32A4 /* MultifactorChallenge.swift in Sources */,
 				5C505FD12E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,

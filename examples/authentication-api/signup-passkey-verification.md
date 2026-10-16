@@ -86,7 +86,7 @@ for method in signupChallenge.verificationRequired ?? [] {
 
 Only `.email` and `.phone` are accepted as keys by Auth0. A `.unknown` key is rejected by the server as an invalid request.
 
-Every identifier in `verificationRequired` needs a non-empty code. If a code is missing or is an empty string, the login request fails with an `invalid_request` error, so make sure every code is filled in before you call `login` (see [Handle verification errors](#5-handle-verification-errors)).
+Every identifier in `verificationRequired` needs a non-empty code. If a code is missing, Auth0 rejects the login request with an `invalid_request` error. The SDK fails the request with an `invalid_request` error, without sending it, when `verification` is an empty dictionary or when the email or phone code is an empty string. Make sure every code is filled in before you call `login` (see [Handle verification errors](#5-handle-verification-errors)).
 
 > [!TIP]
 > Collect the codes **before** creating the passkey credential. That way the user doesn't create a passkey on their device for a signup that never completes.
@@ -163,7 +163,7 @@ Auth0
 </details>
 
 > [!NOTE]
-> If `verification` is empty, the SDK doesn't send a `verification` object at all. If the signup challenge listed identifiers in `verificationRequired`, Auth0 then rejects the request with an `invalid_request` error.
+> If `verification` is `nil`, the SDK doesn't send a `verification` object at all. If the signup challenge listed identifiers in `verificationRequired`, Auth0 then rejects the request with an `invalid_request` error. An empty dictionary is not the same as `nil`: the SDK rejects it, see [Handle verification errors](#5-handle-verification-errors).
 
 #### 5. Handle verification errors
 
@@ -175,13 +175,13 @@ Auth0 keeps the session, so you can retry on it, when it returns an `auth_sessio
 |:------|:----------|:-----------|
 | Wrong code | `isPasskeyVerificationRetryable` and `isPasskeyVerificationCodeInvalid` are `true` | Ask the user again for the codes of the identifiers listed in `passkeyVerificationRequired`. Retry with the **same** passkey credential and the same `auth_session`, which Auth0 echoes back in `passkeyAuthSession`. Auth0 limits how many wrong codes it accepts, but the response doesn't say how many attempts are left. Once Auth0 ends the session, you get an `invalid_grant` without an `auth_session` (see "Session no longer valid"). Also cap the number of retries in your app, then request a new signup challenge. |
 | Retryable `invalid_request` | `isPasskeyVerificationRetryable` is `true` and `isPasskeyVerificationCodeInvalid` is `false` | An `invalid_request` error that comes with an `auth_session` (Auth0 doesn't send this today). The session is still usable: ask for the codes listed in `passkeyVerificationRequired` and retry with the **same** challenge and passkey credential. |
-| Missing or empty code | `code == "invalid_request"`, when your request had no code, or an empty one, for an identifier in `verificationRequired` | The session stays valid, but Auth0 doesn't send an `auth_session` back, so `isPasskeyVerificationRetryable` is `false`. Ask the user for the code, then retry with the **same** challenge and passkey credential. You can avoid this error by checking every code before you call `login`. |
+| Missing or empty code | `code == "invalid_request"`, when your request had no code, or an empty one, for an identifier in `verificationRequired` | The session stays valid, but the error has no `auth_session`, so `isPasskeyVerificationRetryable` is `false`. Ask the user for the code, then retry with the **same** challenge and passkey credential. An empty dictionary and an empty email or phone code never reach Auth0: the SDK fails the request itself, with an `invalid_request` error and a `statusCode` of `0`, because there is no HTTP response. The description is `Missing required parameter: verification must have atleast one identifier otp code` for an empty dictionary, and `"verification.email" is not allowed to be empty` (`"verification.phone" ...` for the phone) for an empty code. You can avoid this error by checking every code before you call `login`, and by passing `nil` when no verification is required. |
 | MFA required | `isMultifactorRequired` is `true` (HTTP 403) | Verification passed: the codes were accepted, including after a retry. The tenant requires multifactor authentication before it issues tokens, and the error carries an `mfa_token`. See [Handle MFA required](#6-handle-mfa-required). |
 | Too many attempts | `isTooManyAttempts` is `true` (HTTP 429) | Auth0 is rate limiting the requests, per IP address or per tenant, or brute force protection has blocked the user. The body can be plain text (the per-IP limit of `/passkey/register` and `/passkey/challenge`) or JSON, with a code such as `too_many_requests` (tenant-wide limit), `access_denied` (`/oauth/token`) or `too_many_attempts` (brute force protection), so check `isTooManyAttempts` instead of the error code. Wrong codes entered too many times are not reported as a 429: see the wrong code row. Don't retry right away: ask the user to try again later. |
 | Session no longer valid | `code == "invalid_grant"` and `isPasskeyVerificationCodeInvalid` is `false` | The session is expired or already used. Request a new signup challenge and start over. A `403 invalid_grant` without a session is also returned when the user is blocked or the passkey is invalid, and starting over won't help in those cases. |
 | Temporary server error | HTTP 5xx (`server_error`) | Auth0 couldn't check the code against its backend. The session is kept, so retry the same request later. |
 
-What Auth0 returns when the `verification` codes have a problem:
+What Auth0 returns when the `verification` codes have a problem. Auth0.swift doesn't send an empty dictionary (`{}`) or an empty email or phone code: it fails the request itself with an `invalid_request` error. For an empty code, the error is the one of the second row.
 
 | Request | Response | `error_description` |
 |:--------|:---------|:--------------------|
@@ -317,4 +317,4 @@ func logIn() async throws -> Credentials? {
 ```
 
 > [!NOTE]
-> If you implement the `Authentication` protocol yourself, for example in a mock or a wrapper, also implement `login(passkey:challenge:connection:audience:scope:organization:verification:)` and `passkeySignupChallenge(…deliveryMethod:)`. A type that doesn't implement them can't be given verification codes or a delivery method.
+> If you implement the `Authentication` protocol yourself, for example in a mock or a wrapper, also implement `login(passkey:challenge:connection:audience:scope:organization:verification:)`, whose `verification` parameter is optional (`nil` means that no verification is required), and `passkeySignupChallenge(…deliveryMethod:)`. A type that doesn't implement them can't be given verification codes or a delivery method.
