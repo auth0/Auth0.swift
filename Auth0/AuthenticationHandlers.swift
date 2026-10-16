@@ -19,6 +19,16 @@ func authenticationDecodable<T: Decodable>(from result: Result<ResponseValue, Au
     }
 }
 
+// Requests that run a RequestValidator get the error it throws wrapped in an error of its own: deliver it as it is.
+func authenticationValidatedDecodable<T: Decodable>(from result: Result<ResponseValue, AuthenticationError>,
+                                                    callback: @Sendable (Result<T, AuthenticationError>) -> Void) {
+    if case .failure(let error) = result, let validationError = error.cause as? AuthenticationError {
+        return callback(.failure(validationError))
+    }
+
+    authenticationDecodable(from: result, callback: callback)
+}
+
 func authenticationObject<T: JSONObjectPayload>(from result: Result<ResponseValue, AuthenticationError>,
                                                 callback: @Sendable (Result<T, AuthenticationError>) -> Void) {
     do {
