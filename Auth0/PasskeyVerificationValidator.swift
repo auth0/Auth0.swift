@@ -2,42 +2,49 @@
 import Foundation
 
 /**
- Validates the `verification` codes of the passkey signup token exchange.
+ Validates the `verification` codes of the passkey signup token exchange against the identifiers that the signup
+ challenge asked to verify.
 
- Auth0 rejects a `verification` object without codes, and a code that is an empty string, with an `invalid_request`
- error. This validator catches both before the network request is sent.
+ Auth0 rejects a missing code, and an empty code, with an `invalid_request` error. This validator
+ reports the same errors before the network request is sent.
 
  ## See Also
 
  - ``RequestValidator``
  - ``PasskeyVerificationMethod``
+ - ``PasskeySignupChallenge/verificationRequired``
  */
 struct PasskeyVerificationValidator: RequestValidator {
 
-    /// The one-time codes, keyed by identifier. `nil` when no verification is required.
-    let verification: [PasskeyVerificationMethod: String]?
+    /// The one-time codes, keyed by identifier. Empty when the app did not provide any.
+    let verification: [PasskeyVerificationMethod: String]
+
+    /// The identifiers that the signup challenge asked to verify. `nil` or empty when verification is not enabled,
+    /// or is not required for any identifier.
+    let verificationRequired: [PasskeyVerificationMethod]?
 
     /**
-     Validates that `verification`, when present, has at least one code, and that the codes of the email and of the
-     phone, when present, are not empty. Any other identifier is left for Auth0 to validate.
+     Validates that every identifier in `verificationRequired` has a non-empty code in `verification`.
 
-     When both codes are empty, the email is the one named.
+     Nothing is validated when `verificationRequired` is `nil` or empty. Otherwise the identifiers are checked in the
+     order the challenge lists them, and the first problem is reported: a missing code is
+     `Missing required parameter: verification.<identifier>`, and an empty code is
+     `"verification.<identifier>" is not allowed to be empty`. A code with only whitespace or newlines counts as empty.
+     Codes for identifiers that are not required are not validated.
 
-     - Throws: ``AuthenticationError`` with the `invalid_request` code if the verification is not valid.
+     - Throws: ``AuthenticationError`` with the `invalid_request` code if a required code is missing or empty.
      */
     func validate() throws {
-        guard let verification = verification else { return }
+        guard let required = verificationRequired, !required.isEmpty else { return }
 
-        if verification.isEmpty {
-            throw invalidRequest("Missing required parameter: verification must have atleast one identifier otp code")
-        }
+        for identifier in required {
+            guard let code = verification[identifier] else {
+                throw invalidRequest("Missing required parameter: verification.\(identifier.rawValue)")
+            }
 
-        if verification[.email]?.isEmpty == true {
-            throw invalidRequest("\"verification.email\" is not allowed to be empty")
-        }
-
-        if verification[.phone]?.isEmpty == true {
-            throw invalidRequest("\"verification.phone\" is not allowed to be empty")
+            if code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                throw invalidRequest("\"verification.\(identifier.rawValue)\" is not allowed to be empty")
+            }
         }
     }
 

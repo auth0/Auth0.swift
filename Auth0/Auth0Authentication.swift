@@ -213,12 +213,13 @@ struct Auth0Authentication: Authentication {
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(passkey: any SignupPasskey,
-               challenge: PasskeySignupChallenge,
+               verificationRequired: [PasskeyVerificationMethod],
+               authSession: String,
                connection: String?,
                audience: String?,
                scope: String,
                organization: String?,
-               verification: [PasskeyVerificationMethod: String]?) -> any TokenRequestable<Credentials, AuthenticationError> {
+               verification: [PasskeyVerificationMethod: String]) -> any TokenRequestable<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -237,7 +238,7 @@ struct Auth0Authentication: Authentication {
         var payload: [String: Any] = [
             "client_id": self.clientId,
             "grant_type": "urn:okta:params:oauth:grant-type:webauthn",
-            "auth_session": challenge.authenticationSession,
+            "auth_session": authSession,
             "authn_response": authenticatorResponse
         ]
 
@@ -245,7 +246,7 @@ struct Auth0Authentication: Authentication {
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
         payload["organization"] = organization
-        if let verification = verification {
+        if !verification.isEmpty {
             payload["verification"] = verification.reduce(into: [String: String]()) { $0[$1.key.rawValue] = $1.value }
         }
 
@@ -257,7 +258,8 @@ struct Auth0Authentication: Authentication {
                                                           logger: self.logger,
                                                           auth0ClientInfo: self.auth0ClientInfo,
                                                           dpop: self.dpop)
-            .requestValidators([PasskeyVerificationValidator(verification: verification)]),
+            .requestValidators([PasskeyVerificationValidator(verification: verification,
+                                                             verificationRequired: verificationRequired)]),
                              authentication: self)
     }
 
@@ -274,7 +276,7 @@ struct Auth0Authentication: Authentication {
                           audience: audience,
                           scope: scope,
                           organization: organization,
-                          verification: nil)
+                          verification: [:])
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)

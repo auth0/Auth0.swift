@@ -82,7 +82,13 @@ struct MockAuthentication: Authentication {
     func login(passkey: SignupPasskey, challenge: PasskeySignupChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: SignupPasskey, verificationRequired: [PasskeyVerificationMethod], authSession: String, connection: String?, audience: String?, scope: String, organization: String?, verification: [PasskeyVerificationMethod: String]) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeySignupChallenge(email: String?, phoneNumber: String?, username: String?, name: String?, givenName: String?, familyName: String?, nickname: String?, picture: String?, userMetadata: [String: String]?, connection: String?, organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> { StubRequestable() }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeySignupChallenge(email: String?, phoneNumber: String?, username: String?, name: String?, givenName: String?, familyName: String?, nickname: String?, picture: String?, userMetadata: [String: String]?, connection: String?, organization: String?, deliveryMethod: DeliveryMethod?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> { StubRequestable() }
 
     func resetPassword(email: String, connection: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }

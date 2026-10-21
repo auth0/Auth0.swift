@@ -109,13 +109,9 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
         return self.code == "access_denied"
     }
 
-    /// When the user is blocked due to too many attempts to log in, or when Auth0 rate limits the request (HTTP 429).
-    ///
-    /// A rate limited response is identified by its status code alone, because its body varies. It can be plain text,
-    /// in which case there is no error code to match, or a JSON error payload with an error code such as
-    /// `too_many_requests` or `access_denied`.
+    /// When the user is blocked due to too many attempts to log in.
     public var isTooManyAttempts: Bool {
-        return self.code == "too_many_attempts" || self.statusCode == 429
+        return self.code == "too_many_attempts"
     }
 
     /// When an additional verification step is required.
@@ -144,8 +140,9 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
 
     /// Identifiers that still require a correct one-time code after a failed passkey token exchange (e.g. `[.phone]`).
     ///
-    /// Non-`nil` only when ``isPasskeyVerificationRetryable`` is `true` and Auth0 listed the identifiers. Use together with
-    /// ``passkeyAuthSession`` to retry the exchange with the corrected codes.
+    /// Non-`nil` only when ``isPasskeyVerificationRetryable`` is `true` and Auth0 listed the identifiers. On a retry, pass
+    /// it as `verificationRequired`, together with ``passkeyAuthSession`` as `authSession`, to
+    /// ``Authentication/login(passkey:verificationRequired:authSession:connection:audience:scope:organization:verification:)``.
     ///
     /// - Note: This is unrelated to ``isVerificationRequired``, which reports the `requires_verification` error.
     public var passkeyVerificationRequired: [PasskeyVerificationMethod]? {
@@ -156,10 +153,9 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
     /// The passkey `auth_session` that Auth0 returned together with a failed token exchange, if any.
     ///
     /// Auth0 returns it with an `invalid_grant` error when the session is still usable, for example when one or more
-    /// verification codes were wrong (see ``isPasskeyVerificationCodeInvalid``). Auth0 doesn't send it with an
-    /// `invalid_request` error today, but ``isPasskeyVerificationRetryable`` covers that case too. It is the same session
-    /// that was sent: retry by passing the corrected codes to
-    /// ``Authentication/login(passkey:challenge:connection:audience:scope:organization:verification:)``.
+    /// verification codes were wrong (see ``isPasskeyVerificationRetryable``). It is the same session
+    /// that was sent: retry by passing it as `authSession`, with the corrected codes, to
+    /// ``Authentication/login(passkey:verificationRequired:authSession:connection:audience:scope:organization:verification:)``.
     ///
     /// `nil` when Auth0 didn't return a session with this error. When that error is an `invalid_grant`, the session is gone
     /// and a fresh ``Authentication/passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``
@@ -168,36 +164,17 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
         return self.info["auth_session"] as? String
     }
 
-    /// When a one-time code sent for passkey identifier verification was wrong.
-    ///
-    /// `true` when an `invalid_grant` error includes the `auth_session`: one or more codes were wrong, and Auth0 keeps the
-    /// session. Ask the user again for the codes listed in ``passkeyVerificationRequired``, and retry with the **same**
-    /// passkey credential and ``passkeyAuthSession``.
-    ///
-    /// Auth0 limits how many wrong codes it accepts, but this response doesn't say how many attempts are left. Once Auth0
-    /// ends the session, the next `invalid_grant` comes without an `auth_session` and this property is `false`. Also cap
-    /// the number of retries in your app, so that a session Auth0 keeps open longer than expected can't loop forever, and
-    /// then request a new signup challenge.
-    ///
-    /// `false` for an `invalid_grant` error without a session, which means the session is gone.
-    public var isPasskeyVerificationCodeInvalid: Bool {
-        return self.code == "invalid_grant" && self.passkeyAuthSession != nil
-    }
-
     /// When a failed passkey token exchange can be retried on the same session.
     ///
-    /// `true` when Auth0 returns an `auth_session` with an `invalid_grant` or an `invalid_request` error: the session is
-    /// still usable. Ask the user for the codes that are wrong or missing (see ``passkeyVerificationRequired``), and
-    /// retry with the **same** passkey credential and ``passkeyAuthSession``.
-    ///
-    /// Auth0 currently sends the `auth_session` only with `invalid_grant`. The `invalid_request` case is covered so that
-    /// this check keeps working if that changes.
+    /// `true` when Auth0 returns an `auth_session` with an `invalid_grant` error: the session is still usable. Ask the
+    /// user for the codes that are wrong (see ``passkeyVerificationRequired``), and retry with the **same** passkey
+    /// credential and ``passkeyAuthSession``.
     ///
     /// `false` for everything else, including an `invalid_grant` error without a session, which means the session is
     /// gone. This property doesn't limit the number of retries: Auth0 limits the wrong codes it accepts but doesn't say
     /// how many attempts are left, so cap the retries in your app as well.
     public var isPasskeyVerificationRetryable: Bool {
-        return (self.code == "invalid_grant" || self.code == "invalid_request") && self.passkeyAuthSession != nil
+        return self.code == "invalid_grant" && self.passkeyAuthSession != nil
     }
 
 }

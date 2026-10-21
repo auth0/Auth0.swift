@@ -298,20 +298,29 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isTooManyAttempts) == true
             }
 
-            it("should detect too many attempts from a rate limited plain text response") {
+            it("should detect too many attempts from the error code alone") {
+                let values = ["error": "too_many_attempts"]
+                expect(AuthenticationError(info: values, statusCode: 401).isTooManyAttempts) == true
+            }
+
+            it("should keep the status code of a rate limit sent as plain text") {
                 // The body is not JSON, so there is no error code to match: only the status code identifies the response
                 let error = AuthenticationError(description: "Too Many Requests", statusCode: 429)
                 expect(error.code) == nonJSONError
-                expect(error.isTooManyAttempts) == true
+                expect(error.isTooManyAttempts) == false
+                expect(error.statusCode) == 429
+                expect(error.isRetryable) == true
             }
 
-            it("should detect too many attempts from a rate limited response with no body") {
+            it("should keep the status code of a rate limit sent with no body") {
                 let error = AuthenticationError(description: nil, statusCode: 429)
                 expect(error.code) == emptyBodyError
-                expect(error.isTooManyAttempts) == true
+                expect(error.isTooManyAttempts) == false
+                expect(error.statusCode) == 429
+                expect(error.isRetryable) == true
             }
 
-            it("should detect too many attempts from a rate limited JSON response") {
+            it("should keep the error code of a rate limit sent as JSON") {
                 let values = [
                     // Hypothetical body taken from the PRD, not observed from the server (the /oauth/token limiter sends access_denied)
                     "error": "too_many_requests",
@@ -319,24 +328,21 @@ class AuthenticationErrorSpec: QuickSpec {
                 ]
                 let error = AuthenticationError(info: values, statusCode: 429)
                 expect(error.code) == "too_many_requests"
-                expect(error.isTooManyAttempts) == true
+                expect(error.isTooManyAttempts) == false
+                expect(error.statusCode) == 429
+                expect(error.isRetryable) == true
             }
 
-            it("should detect too many attempts from a rate limited JSON response with another error code") {
+            it("should keep the error code of a rate limit sent as JSON with another error code") {
                 // What the /oauth/token rate limiter sends
                 let values = [
                     "error": "access_denied",
                     "error_description": "Too Many Requests"
                 ]
                 let error = AuthenticationError(info: values, statusCode: 429)
-                expect(error.isTooManyAttempts) == true
-            }
-
-            it("should not detect too many attempts from responses that are not rate limited") {
-                expect(AuthenticationError(description: "Too Many Requests", statusCode: 400).isTooManyAttempts) == false
-                expect(AuthenticationError(description: nil, statusCode: 500).isTooManyAttempts) == false
-                expect(AuthenticationError(info: ["error": "too_many_requests"], statusCode: 400).isTooManyAttempts) == false
-                expect(AuthenticationError(info: ["error": "access_denied"], statusCode: 403).isTooManyAttempts) == false
+                expect(error.isTooManyAttempts) == false
+                expect(error.statusCode) == 429
+                expect(error.isRetryable) == true
             }
 
             describe("the three responses to an attempt limit") {
@@ -349,15 +355,15 @@ class AuthenticationErrorSpec: QuickSpec {
                     let error = AuthenticationError(info: values, statusCode: 429)
                     expect(error.code) == "too_many_attempts"
                     expect(error.isTooManyAttempts) == true
-                    expect(error.isPasskeyVerificationCodeInvalid) == false
+                    expect(error.isPasskeyVerificationRetryable) == false
                 }
 
                 it("should detect the rate limit sent as plain text") {
                     let error = AuthenticationError(description: "Too Many Requests", statusCode: 429)
                     expect(error.code) == nonJSONError
                     expect(error.localizedDescription) == "Too Many Requests"
-                    expect(error.isTooManyAttempts) == true
-                    expect(error.isPasskeyVerificationCodeInvalid) == false
+                    expect(error.isTooManyAttempts) == false
+                    expect(error.isPasskeyVerificationRetryable) == false
                 }
 
                 it("should detect a wrong code for several identifiers as an invalid code that keeps its session") {
@@ -369,7 +375,6 @@ class AuthenticationErrorSpec: QuickSpec {
                         "error_description": "Invalid or expired session"
                     ]
                     let error = AuthenticationError(info: values, statusCode: 400)
-                    expect(error.isPasskeyVerificationCodeInvalid) == true
                     expect(error.isPasskeyVerificationRetryable) == true
                     expect(error.passkeyAuthSession) == "pas_sess_123"
                     expect(error.passkeyVerificationRequired) == [.email, .phone]
@@ -574,7 +579,6 @@ class AuthenticationErrorSpec: QuickSpec {
                     "verification_required": ["email"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationCodeInvalid) == true
                 expect(error.isPasskeyVerificationRetryable) == true
             }
 
@@ -584,7 +588,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "error_description": "Invalid or expired session"
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationCodeInvalid) == false
+                expect(error.isPasskeyVerificationRetryable) == false
             }
 
             it("should not report an invalid code when 403 invalid_grant has no auth_session") {
@@ -593,21 +597,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "error_description": "Invalid or expired session"
                 ]
                 let error = AuthenticationError(info: values, statusCode: 403)
-                expect(error.isPasskeyVerificationCodeInvalid) == false
-            }
-
-            it("should treat invalid_request with auth_session as retryable but not as a wrong code") {
-                let values: [String: Any] = [
-                    "error": "invalid_request",
-                    "error_description": "Missing required parameter",
-                    "auth_session": "pas_sess_123",
-                    "verification_required": ["email"]
-                ]
-                let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationRetryable) == true
-                expect(error.isPasskeyVerificationCodeInvalid) == false
-                expect(error.passkeyAuthSession) == "pas_sess_123"
-                expect(error.passkeyVerificationRequired) == [.email]
+                expect(error.isPasskeyVerificationRetryable) == false
             }
 
             describe("isPasskeyVerificationRetryable") {
@@ -618,16 +608,6 @@ class AuthenticationErrorSpec: QuickSpec {
                         "error_description": "Invalid or expired session",
                         "auth_session": "pas_sess_123",
                         "verification_required": ["email", "phone"]
-                    ]
-                    let error = AuthenticationError(info: values, statusCode: 400)
-                    expect(error.isPasskeyVerificationRetryable) == true
-                }
-
-                it("should be true for invalid_request with auth_session") {
-                    let values: [String: Any] = [
-                        "error": "invalid_request",
-                        "error_description": "Some description",
-                        "auth_session": "pas_sess_123"
                     ]
                     let error = AuthenticationError(info: values, statusCode: 400)
                     expect(error.isPasskeyVerificationRetryable) == true
@@ -690,7 +670,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "verification_required": ["email"]
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasskeyVerificationCodeInvalid) == false
+                expect(error.isPasskeyVerificationRetryable) == false
                 expect(error.passkeyVerificationRequired).to(beNil())
             }
 
@@ -716,7 +696,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 let error = AuthenticationError(info: values, statusCode: 403)
                 expect(error.isMultifactorRequired) == true
                 expect(error.mfaRequiredErrorPayload).to(beNil())
-                expect(error.isPasskeyVerificationCodeInvalid) == false
+                expect(error.isPasskeyVerificationRetryable) == false
             }
 
             it("should treat mfa required from a passkey token exchange as verification passed") {
@@ -728,7 +708,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 let error = AuthenticationError(info: values, statusCode: 403)
                 expect(error.isMultifactorRequired) == true
                 expect(error.mfaRequiredErrorPayload?.mfaToken) == "test-mfa-token"
-                expect(error.isPasskeyVerificationCodeInvalid) == false
+                expect(error.isPasskeyVerificationRetryable) == false
                 expect(error.passkeyAuthSession).to(beNil())
                 expect(error.passkeyVerificationRequired).to(beNil())
             }

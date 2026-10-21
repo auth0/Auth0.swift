@@ -86,7 +86,7 @@ for method in signupChallenge.verificationRequired ?? [] {
 
 Only `.email` and `.phone` are accepted as keys by Auth0. A `.unknown` key is rejected by the server as an invalid request.
 
-Every identifier in `verificationRequired` needs a non-empty code. If a code is missing, Auth0 rejects the login request with an `invalid_request` error. The SDK fails the request with an `invalid_request` error, without sending it, when `verification` is an empty dictionary or when the email or phone code is an empty string. Make sure every code is filled in before you call `login` (see [Handle verification errors](#5-handle-verification-errors)).
+Every identifier in `verificationRequired` needs a non-empty code. Before sending the request, the SDK checks the `verification` you pass against the `verificationRequired` you pass (or the one of the challenge you pass). If a required code is missing, is an empty string, or has only spaces or newlines, `login` fails with an `invalid_request` error and nothing is sent. Make sure every code is filled in before you call `login` (see [Handle verification errors](#5-handle-verification-errors)). When `verificationRequired` is `nil` or empty, nothing is checked.
 
 > [!TIP]
 > Collect the codes **before** creating the passkey credential. That way the user doesn't create a passkey on their device for a signup that never completes.
@@ -100,6 +100,15 @@ Create the passkey credential from the signup challenge, exactly as in a [regula
 #### 4. Log the new user in
 
 Pass the passkey credential, the signup challenge, and the collected codes to `login(passkey:challenge:connection:audience:scope:organization:verification:)`.
+
+That method is a shorthand for `login(passkey:verificationRequired:authSession:connection:audience:scope:organization:verification:)`, which takes two values separately. You can call it directly, and you need it to retry after a wrong code. `verificationRequired` is the list of identifiers whose codes have to be in `verification`, and it can come from two places:
+
+| When | `verificationRequired` | `authSession` |
+|:-----|:-----------------------|:--------------|
+| First attempt, right after the signup challenge | `signupChallenge.verificationRequired` | `signupChallenge.authenticationSession` |
+| Retry after a wrong code (`isPasskeyVerificationRetryable` is `true`) | `error.passkeyVerificationRequired`: only the identifiers that are still unverified | `error.passkeyAuthSession`: the same session as before |
+
+An empty `verificationRequired` means that verification is not enabled, or is not required for any identifier. Nothing is checked then.
 
 ```swift
 Auth0
@@ -127,113 +136,32 @@ do {
     let credentials = try await Auth0
         .authentication()
         .login(passkey: signupPasskey,
-               challenge: signupChallenge,
+               verificationRequired: verificationRequired,
+               authSession: authSession,
                connection: "Username-Password-Authentication",
                scope: "openid profile email offline_access",
                verification: verification)
         .start()
     print("Obtained credentials")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .authentication()
-    .login(passkey: signupPasskey,
-           challenge: signupChallenge,
-           connection: "Username-Password-Authentication",
-           scope: "openid profile email offline_access",
-           verification: verification)
-    .start()
-    .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print("Failed with: \(error)")
-        }
-    }, receiveValue: { credentials in
-        print("Obtained credentials")
-    })
-    .store(in: &cancellables)
-```
-</details>
-
-> [!NOTE]
-> If `verification` is `nil`, the SDK doesn't send a `verification` object at all. If the signup challenge listed identifiers in `verificationRequired`, Auth0 then rejects the request with an `invalid_request` error. An empty dictionary is not the same as `nil`: the SDK rejects it, see [Handle verification errors](#5-handle-verification-errors).
-
-#### 5. Handle verification errors
-
-If the login request fails, use these `AuthenticationError` properties to decide what to do next.
-
-Auth0 keeps the session, so you can retry on it, when it returns an `auth_session` with an `invalid_grant` or an `invalid_request` error. `isPasskeyVerificationRetryable` is `true` for both, so one check is enough to decide whether to ask for the codes again. `isPasskeyVerificationCodeInvalid` tells you that a code was wrong (`invalid_grant`). Auth0 currently sends the `auth_session` only with `invalid_grant`; the `invalid_request` case is covered so that the check keeps working if that changes.
-
-| Error | Condition | What to do |
-|:------|:----------|:-----------|
-| Wrong code | `isPasskeyVerificationRetryable` and `isPasskeyVerificationCodeInvalid` are `true` | Ask the user again for the codes of the identifiers listed in `passkeyVerificationRequired`. Retry with the **same** passkey credential and the same `auth_session`, which Auth0 echoes back in `passkeyAuthSession`. Auth0 limits how many wrong codes it accepts, but the response doesn't say how many attempts are left. Once Auth0 ends the session, you get an `invalid_grant` without an `auth_session` (see "Session no longer valid"). Also cap the number of retries in your app, then request a new signup challenge. |
-| Retryable `invalid_request` | `isPasskeyVerificationRetryable` is `true` and `isPasskeyVerificationCodeInvalid` is `false` | An `invalid_request` error that comes with an `auth_session` (Auth0 doesn't send this today). The session is still usable: ask for the codes listed in `passkeyVerificationRequired` and retry with the **same** challenge and passkey credential. |
-| Missing or empty code | `code == "invalid_request"`, when your request had no code, or an empty one, for an identifier in `verificationRequired` | The session stays valid, but the error has no `auth_session`, so `isPasskeyVerificationRetryable` is `false`. Ask the user for the code, then retry with the **same** challenge and passkey credential. An empty dictionary and an empty email or phone code never reach Auth0: the SDK fails the request itself, with an `invalid_request` error and a `statusCode` of `0`, because there is no HTTP response. The description is `Missing required parameter: verification must have atleast one identifier otp code` for an empty dictionary, and `"verification.email" is not allowed to be empty` (`"verification.phone" ...` for the phone) for an empty code. You can avoid this error by checking every code before you call `login`, and by passing `nil` when no verification is required. |
-| MFA required | `isMultifactorRequired` is `true` (HTTP 403) | Verification passed: the codes were accepted, including after a retry. The tenant requires multifactor authentication before it issues tokens, and the error carries an `mfa_token`. See [Handle MFA required](#6-handle-mfa-required). |
-| Too many attempts | `isTooManyAttempts` is `true` (HTTP 429) | Auth0 is rate limiting the requests, per IP address or per tenant, or brute force protection has blocked the user. The body can be plain text (the per-IP limit of `/passkey/register` and `/passkey/challenge`) or JSON, with a code such as `too_many_requests` (tenant-wide limit), `access_denied` (`/oauth/token`) or `too_many_attempts` (brute force protection), so check `isTooManyAttempts` instead of the error code. Wrong codes entered too many times are not reported as a 429: see the wrong code row. Don't retry right away: ask the user to try again later. |
-| Session no longer valid | `code == "invalid_grant"` and `isPasskeyVerificationCodeInvalid` is `false` | The session is expired or already used. Request a new signup challenge and start over. A `403 invalid_grant` without a session is also returned when the user is blocked or the passkey is invalid, and starting over won't help in those cases. |
-| Temporary server error | HTTP 5xx (`server_error`) | Auth0 couldn't check the code against its backend. The session is kept, so retry the same request later. |
-
-What Auth0 returns when the `verification` codes have a problem. Auth0.swift doesn't send an empty dictionary (`{}`) or an empty email or phone code: it fails the request itself with an `invalid_request` error. For an empty code, the error is the one of the second row.
-
-| Request | Response | `error_description` |
-|:--------|:---------|:--------------------|
-| `verification` is missing, or has no `email` code (for example `{}`) | `400 invalid_request` | `Missing required parameter: verification.email` |
-| `verification` has an empty `email` code (`""`) | `400 invalid_request` | `"verification.email" is not allowed to be empty` |
-| `verification` has a wrong `email` code | `400 invalid_grant`, with `auth_session` and `verification_required` | `Invalid or expired session` |
-
-> [!IMPORTANT]
-> `invalid_request` is also returned for problems that providing a code can't fix, such as a client or realm mismatch, or an invalid request body. Only treat it as a missing code when you know that your request had no code, or an empty one, for an identifier in `verificationRequired`.
->
-> Never branch on `error_description`, or on any other message text. It is meant for debugging: don't show it to the user, and don't use it to tell a wrong code from an expired session, because both can read `Invalid or expired session`. Use `isPasskeyVerificationCodeInvalid` or `isPasskeyVerificationRetryable` instead, which only look at the error code and at whether Auth0 sent back an `auth_session`.
-
-The samples below run in an async context, and assume `signupChallenge` is declared with `var`.
-
-```swift
-do {
-    let credentials = try await Auth0
-        .authentication()
-        .login(passkey: signupPasskey,
-               challenge: signupChallenge,
-               connection: "Username-Password-Authentication",
-               scope: "openid profile email offline_access",
-               verification: verification)
-        .start()
-    print("Obtained credentials")
-} catch let error as AuthenticationError where error.isPasskeyVerificationCodeInvalid {
-    // One or more codes were wrong, but the session is still alive
-    let methodsToRetry = error.passkeyVerificationRequired ?? []
-    print("Wrong code for: \(methodsToRetry)")
-
-    if let authSession = error.passkeyAuthSession {
-        // Use the session returned by Auth0, with the original challenge data
-        signupChallenge = PasskeySignupChallenge(authenticationSession: authSession,
-                                                 relyingPartyId: signupChallenge.relyingPartyId,
-                                                 userId: signupChallenge.userId,
-                                                 userName: signupChallenge.userName,
-                                                 challengeData: signupChallenge.challengeData,
-                                                 verificationRequired: methodsToRetry)
-    }
-
-    // Ask the user again for the codes of `methodsToRetry` only, then retry the login request
-    // with the same `signupPasskey`
 } catch let error as AuthenticationError where error.isPasskeyVerificationRetryable {
-    // Auth0 kept the session: ask for the codes in `error.passkeyVerificationRequired` and retry with the same
-    // challenge and passkey credential
-    print("Failed with: \(error)")
+    // One or more codes were wrong, but the session is still alive. Auth0 lists the identifiers that are
+    // still unverified, and echoes back the session
+    verificationRequired = error.passkeyVerificationRequired ?? verificationRequired
+    authSession = error.passkeyAuthSession ?? authSession
+    print("Wrong code for: \(verificationRequired)")
+
+    // Ask the user again for the codes of `verificationRequired` only, then call login again with the same
+    // `signupPasskey`, `verificationRequired` and `authSession`
 } catch let error as AuthenticationError where error.isMultifactorRequired {
     // The codes were accepted, but MFA is required before tokens are issued (see "Handle MFA required")
     print("MFA required")
 } catch let error as AuthenticationError where error.isTooManyAttempts {
-    // Auth0 is rate limiting the requests; ask the user to try again later
-    print("Too many attempts: \(error)")
+    // Brute force protection blocked the user: waiting doesn't help, they have to unblock the account first.
+    // Check this before the 429 below, because the block is also a 429
+    print("Account blocked: \(error)")
+} catch let error as AuthenticationError where error.statusCode == 429 {
+    // Auth0 is rate limiting the requests (HTTP 429); ask the user to try again later
+    print("Rate limited: \(error)")
 } catch let error as AuthenticationError where error.code == "invalid_grant" {
     // The session is no longer valid; request a new signup challenge and start over
     print("Failed with: \(error)")
@@ -249,7 +177,8 @@ do {
 Auth0
     .authentication()
     .login(passkey: signupPasskey,
-           challenge: signupChallenge,
+           verificationRequired: verificationRequired,
+           authSession: authSession,
            connection: "Username-Password-Authentication",
            scope: "openid profile email offline_access",
            verification: verification)
@@ -257,22 +186,22 @@ Auth0
         switch result {
         case .success(let credentials):
             print("Obtained credentials")
-        case .failure(let error) where error.isPasskeyVerificationCodeInvalid:
-            // One or more codes were wrong, but the session is still alive
-            let methodsToRetry = error.passkeyVerificationRequired ?? []
-            print("Wrong code for: \(methodsToRetry)")
-            // Update the challenge with `error.passkeyAuthSession`, ask the user again for the codes
-            // of `methodsToRetry` only, and retry the login request with the same `signupPasskey`
         case .failure(let error) where error.isPasskeyVerificationRetryable:
-            // Auth0 kept the session: ask for the codes in `error.passkeyVerificationRequired` and retry with the same
-            // challenge and passkey credential
-            print("Failed with: \(error)")
+            // One or more codes were wrong, but the session is still alive
+            verificationRequired = error.passkeyVerificationRequired ?? verificationRequired
+            authSession = error.passkeyAuthSession ?? authSession
+            print("Wrong code for: \(verificationRequired)")
+            // Ask the user again for the codes of `verificationRequired` only, then call login again with the
+            // same `signupPasskey`, `verificationRequired` and `authSession`
         case .failure(let error) where error.isMultifactorRequired:
             // The codes were accepted, but MFA is required before tokens are issued (see "Handle MFA required")
             print("MFA required")
         case .failure(let error) where error.isTooManyAttempts:
-            // Auth0 is rate limiting the requests; ask the user to try again later
-            print("Too many attempts: \(error)")
+            // Brute force protection blocked the user: waiting doesn't help, they have to unblock the account first
+            print("Account blocked: \(error)")
+        case .failure(let error) where error.statusCode == 429:
+            // Auth0 is rate limiting the requests (HTTP 429); ask the user to try again later
+            print("Rate limited: \(error)")
         case .failure(let error):
             // e.g. the session is no longer valid; request a new signup challenge and start over
             print("Failed with: \(error)")
@@ -317,4 +246,4 @@ func logIn() async throws -> Credentials? {
 ```
 
 > [!NOTE]
-> If you implement the `Authentication` protocol yourself, for example in a mock or a wrapper, also implement `login(passkey:challenge:connection:audience:scope:organization:verification:)`, whose `verification` parameter is optional (`nil` means that no verification is required), and `passkeySignupChallenge(…deliveryMethod:)`. A type that doesn't implement them can't be given verification codes or a delivery method.
+> If you implement the `Authentication` protocol yourself, for example in a mock or a wrapper, also implement `login(passkey:verificationRequired:authSession:connection:audience:scope:organization:verification:)`, whose `verification` parameter is a dictionary that is empty when there are no codes, and `passkeySignupChallenge(…deliveryMethod:)`. The default implementations of these two methods call themselves, so a type that doesn't implement them crashes when they are called.

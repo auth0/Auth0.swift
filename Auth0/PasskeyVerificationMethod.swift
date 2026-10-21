@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Returned in ``PasskeySignupChallenge/verificationRequired`` and ``AuthenticationError/passkeyVerificationRequired``.
 /// Use it as the key when passing the collected codes in the `verification` dictionary of
-/// ``Authentication/login(passkey:challenge:connection:audience:scope:organization:verification:)``.
+/// ``Authentication/login(passkey:verificationRequired:authSession:connection:audience:scope:organization:verification:)``.
 ///
 /// ```swift
 /// let verification: [PasskeyVerificationMethod: String] = [.email: emailCode]

@@ -230,22 +230,20 @@ final class ContentViewModel: ObservableObject {
                 return
             }
         }
-        var codes: [PasskeyVerificationMethod: String] = [PasskeyVerificationMethod.email: "", PasskeyVerificationMethod.phone: collectedVerificationCodes[PasskeyVerificationMethod.phone] ?? ""]
-
         do {
             let credentials = try await authenticationClient
                 .login(passkey: passkey,
                        challenge: challenge,
                        connection: "Username-Password-Authentication",
                        scope: "openid profile email offline_access",
-                       verification: codes)
+                       verification: collectedVerificationCodes)
                 .validateClaims()
                 .start()
             try credentialsManager.store(credentials: credentials)
             // Success — clear all pending state.
             clearPendingPasskeySignup()
             isAuthenticated = true
-        } catch let error as AuthenticationError where error.isPasskeyVerificationCodeInvalid {
+        } catch let error as AuthenticationError where error.isPasskeyVerificationRetryable {
             // Wrong OTP — the session is still alive. Reuse the auth_session echoed in this response.
             let failedChannels = error.passkeyVerificationRequired ?? pendingPasskeySignupChallenge?.verificationRequired ?? []
             guard !failedChannels.isEmpty else {
