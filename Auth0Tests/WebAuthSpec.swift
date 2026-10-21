@@ -358,7 +358,7 @@ class WebAuthSpec: QuickSpec {
         }
 
         describe("redirect uri") {
-            let bundleId = Bundle.main.bundleIdentifier!
+            let bundleId = Bundle.main.bundleIdentifier ?? ""
             let platform: String
 
             #if os(iOS)
@@ -1165,5 +1165,4 @@ class MockUserAgent: WebAuthUserAgent {
     }
 
 }
-
 

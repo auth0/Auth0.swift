@@ -9,17 +9,10 @@
 📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 💡 [**Examples**](#examples) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
 
 > [!IMPORTANT]
-> **🚀 v3 GA Available**
-> A new major version [`3.0.0`](https://github.com/auth0/Auth0.swift/releases/tag/3.0.0) of Auth0.swift is now available as GA. It includes breaking changes and improvements over v2.
+> **🧪 Embedded Auth v4.0.0-beta.0**
+> [`v4.0.0-beta.0`](https://github.com/auth0/Auth0.swift/releases/tag/4.0.0-beta.0) introduces Embedded Auth with Email OTP support (existing users only). This feature is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) — please reach out to Auth0 support to enable it for your tenant.
 >
-> We'd love for you to try it out and share your feedback! Please [open an issue](https://github.com/auth0/Auth0.swift/issues) if you encounter any problems or have suggestions.
->
-> 📚 [Migration Guide](https://github.com/auth0/Auth0.swift/blob/3.0.0/V3_MIGRATION_GUIDE.md) &nbsp;•&nbsp; 📦 [v3 Changelog](https://github.com/auth0/Auth0.swift/blob/3.0.0/CHANGELOG.md) &nbsp;•&nbsp; 🤖 [Auth0 Skill](https://github.com/auth0/agent-skills/blob/main/plugins/auth0/skills/auth0/SKILL.md)
->
-> **Skill for Coding Agents:** If you use coding agents such as Claude Code or Cursor, add the Auth0 skill to automate the upgrade:
-> ```
-> npx skills add auth0/agent-skills --skill auth0
-> ```
+> 📦 [v4 Changelog](https://github.com/auth0/Auth0.swift/blob/v4-development/CHANGELOG.md) &nbsp;•&nbsp; 📚 [Embedded Auth Guide](https://github.com/auth0/Auth0.swift/blob/v4-development/examples/embedded-auth.md)
 >
 
 ## Documentation
@@ -67,7 +60,7 @@ Then, select the dependency rule and press **Add Package**.
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 3.1.0'
+pod 'Auth0', '~> 4.0.0-beta.0'
 ```
 
 Then, run `pod install`.
@@ -77,7 +70,7 @@ Then, run `pod install`.
 Add the following line to your `Cartfile`:
 
 ```text
-github "auth0/Auth0.swift" ~> 3.1.0
+github "auth0/Auth0.swift" ~> 4.0.0-beta.0
 ```
 
 Then, run `carthage bootstrap --use-xcframeworks`.

@@ -42,6 +42,12 @@ Each feature lives in its own file under [`examples/`](examples).
 - [Authentication API client configuration](examples/authentication-api/configuration.md)
 - [Authentication API client errors](examples/authentication-api/errors.md)
 
+## [Embedded Auth (iOS / macOS / tvOS / watchOS / visionOS) [Beta]](examples/embedded-auth.md)
+
+- [Obtain a client](examples/embedded-auth.md#obtain-a-client)
+- [Start the flow and step through next actions](examples/embedded-auth.md#start-the-flow-and-step-through-next-actions)
+- [Error handling during the flow](examples/embedded-auth.md#error-handling-during-the-flow)
+
 ## [MFA API (iOS / macOS / tvOS / watchOS / visionOS)](examples/mfa-api.md)
 
 - [Prerequisites](examples/mfa-api.md#prerequisites)

@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.0.0-beta.0](https://github.com/auth0/Auth0.swift/tree/4.0.0-beta.0) (2026-10-07)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.1.0...4.0.0-beta.0)
+
+**Added**
+- feat(embedded-auth): Add POST /e/authorize Email OTP flow [\#1292](https://github.com/auth0/Auth0.swift/pull/1292) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [3.1.0](https://github.com/auth0/Auth0.swift/tree/3.1.0) (2026-08-19)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.0.2...3.1.0)
 
