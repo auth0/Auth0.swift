@@ -526,7 +526,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///
     /// - Parameters:
     ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
-    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
+    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
@@ -545,6 +545,62 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                audience: String?,
                scope: String,
                organization: String?) -> any TokenRequestable<Credentials, AuthenticationError>
+
+    /// Logs a new user in using a signup passkey credential, with identifier verification.
+    ///
+    /// This is the method that sends the one-time codes. It takes the identifiers to verify and the `auth_session` as
+    /// separate values, so you can use it right after ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``
+    /// and also to retry after a wrong code, without building a new ``PasskeySignupChallenge``. When you have the
+    /// challenge, ``login(passkey:challenge:connection:audience:scope:organization:verification:)`` is a shorthand.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .login(passkey: signupPasskey,
+    ///            verificationRequired: [.email, .phone],
+    ///            authSession: signupChallenge.authenticationSession,
+    ///            connection: "Username-Password-Authentication",
+    ///            audience: nil,
+    ///            scope: "openid profile email offline_access",
+    ///            organization: nil,
+    ///            verification: [.email: "123456", .phone: "654321"])
+    ///     .start { print($0) }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+    ///   - verificationRequired: The identifiers whose one-time codes have to be in `verification`. Where the list comes from:
+    ///                  - **First attempt:** ``PasskeySignupChallenge/verificationRequired``, from the challenge returned by ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``.
+    ///                  - **Retry after a wrong code:** ``AuthenticationError/passkeyVerificationRequired``, from the error of the previous call when ``AuthenticationError/isPasskeyVerificationRetryable`` is `true`. It lists only the identifiers that are still unverified.
+    ///
+    ///                  An empty array means that verification is not enabled, or not required for any identifier: nothing is validated.
+    ///   - authSession: The session of the signup. Use ``PasskeySignupChallenge/authenticationSession`` on the first attempt, and ``AuthenticationError/passkeyAuthSession`` on a retry (Auth0 echoes the same session back).
+    ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
+    ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
+    ///   - organization: Identifier of an organization the user is a member of.
+    ///   - verification: One-time codes that verify ownership of the identifiers, keyed by ``PasskeyVerificationMethod``. For example, `[.email: "123456", .phone: "654321"]`.
+    ///                  Every identifier in `verificationRequired` needs a non-empty code. If a code is missing (`Missing required parameter: verification.email`) or is an empty string, or only whitespace (`"verification.email" is not allowed to be empty`, with `verification.phone` for the phone), the request fails with an `invalid_request` error before it is sent, naming the first identifier of `verificationRequired` with a problem.
+    ///                  The request is not sent in that case, so the session is unchanged: provide the code and call again with the same passkey credential.
+    ///                  Codes for identifiers that are not in `verificationRequired` are not validated, and an empty dictionary is never sent. Defaults to an empty dictionary, in which case no `verification` object is sent.
+    /// - Returns: A request that will yield Auth0 user's credentials.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-new-user)
+    /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
+    /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: SignupPasskey,
+               verificationRequired: [PasskeyVerificationMethod],
+               authSession: String,
+               connection: String?,
+               audience: String?,
+               scope: String,
+               organization: String?,
+               verification: [PasskeyVerificationMethod: String]) -> any TokenRequestable<Credentials, AuthenticationError>
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
@@ -600,8 +656,15 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// authController.performRequests()
     /// ```
     ///
-    /// Then, call ``login(passkey:challenge:connection:audience:scope:)-4q8i0`` with the created
+    /// Then, call ``login(passkey:challenge:connection:audience:scope:organization:verification:)`` with the created
     /// passkey credential and the challenge to log the new user in.
+    ///
+    /// If ``PasskeySignupChallenge/verificationRequired`` is non-nil, the server delivers a one-time code to each
+    /// listed identifier, and the codes must be sent along with the passkey in
+    /// ``login(passkey:challenge:connection:audience:scope:organization:verification:)``.
+    /// To start over — for example when the user asks for new codes — request a new signup challenge. A new challenge
+    /// comes with its own `auth_session` and challenge data, so create a new passkey credential from it as well; a
+    /// passkey created for a previous challenge can't be used with it.
     ///
     /// - Parameters:
     ///   - email:        Email address of the user. Defaults to `nil`.
@@ -634,6 +697,42 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                                 userMetadata: [String: String]?,
                                 connection: String?,
                                 organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError>
+
+    /// Requests a passkey signup challenge with an explicit OTP delivery channel for phone verification.
+    ///
+    /// - Parameters:
+    ///   - email:          Email address of the user. Defaults to `nil`.
+    ///   - phoneNumber:    Phone number of the user. Defaults to `nil`.
+    ///   - username:       Username of the user. Defaults to `nil`.
+    ///   - name:           Display name of the user. Defaults to `nil`.
+    ///   - givenName:      First name of the user. Defaults to `nil`.
+    ///   - familyName:     Last name of the user. Defaults to `nil`.
+    ///   - nickname:       Preferred nickname of the user. Defaults to `nil`.
+    ///   - picture:        URL pointing to the user's profile picture. Defaults to `nil`.
+    ///   - userMetadata:   Additional user metadata as key-value pairs. Defaults to `nil`.
+    ///   - connection:     Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - organization:   Identifier of an organization the user is a member of.
+    ///   - deliveryMethod: OTP delivery channel for phone identifier verification. Only relevant when the connection requires phone verification and `phoneNumber` is provided: it is ignored for an email address, with no error, and the code is sent by email as usual. Defaults to `nil` (server default applies).
+    /// - Returns: A request that will yield a passkey signup challenge.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#request-signup-challenge)
+    /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
+    /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String?,
+                                username: String?,
+                                name: String?,
+                                givenName: String?,
+                                familyName: String?,
+                                nickname: String?,
+                                picture: String?,
+                                userMetadata: [String: String]?,
+                                connection: String?,
+                                organization: String?,
+                                deliveryMethod: DeliveryMethod?) -> any Requestable<PasskeySignupChallenge, AuthenticationError>
     #endif
 
     /**
@@ -1228,17 +1327,59 @@ public extension Authentication {
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(passkey: SignupPasskey,
+               verificationRequired: [PasskeyVerificationMethod],
+               authSession: String,
+               connection: String? = nil,
+               audience: String? = nil,
+               scope: String = defaultScope,
+               organization: String? = nil,
+               verification: [PasskeyVerificationMethod: String] = [:]) -> any TokenRequestable<Credentials, AuthenticationError> {
+        return self.login(passkey: passkey,
+                          verificationRequired: verificationRequired,
+                          authSession: authSession,
+                          connection: connection,
+                          audience: audience,
+                          scope: scope,
+                          organization: organization,
+                          verification: verification)
+    }
+
+    /// Logs a new user in using a signup passkey credential and the challenge it was created from, with identifier
+    /// verification.
+    ///
+    /// Shorthand for ``login(passkey:verificationRequired:authSession:connection:audience:scope:organization:verification:)``
+    /// that takes the identifiers to verify and the `auth_session` from the challenge: ``PasskeySignupChallenge/verificationRequired``
+    /// and ``PasskeySignupChallenge/authenticationSession``.
+    ///
+    /// To retry after a wrong code, call the other method with ``AuthenticationError/passkeyVerificationRequired`` and
+    /// ``AuthenticationError/passkeyAuthSession`` from the error, or build a new ``PasskeySignupChallenge`` from them. If
+    /// you pass the original challenge, all of its identifiers need a code again.
+    ///
+    /// - Parameters:
+    ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``.
+    ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
+    ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
+    ///   - organization: Identifier of an organization the user is a member of.
+    ///   - verification: One-time codes for the identifiers in the challenge's ``PasskeySignupChallenge/verificationRequired``. See ``login(passkey:verificationRequired:authSession:connection:audience:scope:organization:verification:)`` for the validation. Defaults to an empty dictionary, in which case no `verification` object is sent.
+    /// - Returns: A request that will yield Auth0 user's credentials.
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: SignupPasskey,
                challenge: PasskeySignupChallenge,
                connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope,
-               organization: String? = nil) -> any TokenRequestable<Credentials, AuthenticationError> {
+               organization: String? = nil,
+               verification: [PasskeyVerificationMethod: String] = [:]) -> any TokenRequestable<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
-                          challenge: challenge,
+                          verificationRequired: challenge.verificationRequired ?? [],
+                          authSession: challenge.authenticationSession,
                           connection: connection,
                           audience: audience,
                           scope: scope,
-                          organization: organization)
+                          organization: organization,
+                          verification: verification)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -1252,7 +1393,8 @@ public extension Authentication {
                                 picture: String? = nil,
                                 userMetadata: [String: String]? = nil,
                                 connection: String? = nil,
-                                organization: String? = nil) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
+                                organization: String? = nil,
+                                deliveryMethod: DeliveryMethod? = nil) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
         return self.passkeySignupChallenge(email: email,
                                            phoneNumber: phoneNumber,
                                            username: username,
@@ -1263,7 +1405,8 @@ public extension Authentication {
                                            picture: picture,
                                            userMetadata: userMetadata,
                                            connection: connection,
-                                           organization: organization)
+                                           organization: organization,
+                                           deliveryMethod: deliveryMethod)
     }
     #endif
 

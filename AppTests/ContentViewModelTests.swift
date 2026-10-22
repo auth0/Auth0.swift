@@ -72,7 +72,6 @@ struct MockAuthentication: Authentication {
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> any Requestable<DatabaseUser, AuthenticationError> { StubRequestable() }
 
-    #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(passkey: LoginPasskey, challenge: PasskeyLoginChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
 
@@ -83,8 +82,13 @@ struct MockAuthentication: Authentication {
     func login(passkey: SignupPasskey, challenge: PasskeySignupChallenge, connection: String?, audience: String?, scope: String, organization: String?) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func passkeySignupChallenge(email: String?, phoneNumber: String?, username: String?, name: String?, connection: String?, organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> { StubRequestable() }
-    #endif
+    func login(passkey: SignupPasskey, verificationRequired: [PasskeyVerificationMethod], authSession: String, connection: String?, audience: String?, scope: String, organization: String?, verification: [PasskeyVerificationMethod: String]) -> any TokenRequestable<Credentials, AuthenticationError> { TokenRequest(request: StubRequestable(), authentication: self) }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeySignupChallenge(email: String?, phoneNumber: String?, username: String?, name: String?, givenName: String?, familyName: String?, nickname: String?, picture: String?, userMetadata: [String: String]?, connection: String?, organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> { StubRequestable() }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeySignupChallenge(email: String?, phoneNumber: String?, username: String?, name: String?, givenName: String?, familyName: String?, nickname: String?, picture: String?, userMetadata: [String: String]?, connection: String?, organization: String?, deliveryMethod: DeliveryMethod?) -> any Requestable<PasskeySignupChallenge, AuthenticationError> { StubRequestable() }
 
     func resetPassword(email: String, connection: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError> { StubRequestable() }
@@ -126,13 +130,11 @@ struct ContentViewModelTests {
 
     private func makeViewModel(
         email: String = "",
-        password: String = "",
         isAuthenticated: Bool = false,
         loginRequest: any Requestable<Credentials, AuthenticationError>
     ) -> ContentViewModel {
         ContentViewModel(
             email: email,
-            password: password,
             isAuthenticated: isAuthenticated,
             authenticationClient: MockAuthentication(loginRequest: loginRequest),
             credentialsManager: .dummy
@@ -146,7 +148,7 @@ struct ContentViewModelTests {
         let viewModel = makeViewModel(loginRequest: MockRequestable(result: .success(.stub)))
 
         #expect(viewModel.email == "")
-        #expect(viewModel.password == "")
+        #expect(viewModel.phoneNumber == "")
         #expect(viewModel.isLoading == false)
         #expect(viewModel.isAuthenticated == false)
         #expect(viewModel.errorMessage == nil)
@@ -156,45 +158,11 @@ struct ContentViewModelTests {
     func customInitialState() {
         let viewModel = makeViewModel(
             email: "user@example.com",
-            password: "secret",
             isAuthenticated: true,
             loginRequest: MockRequestable(result: .success(.stub))
         )
 
         #expect(viewModel.email == "user@example.com")
-        #expect(viewModel.password == "secret")
         #expect(viewModel.isAuthenticated == true)
-    }
-
-    // MARK: login() — success
-
-    @Test("login() clears isLoading after success")
-    func loginSuccessClearsLoading() async {
-        let viewModel = makeViewModel(loginRequest: MockRequestable(result: .success(.stub)))
-
-        await viewModel.login()
-
-        #expect(viewModel.isLoading == false)
-    }
-
-    // MARK: login() — failure
-
-    @Test("login() sets errorMessage and keeps isAuthenticated false on failure")
-    func loginFailureSetsErrorMessage() async {
-        let viewModel = makeViewModel(loginRequest: MockRequestable(result: .failure(.stub)))
-
-        await viewModel.login()
-
-        #expect(viewModel.isAuthenticated == false)
-        #expect(viewModel.errorMessage == AuthenticationError.stub.localizedDescription)
-    }
-
-    @Test("login() clears isLoading after failure")
-    func loginFailureClearsLoading() async {
-        let viewModel = makeViewModel(loginRequest: MockRequestable(result: .failure(.stub)))
-
-        await viewModel.login()
-
-        #expect(viewModel.isLoading == false)
     }
 }

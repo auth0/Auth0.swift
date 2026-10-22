@@ -93,6 +93,18 @@ func apiFailureResponse(string: String, statusCode: Int) -> RequestResponse {
     }
 }
 
+/// A failure response whose body is plain text, such as the `Too Many Requests` the passkey rate limiter sends.
+func plainTextFailureResponse(_ text: String, statusCode: Int) -> RequestResponse {
+    return { request in
+        let data = text.data(using: .utf8)
+        let response = HTTPURLResponse(url: request.url!,
+                                       statusCode: statusCode,
+                                       httpVersion: nil,
+                                       headerFields: ["Content-Type": "text/plain; charset=utf-8"])!
+        return (data, response, nil)
+    }
+}
+
 func dpopErrorResponse(url: URL, nonce: String) -> RequestResponse {
     return { request in
         let headers = ["Content-Type": "application/json", "DPoP-Nonce": nonce]
@@ -217,13 +229,15 @@ func passkeySignupChallengeResponse(authSession: String,
                                     userId: String,
                                     userName: String,
                                     userDisplayName: String = Support,
-                                    challenge: String) -> RequestResponse {
+                                    challenge: String,
+                                    verificationRequired: [String]? = nil) -> RequestResponse {
     return passkeyEnrollmentChallengeResponse(authSession: authSession,
                                               rpId: rpId,
                                               userId: userId,
                                               userName: userName,
                                               userDisplayName: userDisplayName,
                                               challenge: challenge,
+                                              verificationRequired: verificationRequired,
                                               headers: [:])
 }
 
@@ -233,8 +247,9 @@ func passkeyEnrollmentChallengeResponse(authSession: String,
                                         userName: String,
                                         userDisplayName: String = Support,
                                         challenge: String,
+                                        verificationRequired: [String]? = nil,
                                         headers: [String: String]) -> RequestResponse {
-    let json: [String: Any] = [
+    var json: [String: Any] = [
         "auth_session": authSession,
         "authn_params_public_key": [
             "rp": [
@@ -259,6 +274,9 @@ func passkeyEnrollmentChallengeResponse(authSession: String,
             "timeout": 60000
         ]
     ]
+    if let verificationRequired = verificationRequired {
+        json["verification_required"] = verificationRequired
+    }
 
     return apiSuccessResponse(json: json, headers: headers)
 }
