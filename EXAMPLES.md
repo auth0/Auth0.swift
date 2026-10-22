@@ -8,6 +8,7 @@ Each feature lives in its own file under [`examples/`](examples).
 - [Web Auth configuration](examples/web-auth.md#web-auth-configuration)
 - [ID token validation](examples/web-auth.md#id-token-validation)
 - [DPoP](examples/web-auth.md#dpop)
+- [Experiment Center [EA]](examples/web-auth.md#experiment-center-ea)
 - [Automatic credentials management](examples/web-auth.md#automatic-credentials-management)
 - [Web Auth errors](examples/web-auth.md#web-auth-errors)
 
