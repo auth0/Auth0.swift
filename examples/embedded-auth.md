@@ -184,8 +184,8 @@ do {
     case .accessDenied:
         // Other terminal denial — start over with authorize().
         break
-    case .tooManyAttempts, .tooManyLogins:
-        // Rate-limited — ask the user to wait and retry.
+    case .tooManyAttempts, .tooManyLogins, .ipBlocked:
+        // Rate-limited by attack protection — the flow has ended. Ask the user to try again later, then start over with authorize().
         break
     case .sessionExpired:
         // The grant expired — start over with authorize().

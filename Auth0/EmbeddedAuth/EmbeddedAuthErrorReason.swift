@@ -41,11 +41,20 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// Terminal: the request was malformed (missing or invalid parameters).
     case invalidRequest
 
-    /// Terminal: rate-limited by attack-protection (BFP / SIPT).
+    /// Terminal: rate-limited by attack protection, such as brute-force protection.
+    ///
+    /// Suspicious IP throttling may instead be reported as ``ipBlocked``.
     case tooManyAttempts
 
     /// Terminal: rate-limited by same-user-login protection.
     case tooManyLogins
+
+    /// Terminal: the device's IP address was rate-limited by suspicious IP throttling.
+    ///
+    /// The server returned `too_many_requests` with `error_description` `ip_blocked`. The session is
+    /// cleared, so the same step cannot be retried; ask the user to try again later and start a new flow
+    /// with ``EmbeddedAuth/authorize(connection:)``.
+    case ipBlocked
 
     /// Terminal: the grant is no longer valid. Start a new flow with
     /// ``EmbeddedAuth/authorize(connection:)``.

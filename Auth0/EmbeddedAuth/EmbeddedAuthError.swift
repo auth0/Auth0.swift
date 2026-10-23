@@ -104,6 +104,8 @@ public extension EmbeddedAuthError {
             return .tooManyAttempts
         case (429, "too_many_requests", "too_many_logins"):
             return .tooManyLogins
+        case (_, "too_many_requests", "ip_blocked"):
+            return .ipBlocked
         case (_, "invalid_grant", _):
             return .sessionExpired
         case (_, "no_active_session", _):

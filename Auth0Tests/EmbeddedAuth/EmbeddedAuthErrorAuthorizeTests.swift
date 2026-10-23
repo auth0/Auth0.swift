@@ -330,6 +330,54 @@ import Foundation
         }
     }
 
+    // MARK: - reason: ip_blocked
+
+    @Test func reasonIsIpBlockedFor429AndIpBlockedDescription() {
+        let error = EmbeddedAuthError(
+            info: ["error": "too_many_requests", "error_description": "ip_blocked"],
+            statusCode: 429
+        )
+        guard case .ipBlocked = error.reason else {
+            Issue.record("Expected .ipBlocked, got \(error.reason)"); return
+        }
+    }
+
+    @Test(arguments: [400, 403])
+    func reasonIsIpBlockedForNon429StatusCode(_ statusCode: Int) {
+        let error = EmbeddedAuthError(
+            info: ["error": "too_many_requests", "error_description": "ip_blocked"],
+            statusCode: statusCode
+        )
+        guard case .ipBlocked = error.reason else {
+            Issue.record("Expected .ipBlocked for status \(statusCode), got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsIpBlockedEvenWhenNextAndAuthSessionArePresent() {
+        let error = EmbeddedAuthError(
+            info: [
+                "error": "too_many_requests",
+                "error_description": "ip_blocked",
+                "auth_session": "sess_x",
+                "next": [["action": "action:verify:recovery-code:v1"]]
+            ],
+            statusCode: 429
+        )
+        guard case .ipBlocked = error.reason else {
+            Issue.record("Expected .ipBlocked, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsUnknownForTooManyRequestsWithUnrecognisedDescription() {
+        let error = EmbeddedAuthError(
+            info: ["error": "too_many_requests", "error_description": "Rate limit exceeded"],
+            statusCode: 429
+        )
+        guard case .unknown = error.reason else {
+            Issue.record("Expected .unknown, got \(error.reason)"); return
+        }
+    }
+
     // MARK: - reason: sessionExpired
 
     @Test func reasonIsSessionExpiredForInvalidGrant() {
