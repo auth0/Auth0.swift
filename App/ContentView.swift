@@ -3,6 +3,9 @@ import Auth0
 
 struct ContentView: View {
     @StateObject private var viewModel = ContentViewModel(authenticationClient: Auth0.authentication())
+    #if WEB_AUTH_PLATFORM && !os(macOS)
+    @Environment(\.window) private var window
+    #endif
 
     var body: some View {
         ScrollView {
@@ -22,6 +25,22 @@ struct ContentView: View {
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading)
 
+                    #if WEB_AUTH_PLATFORM
+                    Button {
+                        Task {
+                            #if os(macOS)
+                            await viewModel.webLogin(presentationWindow: getCurrentWindow())
+                            #else
+                            await viewModel.webLogin(presentationWindow: window)
+                            #endif
+                        }
+                    } label: {
+                        Text("Login with Browser")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+                    #endif
+
                 case .identifyEmail:
                     TextField("Email", text: $viewModel.email)
                         #if !os(macOS)
@@ -40,6 +59,42 @@ struct ContentView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading || viewModel.email.isEmpty)
+                    if viewModel.canToggleIdentifier {
+                        Button {
+                            viewModel.toggleIdentifier()
+                        } label: {
+                            Text("Use phone instead")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
+
+                case .identifyPhone:
+                    TextField("Phone number", text: $viewModel.phone)
+                        #if !os(macOS)
+                        .textContentType(.telephoneNumber)
+                        .keyboardType(.phonePad)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    Button {
+                        Task { await viewModel.submitPhone(viewModel.phone) }
+                    } label: {
+                        Text("Submit Phone")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.phone.isEmpty)
+                    if viewModel.canToggleIdentifier {
+                        Button {
+                            viewModel.toggleIdentifier()
+                        } label: {
+                            Text("Use email instead")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
 
                 case .challengeEmail(let index, let identifier):
                     Text(identifier.isEmpty ? "We'll send you a one-time code." : "We'll send a one-time code to \(identifier).")
@@ -52,6 +107,46 @@ struct ContentView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading)
+                    alternativeActionButtons
+
+                case .challengePhone(let index, let identifier, let deliveryMethods):
+                    Text("We'll send a code to \(identifier).")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    // The server may omit the supported methods; fall back to SMS.
+                    ForEach(deliveryMethods.isEmpty ? [.text] : deliveryMethods, id: \.self) { method in
+                        Button {
+                            Task { await viewModel.triggerPhoneChallenge(index: index, deliveryMethod: method) }
+                        } label: {
+                            Text(method == .voice ? "Voice" : "SMS")
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
+                    alternativeActionButtons
+
+                case .challengePush(let index, let name):
+                    Button {
+                        Task { await viewModel.triggerPushChallenge(index: index) }
+                    } label: {
+                        Text("Send push to \(name)")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+                    alternativeActionButtons
+
+                case .pollingPush:
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                    Text("Waiting for approval on your device…")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Button {
+                        viewModel.reset()
+                    } label: {
+                        Text("Cancel")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
 
                 case .verifyOTP(let channel, let identifier):
                     if let identifier {
@@ -67,19 +162,88 @@ struct ContentView: View {
                         #if !os(tvOS)
                         .textFieldStyle(.roundedBorder)
                         #endif
-                    if let otpError = viewModel.otpAttemptError {
-                        Text(otpError)
+                    if let attemptError = viewModel.attemptError {
+                        Text(attemptError)
                             .font(.caption)
                             .foregroundColor(.red)
                     }
                     Button {
-                        viewModel.otpAttemptError = nil
+                        viewModel.attemptError = nil
                         Task { await viewModel.submitOtp(viewModel.otp, channel: channel) }
                     } label: {
                         Text("Verify")
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading || viewModel.otp.isEmpty)
+                    alternativeActionButtons
+
+                case .verifyPassword:
+                    Text("Enter your password")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    SecureField("Password", text: $viewModel.password)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    if let attemptError = viewModel.attemptError {
+                        Text(attemptError)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    Button {
+                        viewModel.attemptError = nil
+                    } label: {
+                        Text("Verify")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.password.isEmpty)
+                    alternativeActionButtons
+
+                case .verifyRecoveryCode:
+                    Text("Enter your recovery code")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    TextField("Recovery code", text: $viewModel.recoveryCode)
+                        #if !os(macOS)
+                        .autocapitalization(.none)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    if let attemptError = viewModel.attemptError {
+                        Text(attemptError)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    Button {
+                        viewModel.attemptError = nil
+                        Task { await viewModel.submitRecoveryCode(viewModel.recoveryCode) }
+                    } label: {
+                        Text("Verify")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.recoveryCode.isEmpty)
+                    alternativeActionButtons
+
+                case .confirmRecoveryCode(let newCode):
+                    Text("New recovery code")
+                        .font(.headline)
+                    Text("Save this code somewhere safe. It replaces your previous recovery code.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Text(verbatim: newCode)
+                        .font(.body.monospaced())
+                        #if !os(tvOS)
+                        .textSelection(.enabled)
+                        #endif
+                    Button {
+                        Task { await viewModel.confirmRecoveryCode() }
+                    } label: {
+                        Text("I've saved it")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
 
                 case .success(let credentials):
                     Text("✓ Authenticated")
@@ -91,9 +255,7 @@ struct ContentView: View {
                         LabeledValue(label: "Expires", value: credentials.expiresAt.formatted())
                     }
                     Button {
-                        viewModel.embeddedAuthUIState = .initial
-                        viewModel.otp = ""
-                        viewModel.email = ""
+                        viewModel.reset()
                     } label: {
                         Text("Reset")
                     }
@@ -108,8 +270,7 @@ struct ContentView: View {
                         .foregroundColor(.red)
                         .multilineTextAlignment(.leading)
                     Button {
-                        viewModel.embeddedAuthUIState = .initial
-                        viewModel.otp = ""
+                        viewModel.reset()
                     } label: {
                         Text("Try Again")
                     }
@@ -122,6 +283,38 @@ struct ContentView: View {
                 }
             }
             .padding()
+        }
+        .onDisappear { viewModel.cancelPolling() }
+    }
+
+    /// Buttons for switching to another method offered by the latest response.
+    @ViewBuilder
+    private var alternativeActionButtons: some View {
+        ForEach(Array(viewModel.alternativeActions.enumerated()), id: \.offset) { _, action in
+            Button {
+                viewModel.selectAction(action)
+            } label: {
+                Text(title(for: action))
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .disabled(viewModel.isLoading)
+        }
+    }
+
+    private func title(for action: NextAction) -> String {
+        switch action {
+        case .challengeEmail:
+            return "Use email code"
+        case .challengePhone(_, let identifier, _):
+            return "Use phone \(identifier)"
+        case .challengePush(_, let name):
+            return "Use push notification on \(name)"
+        case .verifyOTP(let channel, _):
+            return channel == .totp ? "Use authenticator app code" : "Enter a code"
+        case .verifyRecoveryCode:
+            return "Use recovery code"
+        default:
+            return "Use another method"
         }
     }
 }

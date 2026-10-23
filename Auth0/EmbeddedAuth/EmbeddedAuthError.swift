@@ -94,12 +94,20 @@ public extension EmbeddedAuthError {
             return .tooManyWrongOtpAttempts
         case (_, "access_denied", "challenge_expired"):
             return .challengeExpired
+        case (_, "access_denied", "authorization_rejected"):
+            return .authorizationRejected
+        case (_, "access_denied", "no_eligible_factors"):
+            return .noEligibleFactors
+        case (_, "access_denied", "consent_required"):
+            return .consentRequired
         case (_, "access_denied", _):
             return .accessDenied
         case (429, "too_many_requests", "too_many_attempts"):
             return .tooManyAttempts
         case (429, "too_many_requests", "too_many_logins"):
             return .tooManyLogins
+        case (_, "too_many_requests", "ip_blocked"):
+            return .ipBlocked
         case (_, "invalid_grant", _):
             return .sessionExpired
         case (_, "no_active_session", _):
@@ -124,14 +132,34 @@ private extension EmbeddedAuthError {
             switch EmbeddedAction(rawValue: actionString) {
             case .identifyEmail:
                 return .identifyEmail
+            case .identifyPhone:
+                return .identifyPhone
             case .challengeEmail:
                 guard let index = entry["index"] as? Int,
                       let identifier = entry["identifier"] as? String else { return nil }
                 return .challengeEmail(index: index, identifier: identifier)
+            case .challengePhone:
+                guard let index = entry["index"] as? Int,
+                      let identifier = entry["identifier"] as? String,
+                      let rawMethods = entry["delivery_methods"] as? [String] else { return nil }
+                let methods = rawMethods.compactMap { PhoneDeliveryMethod(rawValue: $0) }
+                return .challengePhone(index: index, identifier: identifier, deliveryMethods: methods)
+            case .challengePush:
+                guard let index = entry["index"] as? Int,
+                      let name = entry["name"] as? String else { return nil }
+                return .challengePush(index: index, name: name)
             case .verifyOTP:
                 guard let channelString = entry["channel"] as? String,
                       let channel = OtpChannel(rawValue: channelString.lowercased()) else { return nil }
                 return .verifyOTP(channel: channel, identifier: entry["identifier"] as? String)
+            case .verifyOob:
+                guard let pollInMs = entry["poll_in_ms"] as? Int else { return nil }
+                return .verifyOob(pollInMs: pollInMs)
+            case .verifyRecoveryCode:
+                return .verifyRecoveryCode
+            case .confirmRecoveryCode:
+                guard let newCode = entry["new_code"] as? String else { return nil }
+                return .confirmRecoveryCode(newCode: newCode)
             case .none:
                 return .unknown(rawAction: actionString)
             }

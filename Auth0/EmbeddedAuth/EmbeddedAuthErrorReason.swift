@@ -24,8 +24,19 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// Terminal: too many wrong OTP submissions. Restart the flow.
     case tooManyWrongOtpAttempts
 
-    /// Terminal: the OTP challenge expired before it was verified. Restart the flow.
+    /// Terminal: the push (out-of-band) challenge expired or could not be found. Restart the flow.
     case challengeExpired
+
+    /// Terminal: the user explicitly denied the push notification. Restart the flow.
+    case authorizationRejected
+
+    /// Terminal: a second factor is required but the user has no eligible factor. Fall back to a redirect-based flow.
+    case noEligibleFactors
+
+    /// Terminal: consent is required but cannot be collected in the embedded flow.
+    ///
+    /// Complete sign-in with a redirect-based flow such as Universal Login.
+    case consentRequired
 
     /// Terminal: access denied for a reason not modelled as its own case.
     ///
@@ -35,11 +46,20 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// Terminal: the request was malformed (missing or invalid parameters).
     case invalidRequest
 
-    /// Terminal: rate-limited by attack-protection (BFP / SIPT).
+    /// Terminal: rate-limited by attack protection, such as brute-force protection.
+    ///
+    /// Suspicious IP throttling may instead be reported as ``ipBlocked``.
     case tooManyAttempts
 
     /// Terminal: rate-limited by same-user-login protection.
     case tooManyLogins
+
+    /// Terminal: the device's IP address was rate-limited by suspicious IP throttling.
+    ///
+    /// The server returned `too_many_requests` with `error_description` `ip_blocked`. The session is
+    /// cleared, so the same step cannot be retried; ask the user to try again later and start a new flow
+    /// with ``EmbeddedAuth/authorize(connection:)``.
+    case ipBlocked
 
     /// Terminal: the grant is no longer valid. Start a new flow with
     /// ``EmbeddedAuth/authorize(connection:)``.
@@ -67,7 +87,8 @@ public enum EmbeddedAuthErrorReason: Sendable {
         /// A plain continuation: the server advanced the flow without a specific error.
         case none
 
-        /// The OTP the user entered was incorrect. They may retry via `nextActions`.
+        /// The one-time code or recovery code the user entered was incorrect, for a user the server has already
+        /// identified. They may retry via `nextActions`.
         case invalidCode
 
         /// The identifier+code pair the user entered was incorrect. They may retry via `nextActions`.

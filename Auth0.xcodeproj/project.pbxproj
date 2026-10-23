@@ -653,18 +653,6 @@
 		D45462C0306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546296306CE4DC002957D8 /* EmbeddedAuth.swift */; };
 		D45462C2306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */; };
 		D45462C3306CE4DC002957D8 /* EmbeddedAuthHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546299306CE4DC002957D8 /* EmbeddedAuthHandlers.swift */; };
-		D45462CA306CE50E002957D8 /* EmbeddedAuthErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C7306CE50E002957D8 /* EmbeddedAuthErrorTests.swift */; };
-		D45462CC306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C6306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift */; };
-		D45462CD306CE50E002957D8 /* EmbeddedAuthClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C5306CE50E002957D8 /* EmbeddedAuthClientTests.swift */; };
-		D45462CE306CE50E002957D8 /* EmbeddedAuthErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C7306CE50E002957D8 /* EmbeddedAuthErrorTests.swift */; };
-		D45462D0306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C6306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift */; };
-		D45462D1306CE50E002957D8 /* EmbeddedAuthClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C5306CE50E002957D8 /* EmbeddedAuthClientTests.swift */; };
-		D45462D2306CE50E002957D8 /* EmbeddedAuthErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C7306CE50E002957D8 /* EmbeddedAuthErrorTests.swift */; };
-		D45462D4306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C6306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift */; };
-		D45462D5306CE50E002957D8 /* EmbeddedAuthClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C5306CE50E002957D8 /* EmbeddedAuthClientTests.swift */; };
-		D45462D6306CE50E002957D8 /* EmbeddedAuthErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C7306CE50E002957D8 /* EmbeddedAuthErrorTests.swift */; };
-		D45462D8306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C6306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift */; };
-		D45462D9306CE50E002957D8 /* EmbeddedAuthClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45462C5306CE50E002957D8 /* EmbeddedAuthClientTests.swift */; };
 		D4546443306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */; };
 		D4546444306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */; };
 		D4546445306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */; };
@@ -1186,9 +1174,6 @@
 		D4546299306CE4DC002957D8 /* EmbeddedAuthHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthHandlers.swift; sourceTree = "<group>"; };
 		D454629A306CE4DC002957D8 /* EmbeddedAuthNextAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthNextAction.swift; sourceTree = "<group>"; };
 		D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthSessionValidator.swift; sourceTree = "<group>"; };
-		D45462C5306CE50E002957D8 /* EmbeddedAuthClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthClientTests.swift; sourceTree = "<group>"; };
-		D45462C6306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthErrorAuthorizeTests.swift; sourceTree = "<group>"; };
-		D45462C7306CE50E002957D8 /* EmbeddedAuthErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthErrorTests.swift; sourceTree = "<group>"; };
 		D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthErrorReason.swift; sourceTree = "<group>"; };
 		D46390902F18F28700FD84D7 /* RequestValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestValidator.swift; sourceTree = "<group>"; };
 		D46D5E032F62B934001ECC7B /* TokenRequestable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestable.swift; sourceTree = "<group>"; };
@@ -1263,6 +1248,7 @@
 		D424EBAA2F15D6A500052186 /* MFA */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MFA; sourceTree = "<group>"; };
 		D4919A702F55A38C007EA4B0 /* AppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AppTests; sourceTree = "<group>"; };
 		D4919A762F55A3BD007EA4B0 /* AppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AppTests; sourceTree = "<group>"; };
+		D49F32B230888C200088824C /* EmbeddedAuth */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = EmbeddedAuth; sourceTree = "<group>"; };
 		D4ABFCF72F0F8D78000C828C /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (D4ABFE5E2F0FA132000C828C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, D424EDA82F1668CB00052186 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, D424EDA62F1668C200052186 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, D424EDA72F1668C800052186 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -1625,7 +1611,7 @@
 		5F06DD921CC451430011842B /* Auth0Tests */ = {
 			isa = PBXGroup;
 			children = (
-				D45462C9306CE50E002957D8 /* EmbeddedAuth */,
+				D49F32B230888C200088824C /* EmbeddedAuth */,
 				D424EBAA2F15D6A500052186 /* MFA */,
 				C160EE362CABD352005ACE8E /* Extensions */,
 				C177D76E2C2BDF9D0094C657 /* StubNetworking */,
@@ -1890,16 +1876,6 @@
 			path = EmbeddedAuth;
 			sourceTree = "<group>";
 		};
-		D45462C9306CE50E002957D8 /* EmbeddedAuth */ = {
-			isa = PBXGroup;
-			children = (
-				D45462C5306CE50E002957D8 /* EmbeddedAuthClientTests.swift */,
-				D45462C6306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift */,
-				D45462C7306CE50E002957D8 /* EmbeddedAuthErrorTests.swift */,
-			);
-			path = EmbeddedAuth;
-			sourceTree = "<group>";
-		};
 		D4AC0ECB2FF67AF6001C54C1 /* MFA */ = {
 			isa = PBXGroup;
 			children = (
@@ -2077,6 +2053,9 @@
 				5F06DDA71CC451540011842B /* PBXTargetDependency */,
 				5FCAB1651D07ABC000331C84 /* PBXTargetDependency */,
 			);
+			fileSystemSynchronizedGroups = (
+				D49F32B230888C200088824C /* EmbeddedAuth */,
+			);
 			name = Auth0Tests.iOS;
 			packageProductDependencies = (
 				C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */,
@@ -2101,6 +2080,9 @@
 			dependencies = (
 				5F06DDB61CC451700011842B /* PBXTargetDependency */,
 				5B7EE48A20FCA0A600367724 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D49F32B230888C200088824C /* EmbeddedAuth */,
 			);
 			name = Auth0Tests.macOS;
 			packageProductDependencies = (
@@ -2164,6 +2146,9 @@
 			dependencies = (
 				5F331B001D4BB24C00AE4382 /* PBXTargetDependency */,
 				5B7EE47120FC9FFE00367724 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D49F32B230888C200088824C /* EmbeddedAuth */,
 			);
 			name = Auth0Tests.tvOS;
 			packageProductDependencies = (
@@ -2252,6 +2237,9 @@
 			dependencies = (
 				C1B3BA292C24B95A004A32A4 /* PBXTargetDependency */,
 				C1B3B9CC2C24B39E004A32A4 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D49F32B230888C200088824C /* EmbeddedAuth */,
 			);
 			name = Auth0Tests.visionOS;
 			packageProductDependencies = (
@@ -2979,9 +2967,6 @@
 				5C505FF42E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */,
 				5CF539242836DCC10073F623 /* SafariProviderSpec.swift in Sources */,
 				5FCAB16D1D07AC3500331C84 /* WebAuthSpec.swift in Sources */,
-				D45462D2306CE50E002957D8 /* EmbeddedAuthErrorTests.swift in Sources */,
-				D45462D4306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */,
-				D45462D5306CE50E002957D8 /* EmbeddedAuthClientTests.swift in Sources */,
 				5F28B4671D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				C107B5222CA27F7C006B6BEA /* WebViewProviderSpec.swift in Sources */,
 				5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
@@ -3040,9 +3025,6 @@
 				5CFB82582D5E9F9B009FD237 /* APICredentialsSpec.swift in Sources */,
 				5C53A7E92703A23200A7C0A3 /* UserProfileSpec.swift in Sources */,
 				C177D7712C2BDFE40094C657 /* NetworkStub.swift in Sources */,
-				D45462CE306CE50E002957D8 /* EmbeddedAuthErrorTests.swift in Sources */,
-				D45462D0306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */,
-				D45462D1306CE50E002957D8 /* EmbeddedAuthClientTests.swift in Sources */,
 				5CF539252836DCC10073F623 /* SafariProviderSpec.swift in Sources */,
 				5F28B4681D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				5C505FEA2E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */,
@@ -3302,9 +3284,6 @@
 				5C505FE72E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */,
 				5CFB82782D6FD28E009FD237 /* SSOCredentialsSpec.swift in Sources */,
 				5C1574502DD5182400BF9373 /* MyAccountErrorSpec.swift in Sources */,
-				D45462CA306CE50E002957D8 /* EmbeddedAuthErrorTests.swift in Sources */,
-				D45462CC306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */,
-				D45462CD306CE50E002957D8 /* EmbeddedAuthClientTests.swift in Sources */,
 				5F331B091D4BB7EE00AE4382 /* AuthenticationErrorSpec.swift in Sources */,
 				5CCDDC4B2E2A8D7700079840 /* DPoPSpec.swift in Sources */,
 				5C505FF12E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */,
@@ -3517,9 +3496,6 @@
 				C1B3BA4D2C24BA37004A32A4 /* Matchers.swift in Sources */,
 				5C3D88112DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */,
 				C1B3BA4E2C24BA37004A32A4 /* Responses.swift in Sources */,
-				D45462D6306CE50E002957D8 /* EmbeddedAuthErrorTests.swift in Sources */,
-				D45462D8306CE50E002957D8 /* EmbeddedAuthErrorAuthorizeTests.swift in Sources */,
-				D45462D9306CE50E002957D8 /* EmbeddedAuthClientTests.swift in Sources */,
 				C1B3BA4F2C24BA37004A32A4 /* Generators.swift in Sources */,
 				5C15745A2DD7AF2400BF9373 /* PasskeyAuthenticationMethodSpec.swift in Sources */,
 				5C505FFE2E283A81005D0757 /* SecureEnclaveKeyStoreSpec.swift in Sources */,
