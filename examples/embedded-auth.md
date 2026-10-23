@@ -181,6 +181,9 @@ do {
     case .noEligibleFactors:
         // User has no enrolled MFA factors — fall back to a redirect-based flow.
         break
+    case .consentRequired:
+        // Consent can't be collected in the embedded flow — sign in with a redirect-based flow such as Universal Login.
+        break
     case .accessDenied:
         // Other terminal denial — start over with authorize().
         break

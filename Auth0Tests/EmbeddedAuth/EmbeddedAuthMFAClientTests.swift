@@ -92,6 +92,11 @@ private func insufficientAuthMFA(session: String, description: String, nextActio
     ])
 }
 
+private func accessDeniedMFA(description: String) -> Data {
+    // swiftlint:disable:next force_try
+    try! JSONSerialization.data(withJSONObject: ["error": "access_denied", "error_description": description])
+}
+
 private func tooManyRequestsMFA(description: String, authSession: String? = nil) -> Data {
     var json: [String: Any] = ["error": "too_many_requests", "error_description": description]
     if let authSession { json["auth_session"] = authSession }
@@ -1079,5 +1084,43 @@ struct EmbeddedAuthMFAClientTests {
         } catch {
             Issue.record("Wrong error type: \(error)")
         }
+    }
+
+    // MARK: terminal denials
+
+    @Test func consentRequiredOnVerifyOtpClearsSession() async {
+        let sut = makeMFAClient()
+        await establishSession(sut)
+
+        nonisolated(unsafe) var requestCount = 0
+        nonisolated(unsafe) var tokenRequestCount = 0
+        EmbeddedAuthMFAMockProtocol.requestHandler = { req in
+            requestCount += 1
+            if req.url?.path.hasSuffix("/oauth/token") == true { tokenRequestCount += 1 }
+            return (responseMFA(status: 403), accessDeniedMFA(description: "consent_required"))
+        }
+        do {
+            _ = try await sut.verifyOtp("123456", type: .oob).start()
+            Issue.record("Expected failure")
+        } catch let error as EmbeddedAuthError {
+            guard case .consentRequired = error.reason else {
+                Issue.record("Expected .consentRequired, got \(error.reason)"); return
+            }
+            #expect(error.statusCode == 403)
+        } catch {
+            Issue.record("Wrong error type: \(error)")
+        }
+        #expect(requestCount == 1)
+
+        do {
+            _ = try await sut.verifyOtp("123456", type: .oob).start()
+            Issue.record("Expected no_active_session after consent_required")
+        } catch let error as EmbeddedAuthError {
+            #expect(error.code == "no_active_session")
+        } catch {
+            Issue.record("Wrong error type: \(error)")
+        }
+        #expect(requestCount == 1)
+        #expect(tokenRequestCount == 0)
     }
 }

@@ -269,6 +269,16 @@ import Foundation
         }
     }
 
+    @Test func reasonIsConsentRequiredUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "consent_required"],
+            statusCode: 403
+        )
+        guard case .consentRequired = error.reason else {
+            Issue.record("Expected .consentRequired, got \(error.reason)"); return
+        }
+    }
+
     @Test func reasonIsAccessDeniedForOtherDescription() {
         let error = EmbeddedAuthError(
             info: ["error": "access_denied", "error_description": "some_future_denial"],

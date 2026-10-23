@@ -33,6 +33,11 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// Terminal: a second factor is required but the user has no eligible factor. Fall back to a redirect-based flow.
     case noEligibleFactors
 
+    /// Terminal: consent is required but cannot be collected in the embedded flow.
+    ///
+    /// Complete sign-in with a redirect-based flow such as Universal Login.
+    case consentRequired
+
     /// Terminal: access denied for a reason not modelled as its own case.
     ///
     /// Read ``EmbeddedAuthError/debugDescription`` for specifics.

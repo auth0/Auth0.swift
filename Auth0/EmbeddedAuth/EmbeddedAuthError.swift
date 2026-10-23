@@ -98,6 +98,8 @@ public extension EmbeddedAuthError {
             return .authorizationRejected
         case (_, "access_denied", "no_eligible_factors"):
             return .noEligibleFactors
+        case (_, "access_denied", "consent_required"):
+            return .consentRequired
         case (_, "access_denied", _):
             return .accessDenied
         case (429, "too_many_requests", "too_many_attempts"):
