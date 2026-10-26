@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.0.0-beta.1](https://github.com/auth0/Auth0.swift/tree/4.0.0-beta.1) (2026-10-26)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/4.0.0-beta.0...4.0.0-beta.1)
+
+**Added**
+- feat(embedded-auth): MFA support — phone OTP, push notification, and recovery code flows [\#1307](https://github.com/auth0/Auth0.swift/pull/1307) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [4.0.0-beta.0](https://github.com/auth0/Auth0.swift/tree/4.0.0-beta.0) (2026-10-07)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.1.0...4.0.0-beta.0)
 
