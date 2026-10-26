@@ -64,7 +64,7 @@ final class SafariUserAgent: NSObject, WebAuthUserAgent, Sendable {
     let controller: SFSafariViewController
     let callback: WebAuthProviderCallback
     @MainActor
-    private weak var presentationWindow: Auth0WindowRepresentable?
+    private(set) weak var presentationWindow: Auth0WindowRepresentable?
 
     @MainActor
     init(controller: SFSafariViewController,

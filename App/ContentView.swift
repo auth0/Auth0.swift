@@ -1,276 +1,340 @@
 import SwiftUI
-import Combine
 import Auth0
-
-#if !os(macOS)
-   import UIKit
-#else
-   import AppKit
-#endif
-
 
 struct ContentView: View {
     @StateObject private var viewModel = ContentViewModel(authenticationClient: Auth0.authentication())
-
-    #if !os(macOS)
+    #if WEB_AUTH_PLATFORM && !os(macOS)
     @Environment(\.window) private var window
     #endif
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Embedded Auth")
+                    .font(.title2.bold())
+                    .padding(.bottom, 4)
 
-                // MARK: Email
+                switch viewModel.embeddedAuthUIState {
 
-                TextField(text: $viewModel.email) {
-                    Text("email")
-                }
-                #if !os(tvOS)
-                .textFieldStyle(.roundedBorder)
-                #endif
-                #if os(iOS)
-                .textInputAutocapitalization(.never)
-                .keyboardType(.emailAddress)
-                #endif
-
-                // MARK: Phone Number
-
-                TextField(text: $viewModel.phoneNumber) {
-                    Text("phone number (e.g. +14155552671)")
-                }
-                #if !os(tvOS)
-                .textFieldStyle(.roundedBorder)
-                #endif
-                #if os(iOS)
-                .textInputAutocapitalization(.never)
-                .keyboardType(.phonePad)
-                #endif
-
-                // MARK: Signup with Passkey
-
-                #if PASSKEYS_PLATFORM
-                if #available(iOS 16.6, *) {
+                case .initial:
                     Button {
-                        Task {
-                            await viewModel.signupWithPasskey(window: window)
-                        }
+                        Task { await viewModel.startEmbeddedFlow() }
                     } label: {
-                        Label("Signup with Passkey", systemImage: "person.badge.key")
+                        Text("Start Embedded Auth")
                     }
                     .buttonStyle(PrimaryButtonStyle())
-                    .disabled(viewModel.isLoading || (viewModel.email.isEmpty && viewModel.phoneNumber.isEmpty))
-                }
-                #endif
+                    .disabled(viewModel.isLoading)
 
-                // Inline OTP entry — shown during passkey identifier verification.
-                if viewModel.showOTPSheet {
-                    OTPEntryView(viewModel: viewModel)
-                }
+                    #if WEB_AUTH_PLATFORM
+                    Button {
+                        Task {
+                            #if os(macOS)
+                            await viewModel.webLogin(presentationWindow: getCurrentWindow())
+                            #else
+                            await viewModel.webLogin(presentationWindow: window)
+                            #endif
+                        }
+                    } label: {
+                        Text("Login with Browser")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+                    #endif
 
-                // MARK: Web Login and Logout
+                case .identifyEmail:
+                    TextField("Email", text: $viewModel.email)
+                        #if !os(macOS)
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    Button {
+                        Task { await viewModel.submitEmail(viewModel.email) }
+                    } label: {
+                        Text("Submit Email")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.email.isEmpty)
+                    if viewModel.canToggleIdentifier {
+                        Button {
+                            viewModel.toggleIdentifier()
+                        } label: {
+                            Text("Use phone instead")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
 
-                #if WEB_AUTH_PLATFORM
-                Button {
-                    Task { await viewModel.webLogin() }
-                } label: {
-                    Label("Web Login", systemImage: "globe")
-                }
-                .buttonStyle(SecondaryButtonStyle())
-                .disabled(viewModel.isLoading)
+                case .identifyPhone:
+                    TextField("Phone number", text: $viewModel.phone)
+                        #if !os(macOS)
+                        .textContentType(.telephoneNumber)
+                        .keyboardType(.phonePad)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    Button {
+                        Task { await viewModel.submitPhone(viewModel.phone) }
+                    } label: {
+                        Text("Submit Phone")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.phone.isEmpty)
+                    if viewModel.canToggleIdentifier {
+                        Button {
+                            viewModel.toggleIdentifier()
+                        } label: {
+                            Text("Use email instead")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
 
-                Button {
-                    Task { await viewModel.webLogout() }
-                } label: {
-                    Label("Web Logout", systemImage: "rectangle.portrait.and.arrow.right")
-                }
-                .buttonStyle(SecondaryButtonStyle())
-                .disabled(viewModel.isLoading)
-                #endif
+                case .challengeEmail(let index, let identifier):
+                    Text(identifier.isEmpty ? "We'll send you a one-time code." : "We'll send a one-time code to \(identifier).")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Button {
+                        Task { await viewModel.triggerChallenge(index: index) }
+                    } label: {
+                        Text("Send OTP")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+                    alternativeActionButtons
 
-                // MARK: Clear Credentials
+                case .challengePhone(let index, let identifier, let deliveryMethods):
+                    Text("We'll send a code to \(identifier).")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    // The server may omit the supported methods; fall back to SMS.
+                    ForEach(deliveryMethods.isEmpty ? [.text] : deliveryMethods, id: \.self) { method in
+                        Button {
+                            Task { await viewModel.triggerPhoneChallenge(index: index, deliveryMethod: method) }
+                        } label: {
+                            Text(method == .voice ? "Voice" : "SMS")
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
+                    alternativeActionButtons
 
-                Button {
-                    viewModel.clearCredentials()
-                } label: {
-                    Label("Clear Credentials", systemImage: "trash")
-                }
-                .buttonStyle(SecondaryButtonStyle())
-                .disabled(viewModel.isLoading)
+                case .challengePush(let index, let name):
+                    Button {
+                        Task { await viewModel.triggerPushChallenge(index: index) }
+                    } label: {
+                        Text("Send push to \(name)")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+                    alternativeActionButtons
 
-                if viewModel.isAuthenticated {
+                case .pollingPush:
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                    Text("Waiting for approval on your device…")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Button {
+                        viewModel.reset()
+                    } label: {
+                        Text("Cancel")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+
+                case .verifyOTP(let channel, let identifier):
+                    if let identifier {
+                        Text("Enter the code sent to \(identifier)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    TextField("One-time code", text: $viewModel.otp)
+                        #if !os(macOS)
+                        .textContentType(.oneTimeCode)
+                        .keyboardType(.numberPad)
+                        #endif
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    if let attemptError = viewModel.attemptError {
+                        Text(attemptError)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    Button {
+                        viewModel.attemptError = nil
+                        Task { await viewModel.submitOtp(viewModel.otp, channel: channel) }
+                    } label: {
+                        Text("Verify")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.otp.isEmpty)
+                    alternativeActionButtons
+
+                case .verifyPassword:
+                    Text("Enter your password")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    SecureField("Password", text: $viewModel.password)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    if let attemptError = viewModel.attemptError {
+                        Text(attemptError)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    Button {
+                        viewModel.attemptError = nil
+                    } label: {
+                        Text("Verify")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.password.isEmpty)
+                    alternativeActionButtons
+
+                case .verifyRecoveryCode:
+                    Text("Enter your recovery code")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    TextField("Recovery code", text: $viewModel.recoveryCode)
+                        #if !os(macOS)
+                        .autocapitalization(.none)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    if let attemptError = viewModel.attemptError {
+                        Text(attemptError)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    Button {
+                        viewModel.attemptError = nil
+                        Task { await viewModel.submitRecoveryCode(viewModel.recoveryCode) }
+                    } label: {
+                        Text("Verify")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.recoveryCode.isEmpty)
+                    alternativeActionButtons
+
+                case .confirmRecoveryCode(let newCode):
+                    Text("New recovery code")
+                        .font(.headline)
+                    Text("Save this code somewhere safe. It replaces your previous recovery code.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Text(verbatim: newCode)
+                        .font(.body.monospaced())
+                        #if !os(tvOS)
+                        .textSelection(.enabled)
+                        #endif
+                    Button {
+                        Task { await viewModel.confirmRecoveryCode() }
+                    } label: {
+                        Text("I've saved it")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+
+                case .success(let credentials):
                     Text("✓ Authenticated")
+                        .font(.headline)
                         .foregroundColor(.green)
-                        .font(.caption)
-                }
+                    Group {
+                        LabeledValue(label: "Token type", value: credentials.tokenType)
+                        LabeledValue(label: "Scope", value: credentials.scope ?? "—")
+                        LabeledValue(label: "Expires", value: credentials.expiresAt.formatted())
+                    }
+                    Button {
+                        viewModel.reset()
+                    } label: {
+                        Text("Reset")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
 
-                if let error = viewModel.errorMessage {
-                    Text(error)
+                case .failed(let message):
+                    Text("Error")
+                        .font(.headline)
                         .foregroundColor(.red)
+                    Text(message)
                         .font(.caption)
-                        .multilineTextAlignment(.center)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.leading)
+                    Button {
+                        viewModel.reset()
+                    } label: {
+                        Text("Try Again")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
                 }
-            }
-            .padding(.horizontal)
-            .padding(.top, 10)
-        }
-        .task {
-            await viewModel.checkAuthentication()
-        }
-    }
-}
 
-// MARK: - Inline OTP Entry
-
-struct OTPEntryView: View {
-    @ObservedObject var viewModel: ContentViewModel
-
-    private var channelLabel: String {
-        viewModel.otpChannel == .phone ? "phone" : "email"
-    }
-
-    private var title: String {
-        viewModel.isRetryingPasskeyVerification ? "Retry \(channelLabel) verification" : "Verify \(channelLabel)"
-    }
-
-    private var subtitle: String {
-        "Enter the 6-digit code sent to your \(channelLabel) to continue passkey registration."
-    }
-
-    @State private var isSubmitting = false
-
-    private func submitAction() {
-        #if PASSKEYS_PLATFORM
-        guard !isSubmitting else { return }
-        isSubmitting = true
-        Task {
-            defer { isSubmitting = false }
-            await viewModel.submitPasskeyVerificationOTP()
-        }
-        #endif
-    }
-
-    var body: some View {
-        VStack(spacing: 20) {
-            VStack(spacing: 8) {
-                Text(title)
-                    .font(.title3.bold())
-                Text(subtitle)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-
-            OTPInputView(digits: $viewModel.otpDigits, onComplete: submitAction)
-
-            Button {
-                submitAction()
-            } label: {
                 if viewModel.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
-                        .padding()
-                } else {
-                    Text("Verify")
                 }
             }
-            .buttonStyle(PrimaryButtonStyle())
-            .disabled(viewModel.isLoading || viewModel.otpDigits.joined().count < 6)
-
-            HStack {
-                Button("Resend code") {
-                    #if PASSKEYS_PLATFORM
-                    Task {
-                        await viewModel.resendPasskeyVerificationOTP()
-                    }
-                    #endif
-                }
-                .font(.subheadline)
-                .disabled(viewModel.isLoading)
-                Spacer()
-                Button("Cancel") {
-                    viewModel.showOTPSheet = false
-                }
-                .font(.subheadline)
-            }
+            .padding()
         }
-        .padding(16)
-        #if os(iOS)
-        .background(Color(UIColor.secondarySystemBackground))
-        #elseif os(macOS)
-        .background(Color(NSColor.windowBackgroundColor))
-        #else
-        .background(Color.secondary.opacity(0.1))
-        #endif
-        .cornerRadius(12)
+        .onDisappear { viewModel.cancelPolling() }
+    }
+
+    /// Buttons for switching to another method offered by the latest response.
+    @ViewBuilder
+    private var alternativeActionButtons: some View {
+        ForEach(Array(viewModel.alternativeActions.enumerated()), id: \.offset) { _, action in
+            Button {
+                viewModel.selectAction(action)
+            } label: {
+                Text(title(for: action))
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .disabled(viewModel.isLoading)
+        }
+    }
+
+    private func title(for action: NextAction) -> String {
+        switch action {
+        case .challengeEmail:
+            return "Use email code"
+        case .challengePhone(_, let identifier, _):
+            return "Use phone \(identifier)"
+        case .challengePush(_, let name):
+            return "Use push notification on \(name)"
+        case .verifyOTP(let channel, _):
+            return channel == .totp ? "Use authenticator app code" : "Enter a code"
+        case .verifyRecoveryCode:
+            return "Use recovery code"
+        default:
+            return "Use another method"
+        }
     }
 }
 
-// MARK: - OTP Input
+// MARK: - Subviews
 
-struct OTPInputView: View {
-    @Binding var digits: [String]
-    @FocusState private var focusedIndex: Int?
-    let onComplete: () -> Void
-
+private struct LabeledValue: View {
+    let label: String
+    let value: String
     var body: some View {
-        HStack(spacing: 10) {
-            ForEach(0..<6, id: \.self) { index in
-                TextField("", text: $digits[index])
-                    #if os(iOS)
-                    .keyboardType(.numberPad)
-                    .textContentType(.oneTimeCode)
-                    #endif
-                    .multilineTextAlignment(.center)
-                    .frame(width: 44, height: 54)
-                    #if os(iOS)
-                    .background(Color(UIColor.systemGray6))
-                    #elseif os(macOS)
-                    .background(Color(NSColor.controlBackgroundColor))
-                    #else
-                    .background(Color.secondary.opacity(0.15))
-                    #endif
-                    .cornerRadius(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(focusedIndex == index ? Color.blue : Color.clear, lineWidth: 2)
-                    )
-                    .font(.title2.bold())
-                    .focused($focusedIndex, equals: index)
-                    .onChange(of: digits[index]) { newValue in
-                        let filtered = newValue.filter { $0.isNumber }
-                        if filtered.count > 1 {
-                            // Distribute pasted code across fields starting at this index
-                            let chars = Array(filtered.prefix(6 - index))
-                            for (offset, char) in chars.enumerated() {
-                                digits[index + offset] = String(char)
-                            }
-                            let nextIndex = min(index + chars.count, 5)
-                            focusedIndex = digits[nextIndex].isEmpty ? nextIndex : nil
-                            if digits.allSatisfy({ $0.count == 1 }) { onComplete() }
-                            return
-                        }
-                        if filtered != newValue {
-                            digits[index] = filtered
-                            return
-                        }
-                        if filtered.isEmpty {
-                            if index > 0 { focusedIndex = index - 1 }
-                        } else {
-                            if index < 5 {
-                                focusedIndex = index + 1
-                            } else {
-                                focusedIndex = nil
-                            }
-                            if digits.allSatisfy({ $0.count == 1 }) { onComplete() }
-                        }
-                    }
-            }
+        HStack(alignment: .top) {
+            Text(label + ":")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .frame(width: 80, alignment: .leading)
+            Text(value)
+                .font(.caption.monospaced())
         }
-        .onAppear { focusedIndex = 0 }
     }
 }
-
-// MARK: - Button Styles
 
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
@@ -300,7 +364,13 @@ struct SecondaryButtonStyle: ButtonStyle {
     }
 }
 
-#if !os(macOS)
+#if os(macOS)
+private func getCurrentWindow() -> NSWindow? {
+    NSApplication.shared.keyWindow
+        ?? NSApplication.shared.mainWindow
+        ?? NSApplication.shared.windows.first
+}
+#else
 private struct WindowKey: EnvironmentKey {
     static let defaultValue: UIWindow? = nil
 }
@@ -314,29 +384,22 @@ extension EnvironmentValues {
 
 struct WindowReaderModifier: ViewModifier {
     @State private var window: UIWindow?
-
     func body(content: Content) -> some View {
         content
             .environment(\.window, window)
-            .background(
-                WindowAccessor(window: $window)
-            )
+            .background(WindowAccessor(window: $window))
     }
 }
 
 struct WindowAccessor: UIViewRepresentable {
     @Binding var window: UIWindow?
-
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }
-
     func updateUIView(_ uiView: UIView, context: Context) {
-        DispatchQueue.main.async {
-            self.window = uiView.window
-        }
+        DispatchQueue.main.async { self.window = uiView.window }
     }
 }
 
@@ -345,5 +408,4 @@ extension View {
         self.modifier(WindowReaderModifier())
     }
 }
-
 #endif

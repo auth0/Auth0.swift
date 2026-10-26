@@ -28,7 +28,7 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
     let url: URL
     let method: String
     let requestValidator: [RequestValidator]
-    let handle: @Sendable (Result<ResponseValue, E>, @Sendable (Result<T, E>) -> Void) -> Void
+    let handle: @Sendable (Result<ResponseValue, E>, @escaping @Sendable (Result<T, E>) -> Void) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
@@ -39,7 +39,7 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
          url: URL,
          method: String,
          requestValidator: [RequestValidator] = [],
-         handle: @escaping @Sendable (Result<ResponseValue, E>, @Sendable (Result<T, E>) -> Void) -> Void,
+         handle: @escaping @Sendable (Result<ResponseValue, E>, @escaping @Sendable (Result<T, E>) -> Void) -> Void,
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
          logger: Logger?,

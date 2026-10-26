@@ -1,424 +1,424 @@
 import SwiftUI
 import Auth0
-import Combine
-#if PASSKEYS_PLATFORM
-import AuthenticationServices
-#endif
+
+// MARK: - View Model
 
 @MainActor
 final class ContentViewModel: ObservableObject {
     @Published var email: String = ""
-    @Published var phoneNumber: String = ""
+    @Published var phone: String = ""
+    @Published var otp: String = ""
+    @Published var recoveryCode: String = ""
+    @Published var password: String = ""
     @Published var isLoading: Bool = false
-    @Published var errorMessage: String?
-    @Published var isAuthenticated: Bool = false
-    @Published var showOTPSheet: Bool = false
-    @Published var otpDigits: [String] = Array(repeating: "", count: 6)
-    @Published var otpChannel: PasskeyVerificationMethod = .email
-    @Published var isRetryingPasskeyVerification: Bool = false
+    @Published var embeddedAuthUIState: EmbeddedAuthUIState = .initial
+    @Published var attemptError: String?
+    /// All actions offered by the latest continuation. Indices come from each entry's own `index` field.
+    @Published var availableActions: [NextAction] = []
 
-    private let credentialsManager: CredentialsManager
     private let authenticationClient: Authentication
+    private let embeddedAuthClient: EmbeddedAuth
 
-    #if WEB_AUTH_PLATFORM
-    private let webAuth: WebAuth
-    #endif
+    /// The action backing the screen currently shown, so it is not offered again as an alternative.
+    private var currentAction: NextAction?
+    private var usePhoneIdentifier = false
+    private var pollTask: Task<Void, Never>?
 
-    #if PASSKEYS_PLATFORM
-    private var pendingPasskeySignupChallenge: PasskeySignupChallenge?
-    private var pendingVerificationChannels: [PasskeyVerificationMethod] = []
-    private var collectedVerificationCodes: [PasskeyVerificationMethod: String] = [:]
-    // Identifiers of the signup in progress, so that resending a code isn't affected by edits to the text fields.
-    private var pendingSignupEmail: String?
-    private var pendingSignupPhoneNumber: String?
-    private var pendingPasskeyWindow: UIWindow?
-    // Stored after ASAuthorizationController succeeds so the same credential is reused across OTP retries.
-    private var pendingSignupPasskey: AnyObject?
-    #endif
-
-    #if PASSKEYS_PLATFORM
-    private var _passkeyController: Any?
-
-    @available(iOS 16.6, *)
-    private var passkeyController: PasskeyController {
-        if _passkeyController == nil { _passkeyController = PasskeyController() }
-        return _passkeyController as! PasskeyController
-    }
-    #endif
+    private static let minPollIntervalMs = 1_000
+    private static let maxPollIntervalMs = 60_000
+    private static let maxConsecutiveNetworkFailures = 3
 
     init(email: String = "",
-         isLoading: Bool = false,
-         errorMessage: String? = nil,
-         isAuthenticated: Bool = false,
          authenticationClient: Authentication,
-         credentialsManager: CredentialsManager? = nil) {
+         embeddedAuthClient: EmbeddedAuth? = nil) {
         self.email = email
-        self.isLoading = isLoading
-        self.errorMessage = errorMessage
-        self.isAuthenticated = isAuthenticated
         self.authenticationClient = authenticationClient
-        self.credentialsManager = credentialsManager ?? CredentialsManager(authentication: Auth0.authentication())
-        #if WEB_AUTH_PLATFORM
-        self.webAuth = Auth0
-            .webAuth()
-            .useCredentialsManager(self.credentialsManager)
-        #endif
+        self.embeddedAuthClient = embeddedAuthClient ?? Auth0.embeddedAuth().logging(enabled: true)
     }
 
-    // MARK: - Web Auth
+    // MARK: - Embedded auth
+
+    func startEmbeddedFlow() async {
+        isLoading = true
+        // A cancelled poll may still have a request in flight that mutates the SDK's session,
+        // so wait for it to finish before starting a new flow.
+        cancelPolling()
+        await pollTask?.value
+        pollTask = nil
+        clearFlowState()
+        embeddedAuthUIState = .initial
+        do {
+            _ = try await embeddedAuthClient.authorize(connection: "Username-Password-Authentication").start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
 
     #if WEB_AUTH_PLATFORM
-    func webLogin() async {
+    func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
-        errorMessage = nil
-        do {
-            _ = try await webAuth
-                .scope("openid profile email offline_access")
-                .start()
-            isAuthenticated = true
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-        } catch let error as Auth0Error {
-            errorMessage = "Login failed: \(error.localizedDescription)"
-        } catch {
-            errorMessage = "Unexpected error: \(error.localizedDescription)"
+        var webAuth: WebAuth = Auth0.webAuth().scope("openid profile email offline_access")
+        if let window {
+            webAuth = webAuth.presentationWindow(window)
         }
-        isLoading = false
-    }
-
-    func webLogout() async {
-        isLoading = true
-        errorMessage = nil
         do {
-            try await webAuth.logout()
-            isAuthenticated = false
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-        } catch let error as Auth0Error {
-            errorMessage = "Logout failed: \(error.localizedDescription)"
+            let credentials = try await webAuth.start()
+            finish(with: credentials)
+        } catch let error as WebAuthError where error == .userCancelled {
+            embeddedAuthUIState = .initial
         } catch {
-            errorMessage = "Unexpected error: \(error.localizedDescription)"
+            embeddedAuthUIState = .failed("Web login failed: \(error.localizedDescription)")
         }
         isLoading = false
     }
     #endif
 
-    // MARK: - Passkeys
-
-    #if PASSKEYS_PLATFORM
-    @available(iOS 16.6, *)
-    func signupWithPasskey(window: UIWindow?) async {
-        guard !email.isEmpty || !phoneNumber.isEmpty else {
-            errorMessage = "Please enter an email or phone number to sign up with a passkey"
-            return
-        }
+    func submitEmail(_ email: String) async {
         isLoading = true
-        errorMessage = nil
-        let signupEmail = email.isEmpty ? nil : email
-        let signupPhoneNumber = phoneNumber.isEmpty ? nil : phoneNumber
         do {
-            let challenge = try await authenticationClient
-                .passkeySignupChallenge(
-                    email: signupEmail,
-                    phoneNumber: signupPhoneNumber,
-                    connection: "Username-Password-Authentication",
-                    deliveryMethod: signupPhoneNumber == nil ? nil : .voice)
-                .start()
-
-            if let channels = challenge.verificationRequired, !channels.isEmpty {
-                pendingSignupEmail = signupEmail
-                pendingSignupPhoneNumber = signupPhoneNumber
-                pendingPasskeySignupChallenge = challenge
-                pendingPasskeyWindow = window
-                pendingVerificationChannels = channels
-                collectedVerificationCodes = [:]
-                isLoading = false
-                presentNextPasskeyVerificationChannel()
-                return
-            }
-
-            try await completePasskeySignup(challenge: challenge, window: window)
-        } catch let error as ASAuthorizationError where error.code == .canceled {
-            print(error)
-        } catch let error as CredentialsManagerError {
-            print(error)
-            errorMessage = handleCredentialsManagerError(error)
+            _ = try await embeddedAuthClient.identify(email, type: .email).start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
         } catch {
-            errorMessage = error.localizedDescription
+            embeddedAuthUIState = .failed(error.localizedDescription)
         }
         isLoading = false
     }
 
-    @available(iOS 16.6, *)
-    private func presentNextPasskeyVerificationChannel() {
-        guard let channel = pendingVerificationChannels.first else {
-            Task { await finalizePasskeySignupVerification() }
-            return
-        }
-        otpDigits = Array(repeating: "", count: 6)
-        otpChannel = channel
-        showOTPSheet = true
-    }
-
-    func resendPasskeyVerificationOTP() async {
-        guard #available(iOS 16.6, *) else { return }
-        guard pendingSignupEmail != nil || pendingSignupPhoneNumber != nil else { return }
+    func submitPhone(_ phone: String) async {
         isLoading = true
-        errorMessage = nil
         do {
-            let challenge = try await authenticationClient
-                .passkeySignupChallenge(
-                    email: pendingSignupEmail,
-                    phoneNumber: pendingSignupPhoneNumber,
-                    connection: "Username-Password-Authentication",
-                    deliveryMethod: pendingSignupPhoneNumber == nil ? nil : .voice)
-                .start()
-            pendingPasskeySignupChallenge = challenge
-            pendingVerificationChannels = challenge.verificationRequired ?? []
-            collectedVerificationCodes = [:]
-            pendingSignupPasskey = nil
-            otpDigits = Array(repeating: "", count: 6)
-            if #available(iOS 16.6, *) {
-                presentNextPasskeyVerificationChannel()
-            }
+            _ = try await embeddedAuthClient.identify(phone, type: .phone).start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
         } catch {
-            errorMessage = error.localizedDescription
+            embeddedAuthUIState = .failed(error.localizedDescription)
         }
         isLoading = false
     }
 
-    func submitPasskeyVerificationOTP() async {
-        let code = otpDigits.joined()
-        guard code.count == 6 else {
-            errorMessage = "Please enter all 6 digits"
-            return
+    func triggerChallenge(index: Int) async {
+        isLoading = true
+        do {
+            _ = try await embeddedAuthClient.challengeEmail(index: index).start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
         }
-        collectedVerificationCodes[otpChannel] = code
-        guard !pendingVerificationChannels.isEmpty else { return }
-        pendingVerificationChannels.removeFirst()
-        showOTPSheet = false
+        isLoading = false
+    }
 
-        if #available(iOS 16.6, *) {
-            presentNextPasskeyVerificationChannel()
+    func triggerPhoneChallenge(index: Int, deliveryMethod: PhoneDeliveryMethod) async {
+        isLoading = true
+        do {
+            _ = try await embeddedAuthClient.challengePhone(index: index, deliveryMethod: deliveryMethod).start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    func triggerPushChallenge(index: Int) async {
+        isLoading = true
+        do {
+            _ = try await embeddedAuthClient.challengePush(index: index).start()
+        } catch let error as EmbeddedAuthError {
+            // The push is sent successfully when the server answers with a `verifyOob` continuation.
+            if case .insufficientAuthorization(_, let nextActions) = error.reason,
+               let pollInMs = pollInterval(in: nextActions) {
+                availableActions = nextActions
+                currentAction = nil
+                attemptError = nil
+                embeddedAuthUIState = .pollingPush(pollInMs: pollInMs)
+                startPolling(initialIntervalMs: pollInMs)
+            } else {
+                handle(embeddedAuthError: error)
+            }
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    func submitOtp(_ otp: String, channel: OtpChannel) async {
+        isLoading = true
+        let otpType: OtpType = channel == .totp ? .totp : .oob
+        do {
+            let credentials = try await embeddedAuthClient.verifyOtp(otp, type: otpType).start()
+            finish(with: credentials)
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    func submitRecoveryCode(_ code: String) async {
+        isLoading = true
+        do {
+            _ = try await embeddedAuthClient.verifyRecoveryCode(code).start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    func confirmRecoveryCode() async {
+        isLoading = true
+        do {
+            let credentials = try await embeddedAuthClient.confirmRecoveryCode().start()
+            finish(with: credentials)
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    // MARK: - Navigation between offered methods
+
+    /// Actions from the latest continuation that the user can switch to without a network call.
+    var alternativeActions: [NextAction] {
+        availableActions.filter { action in
+            switch action {
+            case .challengeEmail, .challengePhone, .challengePush, .verifyOTP, .verifyRecoveryCode:
+                return action != currentAction
+            default:
+                return false
+            }
         }
     }
 
-    @available(iOS 16.6, *)
-    private func finalizePasskeySignupVerification() async {
-        guard let challenge = pendingPasskeySignupChallenge else { return }
+    /// Whether the latest continuation offers both email and phone identification.
+    var canToggleIdentifier: Bool {
+        availableActions.contains(.identifyEmail) && availableActions.contains(.identifyPhone)
+    }
 
-        isLoading = true
-        errorMessage = nil
+    func selectAction(_ action: NextAction) {
+        attemptError = nil
+        _ = present(action, among: availableActions)
+    }
 
-        // Create the passkey credential once (only after all OTPs are collected), then reuse it across retries.
-        let passkey: any SignupPasskey
-        if let existing = pendingSignupPasskey as? ASAuthorizationPlatformPublicKeyCredentialRegistration {
-            passkey = existing
-        } else {
+    func toggleIdentifier() {
+        usePhoneIdentifier.toggle()
+        attemptError = nil
+        let action: NextAction = usePhoneIdentifier ? .identifyPhone : .identifyEmail
+        _ = present(action, among: availableActions)
+    }
+
+    // MARK: - Polling & reset
+
+    /// Cancels any push polling. Does not wait for an in-flight request; `startEmbeddedFlow()` does.
+    func cancelPolling() {
+        pollTask?.cancel()
+        if case .pollingPush = embeddedAuthUIState {
+            embeddedAuthUIState = .initial
+            clearFlowState()
+        }
+    }
+
+    /// Cancels polling and clears all flow state and user input.
+    func reset() {
+        cancelPolling()
+        embeddedAuthUIState = .initial
+        email = ""
+        phone = ""
+        otp = ""
+        recoveryCode = ""
+        password = ""
+        clearFlowState()
+    }
+}
+
+private extension ContentViewModel {
+    func clearFlowState() {
+        availableActions = []
+        currentAction = nil
+        attemptError = nil
+        usePhoneIdentifier = false
+    }
+
+    func startPolling(initialIntervalMs: Int) {
+        pollTask = Task { [weak self] in
+            await self?.pollForPushApproval(initialIntervalMs: initialIntervalMs)
+        }
+    }
+
+    func pollForPushApproval(initialIntervalMs: Int) async {
+        var intervalMs = clamped(initialIntervalMs)
+        var networkFailures = 0
+        while !Task.isCancelled {
+            // Wait before every call, including the first.
             do {
-                passkeyController.window = pendingPasskeyWindow
-                let registration = try await passkeyController.presentRegistration(challenge: challenge)
-                pendingSignupPasskey = registration
-                passkey = registration
-            } catch let error as ASAuthorizationError where error.code == .canceled {
-                clearPendingPasskeySignup()
-                isLoading = false
-                return
+                try await Task.sleep(nanoseconds: UInt64(intervalMs) * 1_000_000)
             } catch {
-                errorMessage = error.localizedDescription
-                isLoading = false
                 return
             }
+            guard await pollOnce(intervalMs: &intervalMs, networkFailures: &networkFailures) else { return }
         }
+    }
+
+    /// Calls `verifyOob()` once. Returns `false` when polling should stop.
+    func pollOnce(intervalMs: inout Int, networkFailures: inout Int) async -> Bool {
+        let result: Result<Credentials, Error>
         do {
-            let credentials = try await authenticationClient
-                .login(passkey: passkey,
-                       challenge: challenge,
-                       connection: "Username-Password-Authentication",
-                       scope: "openid profile email offline_access",
-                       verification: collectedVerificationCodes)
-                .validateClaims()
-                .start()
-            try credentialsManager.store(credentials: credentials)
-            // Success — clear all pending state.
-            clearPendingPasskeySignup()
-            isAuthenticated = true
-        } catch let error as AuthenticationError where error.isPasskeyVerificationRetryable {
-            // Wrong OTP — the session is still alive. Reuse the auth_session echoed in this response.
-            let failedChannels = error.passkeyVerificationRequired ?? pendingPasskeySignupChallenge?.verificationRequired ?? []
-            guard !failedChannels.isEmpty else {
-                clearPendingPasskeySignup()
-                errorMessage = "Verification failed. Please try signing up again."
-                isLoading = false
-                return
+            result = .success(try await embeddedAuthClient.verifyOob().start())
+        } catch {
+            result = .failure(error)
+        }
+        // Cancelling the task does not cancel the request, so a late response is dropped here.
+        guard !Task.isCancelled else { return false }
+        switch result {
+        case .success(let credentials):
+            finish(with: credentials)
+            return false
+        case .failure(let error as EmbeddedAuthError):
+            switch error.reason {
+            case .insufficientAuthorization(.authorizationPending, let nextActions):
+                networkFailures = 0
+                availableActions = nextActions
+                intervalMs = pollInterval(in: nextActions).map(clamped) ?? intervalMs
+                return true
+            case .insufficientAuthorization(.slowDown, _):
+                networkFailures = 0
+                intervalMs = clamped(intervalMs * 2)
+                return true
+            case .network:
+                // The session is preserved, so retry the same step a few times.
+                networkFailures += 1
+                if networkFailures <= Self.maxConsecutiveNetworkFailures { return true }
+                fail(with: error)
+                return false
+            default:
+                handle(embeddedAuthError: error)
+                return false
             }
-            pendingVerificationChannels = failedChannels.uniqued()
-            collectedVerificationCodes = [:]
-            if let newSession = error.passkeyAuthSession, let existing = pendingPasskeySignupChallenge {
-                pendingPasskeySignupChallenge = PasskeySignupChallenge(
-                    authenticationSession: newSession,
-                    relyingPartyId: existing.relyingPartyId,
-                    userId: existing.userId,
-                    userName: existing.userName,
-                    challengeData: existing.challengeData,
-                    verificationRequired: failedChannels
-                )
-            }
-            isRetryingPasskeyVerification = true
-            errorMessage = "Incorrect code. Please try again."
-            isLoading = false
-            presentNextPasskeyVerificationChannel()
-            return
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-        } catch let error as AuthenticationError where error.isNetworkError {
-            errorMessage = error.localizedDescription
-        } catch {
-            // Terminal (exhausted attempts, expired session, unknown session).
-            clearPendingPasskeySignup()
-            errorMessage = "Session expired. Please try signing up again."
-        }
-        isLoading = false
-    }
-
-    @available(iOS 16.6, *)
-    private func clearPendingPasskeySignup() {
-        pendingPasskeySignupChallenge = nil
-        pendingSignupPasskey = nil
-        pendingPasskeyWindow = nil
-        pendingSignupEmail = nil
-        pendingSignupPhoneNumber = nil
-        pendingVerificationChannels = []
-        collectedVerificationCodes = [:]
-        isRetryingPasskeyVerification = false
-    }
-
-    @available(iOS 16.6, *)
-    private func completePasskeySignup(challenge: PasskeySignupChallenge, window: UIWindow?) async throws {
-        passkeyController.window = window
-        let passkey = try await passkeyController.presentRegistration(challenge: challenge)
-        let credentials = try await authenticationClient
-            .login(passkey: passkey,
-                   challenge: challenge,
-                   connection: "Username-Password-Authentication",
-                   scope: "openid profile email offline_access")
-            .validateClaims()
-            .start()
-        try credentialsManager.store(credentials: credentials)
-        isAuthenticated = true
-    }
-    #endif
-
-    // MARK: - Session
-
-    func clearCredentials() {
-        errorMessage = nil
-        do {
-            try credentialsManager.clear()
-            isAuthenticated = false
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-        } catch {
-            errorMessage = error.localizedDescription
+        case .failure(let error):
+            embeddedAuthUIState = .failed(error.localizedDescription)
+            return false
         }
     }
 
-    func checkAuthentication() async {
-        do {
-            _ = try await credentialsManager.credentials()
-            isAuthenticated = true
-        } catch let error as CredentialsManagerError {
-            errorMessage = handleCredentialsManagerError(error)
-            isAuthenticated = false
-        } catch {
-            errorMessage = "Unexpected error: \(error.localizedDescription)"
-            isAuthenticated = false
-        }
+    func clamped(_ intervalMs: Int) -> Int {
+        min(max(intervalMs, Self.minPollIntervalMs), Self.maxPollIntervalMs)
     }
 
-    // MARK: - Error Handling
+    func pollInterval(in nextActions: [NextAction]) -> Int? {
+        for case .verifyOob(let pollInMs) in nextActions {
+            return pollInMs
+        }
+        return nil
+    }
 
-    private func handleCredentialsManagerError(_ error: CredentialsManagerError) -> String {
-        switch error {
-        case CredentialsManagerError.noCredentials:
-            return "No credentials found. Please log in again."
-        case CredentialsManagerError.noRefreshToken:
-            return "Session expired. Please log in again."
-        case CredentialsManagerError.renewFailed:
-            return "Failed to renew credentials: \(error.cause?.localizedDescription ?? "Unknown error")"
-        case CredentialsManagerError.storeFailed:
-            return "Failed to save credentials. Please try again."
-        case CredentialsManagerError.clearFailed:
-            return "Failed to clear credentials. Please try again."
-        case CredentialsManagerError.biometricsFailed:
-            return "Biometric authentication failed. Please try again."
-        case CredentialsManagerError.revokeFailed:
-            return "Failed to revoke session: \(error.cause?.localizedDescription ?? "Unknown error")"
+    // MARK: - Result handling
+
+    func finish(with credentials: Credentials) {
+        phone = ""
+        recoveryCode = ""
+        password = ""
+        clearFlowState()
+        embeddedAuthUIState = .success(credentials)
+    }
+
+    func fail(with error: EmbeddedAuthError) {
+        // Built from the error code and description only; `info` may hold the session or a recovery code.
+        let description = error.info["error_description"] as? String
+        let detail: String
+        switch error.reason {
+        case .challengeExpired:
+            detail = "The challenge expired. Start again."
+        case .authorizationRejected:
+            detail = "The request was rejected. Start again."
+        case .network:
+            detail = "A network error occurred. Check your connection and try again."
         default:
-            return "Credentials error: \(error.localizedDescription)"
+            detail = description ?? ""
         }
+        clearFlowState()
+        recoveryCode = ""
+        password = ""
+        embeddedAuthUIState = .failed(detail.isEmpty ? "[\(error.code)]" : "[\(error.code)] \(detail)")
+    }
+
+    func handle(embeddedAuthError error: EmbeddedAuthError) {
+        guard case .insufficientAuthorization(let reason, let nextActions) = error.reason else {
+            fail(with: error)
+            return
+        }
+        availableActions = nextActions
+        switch reason {
+        case .invalidCode:
+            attemptError = "That code is incorrect. Please try again."
+        case .invalidIdentifierOrCode:
+            attemptError = "That identifier or code is incorrect. Please try again."
+        default:
+            attemptError = nil
+        }
+        for action in nextActions where present(action, among: nextActions) {
+            return
+        }
+        fail(with: error)
+    }
+
+    /// Shows the screen for `action`. Returns `false` if the action has no screen.
+    func present(_ action: NextAction, among nextActions: [NextAction]) -> Bool {
+        currentAction = action
+        switch action {
+        case .identifyEmail, .identifyPhone:
+            // `identifyEmail` would otherwise shadow `identifyPhone`; honour the user's choice when both are offered.
+            let offersBoth = nextActions.contains(.identifyEmail) && nextActions.contains(.identifyPhone)
+            let showPhone = offersBoth ? usePhoneIdentifier : action == .identifyPhone
+            currentAction = showPhone ? .identifyPhone : .identifyEmail
+            embeddedAuthUIState = showPhone ? .identifyPhone : .identifyEmail
+        case .challengeEmail(let index, let identifier):
+            embeddedAuthUIState = .challengeEmail(index: index, identifier: identifier)
+        case .challengePhone(let index, let identifier, let deliveryMethods):
+            embeddedAuthUIState = .challengePhone(index: index, identifier: identifier, deliveryMethods: deliveryMethods)
+        case .challengePush(let index, let name):
+            embeddedAuthUIState = .challengePush(index: index, name: name)
+        case .verifyOTP(let channel, let identifier):
+            otp = ""
+            embeddedAuthUIState = .verifyOTP(channel: channel, identifier: identifier)
+        case .verifyOob(let pollInMs):
+            // State only: the polling loop is started by `triggerPushChallenge(index:)`.
+            embeddedAuthUIState = .pollingPush(pollInMs: pollInMs)
+        case .verifyRecoveryCode:
+            recoveryCode = ""
+            embeddedAuthUIState = .verifyRecoveryCode
+        case .confirmRecoveryCode(let newCode):
+            embeddedAuthUIState = .confirmRecoveryCode(newCode: newCode)
+        case .unknown:
+            currentAction = nil
+            return false
+        }
+        return true
     }
 }
 
-extension Array where Element: Hashable {
-    func uniqued() -> [Element] {
-        var seen = Set<Element>()
-        return filter { seen.insert($0).inserted }
-    }
+// MARK: - Embedded Auth UI State
+
+enum EmbeddedAuthUIState {
+    case initial
+    case identifyEmail
+    case identifyPhone
+    case challengeEmail(index: Int, identifier: String)
+    case challengePhone(index: Int, identifier: String, deliveryMethods: [PhoneDeliveryMethod])
+    case challengePush(index: Int, name: String)
+    case pollingPush(pollInMs: Int)
+    case verifyOTP(channel: OtpChannel, identifier: String?)
+    case verifyPassword
+    case verifyRecoveryCode
+    case confirmRecoveryCode(newCode: String)
+    case success(Credentials)
+    case failed(String)
 }
-
-// MARK: - PasskeyController
-
-#if PASSKEYS_PLATFORM
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-final class PasskeyController: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
-
-    var window: UIWindow?
-
-    private var registrationContinuation: CheckedContinuation<ASAuthorizationPlatformPublicKeyCredentialRegistration, Error>?
-    private var authController: ASAuthorizationController?
-
-    func presentRegistration(challenge: PasskeySignupChallenge) async throws -> ASAuthorizationPlatformPublicKeyCredentialRegistration {
-        try await withCheckedThrowingContinuation { continuation in
-            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(
-                relyingPartyIdentifier: challenge.relyingPartyId
-            )
-            let request = provider.createCredentialRegistrationRequest(
-                challenge: challenge.challengeData,
-                name: challenge.userName,
-                userID: challenge.userId
-            )
-            registrationContinuation = continuation
-            let controller = ASAuthorizationController(authorizationRequests: [request])
-            controller.delegate = self
-            controller.presentationContextProvider = self
-            authController = controller
-            controller.performRequests()
-        }
-    }
-
-    // MARK: ASAuthorizationControllerPresentationContextProviding
-
-    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        window ?? UIWindow()
-    }
-
-    // MARK: ASAuthorizationControllerDelegate
-
-    func authorizationController(controller: ASAuthorizationController,
-                                 didCompleteWithAuthorization authorization: ASAuthorization) {
-        defer { authController = nil }
-        if let cred = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration {
-            registrationContinuation?.resume(returning: cred)
-            registrationContinuation = nil
-        }
-    }
-
-    func authorizationController(controller: ASAuthorizationController,
-                                 didCompleteWithError error: Error) {
-        defer { authController = nil }
-        registrationContinuation?.resume(throwing: error)
-        registrationContinuation = nil
-    }
-}
-#endif

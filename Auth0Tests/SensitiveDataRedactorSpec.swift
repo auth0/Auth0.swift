@@ -135,14 +135,116 @@ class SensitiveDataRedactorSpec: QuickSpec {
                     }
                     """
                     let data = json.data(using: .utf8)!
-                    
+
                     let result = SensitiveDataRedactor.redact(data)
-                    
+
                     expect(result).toNot(beNil())
                     expect(result).to(contain("username"))
                     expect(result).to(contain("john"))
                     expect(result).to(contain("age"))
                     expect(result).toNot(contain("<REDACTED>"))
+                }
+
+                it("should redact code (recovery code in request body)") {
+                    let json = """
+                    {
+                        "action": "action:verify:recovery-code:v1",
+                        "code": "SUPER-SECRET-RECOVERY",
+                        "auth_session": "sess_abc"
+                    }
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).toNot(contain("SUPER-SECRET-RECOVERY"))
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).to(contain("action"))
+                }
+
+                for key in ["recovery_code", "password", "mfa_token", "oob_code", "binding_code", "code_verifier", "subject_token"] {
+                    it("should redact \(key)") {
+                        let json = "{\"\(key)\": \"secret-value-123\", \"client_id\": \"abc123\"}"
+                        let data = json.data(using: .utf8)!
+
+                        let result = SensitiveDataRedactor.redact(data)
+
+                        expect(result).toNot(beNil())
+                        expect(result).toNot(contain("secret-value-123"))
+                        expect(result).to(contain("<REDACTED>"))
+                        expect(result).to(contain("client_id"))
+                    }
+                }
+
+                it("should redact sensitive values inside objects of a top-level array") {
+                    let json = """
+                    [
+                        {"password": "secret-in-array", "name": "visible-name"},
+                        {"nested": {"recovery_code": "secret-nested"}}
+                    ]
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).toNot(contain("secret-in-array"))
+                    expect(result).toNot(contain("secret-nested"))
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).to(contain("visible-name"))
+                }
+
+                it("should preserve a top-level array of plain values") {
+                    let data = "[1, 2, 3]".data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).toNot(contain("<REDACTED>"))
+                    expect(result).to(contain("1"))
+                    expect(result).to(contain("3"))
+                }
+
+                it("should redact new_code nested inside next array") {
+                    let json = """
+                    {
+                        "error": "insufficient_authorization",
+                        "next": [
+                            {
+                                "action": "action:confirm:recovery-code:v1",
+                                "new_code": "NEW-SECRET-CODE"
+                            }
+                        ]
+                    }
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).toNot(contain("NEW-SECRET-CODE"))
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).to(contain("action:confirm:recovery-code:v1"))
+                }
+
+                it("should redact auth_session nested in a dict") {
+                    let json = """
+                    {
+                        "context": {
+                            "auth_session": "nested_session_token"
+                        },
+                        "client_id": "abc123"
+                    }
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).toNot(contain("nested_session_token"))
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).to(contain("client_id"))
                 }
             }
         }
