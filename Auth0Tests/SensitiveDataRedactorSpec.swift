@@ -177,6 +177,40 @@ class SensitiveDataRedactorSpec: QuickSpec {
                     }
                 }
 
+                it("should redact the passkey verification codes") {
+                    let json = """
+                    {
+                        "client_id": "abc123",
+                        "auth_session": "session-value",
+                        "verification": {"email": "123456", "phone": "654321"}
+                    }
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).toNot(contain("123456"))
+                    expect(result).toNot(contain("654321"))
+                    expect(result).to(contain("verification"))
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).to(contain("client_id"))
+                }
+
+                it("should not redact verification_required") {
+                    let json = """
+                    {"verification_required": ["email", "phone"], "auth_session": "session-value"}
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).to(contain("verification_required"))
+                    expect(result).to(contain("email"))
+                    expect(result).to(contain("phone"))
+                }
+
                 it("should redact sensitive values inside objects of a top-level array") {
                     let json = """
                     [

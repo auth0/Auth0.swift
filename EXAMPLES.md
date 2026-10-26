@@ -33,6 +33,7 @@ Each feature lives in its own file under [`examples/`](examples).
 - [Reset a password](examples/authentication-api/reset-password.md)
 - [Log in with passkey](examples/authentication-api/login-passkey.md)
 - [Sign up with passkey](examples/authentication-api/signup-passkey.md)
+- [Sign up with passkey and identifier verification](examples/authentication-api/signup-passkey-verification.md)
 - [Passwordless login](examples/authentication-api/passwordless.md)
 - [Passwordless login with a database connection [EA]](examples/authentication-api/passwordless-database.md)
 - [Retrieve user information](examples/authentication-api/user-information.md)

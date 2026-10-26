@@ -138,6 +138,45 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
         return self.code == DPoP.nonceRequiredErrorCode
     }
 
+    /// Identifiers that still require a correct one-time code after a failed passkey token exchange (e.g. `[.phone]`).
+    ///
+    /// Non-`nil` only when ``isPasskeyVerificationRetryable`` is `true` and Auth0 listed the identifiers. On a retry, pass
+    /// it as `verificationRequired`, together with ``passkeyAuthSession`` as `authSession`, to
+    /// ``Authentication/login(passkey:verificationRequired:authSession:connection:audience:scope:organization:verification:)``.
+    ///
+    /// - Note: This is unrelated to ``isVerificationRequired``, which reports the `requires_verification` error.
+    public var passkeyVerificationRequired: [PasskeyVerificationMethod]? {
+        guard isPasskeyVerificationRetryable else { return nil }
+        return (self.info["verification_required"] as? [String])?.map(PasskeyVerificationMethod.init(rawValue:))
+    }
+
+    /// The passkey `auth_session` that Auth0 returned together with a failed token exchange, if any.
+    ///
+    /// Auth0 returns it with an `invalid_grant` error when the session is still usable, for example when one or more
+    /// verification codes were wrong (see ``isPasskeyVerificationRetryable``). It is the same session
+    /// that was sent: retry by passing it as `authSession`, with the corrected codes, to
+    /// ``Authentication/login(passkey:verificationRequired:authSession:connection:audience:scope:organization:verification:)``.
+    ///
+    /// `nil` when Auth0 didn't return a session with this error. When that error is an `invalid_grant`, the session is gone
+    /// and a fresh ``Authentication/passkeySignupChallenge(email:phoneNumber:username:name:givenName:familyName:nickname:picture:userMetadata:connection:organization:deliveryMethod:)``
+    /// call is required.
+    public var passkeyAuthSession: String? {
+        return self.info["auth_session"] as? String
+    }
+
+    /// When a failed passkey token exchange can be retried on the same session.
+    ///
+    /// `true` when Auth0 returns an `auth_session` with an `invalid_grant` error: the session is still usable. Ask the
+    /// user for the codes that are wrong (see ``passkeyVerificationRequired``), and retry with the **same** passkey
+    /// credential and ``passkeyAuthSession``.
+    ///
+    /// `false` for everything else, including an `invalid_grant` error without a session, which means the session is
+    /// gone. This property doesn't limit the number of retries: Auth0 limits the wrong codes it accepts but doesn't say
+    /// how many attempts are left, so cap the retries in your app as well.
+    public var isPasskeyVerificationRetryable: Bool {
+        return self.code == "invalid_grant" && self.passkeyAuthSession != nil
+    }
+
 }
 
 // MARK: - Error Messages

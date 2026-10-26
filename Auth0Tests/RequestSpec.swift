@@ -531,6 +531,67 @@ class RequestSpec: QuickSpec {
         }
         #endif
 
+        describe("request validators") {
+
+            let validationError = AuthenticationError(info: ["error": "invalid_request", "error_description": "Rejected"],
+                                                      statusCode: 0)
+
+            struct RejectingValidator: RequestValidator {
+                let error: AuthenticationError
+                func validate() throws { throw error }
+            }
+
+            func expectRejectedWithoutSending(_ request: any Requestable<AnyJSON, AuthenticationError>) {
+                var requestSent = false
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) }, response: { _ in
+                    requestSent = true
+                    return apiSuccessResponse(json: ["foo": "bar"])(URLRequest(url: Url))
+                })
+
+                waitUntil(timeout: Timeout) { done in
+                    request.start { result in
+                        // The request wraps what a validator throws as the cause of its own error
+                        if case .failure(let error) = result {
+                            expect((error.cause as? AuthenticationError)?.localizedDescription) == "Rejected"
+                        } else {
+                            fail("Expected failure")
+                        }
+                        done()
+                    }
+                }
+
+                expect(requestSent) == false
+            }
+
+            it("should run the validators and not send the request when one fails") {
+                expectRejectedWithoutSending(Request().requestValidators([RejectingValidator(error: validationError)]))
+            }
+
+            it("should keep the validators when extra parameters are added") {
+                expectRejectedWithoutSending(Request()
+                    .requestValidators([RejectingValidator(error: validationError)])
+                    .parameters(["foo": "bar"]))
+            }
+
+            it("should keep the validators when extra headers are added") {
+                expectRejectedWithoutSending(Request()
+                    .requestValidators([RejectingValidator(error: validationError)])
+                    .headers(["foo": "bar"]))
+            }
+
+            it("should keep the validators when more validators are added") {
+                struct PassingValidator: RequestValidator {
+                    func validate() throws {}
+                }
+
+                expectRejectedWithoutSending(Request()
+                    .requestValidators([RejectingValidator(error: validationError)])
+                    .requestValidators([PassingValidator()])
+                    .requestValidators([]))
+            }
+
+        }
+
         describe("main thread callback execution") {
 
             it("should execute callback on main thread on success") {
