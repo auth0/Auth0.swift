@@ -135,6 +135,10 @@ let mfaInsufficientReasonCases: [MFAInsufficientReasonCase] = [
         if case .invalidCode = reason { return true }
         return false
     },
+    .init(description: "invalid_identifier_or_password") { reason in
+        if case .invalidIdentifierOrPassword = reason { return true }
+        return false
+    },
     .init(description: "authorization_pending") { reason in
         if case .authorizationPending = reason { return true }
         return false

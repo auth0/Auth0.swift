@@ -462,6 +462,43 @@ import Foundation
         }
     }
 
+    @Test func reasonIsNoNextStepsUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "no_next_steps"],
+            statusCode: 403
+        )
+        guard case .noNextSteps = error.reason else {
+            Issue.record("Expected .noNextSteps, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsPasswordLeakedUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "password_leaked"],
+            statusCode: 403
+        )
+        guard case .passwordLeaked = error.reason else {
+            Issue.record("Expected .passwordLeaked, got \(error.reason)"); return
+        }
+    }
+
+    // The descriptions that point to `custom_error_message` / `custom_error_code` are not modelled yet.
+    @Test(arguments: ["denied", "validation_error"])
+    func reasonIsAccessDeniedForDescriptionsThatCarryCustomErrorFields(description: String) {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied",
+                   "error_description": description,
+                   "custom_error_message": "Blocked by policy.",
+                   "custom_error_code": "policy_blocked"],
+            statusCode: 403
+        )
+        guard case .accessDenied = error.reason else {
+            Issue.record("Expected .accessDenied, got \(error.reason)"); return
+        }
+        #expect(error.info["custom_error_message"] as? String == "Blocked by policy.")
+        #expect(error.info["custom_error_code"] as? String == "policy_blocked")
+    }
+
     @Test func reasonIsNoEligibleFactorsUnderAccessDenied() {
         let error = EmbeddedAuthError(
             info: ["error": "access_denied", "error_description": "no_eligible_factors"],
@@ -483,6 +520,17 @@ import Foundation
             Issue.record("Expected .insufficientAuthorization"); return
         }
         #expect(actions == [.identifyPhone])
+    }
+
+    @Test func reasonParsesIdentifyUsername() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:identify:username:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions == [.identifyUsername])
     }
 
     @Test func reasonParsesChallengePhoneWithDeliveryMethods() {
@@ -713,5 +761,55 @@ import Foundation
         #expect(phoneIdx == 0)
         #expect(methods.contains(.text))
         #expect(methods.contains(.voice))
+    }
+
+    // MARK: - verify password
+
+    @Test func reasonIsInvalidIdentifierOrPasswordUnderInsufficientAuthorization() {
+        let error = EmbeddedAuthError(
+            info: ["error": "insufficient_authorization", "error_description": "invalid_identifier_or_password"],
+            statusCode: 403
+        )
+        guard case .insufficientAuthorization(.invalidIdentifierOrPassword, _) = error.reason else {
+            Issue.record("Expected .invalidIdentifierOrPassword, got \(error.reason)"); return
+        }
+    }
+
+    @Test func invalidIdentifierOrPasswordCarriesNextActions() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "error_description": "invalid_identifier_or_password",
+            "auth_session": "sess_abc",
+            "next": [["action": "action:verify:password:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(.invalidIdentifierOrPassword, let actions) = error.reason else {
+            Issue.record("Expected .invalidIdentifierOrPassword, got \(error.reason)"); return
+        }
+        #expect(actions == [.verifyPassword])
+    }
+
+    @Test func reasonParsesVerifyPassword() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:verify:password:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions == [.verifyPassword])
+    }
+
+    @Test func reasonDecodesVerifyPasswordAlongsideOtherActions() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [
+                ["action": "action:verify:password:v1"],
+                ["action": "action:challenge:email:v1", "index": 0, "identifier": "al**@example.com"]
+            ]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions == [.verifyPassword, .challengeEmail(index: 0, identifier: "al**@example.com")])
     }
 }

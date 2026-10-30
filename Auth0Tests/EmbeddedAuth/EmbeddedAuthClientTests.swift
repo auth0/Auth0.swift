@@ -684,6 +684,38 @@ struct EmbeddedAuthClientTests {
         #expect(body?["auth_session"] as? String == "sess_002")
     }
 
+    @Test func verifyOtpNetworkFailureOnTheTokenExchangeKeepsTheSessionForRetry() async throws {
+        let sut = makeClient()
+        EmbeddedAuthClientMockProtocol.requestHandler = { _ in
+            return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:verify:otp:v1", "channel": "email"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            if req.url?.path.hasSuffix("/oauth/token") == true { throw URLError(.timedOut) }
+            return (response(status: 200), authCodeData())
+        }
+        let error = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await sut.verifyOtp("123456", type: .oob).start()
+        }
+        guard case .network = error?.reason else {
+            Issue.record("Expected .network, got \(String(describing: error?.reason))"); return
+        }
+
+        // Only the token call failed, so the step can be retried on the same session.
+        nonisolated(unsafe) var sentSession: String?
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            if req.url?.path.hasSuffix("/oauth/token") == true {
+                return (response(status: 200), credentialsData(accessToken: "retry_token"))
+            }
+            sentSession = (try? JSONSerialization.jsonObject(with: req.httpBody ?? Data()) as? [String: Any])?["auth_session"] as? String
+            return (response(status: 200), authCodeData())
+        }
+        let credentials = try await sut.verifyOtp("123456", type: .oob).start()
+        #expect(credentials.accessToken == "retry_token")
+        #expect(sentSession == "sess_001")
+    }
+
     @Test func verifyOtpExchangeFailureClearsSession() async {
         let sut = makeClient()
         // Establish session

@@ -11,6 +11,9 @@ public enum NextAction: Sendable, Equatable {
     /// Server expects the caller to submit a phone number via ``EmbeddedAuth/identify(_:type:)``.
     case identifyPhone
 
+    /// Server expects the caller to submit a username via ``EmbeddedAuth/identify(_:type:)``.
+    case identifyUsername
+
     /// Server expects the caller to trigger an email OTP send via ``EmbeddedAuth/challengeEmail(index:)``.
     ///
     /// - Parameters:
@@ -48,6 +51,9 @@ public enum NextAction: Sendable, Equatable {
     ///
     /// - Parameter pollInMs: Milliseconds to wait before calling ``EmbeddedAuth/verifyOob()`` again.
     case verifyOob(pollInMs: Int)
+
+    /// Server expects the user's password via ``EmbeddedAuth/verifyPassword(_:)``.
+    case verifyPassword
 
     /// Server expects a recovery code via ``EmbeddedAuth/verifyRecoveryCode(_:)``.
     case verifyRecoveryCode
@@ -97,6 +103,9 @@ enum EmbeddedAction: String, Sendable, CaseIterable {
     /// Identify by phone.
     case identifyPhone  = "action:identify:phone:v1"
 
+    /// Identify by username.
+    case identifyUsername = "action:identify:username:v1"
+
     /// Request an email OTP challenge.
     case challengeEmail = "action:challenge:email:v1"
 
@@ -111,6 +120,9 @@ enum EmbeddedAction: String, Sendable, CaseIterable {
 
     /// Poll for push notification approval.
     case verifyOob      = "action:verify:oob:v1"
+
+    /// Submit the user's password.
+    case verifyPassword = "action:verify:password:v1"
 
     /// Submit a recovery code.
     case verifyRecoveryCode  = "action:verify:recovery-code:v1"
@@ -131,6 +143,9 @@ public enum EmbeddedCapability: Sendable, Equatable {
     /// SDK can identify a user by phone.
     case identifyPhone
 
+    /// SDK can identify a user by username.
+    case identifyUsername
+
     /// SDK can trigger an email OTP challenge.
     case challengeEmail
 
@@ -146,6 +161,9 @@ public enum EmbeddedCapability: Sendable, Equatable {
     /// SDK can poll for push notification approval.
     case verifyOob
 
+    /// SDK can verify a password.
+    case verifyPassword
+
     /// SDK can submit a recovery code.
     case verifyRecoveryCode
 
@@ -154,9 +172,9 @@ public enum EmbeddedCapability: Sendable, Equatable {
 
     /// All capabilities this SDK version supports.
     public static let all: [EmbeddedCapability] = [
-        .identifyEmail, .identifyPhone,
+        .identifyEmail, .identifyPhone, .identifyUsername,
         .challengeEmail, .challengePhone, .challengePush,
-        .verifyOTP, .verifyOob,
+        .verifyOTP, .verifyOob, .verifyPassword,
         .verifyRecoveryCode, .confirmRecoveryCode
     ]
 
@@ -164,11 +182,13 @@ public enum EmbeddedCapability: Sendable, Equatable {
         switch self {
         case .identifyEmail:       return .identifyEmail
         case .identifyPhone:       return .identifyPhone
+        case .identifyUsername:    return .identifyUsername
         case .challengeEmail:      return .challengeEmail
         case .challengePhone:      return .challengePhone
         case .challengePush:       return .challengePush
         case .verifyOTP:           return .verifyOTP
         case .verifyOob:           return .verifyOob
+        case .verifyPassword:      return .verifyPassword
         case .verifyRecoveryCode:  return .verifyRecoveryCode
         case .confirmRecoveryCode: return .confirmRecoveryCode
         }

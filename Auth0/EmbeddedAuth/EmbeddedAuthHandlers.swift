@@ -29,8 +29,9 @@ extension Auth0EmbeddedAuth {
     ///
     /// Reusable by any step whose success response carries an `authorization_code`. Session
     /// bookkeeping on failure matches ``decodeAuthorizeResponse(_:callback:)``. On `200` the
-    /// returned code is exchanged via a chained ``exchange(code:)`` request; the code is single-use,
-    /// so the flow's session is cleared once that exchange settles regardless of its outcome.
+    /// returned code is exchanged via a chained ``exchange(code:)`` request. When that exchange settles the
+    /// session is cleared, except after a network failure: the call may not have reached the server, so the
+    /// session is kept and the caller can retry the step.
     func decodeAuthorizationCodeResponse(
         _ result: Result<ResponseValue, EmbeddedAuthError>,
         callback: @escaping @Sendable (Result<Credentials, EmbeddedAuthError>) -> Void
@@ -47,7 +48,12 @@ extension Auth0EmbeddedAuth {
                 return
             }
             exchange(code: body.authorizationCode).start { [self] exchangeResult in
-                currentSession = nil
+                switch exchangeResult {
+                case .success:
+                    currentSession = nil
+                case .failure(let error):
+                    updateSessionFromFailure(error)
+                }
                 callback(exchangeResult)
             }
         }

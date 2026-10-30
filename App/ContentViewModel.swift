@@ -7,6 +7,7 @@ import Auth0
 final class ContentViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var phone: String = ""
+    @Published var username: String = ""
     @Published var otp: String = ""
     @Published var recoveryCode: String = ""
     @Published var password: String = ""
@@ -100,6 +101,18 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
+    func submitUsername(_ username: String) async {
+        isLoading = true
+        do {
+            _ = try await embeddedAuthClient.identify(username, type: .username).start()
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
     func triggerChallenge(index: Int) async {
         isLoading = true
         do {
@@ -151,6 +164,19 @@ final class ContentViewModel: ObservableObject {
         let otpType: OtpType = channel == .totp ? .totp : .oob
         do {
             let credentials = try await embeddedAuthClient.verifyOtp(otp, type: otpType).start()
+            finish(with: credentials)
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    func submitPassword(_ password: String) async {
+        isLoading = true
+        do {
+            let credentials = try await embeddedAuthClient.verifyPassword(password).start()
             finish(with: credentials)
         } catch let error as EmbeddedAuthError {
             handle(embeddedAuthError: error)
@@ -233,6 +259,7 @@ final class ContentViewModel: ObservableObject {
         embeddedAuthUIState = .initial
         email = ""
         phone = ""
+        username = ""
         otp = ""
         recoveryCode = ""
         password = ""
@@ -324,6 +351,7 @@ private extension ContentViewModel {
 
     func finish(with credentials: Credentials) {
         phone = ""
+        username = ""
         recoveryCode = ""
         password = ""
         clearFlowState()
@@ -339,6 +367,8 @@ private extension ContentViewModel {
             detail = "The challenge expired. Start again."
         case .authorizationRejected:
             detail = "The request was rejected. Start again."
+        case .noEligibleFactors:
+            detail = "A second factor is required but none is enrolled. Sign in with a redirect-based flow."
         case .network:
             detail = "A network error occurred. Check your connection and try again."
         default:
@@ -361,6 +391,8 @@ private extension ContentViewModel {
             attemptError = "That code is incorrect. Please try again."
         case .invalidIdentifierOrCode:
             attemptError = "That identifier or code is incorrect. Please try again."
+        case .invalidIdentifierOrPassword:
+            attemptError = "Incorrect username or password. Please try again."
         default:
             attemptError = nil
         }
@@ -380,6 +412,9 @@ private extension ContentViewModel {
             let showPhone = offersBoth ? usePhoneIdentifier : action == .identifyPhone
             currentAction = showPhone ? .identifyPhone : .identifyEmail
             embeddedAuthUIState = showPhone ? .identifyPhone : .identifyEmail
+        case .identifyUsername:
+            username = ""
+            embeddedAuthUIState = .identifyUsername
         case .challengeEmail(let index, let identifier):
             embeddedAuthUIState = .challengeEmail(index: index, identifier: identifier)
         case .challengePhone(let index, let identifier, let deliveryMethods):
@@ -389,6 +424,9 @@ private extension ContentViewModel {
         case .verifyOTP(let channel, let identifier):
             otp = ""
             embeddedAuthUIState = .verifyOTP(channel: channel, identifier: identifier)
+        case .verifyPassword:
+            password = ""
+            embeddedAuthUIState = .verifyPassword
         case .verifyOob(let pollInMs):
             // State only: the polling loop is started by `triggerPushChallenge(index:)`.
             embeddedAuthUIState = .pollingPush(pollInMs: pollInMs)
@@ -411,6 +449,7 @@ enum EmbeddedAuthUIState {
     case initial
     case identifyEmail
     case identifyPhone
+    case identifyUsername
     case challengeEmail(index: Int, identifier: String)
     case challengePhone(index: Int, identifier: String, deliveryMethods: [PhoneDeliveryMethod])
     case challengePush(index: Int, name: String)

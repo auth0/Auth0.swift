@@ -84,6 +84,8 @@ public extension EmbeddedAuthError {
             return .insufficientAuthorization(reason: .invalidCode, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "invalid_identifier_or_code"):
             return .insufficientAuthorization(reason: .invalidIdentifierOrCode, nextActions: parsedNextActions)
+        case (_, "insufficient_authorization", "invalid_identifier_or_password"):
+            return .insufficientAuthorization(reason: .invalidIdentifierOrPassword, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "authorization_pending"):
             return .insufficientAuthorization(reason: .authorizationPending, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "slow_down"):
@@ -100,6 +102,10 @@ public extension EmbeddedAuthError {
             return .noEligibleFactors
         case (_, "access_denied", "consent_required"):
             return .consentRequired
+        case (_, "access_denied", "no_next_steps"):
+            return .noNextSteps
+        case (_, "access_denied", "password_leaked"):
+            return .passwordLeaked
         case (_, "access_denied", _):
             return .accessDenied
         case (429, "too_many_requests", "too_many_attempts"):
@@ -134,6 +140,8 @@ private extension EmbeddedAuthError {
                 return .identifyEmail
             case .identifyPhone:
                 return .identifyPhone
+            case .identifyUsername:
+                return .identifyUsername
             case .challengeEmail:
                 guard let index = entry["index"] as? Int,
                       let identifier = entry["identifier"] as? String else { return nil }
@@ -155,6 +163,8 @@ private extension EmbeddedAuthError {
             case .verifyOob:
                 guard let pollInMs = entry["poll_in_ms"] as? Int else { return nil }
                 return .verifyOob(pollInMs: pollInMs)
+            case .verifyPassword:
+                return .verifyPassword
             case .verifyRecoveryCode:
                 return .verifyRecoveryCode
             case .confirmRecoveryCode:
