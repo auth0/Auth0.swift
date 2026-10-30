@@ -17,6 +17,16 @@ final class ContentViewModel: ObservableObject {
     @Published var otpChannel: PasskeyVerificationMethod = .email
     @Published var isRetryingPasskeyVerification: Bool = false
 
+    // My Account Profile
+    @Published var profileFieldsFilter: String = ""
+    @Published var includeProfileFields: Bool = true
+    @Published var profileGivenName: String = ""
+    @Published var profileFamilyName: String = ""
+    @Published var profileName: String = ""
+    @Published var profileNickname: String = ""
+    @Published var profilePicture: String = ""
+    @Published var profileOutput: String?
+
     private let credentialsManager: CredentialsManager
     private let authenticationClient: Authentication
 
@@ -308,6 +318,106 @@ final class ContentViewModel: ObservableObject {
         isAuthenticated = true
     }
     #endif
+
+    // MARK: - My Account Profile
+
+    private static let profileScope = "read:me:profile update:me:profile"
+
+    /// Fetches the authenticated user's profile, optionally filtered by `profileFieldsFilter` (comma-separated).
+    func getProfile() async {
+        await runProfileRequest { myAccount in
+            let names = self.profileFieldsFilter
+                .split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+            let options = names.isEmpty ? nil : GetUserProfileOptions(fields: names,
+                                                                      includeFields: self.includeProfileFields)
+            return try await myAccount.getUserProfile(options: options).start()
+        }
+    }
+
+    /// Updates the writable profile attributes that have a value in the text fields.
+    func updateProfile() async {
+        await runProfileRequest { myAccount in
+            func value(_ text: String) -> String? { text.isEmpty ? nil : text }
+            let request = UpdateUserProfileRequest(givenName: value(self.profileGivenName),
+                                                   familyName: value(self.profileFamilyName),
+                                                   name: value(self.profileName),
+                                                   nickname: value(self.profileNickname),
+                                                   picture: value(self.profilePicture))
+            return try await myAccount.updateUserProfile(request).start()
+        }
+    }
+
+    private func runProfileRequest(_ request: (MyAccount) async throws -> MyAccountProfile) async {
+        isLoading = true
+        errorMessage = nil
+        profileOutput = nil
+        do {
+            guard let host = authenticationClient.url.host else {
+                errorMessage = "Could not determine the Auth0 domain"
+                isLoading = false
+                return
+            }
+            let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "https://\(host)/me/",
+                                                                             scope: Self.profileScope)
+            let myAccount = Auth0.myAccount(token: apiCredentials.accessToken, domain: host)
+            let profile = try await request(myAccount)
+            populateProfileInputs(from: profile)
+            profileOutput = describe(profile)
+        } catch let error as CredentialsManagerError {
+            errorMessage = handleCredentialsManagerError(error)
+        } catch let error as MyAccountError {
+            errorMessage = describe(error)
+        } catch {
+            errorMessage = "Unexpected error: \(error.localizedDescription)"
+        }
+        isLoading = false
+    }
+
+    private func populateProfileInputs(from profile: MyAccountProfile) {
+        profileGivenName = profile.givenName ?? profileGivenName
+        profileFamilyName = profile.familyName ?? profileFamilyName
+        profileName = profile.name ?? profileName
+        profileNickname = profile.nickname ?? profileNickname
+        profilePicture = profile.picture ?? profilePicture
+    }
+
+    private func describe(_ profile: MyAccountProfile) -> String {
+        var lines: [String] = []
+        func add(_ key: String, _ value: Any?) {
+            if let value { lines.append("\(key): \(value)") }
+        }
+        add("user_id", profile.userId)
+        add("given_name", profile.givenName)
+        add("family_name", profile.familyName)
+        add("name", profile.name)
+        add("nickname", profile.nickname)
+        add("picture", profile.picture)
+        add("email", profile.email)
+        add("email_verified", profile.emailVerified)
+        add("phone_number", profile.phoneNumber)
+        add("phone_verified", profile.phoneVerified)
+        add("username", profile.username)
+        add("created_at", profile.createdAt)
+        add("updated_at", profile.updatedAt)
+        if let policy = profile.profilePolicy {
+            lines.append("profile_policy:")
+            for (pointer, entry) in policy.sorted(by: { $0.key < $1.key }) {
+                let reason = entry.reason.map { " (\($0))" } ?? ""
+                lines.append("  \(pointer): \(entry.access.rawValue), \(entry.source.rawValue)\(reason)")
+            }
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private func describe(_ error: MyAccountError) -> String {
+        var message = "My Account error (\(error.statusCode)): \(error.localizedDescription)"
+        for validationError in error.validationErrors ?? [] {
+            message += "\n• \(validationError.pointer ?? "?"): \(validationError.detail)"
+        }
+        return message
+    }
 
     // MARK: - Session
 
