@@ -611,6 +611,11 @@ extension URLRequest {
         let path = "/me/\(Auth0MyAccount.apiVersion)/authentication-methods\(subpath)"
         return isHost(domain) && isPath(path) && hasBearerToken(token)
     }
+
+    func isMyAccountProfile(_ domain: String, token: String) -> Bool {
+        let path = "/me/\(Auth0MyAccount.apiVersion)/profile"
+        return isHost(domain) && isPath(path) && hasBearerToken(token)
+    }
     
     func isFactorsMethods(_ domain: String, _ endpoint: String = "", token: String) -> Bool {
         let subpath = endpoint.isEmpty ? endpoint : "/\(endpoint)"

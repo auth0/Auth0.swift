@@ -87,6 +87,12 @@ struct ContentView: View {
                 .disabled(viewModel.isLoading)
                 #endif
 
+                // MARK: My Account Profile
+
+                if viewModel.isAuthenticated {
+                    ProfileSectionView(viewModel: viewModel)
+                }
+
                 // MARK: Clear Credentials
 
                 Button {
@@ -116,6 +122,71 @@ struct ContentView: View {
         .task {
             await viewModel.checkAuthentication()
         }
+    }
+}
+
+// MARK: - My Account Profile
+
+struct ProfileSectionView: View {
+    @ObservedObject var viewModel: ContentViewModel
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Text("My Account Profile")
+                .font(.headline)
+
+            // MARK: Get
+
+            profileField("fields (comma-separated, optional)", text: $viewModel.profileFieldsFilter)
+            Toggle("include_fields (off = exclude the listed fields)", isOn: $viewModel.includeProfileFields)
+                .font(.caption)
+
+            Button {
+                Task { await viewModel.getProfile() }
+            } label: {
+                Label("Get Profile", systemImage: "person.crop.circle")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .disabled(viewModel.isLoading)
+
+            // MARK: Update
+
+            profileField("given_name", text: $viewModel.profileGivenName)
+            profileField("family_name", text: $viewModel.profileFamilyName)
+            profileField("name", text: $viewModel.profileName)
+            profileField("nickname", text: $viewModel.profileNickname)
+            profileField("picture (https URL)", text: $viewModel.profilePicture)
+
+            Button {
+                Task { await viewModel.updateProfile() }
+            } label: {
+                Label("Update Profile", systemImage: "square.and.pencil")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .disabled(viewModel.isLoading)
+
+            if let output = viewModel.profileOutput {
+                Text(output)
+                    .font(.system(.caption, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    #if !os(tvOS)
+                    .textSelection(.enabled)
+                    #endif
+            }
+        }
+    }
+
+    private func profileField(_ placeholder: String, text: Binding<String>) -> some View {
+        TextField(text: text) {
+            Text(placeholder)
+        }
+        #if !os(tvOS)
+        .textFieldStyle(.roundedBorder)
+        #endif
+        #if os(iOS)
+        .textInputAutocapitalization(.never)
+        .disableAutocorrection(true)
+        #endif
     }
 }
 

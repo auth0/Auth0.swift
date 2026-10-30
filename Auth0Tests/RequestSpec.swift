@@ -18,7 +18,8 @@ fileprivate extension Request where T == AnyJSON, E == AuthenticationError {
          method: String = "GET",
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
-         dpop: DPoP? = nil) {
+         dpop: DPoP? = nil,
+         alwaysSendsBody: Bool = false) {
         self.init(session: session,
                   url: url,
                   method: method,
@@ -27,7 +28,8 @@ fileprivate extension Request where T == AnyJSON, E == AuthenticationError {
                   headers: headers,
                   logger: nil,
                   auth0ClientInfo: Auth0ClientInfo(),
-                  dpop: dpop)
+                  dpop: dpop,
+                  alwaysSendsBody: alwaysSendsBody)
     }
 
 }
@@ -54,6 +56,55 @@ class RequestSpec: QuickSpec {
         afterEach {
             NetworkStub.clearStubs()
             URLProtocol.unregisterClass(StubURLProtocol.self)
+        }
+
+        describe("request body") {
+
+            func body(of request: any Requestable<AnyJSON, AuthenticationError>) -> String? {
+                return (request as? Request<AnyJSON, AuthenticationError>)?.request.httpBody
+                    .flatMap { String(data: $0, encoding: .utf8) }
+            }
+
+            it("should not send a body when the parameters are empty") {
+                expect(body(of: Request(method: "PATCH"))).to(beNil())
+                expect(body(of: Request(method: "POST"))).to(beNil())
+                expect(body(of: Request(method: "DELETE"))).to(beNil())
+            }
+
+            it("should not send a body by default when the parameters are empty") {
+                for method in ["POST", "PUT", "PATCH", "DELETE"] {
+                    // The production initializer without `alwaysSendsBody`, as every SDK call site except updateUserProfile uses it.
+                    let request = Request<AnyJSON, AuthenticationError>(session: .shared, url: Url, method: method, handle: plainJson,
+                                                                        logger: nil, auth0ClientInfo: Auth0ClientInfo())
+                    expect(request.request.httpBody).to(beNil())
+                }
+            }
+
+            it("should send the parameters as the body when they are not empty") {
+                expect(body(of: Request(method: "PATCH", parameters: ["foo": "bar"]))) == #"{"foo":"bar"}"#
+            }
+
+            it("should send an empty JSON object when asked to and the parameters are empty") {
+                expect(body(of: Request(method: "PATCH", alwaysSendsBody: true))) == "{}"
+            }
+
+            it("should send the parameters when asked to send a body and they are not empty") {
+                expect(body(of: Request(method: "PATCH", parameters: ["foo": "bar"], alwaysSendsBody: true))) == #"{"foo":"bar"}"#
+            }
+
+            it("should not send a body or query parameters for a GET request even when asked to") {
+                let request = Request(method: "GET", alwaysSendsBody: true)
+                expect(body(of: request)).to(beNil())
+                expect((request as Request<AnyJSON, AuthenticationError>).request.url?.query).to(beNil())
+            }
+
+            it("should keep sending the empty JSON object after the request is modified") {
+                let request = Request(method: "PATCH", alwaysSendsBody: true)
+                expect(body(of: request.headers(["X-Test": "1"]))) == "{}"
+                expect(body(of: request.requestValidators([]))) == "{}"
+                expect(body(of: request.parameters([:]))) == "{}"
+            }
+
         }
 
         describe("create and update request") {

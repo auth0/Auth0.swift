@@ -19,6 +19,16 @@ func myAcccountDecodable<T: Decodable>(result: Result<ResponseValue, MyAccountEr
     }
 }
 
+// Requests that run a RequestValidator get the error it throws wrapped in an error of its own: deliver it as it is.
+func myAccountValidatedDecodable<T: Decodable>(result: Result<ResponseValue, MyAccountError>,
+                                               callback: @Sendable (Result<T, MyAccountError>) -> Void) {
+    if case .failure(let error) = result, let validationError = error.cause as? MyAccountError {
+        return callback(.failure(validationError))
+    }
+
+    myAcccountDecodable(result: result, callback: callback)
+}
+
 func myAccountDecodableNoBody(from result: Result<ResponseValue, MyAccountError>,
                               callback: @Sendable (Result<Void, MyAccountError>) -> Void) {
     do {
