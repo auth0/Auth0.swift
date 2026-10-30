@@ -587,9 +587,9 @@ struct EmbeddedAuthPasswordClientTests {
         #expect(next?.code == "no_active_session")
     }
 
-    @Test func verifyPasswordNetworkFailureOnTheTokenExchangeEndsTheFlow() async {
+    @Test func verifyPasswordNetworkFailureOnTheTokenExchangeKeepsTheSessionForRetry() async throws {
         let sut = makePasswordClient()
-        await establishPasswordSession(sut)
+        await establishPasswordSession(sut, session: "sess_001")
 
         EmbeddedAuthPasswordMockProtocol.requestHandler = { req in
             if req.url?.path.hasSuffix("/oauth/token") == true { throw URLError(.notConnectedToInternet) }
@@ -602,7 +602,20 @@ struct EmbeddedAuthPasswordClientTests {
             Issue.record("Expected .network, got \(String(describing: error?.reason))"); return
         }
 
-        // The authorization code is single-use, so unlike a network failure on /e/authorize the flow is over.
+        // Only the token call failed, so the step can be retried on the same session.
+        nonisolated(unsafe) var authorizeBody: PasswordRequestBody?
+        EmbeddedAuthPasswordMockProtocol.requestHandler = { req in
+            if req.url?.path.hasSuffix("/oauth/token") == true {
+                return (responsePassword(status: 200), credentialsPassword(accessToken: "retry_token"))
+            }
+            authorizeBody = passwordRequestBody(req)
+            return (responsePassword(status: 200), authCodePassword(code: "auth0_ac_second"))
+        }
+        let credentials = try await sut.verifyPassword("hunter2").start()
+        #expect(credentials.accessToken == "retry_token")
+        #expect(authorizeBody?.authSession == "sess_001")
+
+        // The flow is over once the exchange succeeds.
         let next = await #expect(throws: EmbeddedAuthError.self) {
             _ = try await sut.verifyPassword("hunter2").start()
         }

@@ -253,8 +253,7 @@ do {
         // The grant expired — start over with authorize().
         break
     case .network:
-        // Transient failure — retry the same step. If the retry fails with .noActiveSession, the failure was in
-        // the final token exchange, which ends the flow: start over with authorize().
+        // Transient failure — retry the same step.
         break
     default:
         print("Failed with: \(error)")
