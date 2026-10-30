@@ -103,7 +103,9 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the MFA actions in `nextActions`.
     ///
     /// A wrong password fails with ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidIdentifierOrPassword``;
-    /// the flow stays live, so the user may retry.
+    /// the flow stays live and `nextActions` offers ``NextAction/verifyPassword`` again, so the user may retry.
+    /// A correct password for a user who must complete a second factor but has none enrolled fails with
+    /// ``EmbeddedAuthErrorReason/noEligibleFactors``.
     ///
     /// If the token exchange that follows fails, even because of a network error, the flow has ended: the
     /// authorization code is single-use, so start a new flow with ``authorize(connection:)``.

@@ -462,6 +462,43 @@ import Foundation
         }
     }
 
+    @Test func reasonIsNoNextStepsUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "no_next_steps"],
+            statusCode: 403
+        )
+        guard case .noNextSteps = error.reason else {
+            Issue.record("Expected .noNextSteps, got \(error.reason)"); return
+        }
+    }
+
+    @Test func reasonIsPasswordLeakedUnderAccessDenied() {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied", "error_description": "password_leaked"],
+            statusCode: 403
+        )
+        guard case .passwordLeaked = error.reason else {
+            Issue.record("Expected .passwordLeaked, got \(error.reason)"); return
+        }
+    }
+
+    // The descriptions that point to `custom_error_message` / `custom_error_code` are not modelled yet.
+    @Test(arguments: ["denied", "validation_error"])
+    func reasonIsAccessDeniedForDescriptionsThatCarryCustomErrorFields(description: String) {
+        let error = EmbeddedAuthError(
+            info: ["error": "access_denied",
+                   "error_description": description,
+                   "custom_error_message": "Blocked by policy.",
+                   "custom_error_code": "policy_blocked"],
+            statusCode: 403
+        )
+        guard case .accessDenied = error.reason else {
+            Issue.record("Expected .accessDenied, got \(error.reason)"); return
+        }
+        #expect(error.info["custom_error_message"] as? String == "Blocked by policy.")
+        #expect(error.info["custom_error_code"] as? String == "policy_blocked")
+    }
+
     @Test func reasonIsNoEligibleFactorsUnderAccessDenied() {
         let error = EmbeddedAuthError(
             info: ["error": "access_denied", "error_description": "no_eligible_factors"],

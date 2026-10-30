@@ -38,6 +38,19 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// Complete sign-in with a redirect-based flow such as Universal Login.
     case consentRequired
 
+    /// Terminal: no further action is available to continue the authorization.
+    ///
+    /// Start a new flow with ``EmbeddedAuth/authorize(connection:)``. If it keeps happening, check that the
+    /// capabilities passed to ``EmbeddedAuth/authorize(connection:capabilities:scope:audience:)`` include a
+    /// complete sign-in path, for example both ``EmbeddedCapability/identifyUsername`` and
+    /// ``EmbeddedCapability/verifyPassword``.
+    case noNextSteps
+
+    /// Terminal: breached password detection blocked the login because the password appears in a data breach.
+    ///
+    /// The user has to choose a different password before signing in again.
+    case passwordLeaked
+
     /// Terminal: access denied for a reason not modelled as its own case.
     ///
     /// Read ``EmbeddedAuthError/debugDescription`` for specifics.

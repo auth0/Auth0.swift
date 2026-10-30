@@ -102,6 +102,10 @@ public extension EmbeddedAuthError {
             return .noEligibleFactors
         case (_, "access_denied", "consent_required"):
             return .consentRequired
+        case (_, "access_denied", "no_next_steps"):
+            return .noNextSteps
+        case (_, "access_denied", "password_leaked"):
+            return .passwordLeaked
         case (_, "access_denied", _):
             return .accessDenied
         case (429, "too_many_requests", "too_many_attempts"):

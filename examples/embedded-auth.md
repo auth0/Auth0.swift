@@ -133,7 +133,9 @@ try await client.identify("alice", type: .username).start()
 
 When `nextActions` contains `.verifyPassword`, submit the user's password with `verifyPassword(_:)`. Like `verifyOtp`, it returns `Credentials` on success. If the user has to complete a second factor, it instead fails with `.insufficientAuthorization` and the MFA actions in `nextActions` (see below).
 
-A wrong password fails with `.insufficientAuthorization(.invalidIdentifierOrPassword, _)`. The flow stays live, so let the user try again. The server deliberately does not say whether the password or the user was wrong.
+A wrong password fails with `.insufficientAuthorization(.invalidIdentifierOrPassword, nextActions)`. The flow stays live on a rotated session, and `nextActions` is `[.verifyPassword]` again, so show the error and present the password step once more. The server deliberately does not say whether the password or the user was wrong.
+
+If a second factor is required but the user has no enrolled factor, `verifyPassword` fails with `.noEligibleFactors` after a correct password. The flow has ended: fall back to a redirect-based flow such as Universal Login.
 
 An empty password is sent to the server like any other and comes back as `.invalidRequest`, which ends the flow. Disable the submit button while the field is empty.
 
@@ -145,8 +147,11 @@ func signIn(password: String) async throws -> Credentials {
         return try await client.verifyPassword(password).start()
     } catch let error as EmbeddedAuthError {
         switch error.reason {
-        case .insufficientAuthorization(.invalidIdentifierOrPassword, _):
-            // Show "incorrect username or password" and let the user retry.
+        case .insufficientAuthorization(.invalidIdentifierOrPassword, let nextActions):
+            // Show "incorrect username or password". nextActions is [.verifyPassword]: ask for the password again.
+            return try await handleNextActions(nextActions)
+        case .noEligibleFactors:
+            // The password was right but a second factor is required and none is enrolled.
             throw error
         case .insufficientAuthorization(_, let nextActions):
             // Any other continuation, for example a second factor after the password.
@@ -232,6 +237,12 @@ do {
     case .consentRequired:
         // Consent can't be collected in the embedded flow — sign in with a redirect-based flow such as Universal Login.
         break
+    case .noNextSteps:
+        // No further action is available — check the capabilities passed to authorize(), then start over.
+        break
+    case .passwordLeaked:
+        // The password appears in a data breach — ask the user to choose a different password.
+        break
     case .accessDenied:
         // Other terminal denial — start over with authorize().
         break
@@ -260,7 +271,7 @@ do {
 | `invalid_identifier_or_code` | `.invalidIdentifierOrCode` | The identifier or one-time code was rejected on the primary path. It is ambiguous on purpose, so a wrong code and an unknown user look the same. | Show a generic "incorrect code" message and let the user retry. |
 | `invalid_code` | `.invalidCode` | A one-time code or recovery code was wrong for a user the server has already identified. | Let the user re-enter the code. |
 | `authorization_pending` | `.authorizationPending` | The push notification has not been approved yet. | Wait for the `pollInMs` from `.verifyOob(pollInMs:)`, then call `verifyOob()` again. |
-| `invalid_identifier_or_password` | `.invalidIdentifierOrPassword` | The identifier (email, phone or username) or the password was rejected. It is ambiguous on purpose, so a wrong password and an unknown user look the same. | Show a generic "incorrect username or password" message and let the user retry. |
+| `invalid_identifier_or_password` | `.invalidIdentifierOrPassword` | The identifier (email, phone or username) or the password was rejected. It is ambiguous on purpose, so a wrong password and an unknown user look the same. | Show a generic "incorrect username or password" message and present `nextActions` again; it holds `.verifyPassword`. |
 | `slow_down` | `.slowDown` | `verifyOob()` was called before `pollInMs` elapsed. | Wait longer than before, then poll again. |
 
 ```swift

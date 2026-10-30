@@ -609,22 +609,21 @@ struct EmbeddedAuthPasswordClientTests {
         #expect(next?.code == "no_active_session")
     }
 
-    // MARK: Leaked password, token exchange errors and username format
+    // MARK: Terminal denials, token exchange errors and username format
 
-    @Test func verifyPasswordLeakedPasswordIsAccessDeniedAndEndsTheFlow() async {
+    @Test(arguments: [("password_leaked", "passwordLeaked"), ("no_next_steps", "noNextSteps")])
+    func verifyPasswordTerminalDenialsHaveTheirOwnReasonAndEndTheFlow(description: String, expectedReason: String) async {
         let sut = makePasswordClient()
         await establishPasswordSession(sut)
 
         EmbeddedAuthPasswordMockProtocol.requestHandler = { _ in
             (responsePassword(status: 403),
-             errorBodyPassword(["error": "access_denied", "error_description": "password_leaked"]))
+             errorBodyPassword(["error": "access_denied", "error_description": description]))
         }
         let first = await #expect(throws: EmbeddedAuthError.self) {
             _ = try await sut.verifyPassword("hunter2").start()
         }
-        guard case .accessDenied = first?.reason else {
-            Issue.record("Expected .accessDenied, got \(String(describing: first?.reason))"); return
-        }
+        #expect(first.map { reasonName($0.reason) } == expectedReason)
 
         let next = await #expect(throws: EmbeddedAuthError.self) {
             _ = try await sut.verifyPassword("hunter2").start()
@@ -825,5 +824,67 @@ struct EmbeddedAuthPasswordClientTests {
         let credentials = try await sut.verifyPassword("hunter2").start()
         #expect(credentials.accessToken == "username_token")
         #expect(passwordBody?.authSession == "sess_002")
+    }
+
+    // MARK: Full flow — repeated wrong passwords, then a correct one that needs an MFA factor the user lacks
+
+    @Test func repeatedWrongPasswordsKeepOfferingVerifyPasswordThenNoEligibleFactors() async throws {
+        let sut = makePasswordClient()
+
+        EmbeddedAuthPasswordMockProtocol.requestHandler = { _ in
+            (responsePassword(status: 403),
+             insufficientAuthPassword(session: "sess_0", nextActions: [["action": "action:identify:username:v1"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+
+        EmbeddedAuthPasswordMockProtocol.requestHandler = { _ in
+            (responsePassword(status: 403),
+             insufficientAuthPassword(session: "sess_1", nextActions: [["action": "action:verify:password:v1"]]))
+        }
+        _ = try? await sut.identify("alice", type: .username).start()
+
+        // Each wrong password is answered with the same next action and a rotated session.
+        for attempt in 1...5 {
+            nonisolated(unsafe) var sentSession: String?
+            EmbeddedAuthPasswordMockProtocol.requestHandler = { req in
+                sentSession = passwordRequestBody(req)?.authSession
+                return (responsePassword(status: 403),
+                        insufficientAuthPassword(session: "sess_\(attempt + 1)",
+                                                 description: "invalid_identifier_or_password",
+                                                 nextActions: [["action": "action:verify:password:v1"]]))
+            }
+            let error = await #expect(throws: EmbeddedAuthError.self) {
+                _ = try await sut.verifyPassword("wrong-\(attempt)").start()
+            }
+            guard case .insufficientAuthorization(.invalidIdentifierOrPassword, let actions) = error?.reason else {
+                Issue.record("Attempt \(attempt): expected .invalidIdentifierOrPassword, got \(String(describing: error?.reason))")
+                return
+            }
+            #expect(actions == [.verifyPassword])
+            #expect(sentSession == "sess_\(attempt)")
+        }
+
+        // The correct password, but the user has no MFA factor enrolled.
+        nonisolated(unsafe) var lastSession: String?
+        EmbeddedAuthPasswordMockProtocol.requestHandler = { req in
+            lastSession = passwordRequestBody(req)?.authSession
+            // swiftlint:disable:next force_try
+            let data = try! JSONSerialization.data(withJSONObject: ["error": "access_denied",
+                                                                    "error_description": "no_eligible_factors"])
+            return (responsePassword(status: 403), data)
+        }
+        let denied = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await sut.verifyPassword("correct").start()
+        }
+        guard case .noEligibleFactors = denied?.reason else {
+            Issue.record("Expected .noEligibleFactors, got \(String(describing: denied?.reason))"); return
+        }
+        #expect(lastSession == "sess_6")
+
+        // The flow is over.
+        let next = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await sut.verifyPassword("correct").start()
+        }
+        #expect(next?.code == "no_active_session")
     }
 }

@@ -367,6 +367,8 @@ private extension ContentViewModel {
             detail = "The challenge expired. Start again."
         case .authorizationRejected:
             detail = "The request was rejected. Start again."
+        case .noEligibleFactors:
+            detail = "A second factor is required but none is enrolled. Sign in with a redirect-based flow."
         case .network:
             detail = "A network error occurred. Check your connection and try again."
         default:
