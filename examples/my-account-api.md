@@ -13,6 +13,8 @@
 - [Get all authentication methods](#get-all-authentication-methods)
 - [Get an authentication method by id](#get-an-authentication-method-by-id)
 - [Delete an authentication method](#delete-an-authentication-method)
+- [Get the user profile](#get-the-user-profile)
+- [Update the user profile](#update-the-user-profile)
 - [My Account API client errors](#my-account-api-client-errors)
 
 Use the Auth0 My Account API to manage the current user's account.
@@ -1174,6 +1176,147 @@ Auth0
 ```
 </details>
 
+
+### Get the user profile
+
+**Scopes required:** `read:me:profile`
+
+Retrieve the authenticated user's profile attributes. The response includes a `profilePolicy` map that describes which fields are editable, so you can drive UI affordances without hard-coding connection-type logic.
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .getUserProfile()
+    .start { result in
+        switch result {
+        case .success(let profile):
+            print("Got profile: \(profile)")
+            // Check per-field editability
+            if profile.profilePolicy?["/nickname"]?.access == .readWrite {
+                print("Nickname is editable")
+            }
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let profile = try await Auth0
+        .myAccount(token: apiCredentials.accessToken)
+        .getUserProfile()
+        .start()
+    print("Got profile: \(profile)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .getUserProfile()
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { profile in
+        print("Got profile: \(profile)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+Use `GetUserProfileOptions` to filter the returned fields:
+
+```swift
+let options = GetUserProfileOptions(
+    fields: ["given_name", "family_name", "email", "profile_policy"],
+    includeFields: true   // return only these fields
+)
+
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .getUserProfile(options: options)
+    .start { result in ... }
+```
+
+> **Note:** A `MyAccountError` with `statusCode == 403` means the token lacks the required scope (`read:me:profile` / `update:me:profile`) or the My Account Profile feature is not enabled for this tenant. Check `error.code`: it ends with `A0E-403-0002` for insufficient scope and `A0E-403-0003` for not entitled. When the feature is off, tokens are not granted the profile scopes, so you will usually see insufficient scope. Make sure the scopes are granted to your application under **Application Access** for the My Account API.
+
+---
+
+### Update the user profile
+
+**Scopes required:** `update:me:profile`
+
+Update the authenticated user's writable profile attributes. Only the fields you set are changed; omitted fields are left unchanged. The update is all-or-nothing — if any field is read-only or fails validation, the entire request is rejected.
+
+```swift
+let request = UpdateUserProfileRequest(
+    nickname: "wonderland_alice",
+    picture: "https://example.com/alice.jpg"
+)
+
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .updateUserProfile(request)
+    .start { result in
+        switch result {
+        case .success(let profile):
+            print("Updated profile: \(profile)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let profile = try await Auth0
+        .myAccount(token: apiCredentials.accessToken)
+        .updateUserProfile(UpdateUserProfileRequest(nickname: "wonderland_alice"))
+        .start()
+    print("Updated profile: \(profile)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .updateUserProfile(UpdateUserProfileRequest(nickname: "wonderland_alice"))
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { profile in
+        print("Updated profile: \(profile)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+> **Note:** The server validates field constraints (character limits, HTTPS-only picture URLs, read-only fields). A `MyAccountError` with `statusCode == 400` may contain a `validationErrors` array that lists the specific fields that failed.
+
+---
 
 ### My Account API client errors
 

@@ -34,6 +34,7 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
     let logger: Logger?
     let auth0ClientInfo: Auth0ClientInfo
     let dpop: DPoP?
+    let alwaysSendsBody: Bool
 
     init(session: URLSession,
          url: URL,
@@ -44,7 +45,8 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
          headers: [String: String] = [:],
          logger: Logger?,
          auth0ClientInfo: Auth0ClientInfo,
-         dpop: DPoP? = nil) {
+         dpop: DPoP? = nil,
+         alwaysSendsBody: Bool = false) {
         self.session = session
         self.url = url
         self.method = method
@@ -55,25 +57,27 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
         self.auth0ClientInfo = auth0ClientInfo
         self.headers = headers
         self.dpop = dpop
+        self.alwaysSendsBody = alwaysSendsBody
     }
 
     var request: URLRequest {
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = method
-        if !parameters.isEmpty {
-            if method.caseInsensitiveCompare("GET") == .orderedSame {
+        if method.caseInsensitiveCompare("GET") == .orderedSame {
+            if !parameters.isEmpty {
                 var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
                 var queryItems = urlComponents?.queryItems ?? []
                 let newQueryItems = parameters.map { URLQueryItem(name: $0.key, value: String(describing: $0.value)) }
                 queryItems.append(contentsOf: newQueryItems)
                 urlComponents?.queryItems = queryItems
                 request.url = urlComponents?.url ?? url
-            } else if let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) {
-                request.httpBody = httpBody
-                #if DEBUG
-                URLProtocol.setProperty(parameters, forKey: parameterPropertyKey, in: request)
-                #endif
             }
+        } else if !parameters.isEmpty || alwaysSendsBody,
+                  let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) {
+            request.httpBody = httpBody
+            #if DEBUG
+            URLProtocol.setProperty(parameters, forKey: parameterPropertyKey, in: request)
+            #endif
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
@@ -162,7 +166,8 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
                        headers: self.headers,
                        logger: self.logger,
                        auth0ClientInfo: self.auth0ClientInfo,
-                       dpop: self.dpop)
+                       dpop: self.dpop,
+                       alwaysSendsBody: self.alwaysSendsBody)
     }
 
     /**
@@ -182,7 +187,8 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
                        headers: headers,
                        logger: self.logger,
                        auth0ClientInfo: self.auth0ClientInfo,
-                       dpop: self.dpop)
+                       dpop: self.dpop,
+                       alwaysSendsBody: self.alwaysSendsBody)
     }
 
     public func requestValidators(_ extraValidators: [RequestValidator]) -> any Requestable<T, E> {
@@ -197,6 +203,7 @@ public struct Request<T: Sendable, E: Auth0APIError>: Requestable, @unchecked Se
                        headers: headers,
                        logger: logger,
                        auth0ClientInfo: auth0ClientInfo,
-                       dpop: dpop)
+                       dpop: dpop,
+                       alwaysSendsBody: alwaysSendsBody)
     }
 }
