@@ -68,6 +68,12 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// The request never reached the server (network failure).
     ///
     /// The session is preserved — retrying the same step is safe.
+    ///
+    /// The exception is the token exchange that ends ``EmbeddedAuth/verifyOtp(_:type:)``,
+    /// ``EmbeddedAuth/verifyPassword(_:)``, ``EmbeddedAuth/verifyOob()`` and ``EmbeddedAuth/confirmRecoveryCode()``.
+    /// The authorization code is single-use, so a failure there ends the flow even when it is a network error:
+    /// start a new one with ``EmbeddedAuth/authorize(connection:)``. A retry that fails with ``noActiveSession``
+    /// tells you that this is what happened.
     case network
 
     /// Client-side guard: no flow is in progress.
@@ -93,6 +99,12 @@ public enum EmbeddedAuthErrorReason: Sendable {
 
         /// The identifier+code pair the user entered was incorrect. They may retry via `nextActions`.
         case invalidIdentifierOrCode
+
+        /// The identifier (email, phone or username) or the password the user entered was rejected.
+        /// They may retry via `nextActions`.
+        ///
+        /// Deliberately ambiguous: a wrong password and an unknown user are indistinguishable.
+        case invalidIdentifierOrPassword
 
         /// The authorization is still pending — the user has not yet completed the out-of-band step.
         case authorizationPending

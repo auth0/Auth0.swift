@@ -13,6 +13,8 @@ public enum IdentifierType {
     case email
     /// A phone number.
     case phone
+    /// A username.
+    case username
 }
 
 // MARK: - Protocol
@@ -50,6 +52,11 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)``
     /// on the first call; read its associated `nextActions` to determine which step to present.
     ///
+    /// The server only offers the username step when
+    /// ``EmbeddedCapability/verifyPassword`` is also advertised. Otherwise it answers with `access_denied`,
+    /// which this SDK reports as ``EmbeddedAuthErrorReason/accessDenied``. The default ``EmbeddedCapability/all``
+    /// includes both.
+    ///
     /// - Parameters:
     ///   - connection:   Connection name to target.
     ///   - capabilities: Actions this SDK version supports. Defaults to ``EmbeddedCapability/all``.
@@ -64,7 +71,7 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///
     /// Requires an active session (``authorize(connection:capabilities:scope:audience:)`` must have been called first).
     /// - Parameters:
-    ///   - identifier: The identifier value (e.g. an email address).
+    ///   - identifier: The identifier value (e.g. an email address, a phone number or a username).
     ///   - type: The type of identifier being submitted.
     func identify(_ identifier: String, type: IdentifierType) -> Request<Void, EmbeddedAuthError>
 
@@ -86,6 +93,25 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///   - otp:  The one-time code entered by the user.
     ///   - type: Whether the code is OOB (email/SMS) or TOTP.
     func verifyOtp(_ otp: String, type: OtpType) -> Request<Credentials, EmbeddedAuthError>
+
+    /// Submits the user's password to verify their identity.
+    ///
+    /// Call this when ``NextAction/verifyPassword`` is among the `nextActions`.
+    ///
+    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    /// If a second factor is also required, the request instead fails with
+    /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the MFA actions in `nextActions`.
+    ///
+    /// A wrong password fails with ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidIdentifierOrPassword``;
+    /// the flow stays live, so the user may retry.
+    ///
+    /// If the token exchange that follows fails, even because of a network error, the flow has ended: the
+    /// authorization code is single-use, so start a new flow with ``authorize(connection:)``.
+    ///
+    /// Requires an active session.
+    ///
+    /// - Parameter password: The password entered by the user.
+    func verifyPassword(_ password: String) -> Request<Credentials, EmbeddedAuthError>
 
     /// Requests that the server send a phone OTP challenge via SMS or voice.
     ///

@@ -96,6 +96,24 @@ struct ContentView: View {
                         .disabled(viewModel.isLoading)
                     }
 
+                case .identifyUsername:
+                    TextField("Username", text: $viewModel.username)
+                        #if !os(macOS)
+                        .textContentType(.username)
+                        .autocapitalization(.none)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    Button {
+                        Task { await viewModel.submitUsername(viewModel.username) }
+                    } label: {
+                        Text("Submit Username")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading || viewModel.username.isEmpty)
+
                 case .challengeEmail(let index, let identifier):
                     Text(identifier.isEmpty ? "We'll send you a one-time code." : "We'll send a one-time code to \(identifier).")
                         .font(.subheadline)
@@ -192,6 +210,7 @@ struct ContentView: View {
                     }
                     Button {
                         viewModel.attemptError = nil
+                        Task { await viewModel.submitPassword(viewModel.password) }
                     } label: {
                         Text("Verify")
                     }

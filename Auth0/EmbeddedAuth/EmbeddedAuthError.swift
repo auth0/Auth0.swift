@@ -84,6 +84,8 @@ public extension EmbeddedAuthError {
             return .insufficientAuthorization(reason: .invalidCode, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "invalid_identifier_or_code"):
             return .insufficientAuthorization(reason: .invalidIdentifierOrCode, nextActions: parsedNextActions)
+        case (_, "insufficient_authorization", "invalid_identifier_or_password"):
+            return .insufficientAuthorization(reason: .invalidIdentifierOrPassword, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "authorization_pending"):
             return .insufficientAuthorization(reason: .authorizationPending, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "slow_down"):
@@ -134,6 +136,8 @@ private extension EmbeddedAuthError {
                 return .identifyEmail
             case .identifyPhone:
                 return .identifyPhone
+            case .identifyUsername:
+                return .identifyUsername
             case .challengeEmail:
                 guard let index = entry["index"] as? Int,
                       let identifier = entry["identifier"] as? String else { return nil }
@@ -155,6 +159,8 @@ private extension EmbeddedAuthError {
             case .verifyOob:
                 guard let pollInMs = entry["poll_in_ms"] as? Int else { return nil }
                 return .verifyOob(pollInMs: pollInMs)
+            case .verifyPassword:
+                return .verifyPassword
             case .verifyRecoveryCode:
                 return .verifyRecoveryCode
             case .confirmRecoveryCode:
