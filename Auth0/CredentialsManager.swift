@@ -38,6 +38,7 @@ public struct CredentialsManager: Sendable {
     private let sessionExpiryKey: String
     private let authentication: Authentication
     private let maxRetries: Int
+    var backgroundTaskProvider: BackgroundTaskProvider = SystemBackgroundTaskProvider()
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     // Biometric session management - using a class to allow mutation in non-mutating methods
@@ -869,6 +870,17 @@ public struct CredentialsManager: Sendable {
                                          callback: callback)
     }
 
+    /// Starts a background task and returns a callback that calls `callback` and then ends the task. Use it just before
+    /// a request, so that the task keeps the app running until the result of the request is stored.
+    private func withBackgroundTask<T>(named name: String,
+                                       callback: @escaping @Sendable (CredentialsManagerResult<T>) -> Void) -> @Sendable (CredentialsManagerResult<T>) -> Void {
+        let backgroundTask = CredentialsBackgroundTask(name: name, provider: self.backgroundTaskProvider)
+        return { result in
+            callback(result)
+            backgroundTask.end()
+        }
+    }
+
     // swiftlint:disable:next function_parameter_count function_body_length
     private func retrieveCredentialsWithRetry(scope: String?,
                                              minTTL: Int,
@@ -902,6 +914,9 @@ public struct CredentialsManager: Sendable {
                 }
 
                 try self.validateDPoPState(for: credentials)
+
+                // A retry keeps the task of the first attempt, because its callback already ends that task.
+                let callback = retryCount == 0 ? self.withBackgroundTask(named: "Auth0.credentials", callback: callback) : callback
 
                 self.authentication
                     .renew(withRefreshToken: refreshToken, scope: scope)
@@ -983,6 +998,8 @@ public struct CredentialsManager: Sendable {
                 }
                 try self.validateDPoPState(for: credentials)
 
+                let callback = self.withBackgroundTask(named: "Auth0.ssoCredentials", callback: callback)
+
                 self.authentication
                     .ssoExchange(withRefreshToken: refreshToken)
                     .parameters(params.asParameters)
@@ -1047,6 +1064,8 @@ public struct CredentialsManager: Sendable {
                     return callback(.failure(.noRefreshToken))
                 }
                 try self.validateDPoPState(for: currentCredentials)
+
+                let callback = self.withBackgroundTask(named: "Auth0.apiCredentials", callback: callback)
 
                 self.authentication
                     .renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
