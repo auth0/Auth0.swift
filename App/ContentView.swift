@@ -65,6 +65,20 @@ struct ContentView: View {
                     }
                     .buttonStyle(SecondaryButtonStyle())
                     .disabled(viewModel.isLoading)
+
+                    Button {
+                        Task {
+                            #if os(macOS)
+                            await viewModel.webLogout(presentationWindow: getCurrentWindow())
+                            #else
+                            await viewModel.webLogout(presentationWindow: window)
+                            #endif
+                        }
+                    } label: {
+                        Text("Logout from Browser")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .disabled(viewModel.isLoading)
                     #endif
 
                 case .identifyEmail:
