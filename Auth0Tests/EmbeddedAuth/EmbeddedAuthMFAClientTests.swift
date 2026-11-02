@@ -10,6 +10,14 @@ private final class EmbeddedAuthMFAMockProtocol: URLProtocol {
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
+        // The client verifies ID tokens, so it fetches the signing keys; serve them without involving the handler.
+        if request.url?.path == "/.well-known/jwks.json" {
+            let (data, response, _) = jwksResponse()(request)
+            if let response { client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed) }
+            if let data { client?.urlProtocol(self, didLoad: data) }
+            client?.urlProtocolDidFinishLoading(self)
+            return
+        }
         guard let handler = EmbeddedAuthMFAMockProtocol.requestHandler else {
             fatalError("EmbeddedAuthMFAMockProtocol requires a requestHandler")
         }
@@ -70,7 +78,7 @@ private func credentialsMFA(accessToken: String = "test_access_token") -> Data {
     try! JSONSerialization.data(withJSONObject: [
         "access_token": accessToken,
         "token_type": "Bearer",
-        "id_token": "test_id_token",
+        "id_token": generateJWT(iss: "https://\(mfaDomain)/", aud: [mfaClientId]).string,
         "expires_in": 86400
     ])
 }

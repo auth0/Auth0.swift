@@ -60,7 +60,7 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
             "client_id": clientId,
             "capabilities": capabilities.map { $0.action.rawValue },
             "connection": connection,
-            "scope": scope
+            "scope": includeRequiredScope(in: scope) ?? scope
         ]
         if let audience { body["audience"] = audience }
         return authorizeRequest(body: body)
@@ -249,8 +249,13 @@ extension Auth0EmbeddedAuth {
     }
 
     /// Exchanges the authorization code returned by a completed flow for ``Credentials``.
-    func exchange(code: String) -> Request<Credentials, EmbeddedAuthError> {
-        Request(
+    ///
+    /// The ID token in the response is validated before the credentials are returned: its signature and its `iss`,
+    /// `sub`, `aud`, `exp` and `iat` claims, plus `azp` when there are several audiences. A validation failure is
+    /// reported as an ``EmbeddedAuthError`` whose `cause` is the validation error. No nonce, max age or organization
+    /// is checked, as the flow never sends them.
+    func exchange(code: String) -> any TokenRequestable<Credentials, EmbeddedAuthError> {
+        let request = Request<Credentials, EmbeddedAuthError>(
             session: session,
             url: url.appending("oauth/token"),
             method: "POST",
@@ -275,6 +280,21 @@ extension Auth0EmbeddedAuth {
             logger: logger,
             auth0ClientInfo: auth0ClientInfo
         )
+        return TokenRequest(request: request,
+                            audience: clientId,
+                            issuer: url.absoluteString,
+                            jwksRequest: jwks())
+            .validateClaims()
+    }
+
+    /// The request for the tenant's public signing keys.
+    private func jwks() -> any Requestable<JWKS, AuthenticationError> {
+        Request(session: session,
+                url: url.appending(".well-known/jwks.json"),
+                method: "GET",
+                handle: authenticationDecodable,
+                logger: logger,
+                auth0ClientInfo: auth0ClientInfo)
     }
 
     /// Updates the flow's session after a step fails.

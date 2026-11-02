@@ -177,24 +177,15 @@ func managementErrorResponse(error: String, description: String, code: String, s
     return apiFailureResponse(json: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: statusCode)
 }
 
+/// The key set holding the public half of `TestKeys`, so it verifies the tokens `generateJWT(...)` signs.
 func jwksResponse(kid: String? = Kid) -> RequestResponse {
-    var jwks: [String: Any] = ["keys": [["alg": "RS256",
-                                         "kty": "RSA",
-                                         "use": "sig",
-                                         "n": "uGbXWiK3dQTyCbX5xdE4yCuYp0AF2d15Qq1JSXT_lx8CEcXb9RbDddl8jGDv-spi5qPa8qEHiK7FwV2KpRE983wGPnYsAm9BxLFb4YrLYcDFOIGULuk2FtrPS512Qea1bXASuvYXEpQNpGbnTGVsWXI9C-yjHztqyL2h8P6mlThPY9E9ue2fCqdgixfTFIF9Dm4SLHbphUS2iw7w1JgT69s7of9-I9l5lsJ9cozf1rxrXX4V1u_SotUuNB3Fp8oB4C1fLBEhSlMcUJirz1E8AziMCxS-VrRPDM-zfvpIJg3JljAh3PJHDiLu902v9w-Iplu1WyoB2aPfitxEhRN0Yw",
-                                         "e": "AQAB",
-                                         "kid": kid]]]
-
-    #if WEB_AUTH_PLATFORM
     let jwk = generateRSAJWK()
-    jwks = ["keys": [["alg": jwk.algorithm,
-                      "kty": jwk.keyType,
-                      "use": jwk.usage,
-                      "n": jwk.modulus,
-                      "e": jwk.exponent,
-                      "kid": kid]]]
-    #endif
-
+    let jwks: [String: Any] = ["keys": [["alg": jwk.algorithm,
+                                         "kty": jwk.keyType,
+                                         "use": jwk.usage,
+                                         "n": jwk.modulus,
+                                         "e": jwk.exponent,
+                                         "kid": kid]]]
     return apiSuccessResponse(json: jwks)
 }
 
