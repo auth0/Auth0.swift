@@ -10,6 +10,14 @@ private final class EmbeddedAuthClientMockProtocol: URLProtocol {
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
+        // The client verifies ID tokens, so it fetches the signing keys; serve them without involving the handler.
+        if request.url?.path == "/.well-known/jwks.json" {
+            let (data, response, _) = jwksResponse()(request)
+            if let response { client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed) }
+            if let data { client?.urlProtocol(self, didLoad: data) }
+            client?.urlProtocolDidFinishLoading(self)
+            return
+        }
         guard let handler = EmbeddedAuthClientMockProtocol.requestHandler else {
             fatalError("EmbeddedAuthClientMockProtocol requires a requestHandler")
         }
@@ -72,7 +80,7 @@ private func credentialsData(accessToken: String = "test_access_token") -> Data 
     try! JSONSerialization.data(withJSONObject: [
         "access_token": accessToken,
         "token_type": "Bearer",
-        "id_token": "test_id_token",
+        "id_token": generateJWT(iss: "https://\(domain)/", aud: [clientId]).string,
         "expires_in": 86400
     ])
 }
@@ -155,6 +163,24 @@ struct EmbeddedAuthClientTests {
                                      scope: "openid",
                                      audience: nil).start()
         #expect(body?["scope"] as? String == "openid")
+    }
+
+    // The ID token returned at the end of the flow is validated, so the scope must always ask for one.
+    @Test(arguments: [("profile email", "openid profile email"),
+                      ("profile openid email", "profile openid email"),
+                      ("openid", "openid")])
+    func authorizeAlwaysRequestsOpenid(scope: String, sentScope: String) async {
+        let sut = makeClient()
+        var body: [String: Any]?
+        EmbeddedAuthClientMockProtocol.requestHandler = { req in
+            body = try? JSONSerialization.jsonObject(with: req.httpBody!) as? [String: Any]
+            return (response(status: 403), insufficientAuthData(session: "s1", nextActions: [["action": "action:identify:email:v1"]]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection",
+                                     capabilities: EmbeddedCapability.all,
+                                     scope: scope,
+                                     audience: nil).start()
+        #expect(body?["scope"] as? String == sentScope)
     }
 
     @Test func authorizeSendsConnectionInBody() async {

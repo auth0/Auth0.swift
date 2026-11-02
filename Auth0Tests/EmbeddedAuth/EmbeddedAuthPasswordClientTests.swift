@@ -10,6 +10,14 @@ private final class EmbeddedAuthPasswordMockProtocol: URLProtocol {
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
+        // The client verifies ID tokens, so it fetches the signing keys; serve them without involving the handler.
+        if request.url?.path == "/.well-known/jwks.json" {
+            let (data, response, _) = jwksResponse()(request)
+            if let response { client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed) }
+            if let data { client?.urlProtocol(self, didLoad: data) }
+            client?.urlProtocolDidFinishLoading(self)
+            return
+        }
         // A request nothing expected fails this one test instead of crashing the whole test process.
         guard let handler = EmbeddedAuthPasswordMockProtocol.requestHandler else {
             client?.urlProtocol(self, didFailWithError: URLError(.unsupportedURL))
@@ -76,7 +84,7 @@ private func credentialsPassword(accessToken: String = "test_access_token") -> D
     try! JSONSerialization.data(withJSONObject: [
         "access_token": accessToken,
         "token_type": "Bearer",
-        "id_token": "test_id_token",
+        "id_token": generateJWT(iss: "https://\(passwordDomain)/", aud: [passwordClientId]).string,
         "expires_in": 86400
     ])
 }
