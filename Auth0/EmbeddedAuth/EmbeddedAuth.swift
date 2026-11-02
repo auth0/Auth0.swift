@@ -53,9 +53,9 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// on the first call; read its associated `nextActions` to determine which step to present.
     ///
     /// The server only offers the username step when
-    /// ``EmbeddedCapability/verifyPassword`` is also advertised. Otherwise it answers with `access_denied`,
-    /// which this SDK reports as ``EmbeddedAuthErrorReason/accessDenied``. The default ``EmbeddedCapability/all``
-    /// includes both.
+    /// ``EmbeddedCapability/verifyPassword`` is also advertised. Otherwise it answers with `access_denied` and
+    /// `no_next_steps`, which this SDK reports as ``EmbeddedAuthErrorReason/noNextSteps``. The default
+    /// ``EmbeddedCapability/all`` includes both.
     ///
     /// - Parameters:
     ///   - connection:   Connection name to target.
