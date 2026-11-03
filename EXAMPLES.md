@@ -68,6 +68,8 @@ Each feature lives in its own file under [`examples/`](examples).
 - [Get all authentication methods](examples/my-account-api.md#get-all-authentication-methods)
 - [Get an authentication method by id](examples/my-account-api.md#get-an-authentication-method-by-id)
 - [Delete an authentication method](examples/my-account-api.md#delete-an-authentication-method)
+- [Get the user profile](examples/my-account-api.md#get-the-user-profile)
+- [Update the user profile](examples/my-account-api.md#update-the-user-profile)
 - [My Account API client errors](examples/my-account-api.md#my-account-api-client-errors)
 
 ## [Logging](examples/logging.md)
