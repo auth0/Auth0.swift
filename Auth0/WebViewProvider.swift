@@ -79,7 +79,7 @@ final class WebViewUserAgent: NSObject, WebAuthUserAgent, Sendable {
     let redirectURL: URL
     let callback: WebAuthProviderCallback
     @MainActor
-    private weak var presentationWindow: Auth0WindowRepresentable?
+    private(set) weak var presentationWindow: Auth0WindowRepresentable?
 
     @MainActor
     init(authorizeURL: URL,

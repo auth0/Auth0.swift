@@ -168,6 +168,51 @@ public func mfa(session: URLSession = .shared,
                session: session)
 }
 
+/**
+ Embedded Login client.
+
+ ## Usage
+
+ ```swift
+ Auth0.embeddedAuth(clientId: "client-id", domain: "samples.us.auth0.com")
+ ```
+
+ - Parameters:
+   - clientId: Client ID of your Auth0 application.
+   - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
+   - session:  `URLSession` instance used for networking. Defaults to `URLSession.shared`.
+ - Returns: Embedded Login client.
+ */
+public func embeddedAuth(clientId: String,
+                         domain: String,
+                         session: URLSession = .shared) -> EmbeddedAuth {
+    Auth0EmbeddedAuth(clientId: clientId,
+                      url: .httpsURL(from: domain),
+                      session: session)
+}
+
+/**
+ Embedded Login client.
+
+ The Auth0 Client ID & Domain are loaded from the `Auth0.plist` file in your main bundle.
+
+ ## Usage
+
+ ```swift
+ Auth0.embeddedAuth()
+ ```
+
+ - Parameters:
+   - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
+   - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
+ - Returns: Embedded Login client.
+ - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
+ */
+public func embeddedAuth(session: URLSession = .shared, bundle: Bundle = .main) -> EmbeddedAuth {
+    let values = plistValues(bundle: bundle)!
+    return embeddedAuth(clientId: values.clientId, domain: values.domain, session: session)
+}
+
 #if WEB_AUTH_PLATFORM
 /**
  [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) client for performing web-based
