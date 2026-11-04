@@ -79,19 +79,14 @@ reviews:
         - Entries must be user-facing descriptions, not commit messages.
         - Ensure an `[Unreleased]` section exists at the top for in-progress changes.
 
-    - path: "Auth0.podspec"
-      instructions: |
-        Verify that `s.version` matches the version string in `Auth0/Version.swift`.
-        Minimum platform versions must not be lowered without team approval.
-
     - path: "Package.swift"
       instructions: |
-        Verify minimum platform versions are consistent with `Auth0.podspec`.
+        Minimum platform versions must not be lowered without team approval.
         New targets or compilation conditions require explicit justification.
         Do not add new external dependencies without team approval.
 
     - path: ".github/workflows/**"
       instructions: |
         CI workflow changes require explicit justification.
-        Verify that all required checks (unit tests on iOS/macOS/tvOS, SwiftLint, pod lib lint, Swift package tests) remain in place.
+        Verify that all required checks (unit tests on iOS/macOS/tvOS, SwiftLint, Swift package tests) remain in place.
         Do not remove or skip any existing required status checks.

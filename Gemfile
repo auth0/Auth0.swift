@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 gem 'fastlane'
-gem 'cocoapods'
 gem 'slather'
 gem 'multi_json'
 

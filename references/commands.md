@@ -26,9 +26,6 @@ carthage bootstrap --platform iOS --use-xcframeworks --no-use-binaries --cache-b
 # Coverage report (iOS only, run after tests)
 bundle exec slather coverage -x --scheme Auth0.iOS Auth0.xcodeproj
 
-# Validate CocoaPods spec
-bundle exec pod lib lint --allow-warnings --fail-fast
-
 # Resolve SPM dependencies
 xcodebuild -resolvePackageDependencies -skipPackageUpdates -onlyUsePackageVersionsFromResolvedFile
 
@@ -38,6 +35,6 @@ bundle exec fastlane build_docs
 
 ## CI Structure
 
-- `.github/workflows/main.yml` runs on every PR: `test` (matrix over iOS/macOS/tvOS via `Auth0.xcodeproj` + Xcode 26.6), `test-package` (`swift test`), `pod-lint`, and `swiftlint`.
-- `.github/actions/setup/action.yml` — composite action: Ruby + CocoaPods + Xcode setup.
+- `.github/workflows/main.yml` runs on every PR: `test` (matrix over iOS/macOS/tvOS via `Auth0.xcodeproj` + Xcode 26.6), `test-package` (`swift test`), and `swiftlint`.
+- `.github/actions/setup/action.yml` — composite action: Ruby + Xcode setup.
 - `.github/actions/test/action.yml` — composite action: SPM cache restore, Carthage bootstrap per platform, `xcodebuild` test run with coverage enabled.

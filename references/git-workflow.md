@@ -21,7 +21,7 @@ Use `.github/PULL_REQUEST_TEMPLATE.md`:
 
 - All new/changed/fixed functionality must be covered by tests.
 - All new/changed public API must have DocC comments.
-- Required CI checks: unit tests on iOS + macOS + tvOS, SwiftLint, pod lib lint, Swift package tests.
+- Required CI checks: unit tests on iOS + macOS + tvOS, SwiftLint, Swift package tests.
 - Sections: **Changes** (types/methods added/deleted/deprecated/changed), **References** (GitHub issues, community posts), **Testing** (how reviewers can verify).
 
 ## Changelog
