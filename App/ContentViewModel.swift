@@ -17,6 +17,22 @@ final class ContentViewModel: ObservableObject {
     /// All actions offered by the latest continuation. Indices come from each entry's own `index` field.
     @Published var availableActions: [NextAction] = []
 
+    // My Account Profile
+    @Published var profileFieldsFilter: String = ""
+    @Published var includeProfileFields: Bool = true
+    @Published var profileGivenName: String = ""
+    @Published var profileFamilyName: String = ""
+    @Published var profileName: String = ""
+    @Published var profileNickname: String = ""
+    @Published var profilePicture: String = ""
+    @Published var profileOutput: String?
+    @Published var profileError: String?
+
+    /// The editable profile values as last returned by the API, to tell which fields were edited.
+    private var loadedProfileValues = EditableProfileValues()
+    /// The credentials of the latest successful login, used for the My Account profile requests.
+    private var authenticatedCredentials: Credentials?
+
     private let authenticationClient: Authentication
     private let embeddedAuthClient: EmbeddedAuth
 
@@ -61,7 +77,11 @@ final class ContentViewModel: ObservableObject {
     #if WEB_AUTH_PLATFORM
     func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
-        var webAuth: WebAuth = Auth0.webAuth().scope("openid profile email offline_access")
+        // The access token is requested for the My Account API so it can be used for the profile requests.
+        var webAuth: WebAuth = Auth0.webAuth().scope(Self.loginScope)
+        if let audience = myAccountAudience {
+            webAuth = webAuth.audience(audience)
+        }
         if let window {
             webAuth = webAuth.presentationWindow(window)
         }
@@ -264,6 +284,144 @@ final class ContentViewModel: ObservableObject {
         recoveryCode = ""
         password = ""
         clearFlowState()
+        authenticatedCredentials = nil
+        resetProfile()
+    }
+
+    // MARK: - My Account Profile
+
+    private static let profileScope = "read:me:profile update:me:profile"
+
+    /// Scope requested by web login, so that the access token can be used for the profile requests.
+    private static let loginScope = "openid profile email offline_access \(profileScope)"
+
+    /// The My Account API audience of the configured tenant, e.g. `https://example.auth0.com/me/`.
+    private var myAccountAudience: String? {
+        authenticationClient.url.host.map { "https://\($0)/me/" }
+    }
+
+    /// Fetches the authenticated user's profile, optionally filtered by `profileFieldsFilter` (comma-separated).
+    func getProfile() async {
+        await runProfileRequest { myAccount in
+            let names = self.profileFieldsFilter
+                .split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+            let options = names.isEmpty ? nil : GetUserProfileOptions(fields: names,
+                                                                      includeFields: self.includeProfileFields)
+            return try await myAccount.getUserProfile(options: options).start()
+        }
+    }
+
+    /// Updates the profile attributes that were edited in the text fields.
+    ///
+    /// Empty and unchanged values are not sent, so a field the user cannot write (for example `given_name` for a user
+    /// managed by an identity provider) does not make the whole update fail unless it was edited.
+    func updateProfile() async {
+        await runProfileRequest { myAccount in
+            func edited(_ text: String, from loaded: String?) -> String? {
+                return text.isEmpty || text == loaded ? nil : text
+            }
+            let loaded = self.loadedProfileValues
+            let request = UpdateUserProfileRequest(givenName: edited(self.profileGivenName, from: loaded.givenName),
+                                                   familyName: edited(self.profileFamilyName, from: loaded.familyName),
+                                                   name: edited(self.profileName, from: loaded.name),
+                                                   nickname: edited(self.profileNickname, from: loaded.nickname),
+                                                   picture: edited(self.profilePicture, from: loaded.picture))
+            return try await myAccount.updateUserProfile(request).start()
+        }
+    }
+
+    private func runProfileRequest(_ request: (MyAccountAuthenticationMethods) async throws -> MyAccountProfile) async {
+        isLoading = true
+        profileError = nil
+        profileOutput = nil
+        do {
+            guard let host = authenticationClient.url.host else {
+                profileError = "Could not determine the Auth0 domain"
+                isLoading = false
+                return
+            }
+            guard let credentials = authenticatedCredentials else {
+                profileError = "Log in first to use the My Account API"
+                isLoading = false
+                return
+            }
+            // Web login requests the My Account audience, so its access token is the one to use.
+            let myAccount = Auth0.myAccount(token: credentials.accessToken, domain: host).authenticationMethods
+            let profile = try await request(myAccount)
+            populateProfileInputs(from: profile)
+            profileOutput = describe(profile)
+        } catch let error as MyAccountError {
+            profileError = describe(error)
+        } catch {
+            profileError = "Unexpected error: \(error.localizedDescription)"
+        }
+        isLoading = false
+    }
+
+    private func populateProfileInputs(from profile: MyAccountProfile) {
+        // A profile requested with `fields` can omit some values: keep what was loaded before for those.
+        loadedProfileValues.givenName = profile.givenName ?? loadedProfileValues.givenName
+        loadedProfileValues.familyName = profile.familyName ?? loadedProfileValues.familyName
+        loadedProfileValues.name = profile.name ?? loadedProfileValues.name
+        loadedProfileValues.nickname = profile.nickname ?? loadedProfileValues.nickname
+        loadedProfileValues.picture = profile.picture ?? loadedProfileValues.picture
+
+        profileGivenName = profile.givenName ?? profileGivenName
+        profileFamilyName = profile.familyName ?? profileFamilyName
+        profileName = profile.name ?? profileName
+        profileNickname = profile.nickname ?? profileNickname
+        profilePicture = profile.picture ?? profilePicture
+    }
+
+    private func describe(_ profile: MyAccountProfile) -> String {
+        var lines: [String] = []
+        func add(_ key: String, _ value: Any?) {
+            if let value { lines.append("\(key): \(value)") }
+        }
+        add("user_id", profile.userId)
+        add("given_name", profile.givenName)
+        add("family_name", profile.familyName)
+        add("name", profile.name)
+        add("nickname", profile.nickname)
+        add("picture", profile.picture)
+        add("email", profile.email)
+        add("email_verified", profile.emailVerified)
+        add("phone_number", profile.phoneNumber)
+        add("phone_verified", profile.phoneVerified)
+        add("username", profile.username)
+        add("created_at", profile.createdAt)
+        add("updated_at", profile.updatedAt)
+        if let policy = profile.profilePolicy {
+            lines.append("profile_policy:")
+            for (pointer, entry) in policy.sorted(by: { $0.key < $1.key }) {
+                let reason = entry.reason.map { " (\($0))" } ?? ""
+                lines.append("  \(pointer): \(entry.access.rawValue), \(entry.source.rawValue)\(reason)")
+            }
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private func describe(_ error: MyAccountError) -> String {
+        var message = "My Account error (\(error.statusCode)) \(error.code): \(error.localizedDescription)"
+        for validationError in error.validationErrors ?? [] {
+            message += "\n• \(validationError.pointer ?? "?"): \(validationError.detail)"
+        }
+        return message
+    }
+
+    private func resetProfile() {
+        profileFieldsFilter = ""
+        includeProfileFields = true
+        profileGivenName = ""
+        profileFamilyName = ""
+        profileName = ""
+        profileNickname = ""
+        profilePicture = ""
+        profileOutput = nil
+        profileError = nil
+        loadedProfileValues = EditableProfileValues()
     }
 }
 
@@ -350,6 +508,7 @@ private extension ContentViewModel {
     // MARK: - Result handling
 
     func finish(with credentials: Credentials) {
+        authenticatedCredentials = credentials
         phone = ""
         username = ""
         recoveryCode = ""
@@ -460,4 +619,13 @@ enum EmbeddedAuthUIState {
     case confirmRecoveryCode(newCode: String)
     case success(Credentials)
     case failed(String)
+}
+
+/// The profile attributes that can be edited in the demo app.
+private struct EditableProfileValues {
+    var givenName: String?
+    var familyName: String?
+    var name: String?
+    var nickname: String?
+    var picture: String?
 }

@@ -4,7 +4,7 @@
 
 | File | Covers | Exists |
 |------|--------|--------|
-| `README.md` | Installation (SPM/CocoaPods/Carthage), quick-start, configuration (`Auth0.plist`), callback URL setup, Web Auth setup | ✅ present |
+| `README.md` | Installation (SPM/Carthage), quick-start, configuration (`Auth0.plist`), callback URL setup, Web Auth setup | ✅ present |
 | `EXAMPLES.md` + `examples/` | `EXAMPLES.md` is an index; `examples/` holds runnable code samples split per feature — Web Auth, Credentials Manager, Authentication API, MFA, My Account API, Logging, Advanced Features | ✅ present |
 
 ## When You Change Code, Update These Docs
@@ -13,7 +13,7 @@
 |-------------------|--------|
 | Public API added to `Authentication`, `WebAuth`, `CredentialsManager`, `MFAClient`, or `MyAccount` protocols | `examples/` — add a usage sample to the relevant file |
 | Public API removed or renamed in any protocol | `README.md` + `examples/` — remove or update every reference to the old symbol |
-| Installation requirements change (new platform minimum, new Xcode requirement, new package version) | `README.md` — Requirements and Installation sections; also update the version pin in all three package manager snippets |
+| Installation requirements change (new platform minimum, new Xcode requirement, new package version) | `README.md` — Requirements and Installation sections; also update the version pin in the Carthage snippet |
 | `Auth0.plist` keys or SDK initialisation options change | `README.md` — Configure the SDK section |
 | Callback / logout URL setup changes | `README.md` — Configure Web Auth section |
 | New integration pattern supported (e.g., new grant type, new provider, new EA feature) | `examples/` — add a new file with a runnable example and link it from `EXAMPLES.md` |

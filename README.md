@@ -1,12 +1,17 @@
 ![Auth0.swift](https://cdn.auth0.com/website/sdks/banners/swift-banner.png)
 
-![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat)
+![Version](https://img.shields.io/github/v/release/auth0/Auth0.swift?style=flat)
 ![Build Status](https://img.shields.io/github/actions/workflow/status/auth0/Auth0.swift/main.yml?style=flat)
 [![Coverage Status](https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat)](https://codecov.io/github/auth0/Auth0.swift)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/auth0/Auth0.swift)
 ![License](https://img.shields.io/github/license/auth0/Auth0.swift.svg?style=flat)
 
 📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 💡 [**Examples**](#examples) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
+
+> [!IMPORTANT]
+> **📦 Auth0.swift is no longer released to CocoaPods**
+>
+> Effective immediately, we have stopped releasing Auth0.swift to CocoaPods. All new releases are available only through the [Swift Package Manager](#using-the-swift-package-manager) and [Carthage](#using-carthage). Versions already published to CocoaPods are not affected, but they will not receive any updates. If your project uses CocoaPods, please migrate to one of them to keep receiving new releases.
 
 > [!IMPORTANT]
 > **🧪 Embedded Auth v4.0.0-beta.0**
@@ -54,16 +59,6 @@ https://github.com/auth0/Auth0.swift
 ```
 
 Then, select the dependency rule and press **Add Package**.
-
-#### Using Cocoapods
-
-Add the following line to your `Podfile`:
-
-```ruby
-pod 'Auth0', '~> 4.0.0-beta.0'
-```
-
-Then, run `pod install`.
 
 #### Using Carthage
 

@@ -611,6 +611,107 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///
     /// - Returns: A request to fetch factors enabled for the Auth0 tenant and available for enrollment
     func getFactors() -> any Requestable<[Factor], MyAccountError>
+
+    /// Retrieves the authenticated user's profile.
+    ///
+    /// Returns the user's profile attributes along with a per-field access policy
+    /// (``MyAccountProfile/profilePolicy``) that indicates which fields are editable.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `read:me:profile`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .getUserProfile(options: nil)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let profile):
+    ///             print("User profile: \(profile)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// Use ``GetUserProfileOptions`` to limit which fields are returned:
+    ///
+    /// ```swift
+    /// let options = GetUserProfileOptions(
+    ///     fields: ["given_name", "family_name", "email"],
+    ///     includeFields: true
+    /// )
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .getUserProfile(options: options)
+    ///     .start { result in ... }
+    /// ```
+    ///
+    /// - Note: A `MyAccountError` with `statusCode == 403` means the token lacks the required scope or the
+    ///   **My Account Profile** feature is not enabled for this tenant. Check ``MyAccountError/code``:
+    ///   `.../A0E-403-0002` is insufficient scope and `.../A0E-403-0003` is not entitled. When the feature is
+    ///   off, tokens are not granted the profile scopes, so you will usually see insufficient scope.
+    ///
+    /// - Parameter options: Field-selection options. Pass `nil` to return all fields.
+    /// - Returns: A request that will yield the user's ``MyAccountProfile``.
+    ///
+    /// ## See Also
+    ///
+    /// - ``MyAccountProfile``
+    /// - ``GetUserProfileOptions``
+    /// - ``MyAccountError``
+    func getUserProfile(options: GetUserProfileOptions?) -> any Requestable<MyAccountProfile, MyAccountError>
+
+    /// Updates the authenticated user's writable profile attributes.
+    ///
+    /// Only the fields you set on ``UpdateUserProfileRequest`` are sent; omitted fields leave
+    /// the stored values unchanged. The update is all-or-nothing — if any field is read-only or
+    /// fails validation, the entire request is rejected.
+    ///
+    /// Returns the full updated profile.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `update:me:profile`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// let request = UpdateUserProfileRequest(nickname: "wonderland_alice")
+    ///
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .updateUserProfile(request)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let profile):
+    ///             print("Updated profile: \(profile)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Note: A `MyAccountError` with `statusCode == 403` means the token lacks the required scope or the
+    ///   **My Account Profile** feature is not enabled for this tenant. Check ``MyAccountError/code``:
+    ///   `.../A0E-403-0002` is insufficient scope and `.../A0E-403-0003` is not entitled. When the feature is
+    ///   off, tokens are not granted the profile scopes, so you will usually see insufficient scope.
+    ///
+    /// - Parameter request: The profile attributes to update.
+    /// - Returns: A request that will yield the updated ``MyAccountProfile``.
+    ///
+    /// ## See Also
+    ///
+    /// - ``MyAccountProfile``
+    /// - ``UpdateUserProfileRequest``
+    /// - ``MyAccountError``
+    func updateUserProfile(_ request: UpdateUserProfileRequest) -> any Requestable<MyAccountProfile, MyAccountError>
 }
 // MARK: - Default Parameters
 
@@ -646,4 +747,103 @@ public extension MyAccountAuthenticationMethods {
                                         name: name,
                                         preferredAuthenticationMethod: preferredAuthenticationMethod)
     }
+}
+
+// MARK: - Profile convenience
+
+public extension MyAccountAuthenticationMethods {
+
+    /// Retrieves the authenticated user's profile with all fields.
+    ///
+    /// Convenience overload of ``getUserProfile(options:)`` that returns all profile fields.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `read:me:profile`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .getUserProfile()
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let profile):
+    ///             print("User profile: \(profile)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Returns: A request that will yield the user's ``MyAccountProfile``.
+    func getUserProfile() -> any Requestable<MyAccountProfile, MyAccountError> {
+        return getUserProfile(options: nil)
+    }
+
+}
+
+// MARK: - Default implementations
+public extension MyAccountAuthenticationMethods {
+
+    /// Default implementation of ``getUserProfile(options:)`` for types outside the SDK that conform to
+    /// ``MyAccountAuthenticationMethods``.
+    ///
+    /// The client returned by ``MyAccount/authenticationMethods`` implements this method and calls the
+    /// My Account API. This default implementation sends no request: the returned request fails with a
+    /// ``MyAccountError`` whose ``MyAccountError/code`` is `a0.sdk.internal_error.not_implemented`. Implement the
+    /// method in your conforming type to support it.
+    ///
+    /// - Parameter options: Ignored.
+    /// - Returns: A request that fails with a ``MyAccountError``.
+    func getUserProfile(options: GetUserProfileOptions?) -> any Requestable<MyAccountProfile, MyAccountError> {
+        return notImplementedRequest(method: "GET", requirement: "getUserProfile(options:)")
+    }
+
+    /// Default implementation of ``updateUserProfile(_:)`` for types outside the SDK that conform to
+    /// ``MyAccountAuthenticationMethods``.
+    ///
+    /// The client returned by ``MyAccount/authenticationMethods`` implements this method and calls the
+    /// My Account API. This default implementation sends no request: the returned request fails with a
+    /// ``MyAccountError`` whose ``MyAccountError/code`` is `a0.sdk.internal_error.not_implemented`. Implement the
+    /// method in your conforming type to support it.
+    ///
+    /// - Parameter request: Ignored.
+    /// - Returns: A request that fails with a ``MyAccountError``.
+    func updateUserProfile(_ request: UpdateUserProfileRequest) -> any Requestable<MyAccountProfile, MyAccountError> {
+        return notImplementedRequest(method: "PATCH", requirement: "updateUserProfile(_:)")
+    }
+
+}
+
+extension MyAccountAuthenticationMethods {
+
+    /// A request that fails before it is sent, because the conforming type does not implement `requirement`.
+    func notImplementedRequest<T: Decodable & Sendable>(method: String,
+                                                        requirement: String) -> any Requestable<T, MyAccountError> {
+        // The validator throws before the data task is created, so the session is never used.
+        return Request(session: .shared,
+                       url: url,
+                       method: method,
+                       requestValidator: [NotImplementedValidator(requirement: requirement)],
+                       handle: { @Sendable result, callback in myAccountValidatedDecodable(result: result, callback: callback) },
+                       logger: logger,
+                       auth0ClientInfo: auth0ClientInfo)
+    }
+
+}
+
+struct NotImplementedValidator: RequestValidator {
+
+    let requirement: String
+
+    func validate() throws {
+        throw MyAccountError(info: ["type": notImplementedError,
+                                    "title": "Not implemented",
+                                    "detail": "\(requirement) is not implemented by this MyAccountAuthenticationMethods conformance."],
+                             statusCode: 0)
+    }
+
 }

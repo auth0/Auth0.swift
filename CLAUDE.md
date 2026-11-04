@@ -34,10 +34,9 @@ Auth0.swift/
 ├── App/                            # Demo application (uses Auth0.plist config)
 ├── fastlane/                       # Release automation (Fastfile)
 ├── .github/
-│   ├── workflows/main.yml          # CI: tests, lint, pod-lint
-│   └── actions/{setup,test}/       # Composite: Ruby+CocoaPods+Xcode setup, Carthage+xcodebuild test
+│   ├── workflows/main.yml          # CI: tests, lint
+│   └── actions/{setup,test}/       # Composite: Ruby+Xcode setup, Carthage+xcodebuild test
 ├── Auth0.xcodeproj
-├── Auth0.podspec
 ├── Package.swift
 └── CHANGELOG.md
 ```
@@ -53,7 +52,7 @@ Auth0.swift/
 - Add DocC comments (`/// ...`) to all `public` types, methods, and properties.
 - Gate WebAuth and Passkeys code with `#if WEB_AUTH_PLATFORM` / `#if PASSKEYS_PLATFORM`.
 - Expose both a completion-handler API and an `async throws` API for any new public method.
-- Keep `Auth0/Version.swift` and `Auth0.podspec` `s.version` in sync — this is the version source of truth.
+- Treat `Auth0/Version.swift` as the version source of truth.
 - Follow the existing error hierarchy — use or extend typed error structs (`AuthenticationError`, `WebAuthError`, etc.).
 - Run `swiftlint lint` and resolve all warnings before submitting.
 - Use `StubURLProtocol` / `NetworkStub` for all network interactions in tests.
@@ -63,7 +62,7 @@ Auth0.swift/
 ### ⚠️ Ask First
 
 - **Any breaking change — always ask first.** Never make a breaking change on your own initiative; stop and ask the maintainer before writing it.
-- Adding new external dependencies (SPM packages or CocoaPods pods).
+- Adding new external dependencies (SPM packages or Carthage dependencies).
 - Modifying public API signatures.
 - Adding new minimum platform versions or dropping support for existing ones.
 - Changes to `.github/workflows/` CI configuration.
@@ -78,7 +77,7 @@ Auth0.swift/
 - Bypass or weaken DPoP proof generation.
 - Force-unwrap optionals in library source code.
 - Use `#if os(iOS)` / `#if os(macOS)` for guards that belong under `WEB_AUTH_PLATFORM` / `PASSKEYS_PLATFORM`.
-- Modify files under `Carthage/`, `Pods/`, `.build/`, or `docs/` (generated artifacts) by hand.
+- Modify files under `Carthage/`, `.build/`, or `docs/` (generated artifacts) by hand.
 - Remove or skip failing tests instead of fixing them.
 - Break backward API compatibility without a major version bump and explicit team approval.
 - Write `public` types or methods without DocC documentation comments.
@@ -105,7 +104,7 @@ swift test                    # Run all tests via SPM (fastest local option)
 swiftlint lint --reporter github-actions-logging   # Lint (must pass before merging)
 ```
 
-See [references/commands.md](references/commands.md) for the full command reference (xcodebuild per-scheme, Carthage bootstrap, coverage, pod lint, DocC generation). Read only when you need to build, test, or lint beyond the two commands above.
+See [references/commands.md](references/commands.md) for the full command reference (xcodebuild per-scheme, Carthage bootstrap, coverage, DocC generation). Read only when you need to build, test, or lint beyond the two commands above.
 
 ## Testing
 

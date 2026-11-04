@@ -977,6 +977,22 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
             }
         }
 
+        describe("request body of existing endpoints") {
+
+            it("should not send a body when deleting an authentication method") {
+                let request = authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId) as? Request<Void, MyAccountError>
+                expect(request).toNot(beNil())
+                expect(request?.request.httpBody).to(beNil())
+            }
+
+            it("should not send a body when updating an authentication method without changes") {
+                let request = authMethods.updateAuthenticationMethod(by: AuthenticationMethodId, name: nil, preferredAuthenticationMethod: nil) as? Request<AuthenticationMethod, MyAccountError>
+                expect(request).toNot(beNil())
+                expect(request?.request.httpBody).to(beNil())
+            }
+
+        }
+
         describe("getFactorStatus") {
             it("should get factor status successfully") {
                 let factor1: [String: Any] = ["type": "totp", "usage": ["primary"]]

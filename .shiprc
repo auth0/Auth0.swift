@@ -2,7 +2,6 @@
     "files": {
         "Auth0/Info.plist": [],
         "Auth0/Version.swift": [],
-        "Auth0.podspec": [],
         "README.md": ["~> {MAJOR}.{MINOR}"]
     },
     "postbump": "bundle update",
