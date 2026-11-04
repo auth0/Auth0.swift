@@ -72,7 +72,7 @@ Then, select the dependency rule and press **Add Package**.
 Add the following line to your `Cartfile`:
 
 ```text
-github "auth0/Auth0.swift" ~> 3.2.0
+github "auth0/Auth0.swift" ~> 3.3.0
 ```
 
 Then, run `carthage bootstrap --use-xcframeworks`.
