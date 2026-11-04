@@ -18,7 +18,7 @@ env:
 
 jobs:
   release:
-    name: Tag, publish to CocoaPods, and create GitHub Release
+    name: Tag and create GitHub Release
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release/'))
     runs-on: macos-26
     environment: release
@@ -56,8 +56,7 @@ jobs:
 
       # Detect a pre-release version so we can tag the GitHub Release
       # accordingly. Any SemVer pre-release uses a hyphen separator (e.g.
-      # 1.0.0-beta.1, 2.0.0-rc.1). CocoaPods treats semver pre-release versions
-      # as pre-releases automatically, so no special pod tag is required.
+      # 1.0.0-beta.1, 2.0.0-rc.1).
       - name: Get prerelease flag
         id: get_prerelease
         run: |
@@ -89,12 +88,9 @@ jobs:
           repo_owner: ${{ github.repository_owner }}
           repo_name: ${{ github.event.repository.name }}
 
-      # Tags the release, pushes the tag, lints the podspec, and pushes the pod
-      # to CocoaPods trunk.
+      # Tags the release and pushes the tag.
       - name: Run release lane
         run: bundle exec fastlane release
-        env:
-          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
 
       # Create the GitHub Release from the pushed tag.
       - name: Create GitHub Release

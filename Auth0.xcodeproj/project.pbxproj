@@ -1117,7 +1117,6 @@
 		5FAE9C891D88731500A871CE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5FAE9C8A1D88731500A871CE /* Gemfile.lock */ = {isa = PBXFileReference; lastKnownFileType = text; path = Gemfile.lock; sourceTree = "<group>"; };
 		5FAE9C8B1D88731500A871CE /* Gemfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Gemfile; sourceTree = "<group>"; };
-		5FAE9C8C1D88731500A871CE /* Auth0.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Auth0.podspec; sourceTree = "<group>"; };
 		5FAE9C8D1D88731500A871CE /* codecov.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = codecov.yml; sourceTree = "<group>"; };
 		5FAE9C8E1D88731500A871CE /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		5FAE9C8F1D88731500A871CE /* Cartfile.private */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile.private; sourceTree = "<group>"; };
@@ -1741,7 +1740,6 @@
 				5FAE9C891D88731500A871CE /* README.md */,
 				5FAE9C8A1D88731500A871CE /* Gemfile.lock */,
 				5FAE9C8B1D88731500A871CE /* Gemfile */,
-				5FAE9C8C1D88731500A871CE /* Auth0.podspec */,
 				5FAE9C8D1D88731500A871CE /* codecov.yml */,
 				5FAE9C8E1D88731500A871CE /* LICENSE */,
 			);

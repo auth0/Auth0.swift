@@ -97,7 +97,6 @@ body:
       multiple: false
       options:
         - Swift Package Manager
-        - Cocoapods
         - Carthage
         - Other
     validations:
