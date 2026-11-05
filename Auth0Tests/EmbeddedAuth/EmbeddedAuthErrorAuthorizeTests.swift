@@ -812,4 +812,85 @@ import Foundation
         }
         #expect(actions == [.verifyPassword, .challengeEmail(index: 0, identifier: "al**@example.com")])
     }
+
+    // MARK: - sign up
+
+    private func signupActions(_ entries: [[String: Any]]) -> [NextAction]? {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "auth_session": "sess_abc",
+            "next": entries
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else { return nil }
+        return actions
+    }
+
+    @Test func reasonParsesSignupWithRequiredEmail() {
+        let actions = signupActions([["action": "action:signup:v1", "identifiers": ["email": ["required": true]]]])
+        #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true)])])
+    }
+
+    @Test func reasonParsesSignupWithOptionalPhone() {
+        let actions = signupActions([["action": "action:signup:v1", "identifiers": ["phone_number": ["required": false]]]])
+        #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .phone, isRequired: false)])])
+    }
+
+    @Test func reasonParsesSignupWithBothIdentifiersInAFixedOrder() {
+        let identifiers: [String: Any] = ["phone_number": ["required": false], "email": ["required": true]]
+        // Dictionaries have no order, so repeat to make sure the result never depends on it.
+        for _ in 0..<20 {
+            let actions = signupActions([["action": "action:signup:v1", "identifiers": identifiers]])
+            #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true),
+                                                      SignupIdentifier(type: .phone, isRequired: false)])])
+        }
+    }
+
+    @Test func reasonDropsSignupMissingIdentifiers() {
+        let actions = signupActions([["action": "action:signup:v1"], ["action": "action:identify:email:v1"]])
+        #expect(actions == [.identifyEmail])
+    }
+
+    @Test func reasonDropsSignupWhoseIdentifiersAreNotAnObject() {
+        #expect(signupActions([["action": "action:signup:v1", "identifiers": ["email", "phone_number"]]]) == [])
+        #expect(signupActions([["action": "action:signup:v1", "identifiers": "email"]]) == [])
+    }
+
+    @Test func reasonKeepsSignupWithOnlyUnknownIdentifierKeys() {
+        let actions = signupActions([["action": "action:signup:v1", "identifiers": ["username": ["required": true]]]])
+        #expect(actions == [.signup(identifiers: [])])
+    }
+
+    @Test func reasonIgnoresUnknownSignupIdentifierKeysNextToKnownOnes() {
+        let actions = signupActions([[
+            "action": "action:signup:v1",
+            "identifiers": ["username": ["required": true], "email": ["required": true]]
+        ]])
+        #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true)])])
+    }
+
+    @Test func reasonSkipsSignupIdentifierWhoseRequiredFlagIsMissingOrNotABoolean() {
+        let missing = signupActions([[
+            "action": "action:signup:v1",
+            "identifiers": ["email": [String: Any](), "phone_number": ["required": true]]
+        ]])
+        #expect(missing == [.signup(identifiers: [SignupIdentifier(type: .phone, isRequired: true)])])
+
+        let notABool = signupActions([[
+            "action": "action:signup:v1",
+            "identifiers": ["email": ["required": "true"], "phone_number": ["required": true]]
+        ]])
+        #expect(notABool == [.signup(identifiers: [SignupIdentifier(type: .phone, isRequired: true)])])
+
+        let notAnObject = signupActions([["action": "action:signup:v1", "identifiers": ["email": true]]])
+        #expect(notAnObject == [.signup(identifiers: [])])
+    }
+
+    @Test func reasonParsesSignupConfirm() {
+        #expect(signupActions([["action": "action:signup:confirm:v1"]]) == [.signupConfirm])
+    }
+
+    @Test func reasonTreatsAnotherSignupVersionAsUnknown() {
+        let actions = signupActions([["action": "action:signup:v2"], ["action": "action:signup:confirm:v2"]])
+        #expect(actions == [.unknown(rawAction: "action:signup:v2"), .unknown(rawAction: "action:signup:confirm:v2")])
+    }
 }

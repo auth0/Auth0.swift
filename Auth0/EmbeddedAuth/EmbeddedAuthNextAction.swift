@@ -63,8 +63,45 @@ public enum NextAction: Sendable, Equatable {
     /// - Parameter newCode: The rotated recovery code the user must record before the flow continues.
     case confirmRecoveryCode(newCode: String)
 
+    /// Server offers to register a new user: call ``EmbeddedAuth/signup()`` if the user wants to create an account.
+    ///
+    /// Offered alongside the identify steps when the connection allows self-registration. Calling
+    /// ``EmbeddedAuth/signup()`` does not create the account yet: the server answers with the steps needed to
+    /// register (for example identifying the new user and verifying a one-time code). Once the user completes them,
+    /// the server offers ``signupConfirm``.
+    ///
+    /// - Parameter identifiers: The identifiers the server accepts for registration, each flagged as required or optional.
+    ///   Identifiers this SDK version does not recognise are left out, so the list can be empty.
+    case signup(identifiers: [SignupIdentifier])
+
+    /// Server expects ``EmbeddedAuth/confirmSignup()`` to be called to finish registration and sign the user in.
+    case signupConfirm
+
     /// An action string the SDK does not recognise — preserved for forward compatibility.
     case unknown(rawAction: String)
+
+}
+
+// MARK: - SignupIdentifier
+
+/// An identifier the server accepts when registering a new user, as offered by ``NextAction/signup(identifiers:)``.
+public struct SignupIdentifier: Sendable, Equatable {
+
+    /// The kind of identifier. Never ``IdentifierType/username``: the server does not offer username sign-up.
+    public let type: IdentifierType
+
+    /// Whether the server requires this identifier for registration.
+    public let isRequired: Bool
+
+    /// Creates a sign-up identifier description.
+    ///
+    /// - Parameters:
+    ///   - type:       The kind of identifier.
+    ///   - isRequired: Whether the server requires this identifier for registration.
+    public init(type: IdentifierType, isRequired: Bool) {
+        self.type = type
+        self.isRequired = isRequired
+    }
 
 }
 
@@ -130,6 +167,12 @@ enum EmbeddedAction: String, Sendable, CaseIterable {
     /// Confirm the rotated recovery code has been recorded.
     case confirmRecoveryCode = "action:confirm:recovery-code:v1"
 
+    /// Start registering a new user.
+    case signup = "action:signup:v1"
+
+    /// Confirm the registration and complete the flow.
+    case signupConfirm = "action:signup:confirm:v1"
+
 }
 
 // MARK: - EmbeddedCapability
@@ -170,12 +213,19 @@ public enum EmbeddedCapability: Sendable, Equatable {
     /// SDK can confirm a rotated recovery code.
     case confirmRecoveryCode
 
+    /// SDK can start a sign-up.
+    case signup
+
+    /// SDK can confirm a sign-up.
+    case signupConfirm
+
     /// All capabilities this SDK version supports.
     public static let all: [EmbeddedCapability] = [
         .identifyEmail, .identifyPhone, .identifyUsername,
         .challengeEmail, .challengePhone, .challengePush,
         .verifyOTP, .verifyOob, .verifyPassword,
-        .verifyRecoveryCode, .confirmRecoveryCode
+        .verifyRecoveryCode, .confirmRecoveryCode,
+        .signup, .signupConfirm
     ]
 
     var action: EmbeddedAction {
@@ -191,6 +241,8 @@ public enum EmbeddedCapability: Sendable, Equatable {
         case .verifyPassword:      return .verifyPassword
         case .verifyRecoveryCode:  return .verifyRecoveryCode
         case .confirmRecoveryCode: return .confirmRecoveryCode
+        case .signup:              return .signup
+        case .signupConfirm:       return .signupConfirm
         }
     }
 

@@ -15,7 +15,7 @@
 
 > [!IMPORTANT]
 > **🧪 Embedded Auth v4.0.0-beta.0**
-> [`v4.0.0-beta.0`](https://github.com/auth0/Auth0.swift/releases/tag/4.0.0-beta.0) introduces Embedded Auth with Email OTP support (existing users only). This feature is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) — please reach out to Auth0 support to enable it for your tenant.
+> [`v4.0.0-beta.0`](https://github.com/auth0/Auth0.swift/releases/tag/4.0.0-beta.0) introduces Embedded Auth with Email OTP support. Later v4 betas add sign-up for new users. This feature is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) — please reach out to Auth0 support to enable it for your tenant.
 >
 > 📦 [v4 Changelog](https://github.com/auth0/Auth0.swift/blob/v4-development/CHANGELOG.md) &nbsp;•&nbsp; 📚 [Embedded Auth Guide](https://github.com/auth0/Auth0.swift/blob/v4-development/examples/embedded-auth.md)
 >

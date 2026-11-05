@@ -81,8 +81,8 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// The request never reached the server (network failure).
     ///
     /// The session is preserved — retrying the same step is safe. That includes the final token exchange of
-    /// ``EmbeddedAuth/verifyOtp(_:type:)``, ``EmbeddedAuth/verifyPassword(_:)``, ``EmbeddedAuth/verifyOob()`` and
-    /// ``EmbeddedAuth/confirmRecoveryCode()``.
+    /// ``EmbeddedAuth/verifyOtp(_:type:)``, ``EmbeddedAuth/verifyPassword(_:)``, ``EmbeddedAuth/verifyOob()``,
+    /// and ``EmbeddedAuth/confirmRecoveryCode()``.
     case network
 
     /// Client-side guard: no flow is in progress.

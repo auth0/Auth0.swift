@@ -6,6 +6,7 @@
 - [Start the flow and step through next actions](#start-the-flow-and-step-through-next-actions)
 - [Username](#username)
 - [Password](#password)
+- [Sign up](#sign-up)
 - [MFA flows](#mfa-flows)
 - [Error handling during the flow](#error-handling-during-the-flow)
 
@@ -26,7 +27,10 @@ let client = Auth0.embeddedAuth()
 #### Start the flow and step through next actions
 
 > [!NOTE]
-> The Email OTP flow (`.challengeEmail` / `.verifyOTP`) is supported only for **existing users** who have already signed up. It does not work for fresh / new user sign-ups.
+> Sign-in with an email OTP (`.challengeEmail` / `.verifyOTP`) is for **existing users**. New users register through the [sign-up](#sign-up) steps (`.signup` / `.signupConfirm`), which the server offers only when the connection allows self-registration.
+
+> [!NOTE]
+> New next actions can be added in future releases, and `.signup` / `.signupConfirm` were added during the v4 beta. If you switch over `NextAction` or `EmbeddedCapability`, keep a `default:` branch (or handle `.unknown`) so new cases don't break your build.
 
 `authorize(connection:)` uses a default scope of `"openid profile email offline_access"`, which ensures `Credentials.idToken` is populated after a successful `verifyOtp` or `verifyPassword`. Pass a custom `scope:` to the full `authorize(connection:capabilities:scope:audience:)` overload if needed.
 
@@ -90,6 +94,14 @@ func handleNextActions(_ actions: [NextAction]) async throws -> Credentials {
     case .confirmRecoveryCode(let newCode):
         // Display newCode to the user so they can record it before continuing.
         return try await client.confirmRecoveryCode().start()
+    case .signup(let identifiers):
+        // The server offers to register a new user. identifiers lists the identifiers it accepts
+        // and whether each is required. Call signup() only if the user chose to create an account.
+        try await client.signup().start()
+        throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
+    case .signupConfirm:
+        // The registration steps are complete. This finishes the sign-up and signs the user in.
+        return try await client.confirmSignup().start()
     case .unknown:
         throw EmbeddedAuthError(info: ["error": "unsupported_action"], statusCode: 0)
     }
@@ -156,6 +168,45 @@ func signIn(password: String) async throws -> Credentials {
         case .insufficientAuthorization(_, let nextActions):
             // Any other continuation, for example a second factor after the password.
             return try await handleNextActions(nextActions)
+        default:
+            throw error
+        }
+    }
+}
+```
+
+#### Sign up
+
+When `nextActions` contains `.signup(identifiers:)`, the connection allows self-registration. `identifiers` lists what the server accepts for the new account: `.email` and/or `.phone`, each with `isRequired`. Use it to decide which form to show. Identifiers this SDK does not recognise are left out, so the list can be empty. A username is never offered.
+
+`authorize(connection:)` advertises every capability, including sign-up. To offer a login-only flow, pass the capabilities explicitly without `.signup` and `.signupConfirm`, and the server will not offer sign-up:
+
+```swift
+let loginCapabilities = EmbeddedCapability.all.filter { $0 != .signup && $0 != .signupConfirm }
+try await client.authorize(connection: connection,
+                           capabilities: loginCapabilities,
+                           scope: "openid profile email offline_access",
+                           audience: nil).start()
+```
+
+If the user chooses to create an account, call `signup()`. It never returns credentials: it always fails with `.insufficientAuthorization` and the `nextActions` for the next step of the registration, for example `.identifyEmail`, then `.verifyOTP`. Handle those like any other continuation. When the server offers `.signupConfirm`, call `confirmSignup()` to finish the registration. Like `verifyOtp`, it returns `Credentials` on success.
+
+If the server rejects the new user before registration, for example because of a pre-registration validation or an Action that denies the sign-up, the request fails with `.accessDenied` and the flow ends. Start a new flow with `authorize()` and show the user a generic message. Both `signup()` and `confirmSignup()` need an active session and fail locally with `.noActiveSession` otherwise.
+
+```swift
+func register() async throws -> Credentials {
+    do {
+        try await client.signup().start()
+        throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
+    } catch let error as EmbeddedAuthError {
+        switch error.reason {
+        case .insufficientAuthorization(_, let nextActions):
+            // For example [.identifyEmail]. confirmSignup() is called from handleNextActions
+            // once the server offers .signupConfirm.
+            return try await handleNextActions(nextActions)
+        case .accessDenied:
+            // Rejected before registration. The flow has ended.
+            throw error
         default:
             throw error
         }

@@ -19,3 +19,45 @@ struct EmbeddedAuthSessionValidator: RequestValidator {
     }
 
 }
+
+/// Fails the request locally for an ``EmbeddedAuth`` step the client does not implement.
+///
+/// Backs the default implementations of protocol requirements added after the first release, so existing
+/// external conformers keep compiling and fail predictably instead of reaching the network.
+struct EmbeddedAuthUnsupportedStepValidator: RequestValidator {
+
+    func validate() throws {
+        throw EmbeddedAuthError.notImplemented
+    }
+
+}
+
+extension EmbeddedAuthError {
+
+    /// The error returned by a step the client does not implement.
+    static var notImplemented: EmbeddedAuthError {
+        EmbeddedAuthError(
+            info: ["error": "not_implemented",
+                   "error_description": "This EmbeddedAuth client does not implement this step."],
+            statusCode: 0
+        )
+    }
+
+}
+
+extension EmbeddedAuth {
+
+    /// Builds a request that fails with ``EmbeddedAuthError/notImplemented`` before any network call.
+    func unsupportedStepRequest<T: Sendable>() -> Request<T, EmbeddedAuthError> {
+        Request(
+            session: .shared,
+            url: URL(fileURLWithPath: "/"),
+            method: "POST",
+            requestValidator: [EmbeddedAuthUnsupportedStepValidator()],
+            handle: { _, callback in callback(.failure(EmbeddedAuthError.notImplemented)) },
+            logger: logger,
+            auth0ClientInfo: auth0ClientInfo
+        )
+    }
+
+}
