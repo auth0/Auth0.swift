@@ -2,6 +2,8 @@ import Foundation
 
 /// A request body for updating the authenticated user's writable profile attributes.
 ///
+/// This API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) and might change before General Availability.
+///
 /// Only the fields you set are sent; omitted fields leave the corresponding profile attributes
 /// unchanged.
 ///
