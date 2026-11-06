@@ -8,7 +8,7 @@ public typealias EmbeddedAuthResult<T> = Result<T, EmbeddedAuthError>
 // MARK: - IdentifierType
 
 /// The type of identifier a user submits during the identify step.
-public enum IdentifierType {
+public enum IdentifierType: Sendable, Equatable {
     /// An email address.
     case email
     /// A phone number.
@@ -155,6 +155,34 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///
     /// Requires an active session.
     func confirmRecoveryCode() -> Request<Credentials, EmbeddedAuthError>
+
+    /// Starts registering a new user.
+    ///
+    /// Call this when ``NextAction/signup(identifiers:)`` is among the `nextActions` and the user wants to create
+    /// an account.
+    ///
+    /// The request always fails with ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)``:
+    /// read its `nextActions` to find the next step of the registration (for example
+    /// ``NextAction/identifyEmail`` or ``NextAction/verifyOTP(channel:identifier:)``) and handle it like any other
+    /// continuation. Once the registration steps are complete the server offers ``NextAction/confirmSignup``,
+    /// which you finish with ``confirmSignup()``.
+    ///
+    /// Requires an active session.
+    ///
+    /// - Note: If the server rejects the identifier before registration starts (for example, because of a
+    ///   pre-registration validation), the request fails with ``EmbeddedAuthErrorReason/accessDenied`` and the flow
+    ///   ends.
+    func signup() -> Request<Void, EmbeddedAuthError>
+
+    /// Confirms the registration and completes the flow.
+    ///
+    /// Call this when ``NextAction/confirmSignup`` is among the `nextActions`.
+    ///
+    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    ///
+    /// Requires an active session. If the token exchange fails with ``EmbeddedAuthErrorReason/network``, the session is
+    /// kept; retrying sends the confirmation again, and the server decides whether it can still be completed.
+    func confirmSignup() -> Request<Credentials, EmbeddedAuthError>
 
 }
 

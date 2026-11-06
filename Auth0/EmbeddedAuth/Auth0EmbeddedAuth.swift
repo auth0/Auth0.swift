@@ -186,6 +186,35 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
         )
     }
 
+    /// Starts registering a new user. Always fails with a continuation.
+    func signup() -> Request<Void, EmbeddedAuthError> {
+        guard let currentSession else { return missingSessionRequest() }
+        return authorizeRequest(body: [
+            "client_id": clientId,
+            "action": EmbeddedAction.signup.rawValue,
+            "auth_session": currentSession
+        ])
+    }
+
+    /// Confirms the registration.
+    /// On success, internally exchanges the authorization code for ``Credentials``.
+    func confirmSignup() -> Request<Credentials, EmbeddedAuthError> {
+        guard let currentSession else { return missingSessionRequest() }
+        return Request(
+            session: session,
+            url: url.appending("e/authorize"),
+            method: "POST",
+            handle: decodeAuthorizationCodeResponse,
+            parameters: [
+                "client_id": clientId,
+                "action": EmbeddedAction.confirmSignup.rawValue,
+                "auth_session": currentSession
+            ],
+            logger: logger,
+            auth0ClientInfo: auth0ClientInfo
+        )
+    }
+
     /// Requests that the server send an email OTP challenge.
     func challengeEmail(index: Int) -> Request<Void, EmbeddedAuthError> {
         guard let currentSession else { return missingSessionRequest() }
