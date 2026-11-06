@@ -4,6 +4,8 @@ import Foundation
 
 /// The authenticated user's profile retrieved from the My Account API.
 ///
+/// This API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) and might change before General Availability.
+///
 /// Contains profile attributes together with a per-field access policy
 /// (``profilePolicy``) that describes which fields the user is allowed to update.
 ///
@@ -112,6 +114,8 @@ extension MyAccountProfile: Decodable {
 
 /// Describes the access policy for a single profile field.
 ///
+/// This API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) and might change before General Availability.
+///
 /// Returned as part of ``MyAccountProfile/profilePolicy`` to indicate whether
 /// a field is editable by the user and who is authoritative for it.
 public struct ProfileFieldPolicy: Decodable, Sendable {
@@ -131,6 +135,8 @@ public struct ProfileFieldPolicy: Decodable, Sendable {
 // MARK: - ProfileFieldAccess
 
 /// Whether a profile field can be updated by the user.
+///
+/// This API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) and might change before General Availability.
 ///
 /// Two values are equal when their ``rawValue`` is equal, so `.unknown("read_only") == .readOnly`.
 public enum ProfileFieldAccess: Sendable, Hashable {
@@ -193,6 +199,8 @@ extension ProfileFieldAccess: Decodable {
 // MARK: - ProfileFieldSource
 
 /// Who is authoritative for a profile field's value.
+///
+/// This API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) and might change before General Availability.
 ///
 /// Two values are equal when their ``rawValue`` is equal, so `.unknown("idp") == .idp`.
 public enum ProfileFieldSource: Sendable, Hashable {
