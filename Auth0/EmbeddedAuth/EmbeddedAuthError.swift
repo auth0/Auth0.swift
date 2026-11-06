@@ -170,9 +170,26 @@ private extension EmbeddedAuthError {
             case .confirmRecoveryCode:
                 guard let newCode = entry["new_code"] as? String else { return nil }
                 return .confirmRecoveryCode(newCode: newCode)
+            case .signup:
+                guard let identifiers = entry["identifiers"] as? [String: Any] else { return nil }
+                return .signup(identifiers: Self.signupIdentifiers(from: identifiers))
+            case .confirmSignup:
+                return .confirmSignup
             case .none:
                 return .unknown(rawAction: actionString)
             }
+        }
+    }
+
+    /// Maps the `identifiers` object of a sign-up entry, in a fixed order (email, then phone).
+    ///
+    /// Keys the SDK does not recognise, and keys whose `required` flag cannot be read as a boolean, are left out.
+    /// Numbers follow Swift's bridging rules, so `0` and `1` are read as `false` and `true`.
+    static func signupIdentifiers(from identifiers: [String: Any]) -> [SignupIdentifier] {
+        [("email", IdentifierType.email), ("phone_number", IdentifierType.phone)].compactMap { key, type in
+            guard let details = identifiers[key] as? [String: Any],
+                  let isRequired = details["required"] as? Bool else { return nil }
+            return SignupIdentifier(type: type, isRequired: isRequired)
         }
     }
 
