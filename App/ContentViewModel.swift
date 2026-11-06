@@ -55,7 +55,11 @@ final class ContentViewModel: ObservableObject {
 
     // MARK: - Embedded auth
 
-    func startEmbeddedFlow() async {
+    /// Starts the flow with the email or phone number entered on the first screen.
+    ///
+    /// Login advertises every capability except sign-up, so the server never offers it. Sign-up advertises all of
+    /// them, calls `signup()` as soon as the server offers it, and then continues with the entered identifier.
+    func startEmbeddedFlow(signingUp: Bool = false) async {
         isLoading = true
         // A cancelled poll may still have a request in flight that mutates the SDK's session,
         // so wait for it to finish before starting a new flow.
@@ -64,14 +68,51 @@ final class ContentViewModel: ObservableObject {
         pollTask = nil
         clearFlowState()
         embeddedAuthUIState = .initial
+        // Open the phone step first when only a phone number was entered.
+        usePhoneIdentifier = email.isEmpty && !phone.isEmpty
         do {
-            _ = try await embeddedAuthClient.authorize(connection: "Username-Password-Authentication").start()
+            _ = try await embeddedAuthClient.authorize(connection: "Username-Password-Authentication",
+                                                       capabilities: capabilities(signingUp: signingUp),
+                                                       scope: "openid profile email offline_access",
+                                                       audience: nil).start()
         } catch let error as EmbeddedAuthError {
             handle(embeddedAuthError: error)
         } catch {
             embeddedAuthUIState = .failed(error.localizedDescription)
         }
         isLoading = false
+        if signingUp, canSignUp {
+            await startSignup()
+        }
+        await submitEnteredIdentifier()
+    }
+
+    /// The capabilities to advertise. Login never advertises sign-up. Sign-up supports a single identifier, so when
+    /// only a phone number was entered the email steps are left out, and when only an email was entered the phone
+    /// steps are.
+    private func capabilities(signingUp: Bool) -> [EmbeddedCapability] {
+        guard signingUp else {
+            return EmbeddedCapability.all.filter { $0 != .signup && $0 != .confirmSignup }
+        }
+        if email.isEmpty, !phone.isEmpty {
+            return EmbeddedCapability.all.filter { $0 != .identifyEmail && $0 != .challengeEmail }
+        }
+        if !email.isEmpty, phone.isEmpty {
+            return EmbeddedCapability.all.filter { $0 != .identifyPhone && $0 != .challengePhone }
+        }
+        return EmbeddedCapability.all
+    }
+
+    /// Submits the email or phone number from the first screen when the flow asks for that identifier.
+    private func submitEnteredIdentifier() async {
+        switch embeddedAuthUIState {
+        case .identifyEmail where !email.isEmpty:
+            await submitEmail(email)
+        case .identifyPhone where !phone.isEmpty:
+            await submitPhone(phone)
+        default:
+            break
+        }
     }
 
     #if WEB_AUTH_PLATFORM
@@ -229,6 +270,42 @@ final class ContentViewModel: ObservableObject {
             embeddedAuthUIState = .failed(error.localizedDescription)
         }
         isLoading = false
+    }
+
+    /// Asks the server to start registering a new user. It never returns credentials: the continuation
+    /// carries the next registration step, which `handle(embeddedAuthError:)` presents.
+    func startSignup() async {
+        isLoading = true
+        do {
+            try await embeddedAuthClient.signup().start()
+            fail(with: EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0))
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    func confirmSignup() async {
+        isLoading = true
+        do {
+            let credentials = try await embeddedAuthClient.confirmSignup().start()
+            finish(with: credentials)
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
+        isLoading = false
+    }
+
+    /// Whether the latest continuation offers to register a new user.
+    private var canSignUp: Bool {
+        availableActions.contains { action in
+            if case .signup = action { return true }
+            return false
+        }
     }
 
     // MARK: - Navigation between offered methods
@@ -528,6 +605,8 @@ private extension ContentViewModel {
             detail = "The request was rejected. Start again."
         case .noEligibleFactors:
             detail = "A second factor is required but none is enrolled. Sign in with a redirect-based flow."
+        case .accessDenied:
+            detail = "The request was denied, for example by a sign-up validation. Start again."
         case .network:
             detail = "A network error occurred. Check your connection and try again."
         default:
@@ -594,7 +673,10 @@ private extension ContentViewModel {
             embeddedAuthUIState = .verifyRecoveryCode
         case .confirmRecoveryCode(let newCode):
             embeddedAuthUIState = .confirmRecoveryCode(newCode: newCode)
-        case .unknown:
+        case .confirmSignup:
+            embeddedAuthUIState = .confirmSignup
+        case .signup, .unknown:
+            // Sign-up has no screen of its own: `startEmbeddedFlow(signingUp:)` calls `signup()` when it is offered.
             currentAction = nil
             return false
         }
@@ -617,6 +699,7 @@ enum EmbeddedAuthUIState {
     case verifyPassword
     case verifyRecoveryCode
     case confirmRecoveryCode(newCode: String)
+    case confirmSignup
     case success(Credentials)
     case failed(String)
 }

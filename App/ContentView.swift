@@ -17,12 +17,38 @@ struct ContentView: View {
                 switch viewModel.embeddedAuthUIState {
 
                 case .initial:
+                    TextField("Email", text: $viewModel.email)
+                        #if !os(macOS)
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
+                    TextField("Phone number", text: $viewModel.phone)
+                        #if !os(macOS)
+                        .textContentType(.telephoneNumber)
+                        .keyboardType(.phonePad)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
                     Button {
                         Task { await viewModel.startEmbeddedFlow() }
                     } label: {
-                        Text("Start Embedded Auth")
+                        Text("Login")
                     }
                     .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+                    Button {
+                        Task { await viewModel.startEmbeddedFlow(signingUp: true) }
+                    } label: {
+                        Text("Signup")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
                     .disabled(viewModel.isLoading)
 
                     #if WEB_AUTH_PLATFORM
@@ -260,6 +286,18 @@ struct ContentView: View {
                         Task { await viewModel.confirmRecoveryCode() }
                     } label: {
                         Text("I've saved it")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+
+                case .confirmSignup:
+                    Text("Your details are verified. Complete the sign-up to finish creating your account.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Button {
+                        Task { await viewModel.confirmSignup() }
+                    } label: {
+                        Text("Complete sign-up")
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading)
