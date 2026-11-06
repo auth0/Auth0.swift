@@ -16,6 +16,8 @@ final class ContentViewModel: ObservableObject {
     @Published var attemptError: String?
     /// All actions offered by the latest continuation. Indices come from each entry's own `index` field.
     @Published var availableActions: [NextAction] = []
+    /// The identifiers sign-up collects and whether each is required, from the `signup` action of the first response.
+    @Published private(set) var signupIdentifiers: [SignupIdentifier] = []
 
     // My Account Profile
     @Published var profileFieldsFilter: String = ""
@@ -39,6 +41,8 @@ final class ContentViewModel: ObservableObject {
     /// The action backing the screen currently shown, so it is not offered again as an alternative.
     private var currentAction: NextAction?
     private var usePhoneIdentifier = false
+    /// Identifiers from the first screen that were already sent, so each is submitted automatically only once.
+    private var submittedIdentifiers = Set<IdentifierType>()
     private var pollTask: Task<Void, Never>?
 
     private static let minPollIntervalMs = 1_000
@@ -57,8 +61,9 @@ final class ContentViewModel: ObservableObject {
 
     /// Starts the flow with the email or phone number entered on the first screen.
     ///
-    /// Login advertises every capability except sign-up, so the server never offers it. Sign-up advertises all of
-    /// them, calls `signup()` as soon as the server offers it, and then continues with the entered identifier.
+    /// Login advertises every capability except sign-up, so the server never offers it. Sign-up advertises just the
+    /// capabilities it uses, calls `signup()` as soon as the server offers it, and then submits the email and the
+    /// phone number that were entered as the server asks for them.
     func startEmbeddedFlow(signingUp: Bool = false) async {
         isLoading = true
         // A cancelled poll may still have a request in flight that mutates the SDK's session,
@@ -68,8 +73,6 @@ final class ContentViewModel: ObservableObject {
         pollTask = nil
         clearFlowState()
         embeddedAuthUIState = .initial
-        // Open the phone step first when only a phone number was entered.
-        usePhoneIdentifier = email.isEmpty && !phone.isEmpty
         do {
             _ = try await embeddedAuthClient.authorize(connection: "Username-Password-Authentication",
                                                        capabilities: capabilities(signingUp: signingUp),
@@ -87,28 +90,30 @@ final class ContentViewModel: ObservableObject {
         await submitEnteredIdentifier()
     }
 
-    /// The capabilities to advertise. Login never advertises sign-up. Sign-up supports a single identifier, so when
-    /// only a phone number was entered the email steps are left out, and when only an email was entered the phone
-    /// steps are.
+    /// The capabilities to advertise. Login never advertises sign-up. Sign-up advertises only what it needs: the
+    /// email and phone identify and challenge steps, the OTP verification, and the sign-up actions. That lets the
+    /// server ask for each identifier it collects (an email, a phone number, or both) whatever was entered first.
     private func capabilities(signingUp: Bool) -> [EmbeddedCapability] {
         guard signingUp else {
             return EmbeddedCapability.all.filter { $0 != .signup && $0 != .signupConfirm }
         }
-        if email.isEmpty, !phone.isEmpty {
-            return EmbeddedCapability.all.filter { $0 != .identifyEmail && $0 != .challengeEmail }
-        }
-        if !email.isEmpty, phone.isEmpty {
-            return EmbeddedCapability.all.filter { $0 != .identifyPhone && $0 != .challengePhone }
-        }
-        return EmbeddedCapability.all
+        return [.signup, .identifyEmail, .identifyPhone, .challengeEmail, .challengePhone, .verifyOTP, .signupConfirm]
     }
 
-    /// Submits the email or phone number from the first screen when the flow asks for that identifier.
+    /// The identifier from the first screen to send next: the email, then the phone number, each at most once.
+    private var pendingIdentifier: IdentifierType? {
+        if !email.isEmpty, !submittedIdentifiers.contains(.email) { return .email }
+        if !phone.isEmpty, !submittedIdentifiers.contains(.phone) { return .phone }
+        return nil
+    }
+
+    /// Submits the pending identifier when the flow asks for it. With both an email and a phone number entered,
+    /// sign-up identifies and verifies one, then the server asks for the other.
     private func submitEnteredIdentifier() async {
         switch embeddedAuthUIState {
-        case .identifyEmail where !email.isEmpty:
+        case .identifyEmail where pendingIdentifier == .email:
             await submitEmail(email)
-        case .identifyPhone where !phone.isEmpty:
+        case .identifyPhone where pendingIdentifier == .phone:
             await submitPhone(phone)
         default:
             break
@@ -140,6 +145,7 @@ final class ContentViewModel: ObservableObject {
 
     func submitEmail(_ email: String) async {
         isLoading = true
+        submittedIdentifiers.insert(.email)
         do {
             _ = try await embeddedAuthClient.identify(email, type: .email).start()
         } catch let error as EmbeddedAuthError {
@@ -152,6 +158,7 @@ final class ContentViewModel: ObservableObject {
 
     func submitPhone(_ phone: String) async {
         isLoading = true
+        submittedIdentifiers.insert(.phone)
         do {
             _ = try await embeddedAuthClient.identify(phone, type: .phone).start()
         } catch let error as EmbeddedAuthError {
@@ -232,6 +239,8 @@ final class ContentViewModel: ObservableObject {
             embeddedAuthUIState = .failed(error.localizedDescription)
         }
         isLoading = false
+        // A sign-up with several identifiers moves on to the next one entered once this one is verified.
+        await submitEnteredIdentifier()
     }
 
     func submitPassword(_ password: String) async {
@@ -306,6 +315,23 @@ final class ContentViewModel: ObservableObject {
             if case .signup = action { return true }
             return false
         }
+    }
+
+    /// Whether sign-up collects `type` without requiring it, so it can be left empty.
+    func isOptional(_ type: IdentifierType) -> Bool {
+        signupIdentifiers.first { $0.type == type }.map { !$0.isRequired } ?? false
+    }
+
+    /// Whether the server lets the user finish sign-up now. That is how an optional identifier is skipped:
+    /// the server only offers `signupConfirm` once every required identifier is verified.
+    var canCompleteSignup: Bool {
+        availableActions.contains(.signupConfirm)
+    }
+
+    /// Skips the identifier on screen and goes to the sign-up confirmation.
+    func skipToConfirmation() {
+        currentAction = .signupConfirm
+        embeddedAuthUIState = .confirmSignup
     }
 
     // MARK: - Navigation between offered methods
@@ -508,6 +534,8 @@ private extension ContentViewModel {
         currentAction = nil
         attemptError = nil
         usePhoneIdentifier = false
+        submittedIdentifiers = []
+        signupIdentifiers = []
     }
 
     func startPolling(initialIntervalMs: Int) {
@@ -624,6 +652,10 @@ private extension ContentViewModel {
             return
         }
         availableActions = nextActions
+        // Only the first response lists the sign-up identifiers, so keep them for the rest of the flow.
+        for case .signup(let identifiers) in nextActions {
+            signupIdentifiers = identifiers
+        }
         switch reason {
         case .invalidCode:
             attemptError = "That code is incorrect. Please try again."
@@ -634,10 +666,25 @@ private extension ContentViewModel {
         default:
             attemptError = nil
         }
+        // The server offers `signupConfirm` only when every required identifier is verified. If the user entered
+        // nothing more that it asks for, any identifier still offered is optional and left empty, so skip it.
+        if nextActions.contains(.signupConfirm), attemptError == nil, !offersEnteredIdentifier(in: nextActions) {
+            _ = present(.signupConfirm, among: nextActions)
+            return
+        }
         for action in nextActions where present(action, among: nextActions) {
             return
         }
         fail(with: error)
+    }
+
+    /// Whether `actions` asks for an identifier the user entered on the first screen and that is not sent yet.
+    func offersEnteredIdentifier(in actions: [NextAction]) -> Bool {
+        switch pendingIdentifier {
+        case .email?: return actions.contains(.identifyEmail)
+        case .phone?: return actions.contains(.identifyPhone)
+        default: return false
+        }
     }
 
     /// Shows the screen for `action`. Returns `false` if the action has no screen.
@@ -647,7 +694,7 @@ private extension ContentViewModel {
         case .identifyEmail, .identifyPhone:
             // `identifyEmail` would otherwise shadow `identifyPhone`; honour the user's choice when both are offered.
             let offersBoth = nextActions.contains(.identifyEmail) && nextActions.contains(.identifyPhone)
-            let showPhone = offersBoth ? usePhoneIdentifier : action == .identifyPhone
+            let showPhone = offersBoth ? (pendingIdentifier.map { $0 == .phone } ?? usePhoneIdentifier) : action == .identifyPhone
             currentAction = showPhone ? .identifyPhone : .identifyEmail
             embeddedAuthUIState = showPhone ? .identifyPhone : .identifyEmail
         case .identifyUsername:

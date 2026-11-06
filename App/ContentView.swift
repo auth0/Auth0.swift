@@ -68,7 +68,7 @@ struct ContentView: View {
                     #endif
 
                 case .identifyEmail:
-                    TextField("Email", text: $viewModel.email)
+                    TextField(viewModel.isOptional(.email) ? "Email (optional)" : "Email", text: $viewModel.email)
                         #if !os(macOS)
                         .textContentType(.emailAddress)
                         .keyboardType(.emailAddress)
@@ -85,6 +85,7 @@ struct ContentView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading || viewModel.email.isEmpty)
+                    skipButton
                     if viewModel.canToggleIdentifier {
                         Button {
                             viewModel.toggleIdentifier()
@@ -96,7 +97,7 @@ struct ContentView: View {
                     }
 
                 case .identifyPhone:
-                    TextField("Phone number", text: $viewModel.phone)
+                    TextField(viewModel.isOptional(.phone) ? "Phone number (optional)" : "Phone number", text: $viewModel.phone)
                         #if !os(macOS)
                         .textContentType(.telephoneNumber)
                         .keyboardType(.phonePad)
@@ -112,6 +113,7 @@ struct ContentView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading || viewModel.phone.isEmpty)
+                    skipButton
                     if viewModel.canToggleIdentifier {
                         Button {
                             viewModel.toggleIdentifier()
@@ -343,6 +345,21 @@ struct ContentView: View {
             .padding()
         }
         .onDisappear { viewModel.cancelPolling() }
+    }
+
+    /// Lets the user skip an optional identifier: the server only offers sign-up confirmation once every
+    /// required identifier is verified.
+    @ViewBuilder
+    private var skipButton: some View {
+        if viewModel.canCompleteSignup {
+            Button {
+                viewModel.skipToConfirmation()
+            } label: {
+                Text("Skip and complete sign-up")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .disabled(viewModel.isLoading)
+        }
     }
 
     /// Buttons for switching to another method offered by the latest response.
