@@ -95,6 +95,23 @@ final class ContentViewModel: ObservableObject {
         }
         isLoading = false
     }
+
+    /// Clears the Universal Login session cookie that "Login with Browser" leaves in the browser.
+    func webLogout(presentationWindow window: Auth0WindowRepresentable? = nil) async {
+        isLoading = true
+        var webAuth: WebAuth = Auth0.webAuth()
+        if let window {
+            webAuth = webAuth.presentationWindow(window)
+        }
+        do {
+            try await webAuth.logout()
+        } catch let error as WebAuthError where error == .userCancelled {
+            // The logout sheet was dismissed, so the browser session may still be active.
+        } catch {
+            embeddedAuthUIState = .failed("Web logout failed: \(error.localizedDescription)")
+        }
+        isLoading = false
+    }
     #endif
 
     func submitEmail(_ email: String) async {
