@@ -177,42 +177,99 @@ func signIn(password: String) async throws -> Credentials {
 
 #### Sign up
 
-When `nextActions` contains `.signup(identifiers:)`, the connection allows self-registration. `identifiers` lists what the server accepts for the new account: `.email` and/or `.phone`, each with `isRequired`. Use it to decide which form to show. Identifiers this SDK does not recognise are left out, so the list can be empty. A username is never offered.
+When `nextActions` contains `.signup(identifiers:)`, the connection allows self-registration. `identifiers` lists what the server collects for the new account: `.email` and/or `.phone`, each with `isRequired`. Use it to decide which fields to show. Identifiers this SDK does not recognise are left out, so the list can be empty. A username is never offered.
 
-`authorize(connection:)` advertises every capability, including sign-up. To offer a login-only flow, pass the capabilities explicitly without `.signup` and `.signupConfirm`, and the server will not offer sign-up:
+**Choose the capabilities.** `authorize(connection:)` advertises every capability, including sign-up. To keep sign-up out of a login screen, pass the capabilities explicitly. Without `.signup` and `.signupConfirm` the server never offers it. For a sign-up screen, advertise what sign-up uses:
 
 ```swift
+// Login: everything except sign-up.
 let loginCapabilities = EmbeddedCapability.all.filter { $0 != .signup && $0 != .signupConfirm }
+
+// Sign-up: the sign-up actions, email and phone identification, their challenges and the code check.
+let signupCapabilities: [EmbeddedCapability] = [
+    .signup, .identifyEmail, .identifyPhone,
+    .challengeEmail, .challengePhone, .verifyOTP, .signupConfirm
+]
+
 try await client.authorize(connection: connection,
-                           capabilities: loginCapabilities,
+                           capabilities: signupCapabilities,
                            scope: "openid profile email offline_access",
                            audience: nil).start()
 ```
 
-If the user chooses to create an account, call `signup()`. It never returns credentials: it always fails with `.insufficientAuthorization` and the `nextActions` for the next step of the registration, for example `.identifyEmail`, then `.verifyOTP`. Handle those like any other continuation. When the server offers `.signupConfirm`, call `confirmSignup()` to finish the registration. Like `verifyOtp`, it returns `Credentials` on success.
+**Collect one or more identifiers.** `signup()` never returns credentials: it always fails with `.insufficientAuthorization` and the `nextActions` for the next step. When `identifiers` lists both `.email` and `.phone`, the server collects them one after another with the same steps used for login: identify one, send and verify its code, and the next continuation asks for the other, until it offers `.signupConfirm`. Call `confirmSignup()` then. Like `verifyOtp`, it returns `Credentials` on success. The server decides the order, so follow `nextActions` instead of assuming a fixed sequence. An identifier that is not required can be skipped.
 
-If the server rejects the new user before registration, for example because of a pre-registration validation or an Action that denies the sign-up, the request fails with `.accessDenied` and the flow ends. Start a new flow with `authorize()` and show the user a generic message. Both `signup()` and `confirmSignup()` need an active session and fail locally with `.noActiveSession` otherwise.
+This example signs a user up with an email and a phone number, in whatever order the server asks for them. Pass `nil` for an identifier the user left empty: an identifier that is not required is then skipped, because the server offers `.signupConfirm` once every required one is verified. An empty value is never sent, because the server rejects it.
 
 ```swift
-func register() async throws -> Credentials {
+/// Runs a step that is expected to continue the flow and returns the `nextActions` it offers.
+func continuation(after step: () async throws -> Void) async throws -> [NextAction] {
     do {
-        try await client.signup().start()
-        throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
+        try await step()
     } catch let error as EmbeddedAuthError {
-        switch error.reason {
-        case .insufficientAuthorization(_, let nextActions):
-            // For example [.identifyEmail]. confirmSignup() is called from handleNextActions
-            // once the server offers .signupConfirm.
-            return try await handleNextActions(nextActions)
-        case .accessDenied:
-            // Rejected before registration. The flow has ended.
-            throw error
-        default:
-            throw error
+        guard case .insufficientAuthorization(_, let nextActions) = error.reason else { throw error }
+        return nextActions
+    }
+    throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
+}
+
+func signUp(email: String?,
+            phone: String?,
+            askForCode: (_ sentTo: String?) async -> String) async throws -> Credentials {
+    var actions = try await continuation {
+        try await client.authorize(connection: connection,
+                                   capabilities: signupCapabilities,
+                                   scope: "openid profile email offline_access",
+                                   audience: nil).start()
+    }
+    // Only start the registration if the connection allows it.
+    guard actions.contains(where: { if case .signup = $0 { return true } else { return false } }) else {
+        throw EmbeddedAuthError(info: ["error": "signup_not_offered"], statusCode: 0)
+    }
+    actions = try await continuation { try await client.signup().start() }
+
+    var identified = Set<IdentifierType>()
+    for _ in 0..<12 {
+        if actions.contains(.signupConfirm) {
+            // Every required identifier is verified: create the account and sign the user in.
+            return try await client.confirmSignup().start()
+        }
+        if let channel = actions.compactMap({ action -> (OtpChannel, String?)? in
+            if case .verifyOTP(let channel, let identifier) = action { return (channel, identifier) }
+            return nil
+        }).first {
+            let code = await askForCode(channel.1)
+            actions = try await continuation {
+                _ = try await client.verifyOtp(code, type: channel.0 == .totp ? .totp : .oob).start()
+            }
+        } else if let index = actions.compactMap({ action -> Int? in
+            if case .challengeEmail(let index, _) = action { return index }
+            return nil
+        }).first {
+            actions = try await continuation { try await client.challengeEmail(index: index).start() }
+        } else if let challenge = actions.compactMap({ action -> (Int, [PhoneDeliveryMethod])? in
+            if case .challengePhone(let index, _, let methods) = action { return (index, methods) }
+            return nil
+        }).first {
+            let method = challenge.1.first ?? .text
+            actions = try await continuation {
+                try await client.challengePhone(index: challenge.0, deliveryMethod: method).start()
+            }
+        } else if actions.contains(.identifyEmail), let email, !email.isEmpty, !identified.contains(.email) {
+            identified.insert(.email)
+            actions = try await continuation { try await client.identify(email, type: .email).start() }
+        } else if actions.contains(.identifyPhone), let phone, !phone.isEmpty, !identified.contains(.phone) {
+            identified.insert(.phone)
+            actions = try await continuation { try await client.identify(phone, type: .phone).start() }
+        } else {
+            throw EmbeddedAuthError(info: ["error": "unsupported_action"], statusCode: 0)
         }
     }
+    throw EmbeddedAuthError(info: ["error": "too_many_steps"], statusCode: 0)
 }
 ```
+
+**Handle rejections.** If the server rejects the new user before registration, for example because of a pre-registration validation or an Action that denies the sign-up, the request fails with `.accessDenied` and the flow ends. Start a new flow with `authorize()` and show the user a generic message. Both `signup()` and `confirmSignup()` need an active session and fail locally with `.noActiveSession` otherwise. If `confirmSignup()` fails with `.network` while exchanging the code, the session is kept and a retry sends the confirmation again.
 
 #### MFA flows
 
