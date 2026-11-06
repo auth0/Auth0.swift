@@ -716,6 +716,149 @@ struct EmbeddedAuthSignupClientTests {
                               channel: "sms")
     }
 
+    /// Sign-up that collects both an email and a phone number. The server decides the order through `nextActions`:
+    /// each identifier is identified and verified in turn, then `signupConfirm` is offered.
+    private func runMultiIdentifierFlow(first: IdentifierType) async throws {
+        let email = "new.user@example.com"
+        let phone = "+15551234567"
+        let (firstValue, firstAction, firstChannel) = first == .email
+            ? (email, identifyEmailAction, "email") : (phone, identifyPhoneAction, "sms")
+        let (secondType, secondValue, secondAction, secondChannel) = first == .email
+            ? (IdentifierType.phone, phone, identifyPhoneAction, "sms") : (IdentifierType.email, email, identifyEmailAction, "email")
+
+        let sut = makeSignupClient()
+        nonisolated(unsafe) var bodies: [SignupRequestBody] = []
+        func respond(session: String, _ nextActions: [[String: Any]]) {
+            EmbeddedAuthSignupMockProtocol.requestHandler = { req in
+                bodies.append(try #require(signupRequestBody(req)))
+                return (signupResponse(status: 403), signupContinuation(session: session, nextActions: nextActions))
+            }
+        }
+
+        // authorize offers both identifiers, and sign-up requires both
+        EmbeddedAuthSignupMockProtocol.requestHandler = { _ in
+            (signupResponse(status: 403),
+             signupContinuation(session: "sess_1",
+                                nextActions: [identifyEmailAction, identifyPhoneAction,
+                                              signupAction(["email": ["required": true], "phone_number": ["required": true]])]))
+        }
+        let authorized = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await sut.authorize(connection: "test-connection").start()
+        }
+        guard case .insufficientAuthorization(_, let offered) = authorized?.reason else {
+            Issue.record("Expected continuation, got \(String(describing: authorized?.reason))"); return
+        }
+        #expect(offered.contains(.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true),
+                                                       SignupIdentifier(type: .phone, isRequired: true)])))
+
+        respond(session: "sess_2", [identifyEmailAction, identifyPhoneAction])
+        _ = try? await sut.signup().start()
+
+        respond(session: "sess_3", [["action": "action:verify:otp:v1", "channel": firstChannel]])
+        _ = try? await sut.identify(firstValue, type: first).start()
+
+        // the first identifier is verified, the second is still needed
+        respond(session: "sess_4", [secondAction])
+        let afterFirst = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await sut.verifyOtp("123456", type: .oob).start()
+        }
+        guard case .insufficientAuthorization(_, let secondOffered) = afterFirst?.reason else {
+            Issue.record("Expected continuation, got \(String(describing: afterFirst?.reason))"); return
+        }
+        #expect(secondOffered == [secondType == .email ? .identifyEmail : .identifyPhone])
+
+        respond(session: "sess_5", [["action": "action:verify:otp:v1", "channel": secondChannel]])
+        _ = try? await sut.identify(secondValue, type: secondType).start()
+
+        respond(session: "sess_6", [signupConfirmAction])
+        _ = try? await sut.verifyOtp("654321", type: .oob).start()
+
+        EmbeddedAuthSignupMockProtocol.requestHandler = { req in
+            if isTokenRequest(req) { return (signupResponse(status: 200), signupCredentials(accessToken: "signup_token")) }
+            bodies.append(try #require(signupRequestBody(req)))
+            return (signupResponse(status: 200), signupAuthCode())
+        }
+        let credentials = try await sut.confirmSignup().start()
+        #expect(credentials.accessToken == "signup_token")
+
+        #expect(bodies.map(\.authSession) == ["sess_1", "sess_2", "sess_3", "sess_4", "sess_5", "sess_6"])
+        #expect(bodies.map(\.action) == ["action:signup:v1", firstAction["action"] as? String, "action:verify:otp:v1",
+                                          secondAction["action"] as? String, "action:verify:otp:v1",
+                                          "action:signup:confirm:v1"])
+        #expect(bodies[1].email == (first == .email ? firstValue : nil))
+        #expect(bodies[1].phone == (first == .phone ? firstValue : nil))
+        #expect(bodies[3].email == (secondType == .email ? secondValue : nil))
+        #expect(bodies[3].phone == (secondType == .phone ? secondValue : nil))
+        await expectNoSession(sut)
+    }
+
+    @Test func fullEmailThenPhoneSignupFlowReturnsCredentials() async throws {
+        try await runMultiIdentifierFlow(first: .email)
+    }
+
+    @Test func fullPhoneThenEmailSignupFlowReturnsCredentials() async throws {
+        try await runMultiIdentifierFlow(first: .phone)
+    }
+
+    /// The phone number is optional (`required: false`): the user verifies only the email, and the server then offers
+    /// `signupConfirm` next to the still-available phone step. Sign-up completes without ever identifying a phone.
+    @Test func optionalPhoneCanBeSkippedAndSignupStillCompletes() async throws {
+        let sut = makeSignupClient()
+        nonisolated(unsafe) var bodies: [SignupRequestBody] = []
+        func respond(session: String, _ nextActions: [[String: Any]]) {
+            EmbeddedAuthSignupMockProtocol.requestHandler = { req in
+                bodies.append(try #require(signupRequestBody(req)))
+                return (signupResponse(status: 403), signupContinuation(session: session, nextActions: nextActions))
+            }
+        }
+
+        EmbeddedAuthSignupMockProtocol.requestHandler = { _ in
+            (signupResponse(status: 403),
+             signupContinuation(session: "sess_1",
+                                nextActions: [identifyEmailAction, identifyPhoneAction,
+                                              signupAction(["email": ["required": true], "phone_number": ["required": false]])]))
+        }
+        let authorized = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await sut.authorize(connection: "test-connection").start()
+        }
+        guard case .insufficientAuthorization(_, let offered) = authorized?.reason else {
+            Issue.record("Expected continuation, got \(String(describing: authorized?.reason))"); return
+        }
+        #expect(offered.contains(.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true),
+                                                       SignupIdentifier(type: .phone, isRequired: false)])))
+
+        respond(session: "sess_2", [identifyEmailAction, identifyPhoneAction])
+        _ = try? await sut.signup().start()
+
+        respond(session: "sess_3", [["action": "action:verify:otp:v1", "channel": "email"]])
+        _ = try? await sut.identify("new.user@example.com", type: .email).start()
+
+        // The email is verified; the optional phone is still offered, and so is the confirmation.
+        respond(session: "sess_4", [identifyPhoneAction, signupConfirmAction])
+        let verified = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await sut.verifyOtp("123456", type: .oob).start()
+        }
+        guard case .insufficientAuthorization(_, let afterVerify) = verified?.reason else {
+            Issue.record("Expected continuation, got \(String(describing: verified?.reason))"); return
+        }
+        #expect(afterVerify == [.identifyPhone, .signupConfirm])
+
+        // Skip the phone number and confirm.
+        EmbeddedAuthSignupMockProtocol.requestHandler = { req in
+            if isTokenRequest(req) { return (signupResponse(status: 200), signupCredentials(accessToken: "signup_token")) }
+            bodies.append(try #require(signupRequestBody(req)))
+            return (signupResponse(status: 200), signupAuthCode())
+        }
+        let credentials = try await sut.confirmSignup().start()
+        #expect(credentials.accessToken == "signup_token")
+
+        #expect(bodies.map(\.action) == ["action:signup:v1", "action:identify:email:v1", "action:verify:otp:v1",
+                                          "action:signup:confirm:v1"])
+        #expect(bodies.map(\.authSession) == ["sess_1", "sess_2", "sess_3", "sess_4"])
+        #expect(!bodies.contains { $0.phone != nil })
+        await expectNoSession(sut)
+    }
+
     // MARK: Default implementations
 
     @Test func existingConformersKeepCompilingAndSignupFailsLocally() async throws {
