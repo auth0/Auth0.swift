@@ -77,6 +77,21 @@ public enum NextAction: Sendable, Equatable {
     /// Server expects ``EmbeddedAuth/confirmSignup()`` to be called to finish registration and sign the user in.
     case confirmSignup
 
+    /// Server offers passkey sign-in: show the system passkey UI built from `options`, then call
+    /// `verifyPasskey(_:)` with the resulting assertion.
+    ///
+    /// Offered in the first `nextActions`, alongside the identify steps. A passkey both identifies and verifies the
+    /// user in one step. The offer is only valid until another step is submitted: after ``EmbeddedAuth/identify(_:type:)``
+    /// it is gone, and only a new ``EmbeddedAuth/authorize(connection:capabilities:scope:audience:)`` offers it again.
+    /// After ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidPasskey`` use the new options from the error,
+    /// never the previous ones.
+    ///
+    /// `verifyPasskey(_:)` is only available on iOS 16.6+, macOS 13.5+ and visionOS 1.0+. On other platforms offer
+    /// another entry from `nextActions`.
+    ///
+    /// - Parameter options: The WebAuthn request options sent by the server.
+    case verifyPasskey(options: PasskeyRequestOptions)
+
     /// An action string the SDK does not recognise — preserved for forward compatibility.
     case unknown(rawAction: String)
 
@@ -173,6 +188,9 @@ enum EmbeddedAction: String, Sendable, CaseIterable {
     /// Confirm the registration and complete the flow.
     case confirmSignup = "action:signup:confirm:v1"
 
+    /// Submit a passkey assertion to sign the user in.
+    case verifyPasskey = "action:verify:passkey:v1"
+
 }
 
 // MARK: - EmbeddedCapability
@@ -219,14 +237,32 @@ public enum EmbeddedCapability: Sendable, Equatable {
     /// SDK can confirm a sign-up.
     case confirmSignup
 
-    /// All capabilities this SDK version supports.
-    public static let all: [EmbeddedCapability] = [
-        .identifyEmail, .identifyPhone, .identifyUsername,
-        .challengeEmail, .challengePhone, .challengePush,
-        .verifyOTP, .verifyOob, .verifyPassword,
-        .verifyRecoveryCode, .confirmRecoveryCode,
-        .signup, .confirmSignup
-    ]
+    /// SDK can verify a passkey.
+    ///
+    /// Included in ``all`` only where the SDK can act on it: iOS 16.6+, macOS 13.5+ and visionOS 1.0+.
+    /// The server only offers a passkey on a custom domain, for a connection with passkey login enabled.
+    case verifyPasskey
+
+    /// All capabilities this SDK version supports on the current platform and OS version.
+    ///
+    /// Includes ``verifyPasskey`` only on iOS 16.6+, macOS 13.5+ and visionOS 1.0+ (checked at runtime), as the
+    /// last entry. To turn passkey sign-in off, pass an explicit list without it, for example
+    /// `EmbeddedCapability.all.filter { $0 != .verifyPasskey }`.
+    public static var all: [EmbeddedCapability] {
+        var capabilities: [EmbeddedCapability] = [
+            .identifyEmail, .identifyPhone, .identifyUsername,
+            .challengeEmail, .challengePhone, .challengePush,
+            .verifyOTP, .verifyOob, .verifyPassword,
+            .verifyRecoveryCode, .confirmRecoveryCode,
+            .signup, .confirmSignup
+        ]
+        #if PASSKEYS_PLATFORM
+        if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
+            capabilities.append(.verifyPasskey)
+        }
+        #endif
+        return capabilities
+    }
 
     var action: EmbeddedAction {
         switch self {
@@ -243,6 +279,7 @@ public enum EmbeddedCapability: Sendable, Equatable {
         case .confirmRecoveryCode: return .confirmRecoveryCode
         case .signup:              return .signup
         case .confirmSignup:       return .confirmSignup
+        case .verifyPasskey:       return .verifyPasskey
         }
     }
 
