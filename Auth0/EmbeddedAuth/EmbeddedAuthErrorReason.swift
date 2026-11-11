@@ -5,7 +5,7 @@ import Foundation
 /// Branch on ``EmbeddedAuthError/reason`` with an exhaustive `switch` to handle each case.
 /// Only ``insufficientAuthorization(reason:nextActions:)`` is non-terminal; all other cases
 /// mean the flow has ended and a new ``EmbeddedAuth/authorize(connection:)`` call is required
-/// (except ``network``, where retrying the same step is safe).
+/// (except ``network`` and ``invalidInput(_:)``, where the same step can be tried again).
 ///
 public enum EmbeddedAuthErrorReason: Sendable {
 
@@ -82,13 +82,21 @@ public enum EmbeddedAuthErrorReason: Sendable {
     ///
     /// The session is preserved — retrying the same step is safe. That includes the final token exchange of
     /// ``EmbeddedAuth/verifyOtp(_:type:)``, ``EmbeddedAuth/verifyPassword(_:)``, ``EmbeddedAuth/verifyOob()``,
-    /// and ``EmbeddedAuth/confirmRecoveryCode()``.
+    /// ``EmbeddedAuth/confirmRecoveryCode()``, ``EmbeddedAuth/confirmSignup()`` and `verifyPasskey(_:)`.
+    /// The SDK doesn't keep a passkey assertion, so retrying `verifyPasskey(_:)` means passing the same assertion
+    /// again; if the failure hit the token exchange, the server decides whether it still accepts it.
     case network
 
     /// Client-side guard: no flow is in progress.
     ///
     /// Call ``EmbeddedAuth/authorize(connection:)`` first.
     case noActiveSession
+
+    /// Client-side guard: a local check on the input failed, so nothing was sent and the session is kept.
+    ///
+    /// The associated message says what to fix, for example a passkey without a user handle (only discoverable
+    /// passkeys are supported). It never contains passkey data. Fix the input and call the same step again.
+    case invalidInput(String)
 
     /// An error this SDK version does not classify.
     ///
@@ -118,5 +126,12 @@ public enum EmbeddedAuthErrorReason: Sendable {
 
         /// The client is polling too frequently and should back off before retrying.
         case slowDown
+
+        /// The passkey couldn't be verified.
+        ///
+        /// Show the passkey UI again with the new options from `nextActions` (the previous assertion can't be
+        /// reused and the previous options must not be reused either), or offer another option from `nextActions`.
+        /// The server doesn't say why verification failed.
+        case invalidPasskey
     }
 }
