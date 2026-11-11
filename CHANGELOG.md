@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.0.0-beta.3](https://github.com/auth0/Auth0.swift/tree/4.0.0-beta.3) (2026-11-11)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/4.0.0-beta.2...4.0.0-beta.3)
+
+**Added**
+- feat(embedded-auth): add signup and confirmSignup [\#1325](https://github.com/auth0/Auth0.swift/pull/1325) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [4.0.0-beta.2](https://github.com/auth0/Auth0.swift/tree/4.0.0-beta.2) (2026-11-03)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/4.0.0-beta.1...4.0.0-beta.2)
 
