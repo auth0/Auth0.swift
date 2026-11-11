@@ -675,8 +675,10 @@ private extension ContentViewModel {
             embeddedAuthUIState = .confirmRecoveryCode(newCode: newCode)
         case .confirmSignup:
             embeddedAuthUIState = .confirmSignup
-        case .signup, .unknown:
+        case .signup, .verifyPasskey, .unknown:
             // Sign-up has no screen of its own: `startEmbeddedFlow(signingUp:)` calls `signup()` when it is offered.
+            // The demo has no passkey screen either (it needs associated domains and a custom domain tenant), so the
+            // caller falls back to another entry of the same menu.
             currentAction = nil
             return false
         }

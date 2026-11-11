@@ -38,14 +38,22 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     ///   will clear `currentSession` and overwrite whatever the new `authorize()` established.
     var currentSession: String?
 
+    /// Unified log used for SDK diagnostics that are not network traces. Injectable for tests.
+    let unifiedLog: Auth0Log
+
+    /// Whether the "passkey wasn't offered" debug message was already logged by this client.
+    var hasLoggedPasskeyNotOffered = false
+
     init(clientId: String,
          url: URL,
          session: URLSession = .shared,
-         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo()) {
+         auth0ClientInfo: Auth0ClientInfo = Auth0ClientInfo(),
+         unifiedLog: Auth0Log = .shared) {
         self.clientId = clientId
         self.url = url
         self.session = session
         self.auth0ClientInfo = auth0ClientInfo
+        self.unifiedLog = unifiedLog
     }
 
     // MARK: Authorization loop
@@ -63,7 +71,7 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
             "scope": scope
         ]
         if let audience { body["audience"] = audience }
-        return authorizeRequest(body: body)
+        return authorizeRequest(body: body, declaresPasskey: capabilities.contains(.verifyPasskey))
     }
 
     /// Submits a user identifier to continue the authorization flow.
@@ -265,12 +273,18 @@ struct AuthorizationCodeResponse: Decodable {
 extension Auth0EmbeddedAuth {
 
     /// Builds a `POST /e/authorize` request for an intermediate step of the loop.
-    func authorizeRequest(body: [String: Any]) -> Request<Void, EmbeddedAuthError> {
+    ///
+    /// - Parameter declaresPasskey: Whether the request advertises the passkey capability, so that a missing passkey
+    ///   offer in the response can be reported in the debug log.
+    func authorizeRequest(body: [String: Any], declaresPasskey: Bool = false) -> Request<Void, EmbeddedAuthError> {
         Request(
             session: session,
             url: url.appending("e/authorize"),
             method: "POST",
-            handle: { [self] result, callback in decodeAuthorizeResponse(result, callback: callback) },
+            handle: { [self] result, callback in
+                if declaresPasskey { logPasskeyNotOfferedIfNeeded(result) }
+                decodeAuthorizeResponse(result, callback: callback)
+            },
             parameters: body,
             logger: logger,
             auth0ClientInfo: auth0ClientInfo
@@ -329,9 +343,9 @@ extension Auth0EmbeddedAuth {
 
 }
 
-// MARK: - Private
+// MARK: - Local failures
 
-private extension Auth0EmbeddedAuth {
+extension Auth0EmbeddedAuth {
 
     func missingSessionRequest<T: Sendable>() -> Request<T, EmbeddedAuthError> {
         Request(
@@ -343,6 +357,26 @@ private extension Auth0EmbeddedAuth {
                 callback(.failure(EmbeddedAuthError(
                     info: ["error": "no_active_session",
                            "error_description": "No active embedded auth session. Call authorize() first."],
+                    statusCode: 0
+                )))
+            },
+            logger: logger,
+            auth0ClientInfo: auth0ClientInfo
+        )
+    }
+
+    /// Fails the request locally because the input is not valid: nothing is sent and the session is kept.
+    ///
+    /// The message must never contain secrets such as passkey data.
+    func invalidInputRequest<T: Sendable>(message: String) -> Request<T, EmbeddedAuthError> {
+        Request(
+            session: session,
+            url: url.appending("e/authorize"),
+            method: "POST",
+            requestValidator: [EmbeddedAuthInputValidator(message: message)],
+            handle: { _, callback in
+                callback(.failure(EmbeddedAuthError(
+                    info: ["error": "invalid_input", "error_description": message],
                     statusCode: 0
                 )))
             },

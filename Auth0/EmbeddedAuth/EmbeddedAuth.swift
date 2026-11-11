@@ -57,6 +57,11 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// which this SDK reports as ``EmbeddedAuthErrorReason/accessDenied``. The default ``EmbeddedCapability/all``
     /// includes both.
     ///
+    /// The default ``EmbeddedCapability/all`` also advertises ``EmbeddedCapability/verifyPasskey`` where the platform
+    /// supports passkeys, so the server may offer ``NextAction/verifyPasskey(options:)``. Choose the step to present
+    /// by the type of the entry in `nextActions`, never by its position. To turn passkey sign-in off, pass an explicit
+    /// list of capabilities without ``EmbeddedCapability/verifyPasskey``.
+    ///
     /// - Parameters:
     ///   - connection:   Connection name to target.
     ///   - capabilities: Actions this SDK version supports. Defaults to ``EmbeddedCapability/all``.
@@ -184,6 +189,36 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// kept; retrying sends the confirmation again, and the server decides whether it can still be completed.
     func confirmSignup() -> Request<Credentials, EmbeddedAuthError>
 
+    #if PASSKEYS_PLATFORM
+    /// Submits a passkey assertion to sign the user in.
+    ///
+    /// Call this when ``NextAction/verifyPasskey(options:)`` is among the `nextActions`, after the user picked a
+    /// passkey in the system UI built from ``PasskeyRequestOptions/assertionRequest()``. A passkey both identifies
+    /// and verifies the user. Only discoverable passkeys are supported.
+    ///
+    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    /// If a second factor is also required, the request instead fails with
+    /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the MFA actions in `nextActions`.
+    ///
+    /// If the passkey couldn't be verified, the request fails with
+    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidPasskey``. Show the passkey UI again with the new
+    /// options found in `nextActions` (the previous assertion can't be reused), or offer another option. The server
+    /// might not offer the passkey again, so look for ``NextAction/verifyPasskey(options:)`` before showing the UI.
+    ///
+    /// If the assertion has no user handle or lacks required data, the request fails locally with
+    /// ``EmbeddedAuthErrorReason/invalidInput(_:)``: nothing is sent and the session is kept.
+    ///
+    /// Requires an active session, and the passkey must still be on offer: call this right after receiving a
+    /// `nextActions` that contains ``NextAction/verifyPasskey(options:)``, before submitting any other step. If the
+    /// request fails with ``EmbeddedAuthErrorReason/network``, the session is kept; retrying means passing the same
+    /// assertion again, and the server decides whether it still accepts it.
+    ///
+    /// - Parameter passkey: The assertion obtained from `ASAuthorizationControllerDelegate`
+    ///   (an `ASAuthorizationPlatformPublicKeyCredentialAssertion`).
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func verifyPasskey(_ passkey: any LoginPasskey) -> Request<Credentials, EmbeddedAuthError>
+    #endif
+
 }
 
 public extension EmbeddedAuth {
@@ -195,4 +230,28 @@ public extension EmbeddedAuth {
                   scope: "openid profile email offline_access",
                   audience: nil)
     }
+
+    #if PASSKEYS_PLATFORM
+    /// Default implementation of ``verifyPasskey(_:)`` for types outside the SDK that conform to ``EmbeddedAuth``.
+    ///
+    /// Sends no request: it fails with an ``EmbeddedAuthError`` whose ``EmbeddedAuthError/code`` is
+    /// `a0.sdk.internal_error.not_implemented`. Implement ``verifyPasskey(_:)`` in your conforming type to support it.
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func verifyPasskey(_ passkey: any LoginPasskey) -> Request<Credentials, EmbeddedAuthError> {
+        // The validator fails the request before any data task is created, so the session and URL are never used.
+        Request(session: .shared,
+                url: URL(fileURLWithPath: "/"),
+                method: "POST",
+                requestValidator: [EmbeddedAuthNotImplementedValidator(requirement: "verifyPasskey(_:)")],
+                handle: { _, callback in
+                    callback(.failure(EmbeddedAuthError(
+                        info: ["error": notImplementedError,
+                               "error_description": "verifyPasskey(_:) is not implemented by this EmbeddedAuth conformance."],
+                        statusCode: 0
+                    )))
+                },
+                logger: logger,
+                auth0ClientInfo: auth0ClientInfo)
+    }
+    #endif
 }

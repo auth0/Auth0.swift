@@ -656,30 +656,35 @@
 		D41DED402DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
 		D454629D306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546294306CE4DC002957D8 /* Auth0EmbeddedAuth.swift */; };
 		D454629E306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629A306CE4DC002957D8 /* EmbeddedAuthNextAction.swift */; };
+		D4546A02306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546A01306CE4DC002957D8 /* EmbeddedAuthPasskey.swift */; };
 		D454629F306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546298306CE4DC002957D8 /* EmbeddedAuthError.swift */; };
 		D45462A0306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546296306CE4DC002957D8 /* EmbeddedAuth.swift */; };
 		D45462A2306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */; };
 		D45462A3306CE4DC002957D8 /* EmbeddedAuthHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546299306CE4DC002957D8 /* EmbeddedAuthHandlers.swift */; };
 		D45462A5306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546294306CE4DC002957D8 /* Auth0EmbeddedAuth.swift */; };
 		D45462A6306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629A306CE4DC002957D8 /* EmbeddedAuthNextAction.swift */; };
+		D4546A03306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546A01306CE4DC002957D8 /* EmbeddedAuthPasskey.swift */; };
 		D45462A7306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546298306CE4DC002957D8 /* EmbeddedAuthError.swift */; };
 		D45462A8306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546296306CE4DC002957D8 /* EmbeddedAuth.swift */; };
 		D45462AA306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */; };
 		D45462AB306CE4DC002957D8 /* EmbeddedAuthHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546299306CE4DC002957D8 /* EmbeddedAuthHandlers.swift */; };
 		D45462AD306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546294306CE4DC002957D8 /* Auth0EmbeddedAuth.swift */; };
 		D45462AE306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629A306CE4DC002957D8 /* EmbeddedAuthNextAction.swift */; };
+		D4546A04306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546A01306CE4DC002957D8 /* EmbeddedAuthPasskey.swift */; };
 		D45462AF306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546298306CE4DC002957D8 /* EmbeddedAuthError.swift */; };
 		D45462B0306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546296306CE4DC002957D8 /* EmbeddedAuth.swift */; };
 		D45462B2306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */; };
 		D45462B3306CE4DC002957D8 /* EmbeddedAuthHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546299306CE4DC002957D8 /* EmbeddedAuthHandlers.swift */; };
 		D45462B5306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546294306CE4DC002957D8 /* Auth0EmbeddedAuth.swift */; };
 		D45462B6306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629A306CE4DC002957D8 /* EmbeddedAuthNextAction.swift */; };
+		D4546A05306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546A01306CE4DC002957D8 /* EmbeddedAuthPasskey.swift */; };
 		D45462B7306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546298306CE4DC002957D8 /* EmbeddedAuthError.swift */; };
 		D45462B8306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546296306CE4DC002957D8 /* EmbeddedAuth.swift */; };
 		D45462BA306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */; };
 		D45462BB306CE4DC002957D8 /* EmbeddedAuthHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546299306CE4DC002957D8 /* EmbeddedAuthHandlers.swift */; };
 		D45462BD306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546294306CE4DC002957D8 /* Auth0EmbeddedAuth.swift */; };
 		D45462BE306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629A306CE4DC002957D8 /* EmbeddedAuthNextAction.swift */; };
+		D4546A06306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546A01306CE4DC002957D8 /* EmbeddedAuthPasskey.swift */; };
 		D45462BF306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546298306CE4DC002957D8 /* EmbeddedAuthError.swift */; };
 		D45462C0306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4546296306CE4DC002957D8 /* EmbeddedAuth.swift */; };
 		D45462C2306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */; };
@@ -1211,6 +1216,7 @@
 		D4546298306CE4DC002957D8 /* EmbeddedAuthError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthError.swift; sourceTree = "<group>"; };
 		D4546299306CE4DC002957D8 /* EmbeddedAuthHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthHandlers.swift; sourceTree = "<group>"; };
 		D454629A306CE4DC002957D8 /* EmbeddedAuthNextAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthNextAction.swift; sourceTree = "<group>"; };
+		D4546A01306CE4DC002957D8 /* EmbeddedAuthPasskey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthPasskey.swift; sourceTree = "<group>"; };
 		D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthSessionValidator.swift; sourceTree = "<group>"; };
 		D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedAuthErrorReason.swift; sourceTree = "<group>"; };
 		D46390902F18F28700FD84D7 /* RequestValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestValidator.swift; sourceTree = "<group>"; };
@@ -1988,6 +1994,7 @@
 				D4546442306DEAE1002957D8 /* EmbeddedAuthErrorReason.swift */,
 				D4546299306CE4DC002957D8 /* EmbeddedAuthHandlers.swift */,
 				D454629A306CE4DC002957D8 /* EmbeddedAuthNextAction.swift */,
+				D4546A01306CE4DC002957D8 /* EmbeddedAuthPasskey.swift */,
 				D454629B306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift */,
 			);
 			path = EmbeddedAuth;
@@ -2801,6 +2808,7 @@
 				D499DB242E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */,
 				D45462AD306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */,
 				D45462AE306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */,
+				D4546A04306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */,
 				D45462AF306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */,
 				D45462B0306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */,
 				D45462B2306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */,
@@ -2925,6 +2933,7 @@
 				5C0AF09E2833420200162044 /* WebAuthentication.swift in Sources */,
 				D45462A5306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */,
 				D45462A6306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */,
+				D4546A03306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */,
 				D45462A7306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */,
 				D45462A8306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */,
 				D45462AA306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */,
@@ -3262,6 +3271,7 @@
 				5C80980E275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
 				D45462B5306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */,
 				D45462B6306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */,
+				D4546A05306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */,
 				D45462B7306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */,
 				D45462B8306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */,
 				D45462BA306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */,
@@ -3370,6 +3380,7 @@
 				5C80980D275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
 				D45462BD306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */,
 				D45462BE306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */,
+				D4546A06306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */,
 				D45462BF306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */,
 				D45462C0306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */,
 				D45462C2306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */,
@@ -3569,6 +3580,7 @@
 				C1B3BA222C24B6D4004A32A4 /* WebAuthentication.swift in Sources */,
 				D454629D306CE4DC002957D8 /* Auth0EmbeddedAuth.swift in Sources */,
 				D454629E306CE4DC002957D8 /* EmbeddedAuthNextAction.swift in Sources */,
+				D4546A02306CE4DC002957D8 /* EmbeddedAuthPasskey.swift in Sources */,
 				D454629F306CE4DC002957D8 /* EmbeddedAuthError.swift in Sources */,
 				D45462A0306CE4DC002957D8 /* EmbeddedAuth.swift in Sources */,
 				D45462A2306CE4DC002957D8 /* EmbeddedAuthSessionValidator.swift in Sources */,

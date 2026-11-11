@@ -280,6 +280,55 @@ class SensitiveDataRedactorSpec: QuickSpec {
                     expect(result).to(contain("<REDACTED>"))
                     expect(result).to(contain("client_id"))
                 }
+
+                it("should redact authn_response and everything inside it") {
+                    let json = """
+                    {
+                        "action": "action:verify:passkey:v1",
+                        "authn_response": {
+                            "id": "credential-id-value",
+                            "response": {
+                                "signature": "signature-value",
+                                "userHandle": "user-handle-value"
+                            }
+                        }
+                    }
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).toNot(contain("credential-id-value"))
+                    expect(result).toNot(contain("signature-value"))
+                    expect(result).toNot(contain("user-handle-value"))
+                    expect(result).to(contain("action:verify:passkey:v1"))
+                }
+
+                it("should redact the challenge nested in a response") {
+                    let json = """
+                    {
+                        "next": [
+                            {
+                                "action": "action:verify:passkey:v1",
+                                "authn_params_public_key": {
+                                    "challenge": "challenge-value",
+                                    "rpId": "login.example.com"
+                                }
+                            }
+                        ]
+                    }
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).toNot(contain("challenge-value"))
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).to(contain("login.example.com"))
+                }
             }
         }
     }
