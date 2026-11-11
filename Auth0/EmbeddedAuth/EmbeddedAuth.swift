@@ -53,14 +53,15 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// on the first call; read its associated `nextActions` to determine which step to present.
     ///
     /// The server only offers the username step when
-    /// ``EmbeddedCapability/verifyPassword`` is also advertised. Otherwise it answers with `access_denied`,
-    /// which this SDK reports as ``EmbeddedAuthErrorReason/accessDenied``. The default ``EmbeddedCapability/all``
-    /// includes both.
+    /// ``EmbeddedCapability/verifyPassword`` is also advertised. Otherwise it answers with `access_denied` and
+    /// `no_next_steps`, which this SDK reports as ``EmbeddedAuthErrorReason/noNextSteps``. The default
+    /// ``EmbeddedCapability/all`` includes both.
     ///
     /// - Parameters:
     ///   - connection:   Connection name to target.
     ///   - capabilities: Actions this SDK version supports. Defaults to ``EmbeddedCapability/all``.
-    ///   - scope:        OAuth scope string. Defaults to `"openid profile email offline_access"`.
+    ///   - scope:        OAuth scope string. Defaults to `"openid profile email offline_access"`. `openid` is added
+    ///                   when missing, as the ID token returned at the end of the flow is validated.
     ///   - audience:     Optional API audience.
     func authorize(connection: String,
                    capabilities: [EmbeddedCapability],
@@ -87,6 +88,11 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///
     /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
     ///
+    /// The ID token in the credentials is validated first: its signature and its `iss`, `sub`, `aud`, `exp` and `iat`
+    /// claims, plus `azp` when there are several audiences. This fetches the tenant's public signing keys. If
+    /// validation fails, the call throws an ``EmbeddedAuthError`` with ``Auth0Error/cause`` set to the validation
+    /// error, and the flow ends.
+    ///
     /// Requires an active session.
     ///
     /// - Parameters:
@@ -101,6 +107,11 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
     /// If a second factor is also required, the request instead fails with
     /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the MFA actions in `nextActions`.
+    ///
+    /// The ID token in the credentials is validated first: its signature and its `iss`, `sub`, `aud`, `exp` and `iat`
+    /// claims, plus `azp` when there are several audiences. This fetches the tenant's public signing keys. If
+    /// validation fails, the call throws an ``EmbeddedAuthError`` with ``Auth0Error/cause`` set to the validation
+    /// error, and the flow ends.
     ///
     /// Requires an active session.
     ///
@@ -136,6 +147,11 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///
     /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
     ///
+    /// The ID token in the credentials is validated first: its signature and its `iss`, `sub`, `aud`, `exp` and `iat`
+    /// claims, plus `azp` when there are several audiences. This fetches the tenant's public signing keys. If
+    /// validation fails, the call throws an ``EmbeddedAuthError`` with ``Auth0Error/cause`` set to the validation
+    /// error, and the flow ends.
+    ///
     /// Requires an active session.
     func verifyOob() -> Request<Credentials, EmbeddedAuthError>
 
@@ -152,6 +168,11 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// Confirms the user has recorded their rotated recovery code and completes the flow.
     ///
     /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    ///
+    /// The ID token in the credentials is validated first: its signature and its `iss`, `sub`, `aud`, `exp` and `iat`
+    /// claims, plus `azp` when there are several audiences. This fetches the tenant's public signing keys. If
+    /// validation fails, the call throws an ``EmbeddedAuthError`` with ``Auth0Error/cause`` set to the validation
+    /// error, and the flow ends.
     ///
     /// Requires an active session.
     func confirmRecoveryCode() -> Request<Credentials, EmbeddedAuthError>

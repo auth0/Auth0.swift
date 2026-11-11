@@ -629,6 +629,7 @@
 		C1B3BA4D2C24BA38004A32A5 /* SpyCredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552E23C9123100C89616 /* SpyCredentialsStorage.swift */; };
 		C1B3BA4E2C24BA37004A32A4 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
 		C1B3BA4F2C24BA37004A32A4 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
+		7D3C1E52A9B84F06D2E1C0A7 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		C1B3BA502C24BA37004A32A4 /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
 		C2A1F2DB6DB54F13B63CB723 /* Array+Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F551923C8FB8E00C89615 /* Array+Encode.swift */; };
 		C2C8D01D435A1F94B294E74A /* MyAccountProfileSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41A6BB95FF12397D7A0BB3EE /* MyAccountProfileSpec.swift */; };
@@ -3406,6 +3407,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F331B0F1D4BB80700AE4382 /* Responses.swift in Sources */,
+				7D3C1E52A9B84F06D2E1C0A7 /* Generators.swift in Sources */,
 				5B6EE39620F8AEDB00264AC7 /* CredentialsManagerSpec.swift in Sources */,
 				5CCDDC422E29703100079840 /* KeychainKeyStoreSpec.swift in Sources */,
 				D581CF792757D773007327D1 /* RequestSpec.swift in Sources */,

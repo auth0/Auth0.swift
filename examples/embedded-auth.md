@@ -32,7 +32,7 @@ let client = Auth0.embeddedAuth()
 > [!NOTE]
 > New next actions can be added in future releases, and `.signup` / `.confirmSignup` were added during the v4 beta. If you switch over `NextAction` or `EmbeddedCapability`, keep a `default:` branch (or handle `.unknown`) so new cases don't break your build.
 
-`authorize(connection:)` uses a default scope of `"openid profile email offline_access"`, which ensures `Credentials.idToken` is populated after a successful `verifyOtp` or `verifyPassword`. Pass a custom `scope:` to the full `authorize(connection:capabilities:scope:audience:)` overload if needed.
+`authorize(connection:)` uses a default scope of `"openid profile email offline_access"`, which ensures `Credentials.idToken` is populated after a successful `verifyOtp` or `verifyPassword`. Pass a custom `scope:` to the full `authorize(connection:capabilities:scope:audience:)` overload if needed. `openid` is added to a custom scope that lacks it, because the SDK validates the ID token.
 
 ```swift
 func runEmbeddedAuth(connection: String) async throws -> Credentials {
