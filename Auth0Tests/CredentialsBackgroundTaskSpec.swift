@@ -1,6 +1,7 @@
 import Foundation
 import Quick
 import Nimble
+import SimpleKeychain
 
 @testable import Auth0
 
@@ -315,6 +316,67 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                         credentialsManager.credentials { _ in }
                     }
 
+                    expect(provider.endedIdentifiers) == [TaskIdentifier]
+                    expect(refreshToken(in: storage)) == RefreshToken
+                }
+
+                it("should end the task when storing the renewed credentials fails") {
+                    class MockStore: CredentialsStorage {
+                        func getEntry(forKey: String) throws -> Data {
+                            return try NSKeyedArchiver.archivedData(withRootObject: Credentials(refreshToken: RefreshToken), requiringSecureCoding: true)
+                        }
+                        func setEntry(_ data: Data, forKey: String) throws {
+                            throw SimpleKeychainError.interactionNotAllowed
+                        }
+                        func deleteAllEntries() throws {}
+                        func deleteEntry(forKey: String) throws {}
+                    }
+
+                    credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
+                    credentialsManager.backgroundTaskProvider = provider
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresAt: ExpiresIn))
+                    var receivedResult: CredentialsManagerResult<Credentials>?
+
+                    waitUntil(timeout: Timeout) { done in
+                        let completion = DispatchGroup()
+                        completion.enter()
+                        completion.enter()
+                        provider.onEnd = { completion.leave() }
+                        credentialsManager.credentials {
+                            receivedResult = $0
+                            completion.leave()
+                        }
+                        completion.notify(queue: .main) { done() }
+                    }
+
+                    expect(receivedResult).to(haveCredentialsManagerError(CredentialsManagerError(code: .storeFailed, cause: SimpleKeychainError.interactionNotAllowed)))
+                    expect(provider.startedNames) == ["Auth0.credentials"]
+                    expect(provider.endedIdentifiers) == [TaskIdentifier]
+                }
+
+                it("should end the task when the renewed credentials cannot satisfy minTTL") {
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresAt: ExpiresIn))
+                    try? credentialsManager.store(credentials: expiredCredentials)
+                    var receivedResult: CredentialsManagerResult<Credentials>?
+
+                    waitUntil(timeout: Timeout) { done in
+                        let completion = DispatchGroup()
+                        completion.enter()
+                        completion.enter()
+                        provider.onEnd = { completion.leave() }
+                        credentialsManager.credentials(minTTL: 100_000) {
+                            receivedResult = $0
+                            completion.leave()
+                        }
+                        completion.notify(queue: .main) { done() }
+                    }
+
+                    if case .failure(let error) = receivedResult, case .largeMinTTL(let minTTL, _) = error.code {
+                        expect(minTTL) == 100_000
+                    } else {
+                        fail("Expected a largeMinTTL error")
+                    }
+                    expect(provider.startedNames) == ["Auth0.credentials"]
                     expect(provider.endedIdentifiers) == [TaskIdentifier]
                     expect(refreshToken(in: storage)) == RefreshToken
                 }

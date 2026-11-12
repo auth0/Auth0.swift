@@ -24,6 +24,7 @@ protocol BackgroundTaskProvider: Sendable {
 /// Uses `UIApplication` where it is available. On the other platforms, no task is started.
 struct SystemBackgroundTaskProvider: BackgroundTaskProvider {
 
+    /// Starts a UIKit background task, or returns nil when background execution is unavailable.
     func begin(name: String, expirationHandler: @escaping @MainActor @Sendable () -> Void) -> Int? {
         #if canImport(UIKit) && !os(watchOS)
         guard let application = UIApplication.sharedIfAvailable() else { return nil }
@@ -47,6 +48,7 @@ private extension UIApplication {
 
     // UIApplication.shared is unavailable in app extensions, so look it up at runtime. Background tasks cannot be used
     // from an app extension, so do not return the application there.
+    // sharedApplication is a public selector, using the same lookup pattern as MobileWebAuth.swift.
     nonisolated static func sharedIfAvailable() -> UIApplication? {
         guard Bundle.main.bundleURL.pathExtension != "appex" else { return nil }
         return UIApplication.perform(NSSelectorFromString("sharedApplication"))?.takeUnretainedValue() as? UIApplication
@@ -74,6 +76,7 @@ final class CredentialsBackgroundTask: @unchecked Sendable {
     private var identifier: Int?
     private var hasEnded = false
 
+    /// Starts the task and handles expiration even if it arrives before the provider returns an identifier.
     init(name: String, provider: BackgroundTaskProvider) {
         self.provider = provider
         // The system terminates the app if an expired task is not ended, so always end it here.
