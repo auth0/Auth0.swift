@@ -19,6 +19,8 @@
 
 The Credentials Manager utility allows you to securely store and retrieve the user's credentials from the Keychain.
 
+In UIKit apps (iOS, Mac Catalyst, tvOS, and visionOS), the Credentials Manager automatically requests limited background execution time for refresh token exchanges and stores the result before ending the task. No `UIBackgroundModes` entry is needed. This is best effort and does not apply to app extensions; a request can still be lost if the system expires the task, the app crashes, or the user force quits it.
+
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 ```

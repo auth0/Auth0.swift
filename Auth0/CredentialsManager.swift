@@ -38,6 +38,7 @@ public struct CredentialsManager: Sendable {
     private let sessionExpiryKey: String
     private let authentication: Authentication
     private let maxRetries: Int
+    var backgroundTaskProvider: BackgroundTaskProvider = Auth0SystemBackgroundTaskProvider()
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     // Biometric session management - using a class to allow mutation in non-mutating methods
@@ -869,8 +870,19 @@ public struct CredentialsManager: Sendable {
                                          callback: callback)
     }
 
-    // swiftlint:disable:next function_parameter_count function_body_length
-    private func retrieveCredentialsWithRetry(scope: String?,
+    /// Starts a background task and returns a callback that calls `callback` and then ends the task. Use it just before
+    /// a request, so that the task keeps the app running until the result of the request is stored.
+    private func withBackgroundTask<T>(named name: String,
+                                       callback: @escaping @Sendable (CredentialsManagerResult<T>) -> Void) -> @Sendable (CredentialsManagerResult<T>) -> Void {
+        let backgroundTask = CredentialsBackgroundTask(name: name, provider: self.backgroundTaskProvider)
+        return { result in
+            callback(result)
+            backgroundTask.end()
+        }
+    }
+
+    /// Renews stored credentials when required, keeping one background task across the request and any retries.
+    private func retrieveCredentialsWithRetry(scope: String?, // swiftlint:disable:this function_parameter_count function_body_length
                                              minTTL: Int,
                                              parameters: [String: Any],
                                              headers: [String: String],
@@ -903,6 +915,9 @@ public struct CredentialsManager: Sendable {
 
                 try self.validateDPoPState(for: credentials)
 
+                // A retry keeps the task of the first attempt, because its callback already ends that task.
+                let callback = retryCount == 0 ? self.withBackgroundTask(named: "Auth0.credentials", callback: callback) : callback
+
                 self.authentication
                     .renew(withRefreshToken: refreshToken, scope: scope)
                     .parameters(params.asParameters)
@@ -912,20 +927,20 @@ public struct CredentialsManager: Sendable {
                         case .success(let credentials):
                             let newCredentials = Credentials(from: credentials,
                                                              refreshToken: credentials.refreshToken ?? refreshToken)
-                            if self.willExpire(newCredentials.expiresAt, within: minTTL) {
-                                let tokenTTL = Int(newCredentials.expiresAt.timeIntervalSinceNow)
-                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
-                                complete()
-                                callback(.failure(error))
-                            } else {
-                                do {
-                                    try self.store(credentials: newCredentials)
+                            do {
+                                try self.store(credentials: newCredentials)
+                                if self.willExpire(newCredentials.expiresAt, within: minTTL) {
+                                    let tokenTTL = Int(newCredentials.expiresAt.timeIntervalSinceNow)
+                                    let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
+                                    complete()
+                                    callback(.failure(error))
+                                } else {
                                     complete()
                                     callback(.success(newCredentials))
-                                } catch {
-                                    complete()
-                                    callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                                 }
+                            } catch {
+                                complete()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                             }
                         case .failure(let error):
                             complete()
@@ -962,6 +977,7 @@ public struct CredentialsManager: Sendable {
         return error.isRetryable
     }
 
+    /// Exchanges the refresh token for SSO credentials and stores any rotated token before completing.
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
                                         callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
@@ -982,6 +998,8 @@ public struct CredentialsManager: Sendable {
                     return callback(.failure(.noRefreshToken))
                 }
                 try self.validateDPoPState(for: credentials)
+
+                let callback = self.withBackgroundTask(named: "Auth0.ssoCredentials", callback: callback)
 
                 self.authentication
                     .ssoExchange(withRefreshToken: refreshToken)
@@ -1016,8 +1034,8 @@ public struct CredentialsManager: Sendable {
         }
     }
 
-    // swiftlint:disable:next function_body_length function_parameter_count
-    private func retrieveAPICredentials(audience: String,
+    /// Retrieves API credentials, keeping a background task open during an exchange and storage of its result.
+    private func retrieveAPICredentials(audience: String, // swiftlint:disable:this function_body_length function_parameter_count
                                         scope: String?,
                                         minTTL: Int,
                                         parameters: [String: Any],
@@ -1048,6 +1066,8 @@ public struct CredentialsManager: Sendable {
                 }
                 try self.validateDPoPState(for: currentCredentials)
 
+                let callback = self.withBackgroundTask(named: "Auth0.apiCredentials", callback: callback)
+
                 self.authentication
                     .renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
                     .parameters(params.asParameters)
@@ -1059,21 +1079,21 @@ public struct CredentialsManager: Sendable {
                                                              idToken: credentials.idToken,
                                                              refreshToken: credentials.refreshToken ?? refreshToken)
                             let newAPICredentials = APICredentials(from: credentials)
-                            if self.willExpire(newAPICredentials.expiresAt, within: minTTL) {
-                                let tokenTTL = Int(newAPICredentials.expiresAt.timeIntervalSinceNow)
-                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
-                                complete()
-                                callback(.failure(error))
-                            } else {
-                                do {
-                                    try self.store(credentials: newCredentials)
-                                    try self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope)
+                            do {
+                                try self.store(credentials: newCredentials)
+                                try self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope)
+                                if self.willExpire(newAPICredentials.expiresAt, within: minTTL) {
+                                    let tokenTTL = Int(newAPICredentials.expiresAt.timeIntervalSinceNow)
+                                    let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
+                                    complete()
+                                    callback(.failure(error))
+                                } else {
                                     complete()
                                     callback(.success(newAPICredentials))
-                                } catch {
-                                    complete()
-                                    callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                                 }
+                            } catch {
+                                complete()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                             }
                         case .failure(let error):
                             complete()
