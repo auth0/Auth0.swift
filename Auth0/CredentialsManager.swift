@@ -38,7 +38,7 @@ public struct CredentialsManager: Sendable {
     private let sessionExpiryKey: String
     private let authentication: Authentication
     private let maxRetries: Int
-    var backgroundTaskProvider: BackgroundTaskProvider = SystemBackgroundTaskProvider()
+    var backgroundTaskProvider: BackgroundTaskProvider = Auth0SystemBackgroundTaskProvider()
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     // Biometric session management - using a class to allow mutation in non-mutating methods

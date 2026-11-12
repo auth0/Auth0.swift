@@ -162,7 +162,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
             it("should start and end a task when called from a background thread") {
                 waitUntil(timeout: Timeout) { done in
                     DispatchQueue.global().async {
-                        let provider = SystemBackgroundTaskProvider()
+                        let provider = Auth0SystemBackgroundTaskProvider()
                         let identifier = provider.begin(name: "foo") {}
                         expect(identifier).toNot(beNil())
                         if let identifier = identifier {
@@ -174,7 +174,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
             }
             #else
             it("should not start a task when UIKit background tasks are unavailable") {
-                expect(SystemBackgroundTaskProvider().begin(name: "foo") {}).to(beNil())
+                expect(Auth0SystemBackgroundTaskProvider().begin(name: "foo") {}).to(beNil())
             }
             #endif
 
@@ -206,7 +206,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
             }
 
             it("should use the system provider when no provider is injected") {
-                expect(CredentialsManager(authentication: authentication).backgroundTaskProvider is SystemBackgroundTaskProvider) == true
+                expect(CredentialsManager(authentication: authentication).backgroundTaskProvider is Auth0SystemBackgroundTaskProvider) == true
             }
 
             describe("credentials") {

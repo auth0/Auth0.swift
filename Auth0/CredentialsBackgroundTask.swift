@@ -22,7 +22,7 @@ protocol BackgroundTaskProvider: Sendable {
 }
 
 /// Uses `UIApplication` where it is available. On the other platforms, no task is started.
-struct SystemBackgroundTaskProvider: BackgroundTaskProvider {
+struct Auth0SystemBackgroundTaskProvider: BackgroundTaskProvider {
 
     /// Starts a UIKit background task, or returns nil when background execution is unavailable.
     func begin(name: String, expirationHandler: @escaping @MainActor @Sendable () -> Void) -> Int? {
