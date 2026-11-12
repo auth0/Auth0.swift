@@ -86,14 +86,14 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                 provider = SpyBackgroundTaskProvider()
             }
 
-            it("should start a task with the given name") {
+            it("should start a task with the given name when initialized") {
                 _ = CredentialsBackgroundTask(name: "foo", provider: provider)
 
                 expect(provider.startedNames) == ["foo"]
                 expect(provider.endedIdentifiers).to(beEmpty())
             }
 
-            it("should end the task") {
+            it("should end the task when explicitly ended") {
                 let task = CredentialsBackgroundTask(name: "foo", provider: provider)
 
                 task.end()
@@ -123,7 +123,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                 expect(provider.endedIdentifiers) == [TaskIdentifier]
             }
 
-            it("should not end the task again after it expires") {
+            it("should not end the task again when explicitly ended after expiration") {
                 let task = CredentialsBackgroundTask(name: "foo", provider: provider)
 
                 waitUntil(timeout: Timeout) { done in
@@ -145,7 +145,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                 expect(provider.endedIdentifiers) == [TaskIdentifier]
             }
 
-            it("should not end a task that did not start") {
+            it("should not end a task when starting it failed") {
                 provider.identifierToReturn = nil
                 let task = CredentialsBackgroundTask(name: "foo", provider: provider)
 
@@ -159,7 +159,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
         describe("system background task provider") {
 
             #if canImport(UIKit) && !os(watchOS)
-            it("should start and end a task from a background thread") {
+            it("should start and end a task when called from a background thread") {
                 waitUntil(timeout: Timeout) { done in
                     DispatchQueue.global().async {
                         let provider = SystemBackgroundTaskProvider()
@@ -173,7 +173,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                 }
             }
             #else
-            it("should not start a task") {
+            it("should not start a task when UIKit background tasks are unavailable") {
                 expect(SystemBackgroundTaskProvider().begin(name: "foo") {}).to(beNil())
             }
             #endif
@@ -205,13 +205,13 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                 URLProtocol.unregisterClass(StubURLProtocol.self)
             }
 
-            it("should use the system provider by default") {
+            it("should use the system provider when no provider is injected") {
                 expect(CredentialsManager(authentication: authentication).backgroundTaskProvider is SystemBackgroundTaskProvider) == true
             }
 
             describe("credentials") {
 
-                it("should start the task before the request and end it after storing the new credentials") {
+                it("should protect the request through credential storage when exchanging a refresh token") {
                     var startedAtRequest: Int?
                     var endedAtRequest: Int?
                     var refreshTokenAtEnd: String?
@@ -282,30 +282,36 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                     expect(provider.startedNames).to(beEmpty())
                 }
 
-                it("should start one task for many calls that wait for the same renewal") {
+                it("should start one task when many calls wait for the same renewal") {
+                    let responseGate = DispatchSemaphore(value: 0)
                     var requests = 0
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) }) { request in
                         requests += 1
+                        if requests == 1 {
+                            expect(responseGate.wait(timeout: .now() + 2)) == .success
+                        }
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresAt: ExpiresIn)(request)
                     }
                     try? credentialsManager.store(credentials: expiredCredentials)
 
                     waitUntil(timeout: Timeout) { done in
-                        let calls = 20
-                        var finished = 0
-                        for _ in 1...calls {
+                        let completion = DispatchGroup()
+                        completion.enter()
+                        provider.onEnd = { completion.leave() }
+                        for _ in 1...20 {
+                            completion.enter()
                             credentialsManager.credentials { result in
                                 expect(result).to(beSuccessful())
-                                finished += 1
-                                if finished == calls {
-                                    done()
-                                }
+                                completion.leave()
                             }
                         }
+                        responseGate.signal()
+                        completion.notify(queue: .main) { done() }
                     }
 
                     expect(requests) == 1
                     expect(provider.startedNames) == ["Auth0.credentials"]
+                    expect(provider.endedIdentifiers) == [TaskIdentifier]
                 }
 
                 it("should end the task when the renewal fails") {
@@ -343,7 +349,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                         completion.enter()
                         completion.enter()
                         provider.onEnd = { completion.leave() }
-                        credentialsManager.credentials {
+                        credentialsManager.credentials(minTTL: 100_000) {
                             receivedResult = $0
                             completion.leave()
                         }
@@ -355,16 +361,20 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                     expect(provider.endedIdentifiers) == [TaskIdentifier]
                 }
 
-                it("should end the task when the renewed credentials cannot satisfy minTTL") {
+                it("should save the rotated refresh token before ending the task when renewed credentials cannot satisfy minTTL") {
                     NetworkStub.addStub(condition: { $0.isToken(Domain) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresAt: ExpiresIn))
                     try? credentialsManager.store(credentials: expiredCredentials)
+                    var refreshTokenAtEnd: String?
                     var receivedResult: CredentialsManagerResult<Credentials>?
 
                     waitUntil(timeout: Timeout) { done in
                         let completion = DispatchGroup()
                         completion.enter()
                         completion.enter()
-                        provider.onEnd = { completion.leave() }
+                        provider.onEnd = {
+                            refreshTokenAtEnd = refreshToken(in: storage)
+                            completion.leave()
+                        }
                         credentialsManager.credentials(minTTL: 100_000) {
                             receivedResult = $0
                             completion.leave()
@@ -379,10 +389,20 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                     }
                     expect(provider.startedNames) == ["Auth0.credentials"]
                     expect(provider.endedIdentifiers) == [TaskIdentifier]
-                    expect(refreshToken(in: storage)) == RefreshToken
+                    expect(refreshTokenAtEnd) == NewRefreshToken
+
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": NewRefreshToken]) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresAt: ExpiresIn))
+                    provider.onEnd = nil
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.renew { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
                 }
 
-                it("should keep one task running across retries") {
+                it("should keep one task running when renewal is retried") {
                     var attempts = 0
                     var endedAtRetry: Int?
                     credentialsManager = CredentialsManager(authentication: authentication, storage: storage, maxRetries: 1)
@@ -430,7 +450,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                     expect(provider.endedIdentifiers) == [TaskIdentifier]
                 }
 
-                it("should use a task with the async API") {
+                it("should use a task when called through the async API") {
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresAt: ExpiresIn))
                     try? credentialsManager.store(credentials: expiredCredentials)
 
@@ -447,7 +467,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
 
             describe("renew") {
 
-                it("should start the task before the request and end it after storing the new credentials") {
+                it("should protect the request through credential storage when exchanging a refresh token") {
                     var startedAtRequest: Int?
                     var endedAtRequest: Int?
                     var refreshTokenAtEnd: String?
@@ -476,7 +496,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
 
             describe("API credentials") {
 
-                it("should start the task before the request and end it after storing the new credentials") {
+                it("should protect the request through credential storage when exchanging a refresh token") {
                     var startedAtRequest: Int?
                     var endedAtRequest: Int?
                     var refreshTokenAtEnd: String?
@@ -502,6 +522,81 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
                     expect(provider.endedIdentifiers) == [TaskIdentifier]
                 }
 
+                it("should save the rotated refresh token before ending the task when API credentials cannot satisfy minTTL") {
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresAt: ExpiresIn))
+                    try? credentialsManager.store(credentials: expiredCredentials)
+                    var refreshTokenAtEnd: String?
+                    var receivedResult: CredentialsManagerResult<APICredentials>?
+
+                    waitUntil(timeout: Timeout) { done in
+                        let completion = DispatchGroup()
+                        completion.enter()
+                        completion.enter()
+                        provider.onEnd = {
+                            refreshTokenAtEnd = refreshToken(in: storage)
+                            completion.leave()
+                        }
+                        credentialsManager.apiCredentials(forAudience: Audience, minTTL: 100_000) {
+                            receivedResult = $0
+                            completion.leave()
+                        }
+                        completion.notify(queue: .main) { done() }
+                    }
+
+                    if case .failure(let error) = receivedResult, case .largeMinTTL(let minTTL, _) = error.code {
+                        expect(minTTL) == 100_000
+                    } else {
+                        fail("Expected a largeMinTTL error")
+                    }
+                    expect(provider.startedNames) == ["Auth0.apiCredentials"]
+                    expect(provider.endedIdentifiers) == [TaskIdentifier]
+                    expect(refreshTokenAtEnd) == NewRefreshToken
+
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": NewRefreshToken]) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresAt: ExpiresIn))
+                    provider.onEnd = nil
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.renew { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+
+                it("should end the task when storing the rotated token fails during an API exchange") {
+                    class MockStore: CredentialsStorage {
+                        func getEntry(forKey: String) throws -> Data {
+                            return try NSKeyedArchiver.archivedData(withRootObject: Credentials(refreshToken: RefreshToken), requiringSecureCoding: true)
+                        }
+                        func setEntry(_ data: Data, forKey: String) throws {
+                            throw SimpleKeychainError.interactionNotAllowed
+                        }
+                        func deleteAllEntries() throws {}
+                        func deleteEntry(forKey: String) throws {}
+                    }
+
+                    credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
+                    credentialsManager.backgroundTaskProvider = provider
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresAt: ExpiresIn))
+                    var receivedResult: CredentialsManagerResult<APICredentials>?
+
+                    waitUntil(timeout: Timeout) { done in
+                        let completion = DispatchGroup()
+                        completion.enter()
+                        completion.enter()
+                        provider.onEnd = { completion.leave() }
+                        credentialsManager.apiCredentials(forAudience: Audience, minTTL: 100_000) {
+                            receivedResult = $0
+                            completion.leave()
+                        }
+                        completion.notify(queue: .main) { done() }
+                    }
+
+                    expect(receivedResult).to(haveCredentialsManagerError(CredentialsManagerError(code: .storeFailed, cause: SimpleKeychainError.interactionNotAllowed)))
+                    expect(provider.startedNames) == ["Auth0.apiCredentials"]
+                    expect(provider.endedIdentifiers) == [TaskIdentifier]
+                }
+
                 it("should end the task when the exchange fails") {
                     NetworkStub.addStub(condition: { $0.isToken(Domain) }, response: authFailure(code: "invalid_grant", description: "Unknown or invalid refresh token."))
                     try? credentialsManager.store(credentials: expiredCredentials)
@@ -518,7 +613,7 @@ class CredentialsBackgroundTaskSpec: QuickSpec {
 
             describe("SSO credentials") {
 
-                it("should start the task before the request and end it after storing the new credentials") {
+                it("should protect the request through credential storage when exchanging a refresh token") {
                     var startedAtRequest: Int?
                     var endedAtRequest: Int?
                     var refreshTokenAtEnd: String?

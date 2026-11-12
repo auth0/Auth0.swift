@@ -927,20 +927,20 @@ public struct CredentialsManager: Sendable {
                         case .success(let credentials):
                             let newCredentials = Credentials(from: credentials,
                                                              refreshToken: credentials.refreshToken ?? refreshToken)
-                            if self.willExpire(newCredentials.expiresAt, within: minTTL) {
-                                let tokenTTL = Int(newCredentials.expiresAt.timeIntervalSinceNow)
-                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
-                                complete()
-                                callback(.failure(error))
-                            } else {
-                                do {
-                                    try self.store(credentials: newCredentials)
+                            do {
+                                try self.store(credentials: newCredentials)
+                                if self.willExpire(newCredentials.expiresAt, within: minTTL) {
+                                    let tokenTTL = Int(newCredentials.expiresAt.timeIntervalSinceNow)
+                                    let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
+                                    complete()
+                                    callback(.failure(error))
+                                } else {
                                     complete()
                                     callback(.success(newCredentials))
-                                } catch {
-                                    complete()
-                                    callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                                 }
+                            } catch {
+                                complete()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                             }
                         case .failure(let error):
                             complete()
@@ -1079,21 +1079,21 @@ public struct CredentialsManager: Sendable {
                                                              idToken: credentials.idToken,
                                                              refreshToken: credentials.refreshToken ?? refreshToken)
                             let newAPICredentials = APICredentials(from: credentials)
-                            if self.willExpire(newAPICredentials.expiresAt, within: minTTL) {
-                                let tokenTTL = Int(newAPICredentials.expiresAt.timeIntervalSinceNow)
-                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
-                                complete()
-                                callback(.failure(error))
-                            } else {
-                                do {
-                                    try self.store(credentials: newCredentials)
-                                    try self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope)
+                            do {
+                                try self.store(credentials: newCredentials)
+                                try self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope)
+                                if self.willExpire(newAPICredentials.expiresAt, within: minTTL) {
+                                    let tokenTTL = Int(newAPICredentials.expiresAt.timeIntervalSinceNow)
+                                    let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
+                                    complete()
+                                    callback(.failure(error))
+                                } else {
                                     complete()
                                     callback(.success(newAPICredentials))
-                                } catch {
-                                    complete()
-                                    callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                                 }
+                            } catch {
+                                complete()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed, cause: error)))
                             }
                         case .failure(let error):
                             complete()
