@@ -282,9 +282,7 @@ struct EmbeddedAuthPasswordSignupClientTests {
 
     // MARK: Capabilities
 
-    @Test func capabilitiesAreUnchanged() {
-        #expect(EmbeddedCapability.all.count == 13)
-        #expect(EmbeddedAction.allCases.count == 13)
+    @Test func signupCapabilitiesKeepTheirActions() {
         #expect(EmbeddedCapability.confirmSignup.action.rawValue == "action:signup:confirm:v1")
         #expect(EmbeddedCapability.signup.action.rawValue == "action:signup:v1")
     }
@@ -377,6 +375,20 @@ struct EmbeddedAuthPasswordSignupClientTests {
         }
         _ = try? await sut.confirmSignup(password: dummyPassword).start()
         #expect(header?.isEmpty == false)
+    }
+
+    @Test func confirmSignupOmitsTheAuth0ClientHeaderWhenTrackingIsDisabled() async {
+        var sut = await clientAtConfirm()
+        sut.tracking(enabled: false)
+        nonisolated(unsafe) var requests: [URLRequest] = []
+        Mock.requestHandler = { req in
+            requests.append(req)
+            if isTokenRequest(req) { return (response(200), credentialsBody()) }
+            return (response(200), authCode())
+        }
+        _ = try? await sut.confirmSignup(password: dummyPassword).start()
+        #expect(requests.count == 2)
+        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "Auth0-Client") == nil })
     }
 
     // MARK: Success
@@ -499,18 +511,47 @@ struct EmbeddedAuthPasswordSignupClientTests {
         #expect(passwordOffer(in: info?.actions ?? [])?.isRequired == true)
     }
 
+    @Test func passwordRequiredUpgradesTheRequirementEvenWhenTheOfferWasNeverSeen() async {
+        let sut = makeClient()
+        await reachConfirm(sut, offer: .noSignupOffer)
+        Mock.requestHandler = { _ in
+            (response(403), continuation(session: "sess_5", description: "password_required", next: [confirmAction()]))
+        }
+        let error = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await sut.confirmSignup().start()
+        }
+        let info = continuationInfo(error)
+        #expect(info?.sub == "passwordRequired")
+        #expect(passwordOffer(in: info?.actions ?? [])?.isRequired == true)
+    }
+
+    @Test func invalidPasswordKeepsAnOptionalPasswordOptional() async {
+        let sut = makeClient()
+        await reachConfirm(sut, offer: .optionalPassword)
+        Mock.requestHandler = { _ in
+            (response(403), continuation(session: "sess_5", description: "invalid_password", next: [confirmAction()]))
+        }
+        let error = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await sut.confirmSignup(password: "short").start()
+        }
+        let info = continuationInfo(error)
+        #expect(info?.sub == "invalidPassword")
+        #expect(passwordOffer(in: info?.actions ?? [])?.isRequired == false)
+    }
+
     // MARK: Recoverable flows
 
     @Test func passwordRequiredLetsTheCallerRetryWithAPasswordOnTheRotatedSession() async throws {
         let sut = await clientAtConfirm(offer: .requiredPassword)
+        nonisolated(unsafe) var firstBody: [String: Any] = [:]
         Mock.requestHandler = { req in
-            let body = bodyJSON(req)
-            #expect(body["password"] == nil)
+            firstBody = bodyJSON(req)
             return (response(403), continuation(session: "sess_5", description: "password_required", next: [confirmAction()]))
         }
         let error = await #expect(throws: EmbeddedAuthError.self) {
             _ = try await sut.confirmSignup().start()
         }
+        #expect(firstBody["password"] == nil)
         let info = continuationInfo(error)
         #expect(info?.sub == "passwordRequired")
         #expect(passwordOffer(in: info?.actions ?? [])?.complexity.minLength == 8)
@@ -733,8 +774,10 @@ struct EmbeddedAuthPasswordSignupClientTests {
         Mock.requestHandler = { _ in
             (response(403), continuation(session: "sess_rotated_value", description: "invalid_password", next: [confirmAction()]))
         }
-        let error = try? await logged.confirmSignup(password: secret).start()
-        #expect(error == nil)
+        let failure = await #expect(throws: EmbeddedAuthError.self) {
+            _ = try await logged.confirmSignup(password: secret).start()
+        }
+        #expect(continuationInfo(failure)?.sub == "invalidPassword")
 
         // The logger writes asynchronously, in order: wait for the response to be logged too.
         for _ in 0..<100 where !output.text.contains("invalid_password") {

@@ -107,7 +107,8 @@ func handleNextActions(_ actions: [NextAction]) async throws -> Credentials {
         // see "Sign up with a password".
         var entered: String?
         if let password {
-            entered = // … collect the password from your UI; leave it nil to skip when !password.isRequired …
+            // Your own UI. Return nil to skip the password when !password.isRequired.
+            entered = await askUserForPassword(rules: password.complexity, isRequired: password.isRequired)
         }
         return try await client.confirmSignup(password: entered).start()
     case .unknown:
@@ -407,6 +408,7 @@ The hints are advisory. The server is authoritative, so a password that satisfie
 ```swift
 func finishSignUp(password: SignupPassword?, askForPassword: (_ lastPasswordWasRejected: Bool) async -> String?) async throws -> Credentials {
     var entered: String?
+    var networkRetries = 0
     if password != nil { entered = await askForPassword(false) }
     while true {
         do {
@@ -414,7 +416,7 @@ func finishSignUp(password: SignupPassword?, askForPassword: (_ lastPasswordWasR
         } catch let error as EmbeddedAuthError {
             switch error.reason {
             case .insufficientAuthorization(.passwordRequired, _):
-                // No password was sent, or an empty one: ask for one.
+                // The connection needs a password and none was sent: ask for one.
                 entered = await askForPassword(false)
             case .insufficientAuthorization(.invalidPassword, _):
                 // The connection's password policy rejected it: show the hints again and ask for another one.
@@ -423,8 +425,10 @@ func finishSignUp(password: SignupPassword?, askForPassword: (_ lastPasswordWasR
                 // The connection does not collect a password: confirm without one.
                 entered = nil
             case .network:
-                // The session is kept, but the SDK does not keep the password: send it again.
-                continue
+                // The session is kept, but the SDK does not keep the password: send it again, a few times at most.
+                networkRetries += 1
+                guard networkRetries <= 3 else { throw error }
+                try await Task.sleep(nanoseconds: 1_000_000_000)
             case .passwordLeaked:
                 // The password appears in a data breach. The flow has ended: start over with authorize().
                 throw error
@@ -465,7 +469,7 @@ client.confirmSignup(password: enteredPassword).start { result in
 ```
 </details>
 
-`.passwordRequired`, `.passwordNotAccepted` and `.invalidPassword` keep the flow live on a rotated session, and `nextActions` offers `.confirmSignup` again. `.passwordLeaked` ends the flow: the password appears in a data breach and the account was not created, so start a new flow with `authorize()` and let the user choose a different password. Do not log or store the password.
+`.passwordRequired`, `.passwordNotAccepted` and `.invalidPassword` keep the flow live on a rotated session, and `nextActions` offers `.confirmSignup` again. `.passwordLeaked` ends the flow: the password appears in a data breach, so start a new flow with `authorize()` and let the user choose a different password. Do not log or store the password.
 
 #### MFA flows
 

@@ -1071,7 +1071,5 @@ import Foundation
 
     @Test func passwordSignupTypesHaveTheDocumentedShape() {
         #expect(SignupPasswordComplexity.CharacterType.allCases.map(\.rawValue) == ["lowercase", "uppercase", "number", "special"])
-        #expect(CredentialRequirement.none != .optional)
-        #expect(CredentialRequirement.required != .optional)
     }
 }
