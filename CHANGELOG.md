@@ -5,6 +5,8 @@
 
 **Fixed**
 - fix: keep the app running while the Credentials Manager renews credentials [\#1321](https://github.com/auth0/Auth0.swift/pull/1321) ([Anzormumladze](https://github.com/Anzormumladze))
+
+**Docs** 
 - docs: mark the My Account Profile API as Beta [\#1330](https://github.com/auth0/Auth0.swift/pull/1330) ([NandanPrabhu](https://github.com/NandanPrabhu))
 
 ## [3.3.0](https://github.com/auth0/Auth0.swift/tree/3.3.0) (2026-11-04)
