@@ -1,5 +1,8 @@
 # Change Log
 
+## [3.3.0](https://github.com/auth0/Auth0.swift/tree/3.3.0) (2026-11-04)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.2.0...3.3.0)
+
 **Added**
 - feat: add My Account Profile GET and PATCH APIs [\#1308](https://github.com/auth0/Auth0.swift/pull/1308) ([NandanPrabhu](https://github.com/NandanPrabhu))
 
