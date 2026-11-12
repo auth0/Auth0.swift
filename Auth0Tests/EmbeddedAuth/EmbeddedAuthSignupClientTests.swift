@@ -626,7 +626,7 @@ struct EmbeddedAuthSignupClientTests {
         guard case .insufficientAuthorization(_, let offered) = authorized?.reason else {
             Issue.record("Expected continuation, got \(String(describing: authorized?.reason))"); return
         }
-        #expect(offered.contains(.signup(identifiers: [SignupIdentifier(type: type, isRequired: true)])))
+        #expect(offered.contains(.signup(identifiers: [SignupIdentifier(type: type, isRequired: true)], passwordRequirement: .none)))
 
         // signup -> identify
         EmbeddedAuthSignupMockProtocol.requestHandler = { req in
@@ -655,7 +655,7 @@ struct EmbeddedAuthSignupClientTests {
         guard case .insufficientAuthorization(_, let confirmActions) = verified?.reason else {
             Issue.record("Expected continuation, got \(String(describing: verified?.reason))"); return
         }
-        #expect(confirmActions == [.confirmSignup])
+        #expect(confirmActions == [.confirmSignup(password: nil)])
 
         // confirm signup -> credentials
         EmbeddedAuthSignupMockProtocol.requestHandler = { req in
@@ -726,7 +726,8 @@ struct EmbeddedAuthSignupClientTests {
             Issue.record("Expected continuation, got \(String(describing: authorized?.reason))"); return
         }
         #expect(offered.contains(.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true),
-                                                       SignupIdentifier(type: .phone, isRequired: true)])))
+                                                       SignupIdentifier(type: .phone, isRequired: true)],
+                                                       passwordRequirement: .none)))
 
         respond(session: "sess_2", [identifyEmailAction, identifyPhoneAction])
         _ = try? await sut.signup().start()
@@ -803,7 +804,8 @@ struct EmbeddedAuthSignupClientTests {
             Issue.record("Expected continuation, got \(String(describing: authorized?.reason))"); return
         }
         #expect(offered.contains(.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true),
-                                                       SignupIdentifier(type: .phone, isRequired: false)])))
+                                                       SignupIdentifier(type: .phone, isRequired: false)],
+                                                       passwordRequirement: .none)))
 
         respond(session: "sess_2", [identifyEmailAction, identifyPhoneAction])
         _ = try? await sut.signup().start()
@@ -819,7 +821,7 @@ struct EmbeddedAuthSignupClientTests {
         guard case .insufficientAuthorization(_, let afterVerify) = verified?.reason else {
             Issue.record("Expected continuation, got \(String(describing: verified?.reason))"); return
         }
-        #expect(afterVerify == [.identifyPhone, .confirmSignup])
+        #expect(afterVerify == [.identifyPhone, .confirmSignup(password: nil)])
 
         // Skip the phone number and confirm.
         EmbeddedAuthSignupMockProtocol.requestHandler = { req in

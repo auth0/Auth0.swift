@@ -46,9 +46,10 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// ``EmbeddedCapability/verifyPassword``.
     case noNextSteps
 
-    /// Terminal: breached password detection blocked the login because the password appears in a data breach.
+    /// Terminal: breached password detection blocked the login or the sign-up because the password appears in a data breach.
     ///
-    /// The user has to choose a different password before signing in again.
+    /// The user has to choose a different password before trying again. Start a new flow with
+    /// ``EmbeddedAuth/authorize(connection:)``.
     case passwordLeaked
 
     /// Terminal: access denied for a reason not modelled as its own case.
@@ -82,7 +83,9 @@ public enum EmbeddedAuthErrorReason: Sendable {
     ///
     /// The session is preserved — retrying the same step is safe. That includes the final token exchange of
     /// ``EmbeddedAuth/verifyOtp(_:type:)``, ``EmbeddedAuth/verifyPassword(_:)``, ``EmbeddedAuth/verifyOob()``,
-    /// and ``EmbeddedAuth/confirmRecoveryCode()``.
+    /// ``EmbeddedAuth/confirmRecoveryCode()`` and ``EmbeddedAuth/confirmSignup(password:)``.
+    ///
+    /// The SDK never keeps the password given to ``EmbeddedAuth/confirmSignup(password:)``, so pass it again when you retry.
     case network
 
     /// Client-side guard: no flow is in progress.
@@ -118,5 +121,20 @@ public enum EmbeddedAuthErrorReason: Sendable {
 
         /// The client is polling too frequently and should back off before retrying.
         case slowDown
+
+        /// The connection needs a password to create the account and none was sent.
+        ///
+        /// Ask the user for one and call ``EmbeddedAuth/confirmSignup(password:)`` again.
+        case passwordRequired
+
+        /// A password was sent, but the connection does not collect one.
+        ///
+        /// Call ``EmbeddedAuth/confirmSignup()`` again without a password.
+        case passwordNotAccepted
+
+        /// The password does not meet the connection's password policy.
+        ///
+        /// Ask the user for another one and call ``EmbeddedAuth/confirmSignup(password:)`` again.
+        case invalidPassword
     }
 }

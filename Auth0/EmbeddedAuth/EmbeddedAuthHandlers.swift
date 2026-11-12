@@ -17,7 +17,7 @@ extension Auth0EmbeddedAuth {
         switch result {
         case .failure(let error):
             updateSessionFromFailure(error)
-            callback(.failure(error))
+            callback(.failure(error.withSignupPasswordRequirement(signupPasswordRequirement)))
         case .success:
             currentSession = nil
             callback(.success(()))
@@ -39,7 +39,7 @@ extension Auth0EmbeddedAuth {
         switch result {
         case .failure(let error):
             updateSessionFromFailure(error)
-            callback(.failure(error))
+            callback(.failure(error.withSignupPasswordRequirement(signupPasswordRequirement)))
         case .success(let response):
             guard let data = response.data,
                   let body = try? JSONDecoder().decode(AuthorizationCodeResponse.self, from: data) else {
@@ -54,7 +54,7 @@ extension Auth0EmbeddedAuth {
                 case .failure(let error):
                     updateSessionFromFailure(error)
                 }
-                callback(exchangeResult)
+                callback(exchangeResult.mapError { $0.withSignupPasswordRequirement(signupPasswordRequirement) })
             }
         }
     }
