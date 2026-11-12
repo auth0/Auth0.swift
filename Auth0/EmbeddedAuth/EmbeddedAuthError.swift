@@ -9,6 +9,12 @@ public struct EmbeddedAuthError: Auth0APIError, @unchecked Sendable {
     /// HTTP status code of the response.
     public let statusCode: Int
 
+    /// The password requirement of the sign-up in progress, when the SDK knows it.
+    ///
+    /// Set by the client that runs the flow, never by the server response, and used to fill
+    /// ``SignupPassword/isRequired`` when the `next` actions are parsed. Not part of equality.
+    var signupPasswordRequirement: CredentialRequirement?
+
     /// Creates an error from a JSON response.
     ///
     /// - Parameters:
@@ -45,6 +51,19 @@ extension EmbeddedAuthError {
             return "Failed with unknown error: \(info)."
         }
         return appendPeriod(to: code)
+    }
+
+}
+
+// MARK: - Sign-up password state
+
+extension EmbeddedAuthError {
+
+    /// A copy of this error that carries the password requirement of the sign-up in progress.
+    func withSignupPasswordRequirement(_ requirement: CredentialRequirement?) -> EmbeddedAuthError {
+        var copy = self
+        copy.signupPasswordRequirement = requirement
+        return copy
     }
 
 }
@@ -90,6 +109,12 @@ public extension EmbeddedAuthError {
             return .insufficientAuthorization(reason: .authorizationPending, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "slow_down"):
             return .insufficientAuthorization(reason: .slowDown, nextActions: parsedNextActions)
+        case (_, "insufficient_authorization", "password_required"):
+            return .insufficientAuthorization(reason: .passwordRequired, nextActions: parsedNextActions)
+        case (_, "insufficient_authorization", "password_not_accepted"):
+            return .insufficientAuthorization(reason: .passwordNotAccepted, nextActions: parsedNextActions)
+        case (_, "insufficient_authorization", "invalid_password"):
+            return .insufficientAuthorization(reason: .invalidPassword, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", _):
             return .insufficientAuthorization(reason: .none, nextActions: parsedNextActions)
         case (_, "access_denied", "too_many_wrong_otp_attempts"):
@@ -172,13 +197,52 @@ private extension EmbeddedAuthError {
                 return .confirmRecoveryCode(newCode: newCode)
             case .signup:
                 guard let identifiers = entry["identifiers"] as? [String: Any] else { return nil }
-                return .signup(identifiers: Self.signupIdentifiers(from: identifiers))
+                return .signup(identifiers: Self.signupIdentifiers(from: identifiers),
+                               passwordRequirement: Self.passwordRequirement(from: entry))
             case .confirmSignup:
-                return .confirmSignup
+                return confirmSignupAction(from: entry)
             case .none:
                 return .unknown(rawAction: actionString)
             }
         }
+    }
+
+    /// Reads `authentication_methods.password.required` of a sign-up entry.
+    ///
+    /// Anything the SDK cannot read as a boolean flag on a `password` object means the connection does not collect
+    /// a password.
+    static func passwordRequirement(from entry: [String: Any]) -> CredentialRequirement {
+        guard let methods = entry["authentication_methods"] as? [String: Any],
+              let password = methods["password"] as? [String: Any],
+              let isRequired = password["required"] as? Bool else { return .none }
+        return isRequired ? .required : .optional
+    }
+
+    /// Maps a confirm-sign-up entry.
+    ///
+    /// Without `password_complexity_options` the connection does not collect a password. Options that cannot be read
+    /// (not an object, or no integer `min_length`) drop the entry, like any other entry the SDK cannot parse.
+    func confirmSignupAction(from entry: [String: Any]) -> NextAction? {
+        guard let rawOptions = entry["password_complexity_options"] else { return .confirmSignup(password: nil) }
+        guard let options = rawOptions as? [String: Any],
+              let minLength = options["min_length"] as? Int else { return nil }
+        let complexity = SignupPasswordComplexity(minLength: minLength,
+                                                  characterTypes: Self.characterTypes(from: options))
+        // Only an optional password can be skipped; unknown means the sign-up offer was never seen, so assume required.
+        let isRequired = signupPasswordRequirement != CredentialRequirement.optional
+        return .confirmSignup(password: SignupPassword(isRequired: isRequired, complexity: complexity))
+    }
+
+    /// Reads `character_types`, leaving out unknown values and duplicates and keeping the server's order.
+    static func characterTypes(from options: [String: Any]) -> [SignupPasswordComplexity.CharacterType] {
+        guard let raw = options["character_types"] as? [Any] else { return [] }
+        var types: [SignupPasswordComplexity.CharacterType] = []
+        for case let value as String in raw {
+            if let type = SignupPasswordComplexity.CharacterType(rawValue: value), !types.contains(type) {
+                types.append(type)
+            }
+        }
+        return types
     }
 
     /// Maps the `identifiers` object of a sign-up entry, in a fixed order (email, then phone).

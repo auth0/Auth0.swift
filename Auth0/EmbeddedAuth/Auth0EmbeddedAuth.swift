@@ -36,7 +36,18 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     /// - Warning: Never call another step while a prior step's network request is still in-flight
     ///   (e.g. retrying `authorize()` inside a loop). A concurrent `exchange(code:)` completion
     ///   will clear `currentSession` and overwrite whatever the new `authorize()` established.
-    var currentSession: String?
+    var currentSession: String? {
+        didSet {
+            if currentSession == nil { signupPasswordRequirement = nil }
+        }
+    }
+
+    /// Whether the connection requires a password at sign-up, as learned from the flow so far; `nil` when not known.
+    ///
+    /// Read from the sign-up offer (or a `password_required` answer) and cleared together with ``currentSession``. It
+    /// fills ``SignupPassword/isRequired``, which the server does not repeat at the confirm step. It never holds the
+    /// password itself. Same sequential-access contract as ``currentSession``.
+    var signupPasswordRequirement: CredentialRequirement?
 
     init(clientId: String,
          url: URL,
@@ -196,20 +207,29 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
         ])
     }
 
-    /// Confirms the registration.
-    /// On success, internally exchanges the authorization code for ``Credentials``.
+    /// Confirms the registration without a password.
     func confirmSignup() -> Request<Credentials, EmbeddedAuthError> {
+        confirmSignup(password: nil)
+    }
+
+    /// Confirms the registration, optionally with a password for the new account.
+    /// On success, internally exchanges the authorization code for ``Credentials``.
+    ///
+    /// The password is only placed in the request body: it is never stored on the client.
+    func confirmSignup(password: String?) -> Request<Credentials, EmbeddedAuthError> {
         guard let currentSession else { return missingSessionRequest() }
+        var body: [String: Any] = [
+            "client_id": clientId,
+            "action": EmbeddedAction.confirmSignup.rawValue,
+            "auth_session": currentSession
+        ]
+        if let password { body["password"] = password }
         return Request(
             session: session,
             url: url.appending("e/authorize"),
             method: "POST",
             handle: decodeAuthorizationCodeResponse,
-            parameters: [
-                "client_id": clientId,
-                "action": EmbeddedAction.confirmSignup.rawValue,
-                "auth_session": currentSession
-            ],
+            parameters: body,
             logger: logger,
             auth0ClientInfo: auth0ClientInfo
         )
@@ -309,16 +329,23 @@ extension Auth0EmbeddedAuth {
     /// Updates the flow's session after a step fails.
     ///
     /// - On a continuation (`.insufficientAuthorization`) the rotated `auth_session` becomes the
-    ///   active session so the next step can proceed.
+    ///   active session so the next step can proceed. The password requirement of a sign-up is
+    ///   remembered from the sign-up offer, or from a `password_required` answer.
     /// - On a network failure (`.network`) the session is preserved so the caller can retry the
     ///   same step.
     /// - On all other failures the session is cleared; any follow-on step will fail locally with
     ///   `.noActiveSession`.
     func updateSessionFromFailure(_ error: EmbeddedAuthError) {
         switch error.reason {
-        case .insufficientAuthorization:
+        case .insufficientAuthorization(let subReason, let nextActions):
             if let newSession = error.info["auth_session"] as? String {
                 currentSession = newSession
+            }
+            for case .signup(_, let requirement) in nextActions {
+                signupPasswordRequirement = requirement
+            }
+            if case .passwordRequired = subReason {
+                signupPasswordRequirement = .required
             }
         case .network:
             break
