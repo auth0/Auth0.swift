@@ -49,7 +49,7 @@ public enum EmbeddedAuthErrorReason: Sendable {
     /// Terminal: breached password detection blocked the login or the sign-up because the password appears in a data breach.
     ///
     /// The user has to choose a different password before trying again. Start a new flow with
-    /// ``EmbeddedAuth/authorize(connection:)``: during a sign-up the account was not created.
+    /// ``EmbeddedAuth/authorize(connection:)``.
     case passwordLeaked
 
     /// Terminal: access denied for a reason not modelled as its own case.
