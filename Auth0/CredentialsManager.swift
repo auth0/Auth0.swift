@@ -882,8 +882,7 @@ public struct CredentialsManager: Sendable {
     }
 
     /// Renews stored credentials when required, keeping one background task across the request and any retries.
-    // swiftlint:disable:next function_parameter_count function_body_length
-    private func retrieveCredentialsWithRetry(scope: String?,
+    private func retrieveCredentialsWithRetry(scope: String?, // swiftlint:disable:this function_parameter_count function_body_length
                                              minTTL: Int,
                                              parameters: [String: Any],
                                              headers: [String: String],
@@ -1036,8 +1035,7 @@ public struct CredentialsManager: Sendable {
     }
 
     /// Retrieves API credentials, keeping a background task open during an exchange and storage of its result.
-    // swiftlint:disable:next function_body_length function_parameter_count
-    private func retrieveAPICredentials(audience: String,
+    private func retrieveAPICredentials(audience: String, // swiftlint:disable:this function_body_length function_parameter_count
                                         scope: String?,
                                         minTTL: Int,
                                         parameters: [String: Any],
