@@ -68,6 +68,7 @@ private final class SpyBackgroundTaskProvider: BackgroundTaskProvider, @unchecke
 
 }
 
+/// Reads the spy store to check refresh token persistence when a background task ends.
 private func refreshToken(in storage: SpyCredentialsStorage) -> String? {
     guard let data = try? storage.getEntry(forKey: "credentials") else { return nil }
     return (try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data))?.refreshToken

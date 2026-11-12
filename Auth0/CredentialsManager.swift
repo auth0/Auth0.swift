@@ -881,6 +881,7 @@ public struct CredentialsManager: Sendable {
         }
     }
 
+    /// Renews stored credentials when required, keeping one background task across the request and any retries.
     // swiftlint:disable:next function_parameter_count function_body_length
     private func retrieveCredentialsWithRetry(scope: String?,
                                              minTTL: Int,
@@ -977,6 +978,7 @@ public struct CredentialsManager: Sendable {
         return error.isRetryable
     }
 
+    /// Exchanges the refresh token for SSO credentials and stores any rotated token before completing.
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
                                         callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
@@ -1033,6 +1035,7 @@ public struct CredentialsManager: Sendable {
         }
     }
 
+    /// Retrieves API credentials, keeping a background task open during an exchange and storage of its result.
     // swiftlint:disable:next function_body_length function_parameter_count
     private func retrieveAPICredentials(audience: String,
                                         scope: String?,

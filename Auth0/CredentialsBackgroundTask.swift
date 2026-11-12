@@ -46,9 +46,9 @@ struct SystemBackgroundTaskProvider: BackgroundTaskProvider {
 #if canImport(UIKit) && !os(watchOS)
 private extension UIApplication {
 
-    // UIApplication.shared is unavailable in app extensions, so look it up at runtime. Background tasks cannot be used
-    // from an app extension, so do not return the application there.
-    // sharedApplication is a public selector, using the same lookup pattern as MobileWebAuth.swift.
+    /// UIApplication.shared is unavailable in app extensions, so look it up at runtime. Background tasks cannot be used
+    /// from an app extension, so do not return the application there.
+    /// sharedApplication is a public selector, using the same lookup pattern as MobileWebAuth.swift.
     nonisolated static func sharedIfAvailable() -> UIApplication? {
         guard Bundle.main.bundleURL.pathExtension != "appex" else { return nil }
         return UIApplication.perform(NSSelectorFromString("sharedApplication"))?.takeUnretainedValue() as? UIApplication
