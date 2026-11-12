@@ -19,3 +19,27 @@ struct EmbeddedAuthSessionValidator: RequestValidator {
     }
 
 }
+
+/// Fails the request locally because an ``EmbeddedAuth`` conformance does not implement `requirement`.
+struct EmbeddedAuthNotImplementedValidator: RequestValidator {
+
+    let requirement: String
+
+    func validate() throws {
+        throw EmbeddedAuthError.notImplemented(requirement: requirement)
+    }
+
+}
+
+extension EmbeddedAuthError {
+
+    /// The error for a method the conforming type does not implement. Carries no request data.
+    static func notImplemented(requirement: String) -> EmbeddedAuthError {
+        EmbeddedAuthError(
+            info: ["error": notImplementedError,
+                   "error_description": "\(requirement) is not implemented by this EmbeddedAuth conformance."],
+            statusCode: 0
+        )
+    }
+
+}

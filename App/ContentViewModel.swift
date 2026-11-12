@@ -11,6 +11,9 @@ final class ContentViewModel: ObservableObject {
     @Published var otp: String = ""
     @Published var recoveryCode: String = ""
     @Published var password: String = ""
+    /// The connection the flow runs against. Change it to try connections that collect a password at sign-up
+    /// (required or optional) and ones that do not.
+    @Published var connection: String = "Username-Password-Authentication"
     @Published var isLoading: Bool = false
     @Published var embeddedAuthUIState: EmbeddedAuthUIState = .initial
     @Published var attemptError: String?
@@ -77,7 +80,7 @@ final class ContentViewModel: ObservableObject {
         isSigningUp = signingUp
         embeddedAuthUIState = .initial
         do {
-            _ = try await embeddedAuthClient.authorize(connection: "Username-Password-Authentication",
+            _ = try await embeddedAuthClient.authorize(connection: connection,
                                                        capabilities: capabilities(signingUp: signingUp),
                                                        scope: "openid profile email offline_access",
                                                        audience: nil).start()
@@ -308,17 +311,19 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
-    func confirmSignup() async {
+    /// Finishes the sign-up. `password` is `nil` when the connection does not collect one, or when the user skips an
+    /// optional one. A missing, refused or rejected password comes back as a continuation that offers the
+    /// confirmation again, which `handle(embeddedAuthError:)` presents with a message.
+    func confirmSignup(password: String? = nil) async {
         isLoading = true
+        attemptError = nil
         do {
-            let credentials = try await embeddedAuthClient.confirmSignup().start()
+            let credentials = try await embeddedAuthClient.confirmSignup(password: password).start()
             finish(with: credentials)
         } catch let error as EmbeddedAuthError {
-            if error.info["error_description"] as? String == "password_required" {
-                // The connection collects a password at sign-up, which this SDK version cannot send. Offering
-                // the confirmation again would only loop.
-                clearFlowState()
-                embeddedAuthUIState = .failed("This connection collects a password at sign-up, which the example app does not support yet.")
+            if case .network = error.reason {
+                // The session is kept and the SDK does not keep the password, so the user submits it again.
+                attemptError = "A network error occurred. Check your connection and try again."
             } else {
                 handle(embeddedAuthError: error)
             }
@@ -344,13 +349,13 @@ final class ContentViewModel: ObservableObject {
     /// Whether the server lets the user finish sign-up now. That is how an optional identifier is skipped:
     /// the server only offers `confirmSignup` once every required identifier is verified.
     var canCompleteSignup: Bool {
-        availableActions.contains(.confirmSignup)
+        availableActions.contains { $0.isConfirmSignup }
     }
 
     /// Skips the identifier on screen and goes to the sign-up confirmation.
     func skipToConfirmation() {
-        currentAction = .confirmSignup
-        embeddedAuthUIState = .confirmSignup
+        guard let confirm = availableActions.first(where: { $0.isConfirmSignup }) else { return }
+        _ = present(confirm, among: availableActions)
     }
 
     // MARK: - Navigation between offered methods
@@ -678,7 +683,7 @@ private extension ContentViewModel {
             usePhoneIdentifier = pending == .phone
         }
         // Only the first response lists the sign-up identifiers, so keep them for the rest of the flow.
-        for case .signup(let identifiers) in nextActions {
+        for case .signup(let identifiers, _) in nextActions {
             signupIdentifiers = identifiers
         }
         switch reason {
@@ -688,17 +693,23 @@ private extension ContentViewModel {
             attemptError = "That identifier or code is incorrect. Please try again."
         case .invalidIdentifierOrPassword:
             attemptError = "Incorrect username or password. Please try again."
+        case .passwordRequired:
+            attemptError = "A password is required to create the account."
+        case .passwordNotAccepted:
+            attemptError = "This connection does not use a password. Continue without one."
+        case .invalidPassword:
+            attemptError = "That password does not meet the requirements. Please try another one."
         default:
             attemptError = nil
         }
         // The server offers `confirmSignup` only when every required identifier is verified. If it also still asks
         // for an identifier the user entered, send that first. Otherwise any identifier still offered is optional
         // and was left empty, so skip it. Whatever order the server lists the actions in, the result is the same.
-        if nextActions.contains(.confirmSignup), attemptError == nil {
+        if let confirm = nextActions.first(where: { $0.isConfirmSignup }), attemptError == nil {
             if let pending = pendingIdentifier, offersEnteredIdentifier(in: nextActions) {
                 _ = present(pending == .email ? .identifyEmail : .identifyPhone, among: nextActions)
             } else {
-                _ = present(.confirmSignup, among: nextActions)
+                _ = present(confirm, among: nextActions)
             }
             return
         }
@@ -750,8 +761,10 @@ private extension ContentViewModel {
             embeddedAuthUIState = .verifyRecoveryCode
         case .confirmRecoveryCode(let newCode):
             embeddedAuthUIState = .confirmRecoveryCode(newCode: newCode)
-        case .confirmSignup:
-            embeddedAuthUIState = .confirmSignup
+        case .confirmSignup(let signupPassword):
+            // The field is empty on every visit, so a rejected password is never shown again.
+            password = ""
+            embeddedAuthUIState = .confirmSignup(password: signupPassword)
         case .signup, .unknown:
             // Sign-up has no screen of its own: `startEmbeddedFlow(signingUp:)` calls `signup()` when it is offered.
             currentAction = nil
@@ -776,7 +789,7 @@ enum EmbeddedAuthUIState {
     case verifyPassword
     case verifyRecoveryCode
     case confirmRecoveryCode(newCode: String)
-    case confirmSignup
+    case confirmSignup(password: SignupPassword?)
     case success(Credentials)
     case failed(String)
 }
@@ -788,4 +801,11 @@ private struct EditableProfileValues {
     var name: String?
     var nickname: String?
     var picture: String?
+}
+
+private extension NextAction {
+    var isConfirmSignup: Bool {
+        if case .confirmSignup = self { return true }
+        return false
+    }
 }
