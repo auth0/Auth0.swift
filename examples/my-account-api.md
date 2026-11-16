@@ -13,8 +13,8 @@
 - [Get all authentication methods](#get-all-authentication-methods)
 - [Get an authentication method by id](#get-an-authentication-method-by-id)
 - [Delete an authentication method](#delete-an-authentication-method)
-- [Get the user profile](#get-the-user-profile)
-- [Update the user profile](#update-the-user-profile)
+- [Get the user profile \[Beta\]](#get-the-user-profile-beta)
+- [Update the user profile \[Beta\]](#update-the-user-profile-beta)
 - [My Account API client errors](#my-account-api-client-errors)
 
 Use the Auth0 My Account API to manage the current user's account.
@@ -1177,7 +1177,12 @@ Auth0
 </details>
 
 
-### Get the user profile
+<a id="get-the-user-profile"></a>
+
+### Get the user profile [Beta]
+
+> [!NOTE]
+> The My Account Profile API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta). It might change before General Availability, and Auth0 does not support beta functionality for production use. The feature must be enabled for your tenant.
 
 **Scopes required:** `read:me:profile`
 
@@ -1258,7 +1263,12 @@ Auth0
 
 ---
 
-### Update the user profile
+<a id="update-the-user-profile"></a>
+
+### Update the user profile [Beta]
+
+> [!NOTE]
+> The My Account Profile API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta). It might change before General Availability, and Auth0 does not support beta functionality for production use. The feature must be enabled for your tenant.
 
 **Scopes required:** `update:me:profile`
 

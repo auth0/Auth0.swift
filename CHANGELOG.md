@@ -1,10 +1,25 @@
 # Change Log
 
+## [3.3.1](https://github.com/auth0/Auth0.swift/tree/3.3.1) (2026-11-12)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.3.0...3.3.1)
+
+**Fixed**
+- fix: keep the app running while the Credentials Manager renews credentials [\#1321](https://github.com/auth0/Auth0.swift/pull/1321) ([Anzormumladze](https://github.com/Anzormumladze))
+
+**Docs** 
+- docs: mark the My Account Profile API as Beta [\#1330](https://github.com/auth0/Auth0.swift/pull/1330) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [4.0.0-beta.3](https://github.com/auth0/Auth0.swift/tree/4.0.0-beta.3) (2026-11-11)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/4.0.0-beta.2...4.0.0-beta.3)
 
 **Added**
 - feat(embedded-auth): add signup and confirmSignup [\#1325](https://github.com/auth0/Auth0.swift/pull/1325) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
+## [3.3.0](https://github.com/auth0/Auth0.swift/tree/3.3.0) (2026-11-04)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.2.0...3.3.0)
+
+**Added**
+- feat: add My Account Profile GET and PATCH APIs [\#1308](https://github.com/auth0/Auth0.swift/pull/1308) ([NandanPrabhu](https://github.com/NandanPrabhu))
 
 ## [4.0.0-beta.2](https://github.com/auth0/Auth0.swift/tree/4.0.0-beta.2) (2026-11-03)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/4.0.0-beta.1...4.0.0-beta.2)

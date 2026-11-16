@@ -2,6 +2,8 @@ import Foundation
 
 /// Options for filtering the fields returned by ``MyAccountAuthenticationMethods/getUserProfile(options:)``.
 ///
+/// This API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) and might change before General Availability.
+///
 /// By default (when `options` is `nil` or both properties are `nil`) the API returns all fields.
 /// Use ``fields`` together with ``includeFields`` for fine-grained control.
 ///

@@ -617,6 +617,13 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Returns the user's profile attributes along with a per-field access policy
     /// (``MyAccountProfile/profilePolicy``) that indicates which fields are editable.
     ///
+    /// ## Availability
+    ///
+    /// This feature is currently in
+    /// [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta).
+    /// It might change before General Availability, and Auth0 does not support beta functionality for
+    /// production use. The feature must be enabled for your tenant.
+    ///
     /// ## Scopes Required
     ///
     /// `read:me:profile`
@@ -674,6 +681,13 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// fails validation, the entire request is rejected.
     ///
     /// Returns the full updated profile.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently in
+    /// [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta).
+    /// It might change before General Availability, and Auth0 does not support beta functionality for
+    /// production use. The feature must be enabled for your tenant.
     ///
     /// ## Scopes Required
     ///
@@ -757,6 +771,8 @@ public extension MyAccountAuthenticationMethods {
     ///
     /// Convenience overload of ``getUserProfile(options:)`` that returns all profile fields.
     ///
+    /// This API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) and might change before General Availability.
+    ///
     /// ## Scopes Required
     ///
     /// `read:me:profile`
@@ -791,6 +807,8 @@ public extension MyAccountAuthenticationMethods {
     /// Default implementation of ``getUserProfile(options:)`` for types outside the SDK that conform to
     /// ``MyAccountAuthenticationMethods``.
     ///
+    /// This API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) and might change before General Availability.
+    ///
     /// The client returned by ``MyAccount/authenticationMethods`` implements this method and calls the
     /// My Account API. This default implementation sends no request: the returned request fails with a
     /// ``MyAccountError`` whose ``MyAccountError/code`` is `a0.sdk.internal_error.not_implemented`. Implement the
@@ -804,6 +822,8 @@ public extension MyAccountAuthenticationMethods {
 
     /// Default implementation of ``updateUserProfile(_:)`` for types outside the SDK that conform to
     /// ``MyAccountAuthenticationMethods``.
+    ///
+    /// This API is currently in [Beta](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#beta) and might change before General Availability.
     ///
     /// The client returned by ``MyAccount/authenticationMethods`` implements this method and calls the
     /// My Account API. This default implementation sends no request: the returned request fails with a
