@@ -159,6 +159,17 @@ class LoggerSpec: QuickSpec {
                 expect(output.messages).toEventually(contain(json))
             }
 
+            it("should redact sensitive values in a JSON request body") {
+                let body = ["recovery_code": "SECRET-RECOVERY", "password": "SECRET-PASSWORD", "client_id": "abc123"]
+                request.httpBody = try! JSONSerialization.data(withJSONObject: body)
+                logger.trace(request: request, session: URLSession.shared)
+                expect(output.messages.joined(separator: "\n")).toEventually(contain("client_id"))
+                let logged = output.messages.joined(separator: "\n")
+                expect(logged).to(contain("<REDACTED>"))
+                expect(logged).toNot(contain("SECRET-RECOVERY"))
+                expect(logged).toNot(contain("SECRET-PASSWORD"))
+            }
+
             it("should log nothing for invalid request") {
                 request.url = nil
                 logger.trace(request: request, session: URLSession.shared)
@@ -217,11 +228,28 @@ class LoggerSpec: QuickSpec {
     }
 }
 
-class SpyOutput: LoggerOutput {
-    var messages: [String] = []
+final class SpyOutput: LoggerOutput, @unchecked Sendable {
+    // DefaultLogger appends from its background queue while specs poll from the test thread.
+    private let lock = NSLock()
+    private var storage: [String] = []
+
+    var messages: [String] {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return storage
+        }
+        set {
+            lock.lock()
+            defer { lock.unlock() }
+            storage = newValue
+        }
+    }
 
     func log(message: String) {
-        messages.append(message)
+        lock.lock()
+        defer { lock.unlock() }
+        storage.append(message)
     }
 
     func newLine() { }
