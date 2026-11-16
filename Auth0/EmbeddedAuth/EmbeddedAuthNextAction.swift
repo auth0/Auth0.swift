@@ -68,14 +68,20 @@ public enum NextAction: Sendable, Equatable {
     /// Offered alongside the identify steps when the connection allows self-registration. Calling
     /// ``EmbeddedAuth/signup()`` does not create the account yet: the server answers with the steps needed to
     /// register (for example identifying the new user and verifying a one-time code). Once the user completes them,
-    /// the server offers ``confirmSignup``.
+    /// the server offers ``confirmSignup(password:)``.
     ///
-    /// - Parameter identifiers: The identifiers the server accepts for registration, each flagged as required or optional.
-    ///   Identifiers this SDK version does not recognise are left out, so the list can be empty.
-    case signup(identifiers: [SignupIdentifier])
+    /// - Parameters:
+    ///   - identifiers:         The identifiers the server accepts for registration, each flagged as required or optional.
+    ///     Identifiers this SDK version does not recognise are left out, so the list can be empty.
+    ///   - passwordRequirement: Whether the connection collects a password at registration, so the first screen can tell the
+    ///     user that a password is coming. The password itself is collected at the last step, see ``confirmSignup(password:)``.
+    case signup(identifiers: [SignupIdentifier], passwordRequirement: CredentialRequirement)
 
-    /// Server expects ``EmbeddedAuth/confirmSignup()`` to be called to finish registration and sign the user in.
-    case confirmSignup
+    /// Server expects ``EmbeddedAuth/confirmSignup(password:)`` to be called to finish registration and sign the user in.
+    ///
+    /// - Parameter password: What to ask the user for, or `nil` when the connection does not collect a password at
+    ///   registration. When it is `nil`, call ``EmbeddedAuth/confirmSignup()``.
+    case confirmSignup(password: SignupPassword?)
 
     /// An action string the SDK does not recognise — preserved for forward compatibility.
     case unknown(rawAction: String)
@@ -84,7 +90,7 @@ public enum NextAction: Sendable, Equatable {
 
 // MARK: - SignupIdentifier
 
-/// An identifier the server accepts when registering a new user, as offered by ``NextAction/signup(identifiers:)``.
+/// An identifier the server accepts when registering a new user, as offered by ``NextAction/signup(identifiers:passwordRequirement:)``.
 public struct SignupIdentifier: Sendable, Equatable {
 
     /// The kind of identifier. Never ``IdentifierType/username``: the server does not offer username sign-up.
@@ -101,6 +107,105 @@ public struct SignupIdentifier: Sendable, Equatable {
     public init(type: IdentifierType, isRequired: Bool) {
         self.type = type
         self.isRequired = isRequired
+    }
+
+}
+
+// MARK: - CredentialRequirement
+
+/// Whether a connection collects a credential, such as a password, and whether the user must provide it.
+///
+/// - Note: Because this type has a `none` case, write `CredentialRequirement.none` (or rely on the type being known
+///   from context) rather than `.none` where the value is wrapped in an `Optional`, which Swift reads as
+///   `Optional.none`.
+public enum CredentialRequirement: Sendable, Equatable {
+
+    /// The connection does not collect this credential.
+    case none
+
+    /// The connection collects this credential, but the user can skip it.
+    case optional
+
+    /// The connection requires this credential.
+    case required
+
+}
+
+// MARK: - SignupPassword
+
+/// What the app needs to collect when the connection asks for a password at the last step of a sign-up, as offered by
+/// ``NextAction/confirmSignup(password:)``.
+///
+/// The hints in ``complexity`` are advisory, so the app can guide the user as they type. The server is authoritative:
+/// a password that satisfies the hints can still be rejected, in which case the request fails with
+/// ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidPassword``.
+public struct SignupPassword: Sendable, Equatable {
+
+    /// Whether the user must provide a password.
+    ///
+    /// When `false` the user can skip it by calling ``EmbeddedAuth/confirmSignup()``.
+    ///
+    /// The server does not repeat this flag when it offers ``NextAction/confirmSignup(password:)``. The SDK takes it from the
+    /// flow so far: it is `false` only when the sign-up offer said the password is optional. It is `true` when the
+    /// password is required, and also when the SDK never saw that offer, for example when the flow was started with a
+    /// different ``EmbeddedAuth`` client. In that case a skipped password that the connection requires is rejected with
+    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordRequired``.
+    public let isRequired: Bool
+
+    /// Advisory hints about the password rules.
+    public let complexity: SignupPasswordComplexity
+
+    /// Creates a description of the password to collect.
+    ///
+    /// - Parameters:
+    ///   - isRequired: Whether the user must provide a password.
+    ///   - complexity: Advisory hints about the password rules.
+    public init(isRequired: Bool, complexity: SignupPasswordComplexity) {
+        self.isRequired = isRequired
+        self.complexity = complexity
+    }
+
+}
+
+// MARK: - SignupPasswordComplexity
+
+/// Advisory hints about the password rules of the connection, as offered by ``SignupPassword/complexity``.
+///
+/// The hints are never stricter than the server, but they can be looser: rules that cannot be expressed here, such as
+/// "at least 3 of the 4 character types", are not included and are still enforced. The server is authoritative, so a
+/// password that satisfies the hints can still be rejected.
+public struct SignupPasswordComplexity: Sendable, Equatable {
+
+    /// Minimum password length, counted in UTF-16 code units.
+    ///
+    /// Count with `password.utf16.count`, not `password.count`: the two differ for characters such as emoji.
+    public let minLength: Int
+
+    /// Character types the password must contain. All of them are required.
+    ///
+    /// Empty when the server lists none. Character types this SDK version does not recognise are left out.
+    public let characterTypes: [CharacterType]
+
+    /// Creates a description of the password rules.
+    ///
+    /// - Parameters:
+    ///   - minLength:      Minimum password length, counted in UTF-16 code units.
+    ///   - characterTypes: Character types the password must contain. All of them are required.
+    public init(minLength: Int, characterTypes: [CharacterType]) {
+        self.minLength = minLength
+        self.characterTypes = characterTypes
+    }
+
+    /// A kind of character a password must contain.
+    public enum CharacterType: String, Sendable, Equatable, CaseIterable {
+        /// A lowercase letter.
+        case lowercase
+        /// An uppercase letter.
+        case uppercase
+        /// A digit.
+        case number
+        /// A special character, such as `!` or `#`.
+        case special
     }
 
 }

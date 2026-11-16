@@ -827,12 +827,12 @@ import Foundation
 
     @Test func reasonParsesSignupWithRequiredEmail() {
         let actions = signupActions([["action": "action:signup:v1", "identifiers": ["email": ["required": true]]]])
-        #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true)])])
+        #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true)], passwordRequirement: .none)])
     }
 
     @Test func reasonParsesSignupWithOptionalPhone() {
         let actions = signupActions([["action": "action:signup:v1", "identifiers": ["phone_number": ["required": false]]]])
-        #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .phone, isRequired: false)])])
+        #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .phone, isRequired: false)], passwordRequirement: .none)])
     }
 
     @Test func reasonParsesSignupWithBothIdentifiersInAFixedOrder() {
@@ -841,7 +841,7 @@ import Foundation
         for _ in 0..<20 {
             let actions = signupActions([["action": "action:signup:v1", "identifiers": identifiers]])
             #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true),
-                                                      SignupIdentifier(type: .phone, isRequired: false)])])
+                                                      SignupIdentifier(type: .phone, isRequired: false)], passwordRequirement: .none)])
         }
     }
 
@@ -857,7 +857,7 @@ import Foundation
 
     @Test func reasonKeepsSignupWithOnlyUnknownIdentifierKeys() {
         let actions = signupActions([["action": "action:signup:v1", "identifiers": ["username": ["required": true]]]])
-        #expect(actions == [.signup(identifiers: [])])
+        #expect(actions == [.signup(identifiers: [], passwordRequirement: .none)])
     }
 
     @Test func reasonIgnoresUnknownSignupIdentifierKeysNextToKnownOnes() {
@@ -865,7 +865,7 @@ import Foundation
             "action": "action:signup:v1",
             "identifiers": ["username": ["required": true], "email": ["required": true]]
         ]])
-        #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true)])])
+        #expect(actions == [.signup(identifiers: [SignupIdentifier(type: .email, isRequired: true)], passwordRequirement: .none)])
     }
 
     @Test func reasonSkipsSignupIdentifierWhoseRequiredFlagIsMissingOrNotABoolean() {
@@ -873,24 +873,203 @@ import Foundation
             "action": "action:signup:v1",
             "identifiers": ["email": [String: Any](), "phone_number": ["required": true]]
         ]])
-        #expect(missing == [.signup(identifiers: [SignupIdentifier(type: .phone, isRequired: true)])])
+        #expect(missing == [.signup(identifiers: [SignupIdentifier(type: .phone, isRequired: true)], passwordRequirement: .none)])
 
         let notABool = signupActions([[
             "action": "action:signup:v1",
             "identifiers": ["email": ["required": "true"], "phone_number": ["required": true]]
         ]])
-        #expect(notABool == [.signup(identifiers: [SignupIdentifier(type: .phone, isRequired: true)])])
+        #expect(notABool == [.signup(identifiers: [SignupIdentifier(type: .phone, isRequired: true)], passwordRequirement: .none)])
 
         let notAnObject = signupActions([["action": "action:signup:v1", "identifiers": ["email": true]]])
-        #expect(notAnObject == [.signup(identifiers: [])])
+        #expect(notAnObject == [.signup(identifiers: [], passwordRequirement: .none)])
     }
 
     @Test func reasonParsesConfirmSignup() {
-        #expect(signupActions([["action": "action:signup:confirm:v1"]]) == [.confirmSignup])
+        #expect(signupActions([["action": "action:signup:confirm:v1"]]) == [.confirmSignup(password: nil)])
     }
 
     @Test func reasonTreatsAnotherSignupVersionAsUnknown() {
         let actions = signupActions([["action": "action:signup:v2"], ["action": "action:signup:confirm:v2"]])
         #expect(actions == [.unknown(rawAction: "action:signup:v2"), .unknown(rawAction: "action:signup:confirm:v2")])
+    }
+
+    // MARK: - password sign-up: sub-reasons
+
+    private func subReasonName(_ description: String?, status: Int = 403, code: String = "insufficient_authorization") -> String? {
+        var info: [String: Any] = ["error": code, "auth_session": "sess_abc", "next": [["action": "action:signup:confirm:v1"]]]
+        if let description { info["error_description"] = description }
+        let reason = EmbeddedAuthError(info: info, statusCode: status).reason
+        guard case .insufficientAuthorization(let sub, let actions) = reason else { return nil }
+        #expect(actions == [.confirmSignup(password: nil)])
+        return String(describing: sub)
+    }
+
+    @Test func reasonMapsThePasswordSignupSubReasonsAndParsesNextActions() {
+        #expect(subReasonName("password_required") == "passwordRequired")
+        #expect(subReasonName("password_not_accepted") == "passwordNotAccepted")
+        #expect(subReasonName("invalid_password") == "invalidPassword")
+    }
+
+    @Test func reasonKeepsUnrecognisedInsufficientAuthorizationDescriptionsAsNone() {
+        #expect(subReasonName("unknown_error") == "none")
+        #expect(subReasonName("password_required_please") == "none")
+        #expect(subReasonName("Password_Required") == "none")
+        #expect(subReasonName(nil) == "none")
+    }
+
+    @Test func reasonDoesNotMapThePasswordSubReasonsUnderOtherErrorCodes() {
+        let denied = EmbeddedAuthError(info: ["error": "access_denied", "error_description": "password_required"], statusCode: 403)
+        guard case .accessDenied = denied.reason else {
+            Issue.record("Expected .accessDenied, got \(denied.reason)"); return
+        }
+    }
+
+    @Test func reasonMapsPasswordLeakedToItsOwnTerminalReason() {
+        let error = EmbeddedAuthError(info: ["error": "access_denied", "error_description": "password_leaked"], statusCode: 403)
+        guard case .passwordLeaked = error.reason else {
+            Issue.record("Expected .passwordLeaked, got \(error.reason)"); return
+        }
+    }
+
+    // MARK: - password sign-up: sign-up offer
+
+    private func signupOffer(_ methods: Any?) -> [NextAction]? {
+        var entry: [String: Any] = ["action": "action:signup:v1", "identifiers": ["email": ["required": true]]]
+        if let methods { entry["authentication_methods"] = methods }
+        return signupActions([entry])
+    }
+
+    private let requiredEmail = SignupIdentifier(type: .email, isRequired: true)
+
+    @Test func reasonReadsTheSignupPasswordRequirement() {
+        #expect(signupOffer(nil) == [.signup(identifiers: [requiredEmail], passwordRequirement: .none)])
+        #expect(signupOffer(["password": ["required": true]]) == [.signup(identifiers: [requiredEmail], passwordRequirement: .required)])
+        #expect(signupOffer(["password": ["required": false]]) == [.signup(identifiers: [requiredEmail], passwordRequirement: .optional)])
+    }
+
+    @Test func reasonTreatsAnUnreadablePasswordRequirementAsNoneAndKeepsTheIdentifiers() {
+        let none = [NextAction.signup(identifiers: [requiredEmail], passwordRequirement: .none)]
+        // A sibling method this SDK does not know, without a password key.
+        #expect(signupOffer(["passkey": ["required": true]]) == none)
+        #expect(signupOffer(["password": ["required": "true"]]) == none)
+        #expect(signupOffer(["password": [String: Any]()]) == none)
+        #expect(signupOffer(["password": true]) == none)
+        #expect(signupOffer("password") == none)
+        #expect(signupOffer(["password"]) == none)
+        #expect(signupOffer([String: Any]()) == none)
+    }
+
+    @Test func reasonReadsThePasswordRequirementNextToAnUnknownSibling() {
+        let offer = signupOffer(["passkey": ["required": true], "password": ["required": false]])
+        #expect(offer == [.signup(identifiers: [requiredEmail], passwordRequirement: .optional)])
+    }
+
+    // MARK: - password sign-up: confirm entry
+
+    private func confirmEntry(_ options: Any?) -> [String: Any] {
+        var entry: [String: Any] = ["action": "action:signup:confirm:v1"]
+        if let options { entry["password_complexity_options"] = options }
+        return entry
+    }
+
+    private func confirmActions(_ options: Any?, requirement: CredentialRequirement? = nil) -> [NextAction]? {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "auth_session": "sess_abc",
+            "next": [confirmEntry(options)]
+        ], statusCode: 403).withSignupPasswordRequirement(requirement)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else { return nil }
+        return actions
+    }
+
+    @Test func reasonParsesConfirmSignupWithoutPasswordOptions() {
+        #expect(confirmActions(nil) == [.confirmSignup(password: nil)])
+    }
+
+    @Test func reasonParsesConfirmSignupWithFullPasswordOptions() {
+        let options: [String: Any] = ["min_length": 12, "character_types": ["lowercase", "uppercase", "number", "special"]]
+        let complexity = SignupPasswordComplexity(minLength: 12, characterTypes: [.lowercase, .uppercase, .number, .special])
+        #expect(confirmActions(options) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+    }
+
+    @Test func reasonParsesPasswordOptionsWithoutCharacterTypes() {
+        let complexity = SignupPasswordComplexity(minLength: 8, characterTypes: [])
+        #expect(confirmActions(["min_length": 8]) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+    }
+
+    @Test func reasonLeavesOutUnknownCharacterTypes() {
+        let complexity = SignupPasswordComplexity(minLength: 8, characterTypes: [.number, .special])
+        let options: [String: Any] = ["min_length": 8, "character_types": ["number", "emoji", 5, "special", "Number"]]
+        #expect(confirmActions(options) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+    }
+
+    @Test func reasonRemovesDuplicateCharacterTypesKeepingTheOrder() {
+        let complexity = SignupPasswordComplexity(minLength: 8, characterTypes: [.special, .number, .lowercase])
+        let options: [String: Any] = ["min_length": 8, "character_types": ["special", "number", "special", "lowercase", "number"]]
+        #expect(confirmActions(options) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+    }
+
+    @Test func reasonTreatsCharacterTypesThatAreNotAnArrayAsEmpty() {
+        let complexity = SignupPasswordComplexity(minLength: 8, characterTypes: [])
+        let expected = [NextAction.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))]
+        #expect(confirmActions(["min_length": 8, "character_types": "number"]) == expected)
+        #expect(confirmActions(["min_length": 8, "character_types": ["number": true]]) == expected)
+    }
+
+    @Test func reasonDropsConfirmSignupWhoseMinLengthCannotBeRead() {
+        #expect(confirmActions([String: Any]()) == [])
+        #expect(confirmActions(["character_types": ["number"]]) == [])
+        #expect(confirmActions(["min_length": "8"]) == [])
+        #expect(confirmActions(["min_length": 8.5]) == [])
+    }
+
+    @Test func reasonDropsConfirmSignupWhoseOptionsAreNotAnObject() {
+        #expect(confirmActions("min_length") == [])
+        #expect(confirmActions([8]) == [])
+        #expect(confirmActions(true) == [])
+    }
+
+    @Test func reasonKeepsSiblingsOfADroppedConfirmSignup() {
+        let error = EmbeddedAuthError(info: [
+            "error": "insufficient_authorization",
+            "next": [["action": "action:identify:email:v1"], confirmEntry("bad"), ["action": "action:verify:password:v1"]]
+        ], statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions == [.identifyEmail, .verifyPassword])
+    }
+
+    @Test func reasonDoesNotRangeCheckMinLength() {
+        let complexity = SignupPasswordComplexity(minLength: 0, characterTypes: [])
+        #expect(confirmActions(["min_length": 0]) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+    }
+
+    @Test func reasonDerivesIsRequiredFromTheFlowRequirement() {
+        let options: [String: Any] = ["min_length": 8]
+        func isRequired(_ requirement: CredentialRequirement?) -> Bool? {
+            guard case .confirmSignup(let password)? = confirmActions(options, requirement: requirement)?.first else { return nil }
+            return password?.isRequired
+        }
+        #expect(isRequired(.optional) == false)
+        #expect(isRequired(.required) == true)
+        #expect(isRequired(CredentialRequirement.none) == true)
+        #expect(isRequired(nil) == true)
+    }
+
+    @Test func theFlowRequirementDoesNotChangeErrorEquality() {
+        let error = EmbeddedAuthError(info: ["error": "insufficient_authorization"], statusCode: 403)
+        #expect(error.withSignupPasswordRequirement(.optional) == error)
+    }
+
+    @Test func reasonKeepsOtherSignupVersionsUnknownNextToPasswordOptions() {
+        let actions = signupActions([["action": "action:signup:v2", "authentication_methods": ["password": ["required": true]]],
+                                     ["action": "action:signup:confirm:v2", "password_complexity_options": ["min_length": 8]]])
+        #expect(actions == [.unknown(rawAction: "action:signup:v2"), .unknown(rawAction: "action:signup:confirm:v2")])
+    }
+
+    @Test func passwordSignupTypesHaveTheDocumentedShape() {
+        #expect(SignupPasswordComplexity.CharacterType.allCases.map(\.rawValue) == ["lowercase", "uppercase", "number", "special"])
     }
 }
