@@ -419,8 +419,8 @@ struct EmbeddedAuthClientTests {
         do {
             let credentials = try await sut.verifyOtp("123456", type: .oob).start()
             #expect(credentials.accessToken == "the_access_token")
-            // G2: token exchange must not include empty PKCE/redirect fields
-            #expect(tokenBody?["code_verifier"] == nil)
+            // The exchange carries the PKCE verifier but no redirect_uri (none was sent at authorize).
+            #expect((tokenBody?["code_verifier"] as? String)?.isEmpty == false)
             #expect(tokenBody?["redirect_uri"] == nil)
             #expect(tokenBody?["code"] as? String == "auth0_ac_theCode")
         } catch {
