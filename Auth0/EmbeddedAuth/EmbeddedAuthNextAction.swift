@@ -146,10 +146,10 @@ public struct SignupPassword: Sendable, Equatable {
     /// When `false` the user can skip it by calling ``EmbeddedAuth/confirmSignup()``.
     ///
     /// The server does not repeat this flag when it offers ``NextAction/confirmSignup(password:)``. The SDK takes it from the
-    /// flow so far: it is `false` only when the sign-up offer said the password is optional. It is `true` when the
-    /// password is required, and also when the SDK never saw that offer, for example when the flow was started with a
-    /// different ``EmbeddedAuth`` client. In that case a skipped password that the connection requires is rejected with
-    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordRequired``.
+    /// flow so far: it is `true` only when the sign-up offer said the password is required, or when the server has
+    /// already answered a confirmation with
+    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordRequired``. Otherwise it is `false`, and a skipped
+    /// password that the connection needs is rejected with that same reason, which makes it `true` from then on.
     public let isRequired: Bool
 
     /// Advisory hints about the password rules.

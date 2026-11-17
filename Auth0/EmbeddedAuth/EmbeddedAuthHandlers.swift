@@ -8,7 +8,7 @@ extension Auth0EmbeddedAuth {
     ///
     /// A `403 insufficient_authorization` failure carries the rotated `auth_session`, which becomes
     /// the active session for the next step; any other failure clears it (see
-    /// ``updateSessionFromFailure(_:)``). Intermediate steps never produce a successful `200`
+    /// ``EmbeddedAuthFlowState/apply(_:)``). Intermediate steps never produce a successful `200`
     /// response in practice — if one arrives, the session is cleared and `.success(())` forwarded.
     func decodeAuthorizeResponse(
         _ result: Result<ResponseValue, EmbeddedAuthError>,
@@ -16,10 +16,9 @@ extension Auth0EmbeddedAuth {
     ) {
         switch result {
         case .failure(let error):
-            updateSessionFromFailure(error)
-            callback(.failure(error.withSignupPasswordRequirement(signupPasswordRequirement)))
+            callback(.failure(record(error)))
         case .success:
-            currentSession = nil
+            flow.end()
             callback(.success(()))
         }
     }
@@ -38,25 +37,34 @@ extension Auth0EmbeddedAuth {
     ) {
         switch result {
         case .failure(let error):
-            updateSessionFromFailure(error)
-            callback(.failure(error.withSignupPasswordRequirement(signupPasswordRequirement)))
+            callback(.failure(record(error)))
         case .success(let response):
             guard let data = response.data,
                   let body = try? JSONDecoder().decode(AuthorizationCodeResponse.self, from: data) else {
-                currentSession = nil
+                flow.end()
                 callback(.failure(EmbeddedAuthError(from: response)))
                 return
             }
             exchange(code: body.authorizationCode).start { [self] exchangeResult in
                 switch exchangeResult {
-                case .success:
-                    currentSession = nil
+                case .success(let credentials):
+                    flow.end()
+                    callback(.success(credentials))
                 case .failure(let error):
-                    updateSessionFromFailure(error)
+                    callback(.failure(record(error)))
                 }
-                callback(exchangeResult.mapError { $0.withSignupPasswordRequirement(signupPasswordRequirement) })
             }
         }
+    }
+
+    /// Applies a failed step to the flow, then returns the error to deliver: the error itself, carrying the password
+    /// requirement the flow learned so far.
+    ///
+    /// This is the single place that attaches the requirement. An error does not know about the flow, because it is
+    /// parsed lazily from the server's JSON and the server does not repeat the requirement at the confirm step.
+    private func record(_ error: EmbeddedAuthError) -> EmbeddedAuthError {
+        flow.apply(error)
+        return error.withSignupPasswordRequirement(flow.signupPasswordRequirement)
     }
 
 }

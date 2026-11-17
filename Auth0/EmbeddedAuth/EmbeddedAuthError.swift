@@ -12,7 +12,7 @@ public struct EmbeddedAuthError: Auth0APIError, @unchecked Sendable {
     /// The password requirement of the sign-up in progress, when the SDK knows it.
     ///
     /// Set by the client that runs the flow, never by the server response, and used to fill
-    /// ``SignupPassword/isRequired`` when the `next` actions are parsed. Not part of equality.
+    /// ``SignupPassword/isRequired`` when the `next` actions are parsed. Like ``info``, it is ignored by `==`.
     var signupPasswordRequirement: CredentialRequirement?
 
     /// Creates an error from a JSON response.
@@ -228,8 +228,9 @@ private extension EmbeddedAuthError {
               let minLength = options["min_length"] as? Int else { return nil }
         let complexity = SignupPasswordComplexity(minLength: minLength,
                                                   characterTypes: Self.characterTypes(from: options))
-        // Only an optional password can be skipped; unknown means the sign-up offer was never seen, so assume required.
-        let isRequired = signupPasswordRequirement != CredentialRequirement.optional
+        // Only a sign-up offer that said the password is required (or a `password_required` answer) makes it mandatory.
+        // Without that information the password can be skipped, and the server answers if it was needed.
+        let isRequired = signupPasswordRequirement == CredentialRequirement.required
         return .confirmSignup(password: SignupPassword(isRequired: isRequired, complexity: complexity))
     }
 

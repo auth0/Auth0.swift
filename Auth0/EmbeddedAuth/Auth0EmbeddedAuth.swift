@@ -26,28 +26,23 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     /// Optional logger for request/response tracing.
     var logger: Logger?
 
-    /// The rotated `auth_session` for the in-progress flow; `nil` when no flow is active.
+    /// The in-progress flow: its rotated `auth_session` and what it revealed about the sign-up password.
     ///
-    /// Internal storage only — deliberately not named `authSession` and not exposed on the
-    /// ``EmbeddedAuth`` protocol, so callers cannot read the session. The flow is strictly
-    /// sequential — each step starts only after the previous one delivers its result — so this
-    /// value is never touched concurrently.
+    /// Internal storage only, and not part of the ``EmbeddedAuth`` protocol, so callers cannot read the session. The
+    /// flow is strictly sequential — each step starts only after the previous one delivers its result — so this
+    /// value is never touched concurrently. Only `authorize` and the response handlers change it, through the
+    /// transitions of ``EmbeddedAuthFlowState``.
     ///
     /// - Warning: Never call another step while a prior step's network request is still in-flight
     ///   (e.g. retrying `authorize()` inside a loop). A concurrent `exchange(code:)` completion
-    ///   will clear `currentSession` and overwrite whatever the new `authorize()` established.
-    var currentSession: String? {
-        didSet {
-            if currentSession == nil { signupPasswordRequirement = nil }
-        }
-    }
+    ///   will end the flow and overwrite whatever the new `authorize()` established.
+    var flow = EmbeddedAuthFlowState()
+
+    /// The rotated `auth_session` of the in-progress flow; `nil` when no flow is active.
+    var currentSession: String? { flow.session }
 
     /// Whether the connection requires a password at sign-up, as learned from the flow so far; `nil` when not known.
-    ///
-    /// Read from the sign-up offer (or a `password_required` answer) and cleared together with ``currentSession``. It
-    /// fills ``SignupPassword/isRequired``, which the server does not repeat at the confirm step. It never holds the
-    /// password itself. Same sequential-access contract as ``currentSession``.
-    var signupPasswordRequirement: CredentialRequirement?
+    var signupPasswordRequirement: CredentialRequirement? { flow.signupPasswordRequirement }
 
     init(clientId: String,
          url: URL,
@@ -66,7 +61,7 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
                    capabilities: [EmbeddedCapability],
                    scope: String = "openid profile email offline_access",
                    audience: String?) -> Request<Void, EmbeddedAuthError> {
-        currentSession = nil
+        flow.end()
         var body: [String: Any] = [
             "client_id": clientId,
             "capabilities": capabilities.map { $0.action.rawValue },
@@ -324,34 +319,6 @@ extension Auth0EmbeddedAuth {
             logger: logger,
             auth0ClientInfo: auth0ClientInfo
         )
-    }
-
-    /// Updates the flow's session after a step fails.
-    ///
-    /// - On a continuation (`.insufficientAuthorization`) the rotated `auth_session` becomes the
-    ///   active session so the next step can proceed. The password requirement of a sign-up is
-    ///   remembered from the sign-up offer, or from a `password_required` answer.
-    /// - On a network failure (`.network`) the session is preserved so the caller can retry the
-    ///   same step.
-    /// - On all other failures the session is cleared; any follow-on step will fail locally with
-    ///   `.noActiveSession`.
-    func updateSessionFromFailure(_ error: EmbeddedAuthError) {
-        switch error.reason {
-        case .insufficientAuthorization(let subReason, let nextActions):
-            if let newSession = error.info["auth_session"] as? String {
-                currentSession = newSession
-            }
-            for case .signup(_, let requirement) in nextActions {
-                signupPasswordRequirement = requirement
-            }
-            if case .passwordRequired = subReason {
-                signupPasswordRequirement = .required
-            }
-        case .network:
-            break
-        default:
-            currentSession = nil
-        }
     }
 
 }

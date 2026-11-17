@@ -395,7 +395,7 @@ Some connections also collect a password, as the last step of the sign-up. The i
 
 `passwordRequirement` lets the first screen tell the user a password is coming. When the value is wrapped in an `Optional`, write `CredentialRequirement.none`: a bare `.none` is read as `Optional.none`.
 
-`.confirmSignup(password:)` tells you what to render. `password` is `nil` when there is no password to collect. Otherwise show a password field, mandatory when `isRequired` is `true`, and use `complexity` for hints. The server does not repeat `isRequired` at the confirm step: the client remembers it from the sign-up offer at the start of the flow, so use the same client for the whole flow. If the client never saw the offer, `isRequired` is `true`, and a skipped password that the connection requires comes back as `.passwordRequired`.
+`.confirmSignup(password:)` tells you what to render. `password` is `nil` when there is no password to collect. Otherwise show a password field, mandatory when `isRequired` is `true`, and use `complexity` for hints. The server does not repeat `isRequired` at the confirm step: the client remembers it from the sign-up offer at the start of the flow, so use the same client for the whole flow. `isRequired` is `true` only when that offer said the password is required, or after the server has answered with `.passwordRequired`. Otherwise it is `false`, and a skipped password that the connection needs comes back as `.passwordRequired`, which makes `isRequired` `true` from then on.
 
 The hints are advisory. The server is authoritative, so a password that satisfies them can still be rejected:
 
@@ -403,7 +403,7 @@ The hints are advisory. The server is authoritative, so a password that satisfie
 - `complexity.characterTypes` lists the character types the password must contain; all of them are required. It is empty when the server lists none, and types this SDK does not recognise are left out.
 - Rules such as "at least 3 of the 4 character types" are not included, but they are still enforced.
 
-`nil` creates the account without a password, which only works when the password is optional. An empty string is sent as is, like the password of `verifyPassword(_:)`, and nothing is trimmed. The SDK does not check the length or the complexity locally. A password longer than 2048 characters comes back as `.invalidRequest`, which ends the flow.
+`nil` creates the account without a password, which only works when the password is optional. The password is sent as is and nothing is trimmed, and the server treats an empty string as no password. The SDK does not check the length or the complexity locally: the server and the connection's password policy enforce the limits.
 
 ```swift
 func finishSignUp(password: SignupPassword?, askForPassword: (_ lastPasswordWasRejected: Bool) async -> String?) async throws -> Credentials {

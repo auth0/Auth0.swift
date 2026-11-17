@@ -194,9 +194,8 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// Call this when ``NextAction/confirmSignup(password:)`` is among the `nextActions`. Pass the password the user
     /// entered, or `nil` to create the account without one when the password is optional.
     ///
-    /// The password is sent as given: it is not trimmed, and an empty string is sent as an empty string. The SDK does not
-    /// check its length or its complexity locally. The server is authoritative; a password longer than 2048 characters
-    /// ends the flow with ``EmbeddedAuthErrorReason/invalidRequest``.
+    /// The password is sent as given and is not trimmed. The server treats an empty string as no password. The SDK does not
+    /// check its length or its complexity locally: the server and the connection's password policy enforce the limits.
     ///
     /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
     /// The SDK never keeps the password. If the token exchange fails with ``EmbeddedAuthErrorReason/network``, the

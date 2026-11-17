@@ -442,12 +442,12 @@ struct EmbeddedAuthPasswordSignupClientTests {
         #expect(await isRequired(after: .requiredPassword) == true)
     }
 
-    @Test func isRequiredIsTrueWhenTheOfferHadNoPasswordInformation() async {
-        #expect(await isRequired(after: .noPassword) == true)
+    @Test func isRequiredIsFalseWhenTheOfferHadNoPasswordInformation() async {
+        #expect(await isRequired(after: .noPassword) == false)
     }
 
-    @Test func isRequiredIsTrueWhenTheSignupOfferWasNeverSeen() async {
-        #expect(await isRequired(after: .noSignupOffer) == true)
+    @Test func isRequiredIsFalseWhenTheSignupOfferWasNeverSeen() async {
+        #expect(await isRequired(after: .noSignupOffer) == false)
     }
 
     @Test func confirmSignupCarriesTheComplexityHints() async {
@@ -461,9 +461,9 @@ struct EmbeddedAuthPasswordSignupClientTests {
 
     @Test func aNewAuthorizeResetsWhatWasLearnedAboutThePassword() async {
         let sut = makeClient()
-        await reachConfirm(sut, offer: .optionalPassword)
+        await reachConfirm(sut, offer: .requiredPassword)
         // Same client, new flow: the earlier offer must not leak into it.
-        #expect(await isRequiredOnSameClient(sut, offer: .noSignupOffer) == true)
+        #expect(await isRequiredOnSameClient(sut, offer: .noSignupOffer) == false)
     }
 
     private func isRequiredOnSameClient(_ sut: EmbeddedAuth, offer: Offer) async -> Bool? {
@@ -644,9 +644,9 @@ struct EmbeddedAuthPasswordSignupClientTests {
         await expectNoSession(sut)
     }
 
-    @Test func aPasswordLongerThan2048CharactersIsSentUnmodifiedAndEndsTheFlow() async {
+    @Test func aPasswordTheServerRejectsAsMalformedIsSentUnmodifiedAndEndsTheFlow() async {
         let sut = await clientAtConfirm()
-        let tooLong = String(repeating: "a", count: 2049)
+        let tooLong = String(repeating: "a", count: 4096)
         nonisolated(unsafe) var sent: String?
         Mock.requestHandler = { req in
             sent = bodyJSON(req)["password"] as? String

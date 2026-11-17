@@ -973,7 +973,9 @@ import Foundation
         return entry
     }
 
-    private func confirmActions(_ options: Any?, requirement: CredentialRequirement? = nil) -> [NextAction]? {
+    /// The `next` actions of a confirm entry. The requirement defaults to `.required`, so tests about parsing the
+    /// options don't depend on the unknown default; pass `nil` to test that.
+    private func confirmActions(_ options: Any?, requirement: CredentialRequirement? = .required) -> [NextAction]? {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
@@ -1054,8 +1056,9 @@ import Foundation
         }
         #expect(isRequired(.optional) == false)
         #expect(isRequired(.required) == true)
-        #expect(isRequired(CredentialRequirement.none) == true)
-        #expect(isRequired(nil) == true)
+        // Without a sign-up offer that said "required", the password can be skipped; the server answers if it was needed.
+        #expect(isRequired(CredentialRequirement.none) == false)
+        #expect(isRequired(nil) == false)
     }
 
     @Test func theFlowRequirementDoesNotChangeErrorEquality() {
