@@ -1,4 +1,3 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import CommonCrypto
 
@@ -30,4 +29,3 @@ struct ChallengeGenerator {
         self.challenge = getChallenge(for: self.verifier)
     }
 }
-#endif

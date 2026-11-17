@@ -872,6 +872,9 @@
 		F5C23C0A9F20FC4B25879408 /* PARTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF123110E42EC5CBB8BF169 /* PARTransaction.swift */; };
 		FC33B42E05F64A93BA452F93 /* JWT+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D6B23D0BBA500074024 /* JWT+Header.swift */; };
 		V17KI34D4PWP799FLD81GPVP /* BiometricPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */; };
+		A9E0C1A2300000000000A001 /* ChallengeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */; };
+		A9E0C1A2300000000000A002 /* ChallengeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */; };
+		A9E0C1A2300000000000A003 /* ChallengeGeneratorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F09C6A61D07532B00727E55 /* ChallengeGeneratorSpec.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -3206,6 +3209,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9E0C1A2300000000000A002 /* ChallengeGenerator.swift in Sources */,
 				5F23E6E91D4ACD9200C3F2D9 /* Auth0.swift in Sources */,
 				5CC9940424ED9EC90027DC74 /* CredentialsManagerError.swift in Sources */,
 				5F23E6EA1D4ACD9600C3F2D9 /* Auth0Error.swift in Sources */,
@@ -3315,6 +3319,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9E0C1A2300000000000A001 /* ChallengeGenerator.swift in Sources */,
 				5F23E70E1D4B88FC00C3F2D9 /* Request.swift in Sources */,
 				5FDE87701D8A424700EA27DC /* AuthenticationHandlers.swift in Sources */,
 				5C4F551D23C8FB8E00C89615 /* String+URLSafe.swift in Sources */,
@@ -3424,6 +3429,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9E0C1A2300000000000A003 /* ChallengeGeneratorSpec.swift in Sources */,
 				5F331B0F1D4BB80700AE4382 /* Responses.swift in Sources */,
 				5B6EE39620F8AEDB00264AC7 /* CredentialsManagerSpec.swift in Sources */,
 				5CCDDC422E29703100079840 /* KeychainKeyStoreSpec.swift in Sources */,

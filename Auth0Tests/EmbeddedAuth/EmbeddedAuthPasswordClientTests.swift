@@ -148,28 +148,6 @@ private func reasonName(_ reason: EmbeddedAuthErrorReason) -> String {
     String(describing: reason).prefix { $0 != "(" }.description
 }
 
-/// Collects what a `DefaultLogger` writes so a test can inspect it.
-private final class CapturingOutput: LoggerOutput, @unchecked Sendable {
-    private let lock = NSLock()
-    private var messages: [String] = []
-
-    var text: String {
-        lock.lock()
-        defer { lock.unlock() }
-        return messages.joined(separator: "\n")
-    }
-
-    func log(message: String) {
-        lock.lock()
-        messages.append(message)
-        lock.unlock()
-    }
-
-    func newLine() {
-        log(message: "")
-    }
-}
-
 // MARK: - Suite
 
 @Suite(.serialized)
