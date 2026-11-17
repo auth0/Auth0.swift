@@ -8,7 +8,7 @@ import Foundation
 /// ``Auth0/embeddedAuth(clientId:domain:session:)`` or ``Auth0/embeddedAuth(session:bundle:)``.
 ///
 /// A client tracks a single in-progress flow: calling ``authorize(connection:capabilities:scope:audience:)``
-/// again abandons any previous one, so a new sign-in never reuses a stale session.
+/// again abandons any previous one, so a new sign-in never reuses a stale session or PKCE verifier.
 final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
 
     /// Auth0 application client ID.
@@ -34,8 +34,8 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     /// value is never touched concurrently.
     ///
     /// - Warning: Never call another step while a prior step's network request is still in-flight
-    ///   (e.g. retrying `authorize()` inside a loop). A concurrent `exchange(code:)` completion
-    ///   will clear `currentSession` and overwrite whatever the new `authorize()` established.
+    ///   (e.g. retrying `authorize()` inside a loop). A concurrent `exchange(code:)` completion will clear
+    ///   `currentSession` and `currentVerifier`, undoing the new `authorize()`.
     var currentSession: String? {
         didSet {
             if currentSession == nil { signupPasswordRequirement = nil }
@@ -48,6 +48,11 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     /// fills ``SignupPassword/isRequired``, which the server does not repeat at the confirm step. It never holds the
     /// password itself. Same sequential-access contract as ``currentSession``.
     var signupPasswordRequirement: CredentialRequirement?
+
+    /// The PKCE `code_verifier` for the in-progress flow; `nil` when no flow is active. Set when the `authorize` response
+    /// arrives, so it always matches the challenge that request sent. Sent on the token exchange, cleared with
+    /// ``currentSession``. Memory only: never logged by the SDK (the default logger redacts it) or exposed.
+    var currentVerifier: String?
 
     init(clientId: String,
          url: URL,
@@ -66,15 +71,18 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
                    capabilities: [EmbeddedCapability],
                    scope: String = "openid profile email offline_access",
                    audience: String?) -> Request<Void, EmbeddedAuthError> {
-        currentSession = nil
+        endFlow()
+        let pkce = ChallengeGenerator()
         var body: [String: Any] = [
             "client_id": clientId,
             "capabilities": capabilities.map { $0.action.rawValue },
             "connection": connection,
-            "scope": scope
+            "scope": scope,
+            "code_challenge": pkce.challenge,
+            "code_challenge_method": pkce.method
         ]
         if let audience { body["audience"] = audience }
-        return authorizeRequest(body: body)
+        return authorizeRequest(body: body, verifier: pkce.verifier)
     }
 
     /// Submits a user identifier to continue the authorization flow.
@@ -285,12 +293,15 @@ struct AuthorizationCodeResponse: Decodable {
 extension Auth0EmbeddedAuth {
 
     /// Builds a `POST /e/authorize` request for an intermediate step of the loop.
-    func authorizeRequest(body: [String: Any]) -> Request<Void, EmbeddedAuthError> {
+    func authorizeRequest(body: [String: Any], verifier: String? = nil) -> Request<Void, EmbeddedAuthError> {
         Request(
             session: session,
             url: url.appending("e/authorize"),
             method: "POST",
-            handle: { [self] result, callback in decodeAuthorizeResponse(result, callback: callback) },
+            handle: { [weak self] result, callback in
+                guard let self else { return }
+                decodeAuthorizeResponse(result, verifier: verifier, callback: callback)
+            },
             parameters: body,
             logger: logger,
             auth0ClientInfo: auth0ClientInfo
@@ -299,7 +310,15 @@ extension Auth0EmbeddedAuth {
 
     /// Exchanges the authorization code returned by a completed flow for ``Credentials``.
     func exchange(code: String) -> Request<Credentials, EmbeddedAuthError> {
-        Request(
+        // Without the verifier the code cannot be redeemed, so fail locally instead of sending an exchange without PKCE.
+        guard let currentVerifier else { return missingSessionRequest() }
+        var parameters = [
+            "client_id": clientId,
+            "grant_type": "authorization_code",
+            "code": code
+        ]
+        parameters["code_verifier"] = currentVerifier
+        return Request(
             session: session,
             url: url.appending("oauth/token"),
             method: "POST",
@@ -316,30 +335,33 @@ extension Auth0EmbeddedAuth {
                     callback(.success(credentials))
                 }
             },
-            parameters: [
-                "client_id": clientId,
-                "grant_type": "authorization_code",
-                "code": code
-            ],
+            parameters: parameters,
             logger: logger,
             auth0ClientInfo: auth0ClientInfo
         )
     }
 
+    /// Ends the in-progress flow, discarding its session and PKCE verifier.
+    func endFlow() {
+        currentSession = nil
+        currentVerifier = nil
+    }
+
     /// Updates the flow's session after a step fails.
     ///
-    /// - On a continuation (`.insufficientAuthorization`) the rotated `auth_session` becomes the
-    ///   active session so the next step can proceed. The password requirement of a sign-up is
+    /// - On a continuation (`.insufficientAuthorization`) the rotated `auth_session` becomes the active session, together
+    ///   with the PKCE `verifier` of the `authorize` request being answered. A sign-up's password requirement is
     ///   remembered from the sign-up offer, or from a `password_required` answer.
     /// - On a network failure (`.network`) the session is preserved so the caller can retry the
     ///   same step.
     /// - On all other failures the session is cleared; any follow-on step will fail locally with
     ///   `.noActiveSession`.
-    func updateSessionFromFailure(_ error: EmbeddedAuthError) {
+    func updateSessionFromFailure(_ error: EmbeddedAuthError, verifier: String? = nil) {
         switch error.reason {
         case .insufficientAuthorization(let subReason, let nextActions):
             if let newSession = error.info["auth_session"] as? String {
                 currentSession = newSession
+                if let verifier { currentVerifier = verifier }
             }
             for case .signup(_, let requirement) in nextActions {
                 signupPasswordRequirement = requirement
@@ -350,7 +372,7 @@ extension Auth0EmbeddedAuth {
         case .network:
             break
         default:
-            currentSession = nil
+            endFlow()
         }
     }
 

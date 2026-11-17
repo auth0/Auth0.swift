@@ -35,6 +35,9 @@ let client = Auth0.embeddedAuth()
 
 `authorize(connection:)` uses a default scope of `"openid profile email offline_access"`, which ensures `Credentials.idToken` is populated after a successful `verifyOtp` or `verifyPassword`. Pass a custom `scope:` to the full `authorize(connection:capabilities:scope:audience:)` overload if needed.
 
+> [!NOTE]
+> Every flow is protected with PKCE (S256). `authorize` generates the code challenge and the SDK sends the matching code verifier when it exchanges the authorization code, so there is nothing to configure. If the server rejects the verifier, the error reason is `.sessionExpired`.
+
 ```swift
 func runEmbeddedAuth(connection: String) async throws -> Credentials {
     do {
