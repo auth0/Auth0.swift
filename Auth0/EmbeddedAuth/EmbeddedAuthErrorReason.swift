@@ -129,7 +129,7 @@ public enum EmbeddedAuthErrorReason: Sendable {
 
         /// A password was sent, but the connection does not collect one.
         ///
-        /// Call ``EmbeddedAuth/confirmSignup()`` again without a password.
+        /// Call ``EmbeddedAuth/confirmSignup(password:)`` again with `nil`.
         case passwordNotAccepted
 
         /// The password does not meet the connection's password policy.

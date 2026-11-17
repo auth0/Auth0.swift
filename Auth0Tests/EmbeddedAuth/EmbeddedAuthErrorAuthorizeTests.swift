@@ -973,14 +973,14 @@ import Foundation
         return entry
     }
 
-    /// The `next` actions of a confirm entry. The requirement defaults to `.required`, so tests about parsing the
-    /// options don't depend on the unknown default; pass `nil` to test that.
-    private func confirmActions(_ options: Any?, requirement: CredentialRequirement? = .required) -> [NextAction]? {
+    /// The `next` actions of a confirm entry, as the error parses them. The parser cannot know whether the password is
+    /// required, so `isRequired` is `false`; the client that runs the flow corrects it.
+    private func confirmActions(_ options: Any?) -> [NextAction]? {
         let error = EmbeddedAuthError(info: [
             "error": "insufficient_authorization",
             "auth_session": "sess_abc",
             "next": [confirmEntry(options)]
-        ], statusCode: 403).withSignupPasswordRequirement(requirement)
+        ], statusCode: 403)
         guard case .insufficientAuthorization(_, let actions) = error.reason else { return nil }
         return actions
     }
@@ -992,29 +992,29 @@ import Foundation
     @Test func reasonParsesConfirmSignupWithFullPasswordOptions() {
         let options: [String: Any] = ["min_length": 12, "character_types": ["lowercase", "uppercase", "number", "special"]]
         let complexity = SignupPasswordComplexity(minLength: 12, characterTypes: [.lowercase, .uppercase, .number, .special])
-        #expect(confirmActions(options) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+        #expect(confirmActions(options) == [.confirmSignup(password: SignupPassword(isRequired: false, complexity: complexity))])
     }
 
     @Test func reasonParsesPasswordOptionsWithoutCharacterTypes() {
         let complexity = SignupPasswordComplexity(minLength: 8, characterTypes: [])
-        #expect(confirmActions(["min_length": 8]) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+        #expect(confirmActions(["min_length": 8]) == [.confirmSignup(password: SignupPassword(isRequired: false, complexity: complexity))])
     }
 
     @Test func reasonLeavesOutUnknownCharacterTypes() {
         let complexity = SignupPasswordComplexity(minLength: 8, characterTypes: [.number, .special])
         let options: [String: Any] = ["min_length": 8, "character_types": ["number", "emoji", 5, "special", "Number"]]
-        #expect(confirmActions(options) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+        #expect(confirmActions(options) == [.confirmSignup(password: SignupPassword(isRequired: false, complexity: complexity))])
     }
 
     @Test func reasonRemovesDuplicateCharacterTypesKeepingTheOrder() {
         let complexity = SignupPasswordComplexity(minLength: 8, characterTypes: [.special, .number, .lowercase])
         let options: [String: Any] = ["min_length": 8, "character_types": ["special", "number", "special", "lowercase", "number"]]
-        #expect(confirmActions(options) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+        #expect(confirmActions(options) == [.confirmSignup(password: SignupPassword(isRequired: false, complexity: complexity))])
     }
 
     @Test func reasonTreatsCharacterTypesThatAreNotAnArrayAsEmpty() {
         let complexity = SignupPasswordComplexity(minLength: 8, characterTypes: [])
-        let expected = [NextAction.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))]
+        let expected = [NextAction.confirmSignup(password: SignupPassword(isRequired: false, complexity: complexity))]
         #expect(confirmActions(["min_length": 8, "character_types": "number"]) == expected)
         #expect(confirmActions(["min_length": 8, "character_types": ["number": true]]) == expected)
     }
@@ -1045,25 +1045,34 @@ import Foundation
 
     @Test func reasonDoesNotRangeCheckMinLength() {
         let complexity = SignupPasswordComplexity(minLength: 0, characterTypes: [])
-        #expect(confirmActions(["min_length": 0]) == [.confirmSignup(password: SignupPassword(isRequired: true, complexity: complexity))])
+        #expect(confirmActions(["min_length": 0]) == [.confirmSignup(password: SignupPassword(isRequired: false, complexity: complexity))])
     }
 
-    @Test func reasonDerivesIsRequiredFromTheFlowRequirement() {
-        let options: [String: Any] = ["min_length": 8]
-        func isRequired(_ requirement: CredentialRequirement?) -> Bool? {
-            guard case .confirmSignup(let password)? = confirmActions(options, requirement: requirement)?.first else { return nil }
-            return password?.isRequired
+    @Test func reasonLeavesTheRequiredFlagToTheClient() {
+        guard case .confirmSignup(let password)? = confirmActions(["min_length": 8])?.first else {
+            Issue.record("Expected .confirmSignup"); return
         }
-        #expect(isRequired(.optional) == false)
-        #expect(isRequired(.required) == true)
-        // Without a sign-up offer that said "required", the password can be skipped; the server answers if it was needed.
-        #expect(isRequired(CredentialRequirement.none) == false)
-        #expect(isRequired(nil) == false)
+        #expect(password?.isRequired == false)
     }
 
-    @Test func theFlowRequirementDoesNotChangeErrorEquality() {
-        let error = EmbeddedAuthError(info: ["error": "insufficient_authorization"], statusCode: 403)
-        #expect(error.withSignupPasswordRequirement(.optional) == error)
+    @Test func withNextActionsReplacesTheParsedActions() {
+        let error = EmbeddedAuthError(info: ["error": "insufficient_authorization", "next": [["action": "action:identify:email:v1"]]],
+                                      statusCode: 403)
+        guard case .insufficientAuthorization(_, let actions) = error.withNextActions([.identifyPhone]).reason else {
+            Issue.record("Expected .insufficientAuthorization"); return
+        }
+        #expect(actions == [.identifyPhone])
+    }
+
+    @Test func withNextActionsKeepsTheRestOfTheErrorAndItsEquality() {
+        let error = EmbeddedAuthError(info: ["error": "insufficient_authorization", "error_description": "invalid_code", "auth_session": "s"],
+                                      statusCode: 403)
+        let rewritten = error.withNextActions([.identifyPhone])
+        #expect(rewritten == error)
+        #expect(rewritten.info["auth_session"] as? String == "s")
+        guard case .insufficientAuthorization(.invalidCode, _) = rewritten.reason else {
+            Issue.record("Expected the same sub-reason"); return
+        }
     }
 
     @Test func reasonKeepsOtherSignupVersionsUnknownNextToPasswordOptions() {

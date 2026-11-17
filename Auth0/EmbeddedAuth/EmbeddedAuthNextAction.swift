@@ -80,7 +80,7 @@ public enum NextAction: Sendable, Equatable {
     /// Server expects ``EmbeddedAuth/confirmSignup(password:)`` to be called to finish registration and sign the user in.
     ///
     /// - Parameter password: What to ask the user for, or `nil` when the connection does not collect a password at
-    ///   registration. When it is `nil`, call ``EmbeddedAuth/confirmSignup()``.
+    ///   registration. When it is `nil`, call ``EmbeddedAuth/confirmSignup(password:)`` with `nil`.
     case confirmSignup(password: SignupPassword?)
 
     /// An action string the SDK does not recognise — preserved for forward compatibility.
@@ -143,7 +143,7 @@ public struct SignupPassword: Sendable, Equatable {
 
     /// Whether the user must provide a password.
     ///
-    /// When `false` the user can skip it by calling ``EmbeddedAuth/confirmSignup()``.
+    /// When `false` the user can skip it by calling ``EmbeddedAuth/confirmSignup(password:)`` with `nil`.
     ///
     /// The server does not repeat this flag when it offers ``NextAction/confirmSignup(password:)``. The SDK takes it from the
     /// flow so far: it is `true` only when the sign-up offer said the password is required, or when the server has

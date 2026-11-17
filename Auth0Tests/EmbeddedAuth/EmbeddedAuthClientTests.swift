@@ -279,13 +279,13 @@ struct EmbeddedAuthClientTests {
             return (response(status: 403), insufficientAuthData(session: "sess_001", nextActions: [["action": "action:identify:email:v1"]]))
         }
         _ = try? await sut.authorize(connection: "test-connection").start()
-        // Session is stored in the internal `currentSession` property, not accessible via the EmbeddedAuth protocol.
+        // Session is stored in the internal `transactionState` property, not accessible via the EmbeddedAuth protocol.
         // The protocol-typed `sut` has no `authSession` accessor — that is a compile-time guarantee.
         guard let concrete = sut as? Auth0EmbeddedAuth else {
             Issue.record("Expected Auth0EmbeddedAuth instance")
             return
         }
-        #expect(concrete.currentSession == "sess_001")
+        #expect(concrete.transactionState?.authSession == "sess_001")
     }
 
     // MARK: challengeEmail

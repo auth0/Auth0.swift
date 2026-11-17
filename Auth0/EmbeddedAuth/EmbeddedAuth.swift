@@ -2,9 +2,9 @@ import Foundation
 
 // MARK: - Result alias
 
+
 /// `Result` wrapper for Embedded Login operations.
 public typealias EmbeddedAuthResult<T> = Result<T, EmbeddedAuthError>
-
 // MARK: - IdentifierType
 
 /// The type of identifier a user submits during the identify step.
@@ -165,7 +165,7 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// read its `nextActions` to find the next step of the registration (for example
     /// ``NextAction/identifyEmail`` or ``NextAction/verifyOTP(channel:identifier:)``) and handle it like any other
     /// continuation. Once the registration steps are complete the server offers
-    /// ``NextAction/confirmSignup(password:)``, which you finish with ``confirmSignup()`` or ``confirmSignup(password:)``.
+    /// ``NextAction/confirmSignup(password:)``, which you finish with ``confirmSignup(password:)``.
     ///
     /// Requires an active session.
     ///
@@ -174,38 +174,26 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///   ends.
     func signup() -> Request<Void, EmbeddedAuthError>
 
-    /// Confirms the registration without a password and completes the flow.
-    ///
-    /// Call this when ``NextAction/confirmSignup(password:)`` is among the `nextActions` and its `password` is `nil`
-    /// (the connection does not collect one), or when the password is optional and the user skips it. It is equivalent
-    /// to ``confirmSignup(password:)`` with `nil`.
-    ///
-    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
-    ///
-    /// Requires an active session. If the token exchange fails with ``EmbeddedAuthErrorReason/network``, the session is
-    /// kept; retrying sends the confirmation again, and the server decides whether it can still be completed.
-    ///
-    /// If the connection requires a password, the request fails with
-    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordRequired`` and the flow stays open.
-    func confirmSignup() -> Request<Credentials, EmbeddedAuthError>
-
     /// Confirms the registration, optionally with a password for the new account, and completes the flow.
     ///
     /// Call this when ``NextAction/confirmSignup(password:)`` is among the `nextActions`. Pass the password the user
-    /// entered, or `nil` to create the account without one when the password is optional.
+    /// entered. Pass `nil` to create the account without one: when the offer's ``SignupPassword`` is `nil` (the
+    /// connection collects no password), or when the password is optional and the user skips it.
     ///
     /// The password is sent as given and is not trimmed. The server treats an empty string as no password. The SDK does not
     /// check its length or its complexity locally: the server and the connection's password policy enforce the limits.
     ///
     /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
     /// The SDK never keeps the password. If the token exchange fails with ``EmbeddedAuthErrorReason/network``, the
-    /// session is kept; retrying sends the confirmation again, so pass the password again.
+    /// session is kept; retrying sends the confirmation again, so pass the password again. If the connection requires a
+    /// password and `nil` is passed, the request fails with
+    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordRequired`` and the flow stays open.
     ///
     /// A request the server cannot accept yet fails with
     /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the flow stays open:
     /// - ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordRequired``: ask for a password.
     /// - ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordNotAccepted``: the connection does not collect one;
-    ///   call ``confirmSignup()``.
+    ///   call ``confirmSignup(password:)`` with `nil`.
     /// - ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidPassword``: the password does not meet the
     ///   connection's policy; ask for another one.
     ///
@@ -213,9 +201,9 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///
     /// Requires an active session.
     ///
-    /// - Note: Types outside the SDK that conform to ``EmbeddedAuth`` get a default implementation. It forwards `nil` to
-    ///   ``confirmSignup()``; for a password it sends no request and fails with an ``EmbeddedAuthError`` whose
-    ///   ``EmbeddedAuthError/code`` is `a0.sdk.internal_error.not_implemented`.
+    /// - Note: Types outside the SDK that conform to ``EmbeddedAuth`` get a default implementation that sends no request
+    ///   and fails with an ``EmbeddedAuthError`` whose ``EmbeddedAuthError/code`` is
+    ///   `a0.sdk.internal_error.not_implemented`.
     ///
     /// - Parameter password: The password entered by the user, or `nil` for none.
     func confirmSignup(password: String?) -> Request<Credentials, EmbeddedAuthError>
@@ -231,30 +219,4 @@ public extension EmbeddedAuth {
                   scope: "openid profile email offline_access",
                   audience: nil)
     }
-
-    /// Default implementation of ``confirmSignup(password:)`` for types outside the SDK that conform to ``EmbeddedAuth``.
-    ///
-    /// The client returned by ``Auth0/embeddedAuth(clientId:domain:session:)`` implements this method. This default
-    /// forwards `nil` to ``confirmSignup()``. For a password it sends no request: the returned request fails with an
-    /// ``EmbeddedAuthError`` whose ``EmbeddedAuthError/code`` is `a0.sdk.internal_error.not_implemented`. Implement the
-    /// method in your conforming type to support it.
-    ///
-    /// - Parameter password: The password entered by the user, or `nil` for none.
-    /// - Returns: The request of ``confirmSignup()`` for `nil`, otherwise a request that fails locally.
-    func confirmSignup(password: String?) -> Request<Credentials, EmbeddedAuthError> {
-        guard password != nil else { return confirmSignup() }
-        return Request(
-            // The validator throws before a data task is created, so the session and the URL are never used.
-            session: .shared,
-            url: URL(fileURLWithPath: "/e/authorize"),
-            method: "POST",
-            requestValidator: [EmbeddedAuthNotImplementedValidator(requirement: "confirmSignup(password:)")],
-            handle: { _, callback in
-                callback(.failure(EmbeddedAuthError.notImplemented(requirement: "confirmSignup(password:)")))
-            },
-            logger: logger,
-            auth0ClientInfo: auth0ClientInfo
-        )
-    }
-
 }

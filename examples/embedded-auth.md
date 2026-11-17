@@ -207,7 +207,7 @@ try await client.authorize(connection: connection,
                            audience: nil).start()
 ```
 
-**Collect one or more identifiers.** `signup()` never returns credentials: it always fails with `.insufficientAuthorization` and the `nextActions` for the next step. When `identifiers` lists both `.email` and `.phone`, the registration collects both with the same steps used for login: identify an identifier, send and verify its code, then do the same for the other. The server offers the identify steps it still needs, and your app picks which one to do next, so follow `nextActions` after every step instead of assuming a fixed sequence. Once every required identifier is verified the server offers `.confirmSignup(password:)`. Call `confirmSignup()` then, or `confirmSignup(password:)` when the connection collects a password. Like `verifyOtp`, it returns `Credentials` on success. An identifier that is not required can be left out: the server offers `.confirmSignup` without it.
+**Collect one or more identifiers.** `signup()` never returns credentials: it always fails with `.insufficientAuthorization` and the `nextActions` for the next step. When `identifiers` lists both `.email` and `.phone`, the registration collects both with the same steps used for login: identify an identifier, send and verify its code, then do the same for the other. The server offers the identify steps it still needs, and your app picks which one to do next, so follow `nextActions` after every step instead of assuming a fixed sequence. Once every required identifier is verified the server offers `.confirmSignup(password:)`. Call `confirmSignup(password: nil)` then, or `confirmSignup(password:)` when the connection collects a password. Like `verifyOtp`, it returns `Credentials` on success. An identifier that is not required can be left out: the server offers `.confirmSignup` without it.
 
 This example signs a user up with an email and a phone number, and a password when the connection collects one. It does the email first, then the phone number. Pass `nil` for an identifier the user left empty. An empty value is never sent, because the server rejects it:
 
@@ -224,7 +224,7 @@ func continuation(after step: () async throws -> Void) async throws -> (wrongCod
         default: return (false, nextActions)
         }
     }
-    // During sign-up only confirmSignup() returns credentials, so a step that succeeds is unexpected.
+    // During sign-up only confirmSignup(password: nil) returns credentials, so a step that succeeds is unexpected.
     throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
 }
 
@@ -366,7 +366,7 @@ client.confirmSignup(password: password).start { result in
             // Ask the user for a (new) password, then call confirmSignup(password:) again
             break
         case .insufficientAuthorization(.passwordNotAccepted, _):
-            // The connection does not collect a password: call confirmSignup()
+            // The connection does not collect a password: call confirmSignup(password: nil)
             break
         case .passwordLeaked:
             // The password appears in a data breach. The flow has ended: start over with authorize()
@@ -379,7 +379,7 @@ client.confirmSignup(password: password).start { result in
 ```
 </details>
 
-**Handle rejections.** If the server rejects the new user before registration, for example because of a pre-registration validation or an Action that denies the sign-up, the request fails with `.accessDenied` and the flow ends. Start a new flow with `authorize()` and show the user a generic message. `signup()`, `confirmSignup()` and `confirmSignup(password:)` need an active session and fail locally with `.noActiveSession` otherwise. If `confirmSignup(password:)` fails with `.network` while exchanging the code, the session is kept and a retry sends the confirmation again. The server decides whether it can still complete. The SDK never keeps the password, so pass it again when you retry.
+**Handle rejections.** If the server rejects the new user before registration, for example because of a pre-registration validation or an Action that denies the sign-up, the request fails with `.accessDenied` and the flow ends. Start a new flow with `authorize()` and show the user a generic message. `signup()`, `confirmSignup(password: nil)` and `confirmSignup(password:)` need an active session and fail locally with `.noActiveSession` otherwise. If `confirmSignup(password:)` fails with `.network` while exchanging the code, the session is kept and a retry sends the confirmation again. The server decides whether it can still complete. The SDK never keeps the password, so pass it again when you retry.
 
 **An identifier that already has an account.** Signing up with an email or phone number that already has an account does not return an error, so sign-up can't be used to find out which accounts exist. The server answers each step as it would for a new identifier but sends no code, so any code the user enters fails with `.insufficientAuthorization(.invalidIdentifierOrCode, nextActions)`, the same as a mistyped code, until the attempt limit ends the flow with `.tooManyWrongOtpAttempts`. Requesting codes again is limited too and ends the flow with `.accessDenied`. While that identifier is required, the server never offers `.confirmSignup`. If it is optional, the user can leave it out and the account is created without it. Your app can't tell this case apart from a mistyped code, so on the code screen offer a way out, such as "Already have an account? Sign in", which starts a new login flow with `authorize()`.
 
@@ -389,9 +389,9 @@ Some connections also collect a password, as the last step of the sign-up. The i
 
 | Connection | `.signup` `passwordRequirement` | `.confirmSignup` `password` | What the app does |
 |---|---|---|---|
-| No password | `.none` | `nil` | `confirmSignup()` |
+| No password | `.none` | `nil` | `confirmSignup(password: nil)` |
 | Password required | `.required` | set, `isRequired` is `true` | `confirmSignup(password:)` |
-| Password optional | `.optional` | set, `isRequired` is `false` | `confirmSignup(password:)`, or `confirmSignup()` to skip |
+| Password optional | `.optional` | set, `isRequired` is `false` | `confirmSignup(password:)`, with `nil` to skip |
 
 `passwordRequirement` lets the first screen tell the user a password is coming. When the value is wrapped in an `Optional`, write `CredentialRequirement.none`: a bare `.none` is read as `Optional.none`.
 
@@ -455,7 +455,7 @@ client.confirmSignup(password: enteredPassword).start { result in
             // The flow is still live. Ask for a (new) password and call confirmSignup(password:) again.
             break
         case .insufficientAuthorization(.passwordNotAccepted, _):
-            // Call confirmSignup() instead.
+            // Call confirmSignup(password: nil) instead.
             break
         case .network:
             // The SDK does not keep the password: call confirmSignup(password:) again with it.
@@ -582,7 +582,7 @@ do {
 | `invalid_identifier_or_password` | `.invalidIdentifierOrPassword` | The identifier (email, phone or username) or the password was rejected. It is ambiguous on purpose, so a wrong password and an unknown user look the same. | Show a generic "incorrect username or password" message and present `nextActions` again; it holds `.verifyPassword`. |
 | `slow_down` | `.slowDown` | `verifyOob()` was called before `pollInMs` elapsed. | Wait longer than before, then poll again. |
 | `password_required` | `.passwordRequired` | `confirmSignup` was called without a password, but the connection requires one. | Ask for a password and call `confirmSignup(password:)` again. |
-| `password_not_accepted` | `.passwordNotAccepted` | `confirmSignup(password:)` was called with a password, but the connection does not collect one. | Call `confirmSignup()` without a password. |
+| `password_not_accepted` | `.passwordNotAccepted` | `confirmSignup(password:)` was called with a password, but the connection does not collect one. | Call `confirmSignup(password: nil)` without a password. |
 | `invalid_password` | `.invalidPassword` | The password does not meet the connection's password policy. | Show the hints again, ask for another password and call `confirmSignup(password:)` again. |
 
 ```swift

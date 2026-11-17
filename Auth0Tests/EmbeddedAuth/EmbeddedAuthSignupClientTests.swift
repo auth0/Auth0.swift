@@ -388,7 +388,7 @@ struct EmbeddedAuthSignupClientTests {
         #expect(body?.authSession == "sess_001")
     }
 
-    // MARK: confirmSignup() — request
+    // MARK: confirmSignup(password: nil) — request
 
     @Test func confirmSignupFailsLocallyWithNoSessionAndMakesNoRequest() async {
         let sut = makeSignupClient()
@@ -398,7 +398,7 @@ struct EmbeddedAuthSignupClientTests {
             return (signupResponse(status: 200), signupAuthCode())
         }
         let error = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.confirmSignup().start()
+            _ = try await sut.confirmSignup(password: nil).start()
         }
         #expect(error?.code == "no_active_session")
         #expect(error?.statusCode == 0)
@@ -419,7 +419,7 @@ struct EmbeddedAuthSignupClientTests {
             body = signupRequestBody(req)
             return (signupResponse(status: 200), signupAuthCode())
         }
-        _ = try? await sut.confirmSignup().start()
+        _ = try? await sut.confirmSignup(password: nil).start()
 
         #expect(path == "/e/authorize")
         #expect(method == "POST")
@@ -429,7 +429,7 @@ struct EmbeddedAuthSignupClientTests {
         #expect(body?.keyCount == 3)
     }
 
-    // MARK: confirmSignup() — success
+    // MARK: confirmSignup(password: nil) — success
 
     @Test func confirmSignupReturnsCredentialsAfterCodeExchangeAndClearsSession() async throws {
         let sut = makeSignupClient()
@@ -443,13 +443,13 @@ struct EmbeddedAuthSignupClientTests {
             }
             return (signupResponse(status: 200), signupAuthCode(code: "auth0_ac_theCode"))
         }
-        let credentials = try await sut.confirmSignup().start()
+        let credentials = try await sut.confirmSignup(password: nil).start()
         #expect(credentials.accessToken == "the_access_token")
         #expect(tokenBody?.code == "auth0_ac_theCode")
         #expect(tokenBody?.grantType == "authorization_code")
 
         let next = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.confirmSignup().start()
+            _ = try await sut.confirmSignup(password: nil).start()
         }
         #expect(next?.code == "no_active_session")
     }
@@ -463,14 +463,14 @@ struct EmbeddedAuthSignupClientTests {
             return (signupResponse(status: 200), signupAuthCode())
         }
         let credentials = await withCheckedContinuation { continuation in
-            sut.confirmSignup().start { result in
+            sut.confirmSignup(password: nil).start { result in
                 continuation.resume(returning: try? result.get())
             }
         }
         #expect(credentials?.accessToken == "cb_token")
     }
 
-    // MARK: confirmSignup() — failures
+    // MARK: confirmSignup(password: nil) — failures
 
     @Test func confirmSignupNetworkFailureOnTheTokenExchangeKeepsTheSessionForRetry() async throws {
         let sut = makeSignupClient()
@@ -481,7 +481,7 @@ struct EmbeddedAuthSignupClientTests {
             return (signupResponse(status: 200), signupAuthCode())
         }
         let error = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.confirmSignup().start()
+            _ = try await sut.confirmSignup(password: nil).start()
         }
         guard case .network = error?.reason else {
             Issue.record("Expected .network, got \(String(describing: error?.reason))"); return
@@ -494,7 +494,7 @@ struct EmbeddedAuthSignupClientTests {
             authorizeBody = signupRequestBody(req)
             return (signupResponse(status: 200), signupAuthCode(code: "auth0_ac_second"))
         }
-        let credentials = try await sut.confirmSignup().start()
+        let credentials = try await sut.confirmSignup(password: nil).start()
         #expect(credentials.accessToken == "retry_token")
         #expect(authorizeBody?.authSession == "sess_001")
     }
@@ -505,7 +505,7 @@ struct EmbeddedAuthSignupClientTests {
 
         EmbeddedAuthSignupMockProtocol.requestHandler = { _ in throw URLError(.timedOut) }
         let error = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.confirmSignup().start()
+            _ = try await sut.confirmSignup(password: nil).start()
         }
         guard case .network = error?.reason else {
             Issue.record("Expected .network, got \(String(describing: error?.reason))"); return
@@ -516,7 +516,7 @@ struct EmbeddedAuthSignupClientTests {
             body = signupRequestBody(req)
             return (signupResponse(status: 403), signupContinuation(session: "sess_002", nextActions: []))
         }
-        _ = try? await sut.confirmSignup().start()
+        _ = try? await sut.confirmSignup(password: nil).start()
         #expect(body?.authSession == "sess_001")
     }
 
@@ -531,7 +531,7 @@ struct EmbeddedAuthSignupClientTests {
             return (signupResponse(status: 200), signupAuthCode())
         }
         let error = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.confirmSignup().start()
+            _ = try await sut.confirmSignup(password: nil).start()
         }
         guard case .sessionExpired = error?.reason else {
             Issue.record("Expected .sessionExpired, got \(String(describing: error?.reason))"); return
@@ -548,7 +548,7 @@ struct EmbeddedAuthSignupClientTests {
             (signupResponse(status: 200), Data("{}".utf8))
         }
         let first = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.confirmSignup().start()
+            _ = try await sut.confirmSignup(password: nil).start()
         }
         #expect(first.map { signupReasonName($0.reason) } == "unknown")
         await expectNoSession(sut)
@@ -564,7 +564,7 @@ struct EmbeddedAuthSignupClientTests {
                                 nextActions: [["action": "action:verify:otp:v1", "channel": "email", "identifier": "al**@example.com"]]))
         }
         let error = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.confirmSignup().start()
+            _ = try await sut.confirmSignup(password: nil).start()
         }
         guard case .insufficientAuthorization(_, let actions) = error?.reason else {
             Issue.record("Expected continuation, got \(String(describing: error?.reason))"); return
@@ -597,7 +597,7 @@ struct EmbeddedAuthSignupClientTests {
             (signupResponse(status: status), signupErrorBody(["error": code, "error_description": description]))
         }
         let first = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.confirmSignup().start()
+            _ = try await sut.confirmSignup(password: nil).start()
         }
         #expect(first.map { signupReasonName($0.reason) } == expectedReason)
         await expectNoSession(sut)
@@ -663,7 +663,7 @@ struct EmbeddedAuthSignupClientTests {
             bodies.append(try #require(signupRequestBody(req)))
             return (signupResponse(status: 200), signupAuthCode())
         }
-        let credentials = try await sut.confirmSignup().start()
+        let credentials = try await sut.confirmSignup(password: nil).start()
         #expect(credentials.accessToken == "signup_token")
 
         #expect(bodies.map(\.authSession) == ["sess_1", "sess_2", "sess_3", "sess_4"])
@@ -756,7 +756,7 @@ struct EmbeddedAuthSignupClientTests {
             bodies.append(try #require(signupRequestBody(req)))
             return (signupResponse(status: 200), signupAuthCode())
         }
-        let credentials = try await sut.confirmSignup().start()
+        let credentials = try await sut.confirmSignup(password: nil).start()
         #expect(credentials.accessToken == "signup_token")
 
         #expect(bodies.map(\.authSession) == ["sess_1", "sess_2", "sess_3", "sess_4", "sess_5", "sess_6"])
@@ -829,7 +829,7 @@ struct EmbeddedAuthSignupClientTests {
             bodies.append(try #require(signupRequestBody(req)))
             return (signupResponse(status: 200), signupAuthCode())
         }
-        let credentials = try await sut.confirmSignup().start()
+        let credentials = try await sut.confirmSignup(password: nil).start()
         #expect(credentials.accessToken == "signup_token")
 
         #expect(bodies.map(\.action) == ["action:signup:v1", "action:identify:email:v1", "action:verify:otp:v1",

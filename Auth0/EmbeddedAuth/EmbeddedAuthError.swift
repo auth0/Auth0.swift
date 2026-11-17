@@ -9,11 +9,11 @@ public struct EmbeddedAuthError: Auth0APIError, @unchecked Sendable {
     /// HTTP status code of the response.
     public let statusCode: Int
 
-    /// The password requirement of the sign-up in progress, when the SDK knows it.
+    /// The `next` actions to report instead of the ones parsed from ``info``, when the client that runs the flow
+    /// corrected them.
     ///
-    /// Set by the client that runs the flow, never by the server response, and used to fill
-    /// ``SignupPassword/isRequired`` when the `next` actions are parsed. Like ``info``, it is ignored by `==`.
-    var signupPasswordRequirement: CredentialRequirement?
+    /// Set by the client, never by the server response. Like ``info``, it is ignored by `==`.
+    var nextActionsOverride: [NextAction]?
 
     /// Creates an error from a JSON response.
     ///
@@ -55,14 +55,14 @@ extension EmbeddedAuthError {
 
 }
 
-// MARK: - Sign-up password state
+// MARK: - Next actions
 
 extension EmbeddedAuthError {
 
-    /// A copy of this error that carries the password requirement of the sign-up in progress.
-    func withSignupPasswordRequirement(_ requirement: CredentialRequirement?) -> EmbeddedAuthError {
+    /// A copy of this error that reports `nextActions` instead of the ones parsed from ``info``.
+    func withNextActions(_ nextActions: [NextAction]) -> EmbeddedAuthError {
         var copy = self
-        copy.signupPasswordRequirement = requirement
+        copy.nextActionsOverride = nextActions
         return copy
     }
 
@@ -157,6 +157,7 @@ public extension EmbeddedAuthError {
 private extension EmbeddedAuthError {
 
     var parsedNextActions: [NextAction] {
+        if let nextActionsOverride { return nextActionsOverride }
         guard let nextArray = info["next"] as? [[String: Any]] else { return [] }
         return nextArray.compactMap { entry in
             guard let actionString = entry["action"] as? String else { return nil }
@@ -228,10 +229,9 @@ private extension EmbeddedAuthError {
               let minLength = options["min_length"] as? Int else { return nil }
         let complexity = SignupPasswordComplexity(minLength: minLength,
                                                   characterTypes: Self.characterTypes(from: options))
-        // Only a sign-up offer that said the password is required (or a `password_required` answer) makes it mandatory.
-        // Without that information the password can be skipped, and the server answers if it was needed.
-        let isRequired = signupPasswordRequirement == CredentialRequirement.required
-        return .confirmSignup(password: SignupPassword(isRequired: isRequired, complexity: complexity))
+        // The server does not repeat whether the password is required at the confirm step. The client that runs the flow
+        // knows it from the sign-up offer, and corrects the flag in `updateSessionFromFailure(_:)`.
+        return .confirmSignup(password: SignupPassword(isRequired: false, complexity: complexity))
     }
 
     /// Reads `character_types`, leaving out unknown values and duplicates and keeping the server's order.
