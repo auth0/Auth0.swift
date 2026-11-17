@@ -243,7 +243,7 @@ private extension EmbeddedAuthError {
         let complexity = SignupPasswordComplexity(minLength: minLength,
                                                   characterTypes: Self.characterTypes(from: options))
         // The server does not repeat whether the password is required at the confirm step. The client that runs the flow
-        // knows it from the sign-up offer, and corrects the flag in `updateSessionFromFailure(_:)`.
+        // knows it from the sign-up offer, and corrects the flag in `updateSessionFromFailure(_:verifier:)`.
         return .confirmSignup(password: SignupPassword(isRequired: false, complexity: complexity))
     }
 

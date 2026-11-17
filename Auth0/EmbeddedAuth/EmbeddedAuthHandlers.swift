@@ -8,15 +8,21 @@ extension Auth0EmbeddedAuth {
     ///
     /// A `403 insufficient_authorization` failure carries the rotated `auth_session`, which becomes
     /// the active session for the next step; any other failure clears it (see
-    /// ``updateSessionFromFailure(_:)``). Intermediate steps never produce a successful `200`
+    /// ``updateSessionFromFailure(_:verifier:)``). Intermediate steps never produce a successful `200`
     /// response in practice — if one arrives, the session is cleared and `.success(())` forwarded.
+    ///
+    /// When the request that started the flow passes its PKCE `verifier`, it becomes the active one together with
+    /// the session the response opens (a continuation without an `auth_session` opens none), so a restarted
+    /// `authorize` request always pairs with the challenge it sent. Both are adopted by
+    /// ``updateSessionFromFailure(_:verifier:)``, so the two can't drift apart.
     func decodeAuthorizeResponse(
         _ result: Result<ResponseValue, EmbeddedAuthError>,
+        verifier: String? = nil,
         callback: @Sendable (Result<Void, EmbeddedAuthError>) -> Void
     ) {
         switch result {
         case .failure(let error):
-            callback(.failure(updateSessionFromFailure(error)))
+            callback(.failure(updateSessionFromFailure(error, verifier: verifier)))
         case .success:
             transactionState = nil
             callback(.success(()))
@@ -27,12 +33,13 @@ extension Auth0EmbeddedAuth {
     /// exchanges that code for ``Credentials``.
     ///
     /// Reusable by any step whose success response carries an `authorization_code`. Session
-    /// bookkeeping on failure matches ``decodeAuthorizeResponse(_:callback:)``. On `200` the
-    /// returned code is exchanged via a chained ``exchange(code:)`` request. When that exchange settles the
-    /// session is cleared, except after a network failure: the call may not have reached the server, so the
-    /// session is kept and the caller can retry the step.
+    /// bookkeeping on failure matches ``decodeAuthorizeResponse(_:verifier:callback:)``. On `200` the
+    /// returned code is exchanged via a chained ``exchange(code:verifier:)`` request, with the `verifier` of the flow
+    /// that the step was built in. When that exchange settles the session is cleared, except after a network failure:
+    /// the call may not have reached the server, so the session is kept and the caller can retry the step.
     func decodeAuthorizationCodeResponse(
         _ result: Result<ResponseValue, EmbeddedAuthError>,
+        verifier: String,
         callback: @escaping @Sendable (Result<Credentials, EmbeddedAuthError>) -> Void
     ) {
         switch result {
@@ -45,7 +52,7 @@ extension Auth0EmbeddedAuth {
                 callback(.failure(EmbeddedAuthError(from: response)))
                 return
             }
-            exchange(code: body.authorizationCode).start { [self] exchangeResult in
+            exchange(code: body.authorizationCode, verifier: verifier).start { [self] exchangeResult in
                 switch exchangeResult {
                 case .success(let credentials):
                     transactionState = nil

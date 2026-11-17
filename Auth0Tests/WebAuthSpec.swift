@@ -757,6 +757,23 @@ class WebAuthSpec: QuickSpec {
                     expect(secondResult).toEventually(beNil())
                 }
 
+                it("should lower the barrier when the PKCE code challenge can't be created") {
+                    let expectedError = WebAuthError(code: .unknown("Unable to create the PKCE code challenge"),
+                                                     cause: ChallengeGeneratorError.randomBytesUnavailable)
+                    var firstResult: WebAuthResult<Credentials>?
+                    var secondResult: WebAuthResult<Credentials>?
+                    TransactionStore.shared.clear()
+                    auth.makeChallenge = { throw ChallengeGeneratorError.randomBytesUnavailable }
+                    auth.start { firstResult = $0 }
+                    expect(firstResult).toEventually(haveWebAuthError(expectedError))
+                    auth.makeChallenge = { try ChallengeGenerator() }
+                    auth = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.start { secondResult = $0 }
+                    expect(TransactionStore.shared.current).toEventuallyNot(beNil())
+                    TransactionStore.shared.cancel()
+                    expect(secondResult).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
+                }
+
             }
 
         }
