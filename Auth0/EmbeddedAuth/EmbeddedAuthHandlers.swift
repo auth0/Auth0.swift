@@ -16,10 +16,9 @@ extension Auth0EmbeddedAuth {
     ) {
         switch result {
         case .failure(let error):
-            updateSessionFromFailure(error)
-            callback(.failure(error))
+            callback(.failure(updateSessionFromFailure(error)))
         case .success:
-            currentSession = nil
+            transactionState = nil
             callback(.success(()))
         }
     }
@@ -38,23 +37,22 @@ extension Auth0EmbeddedAuth {
     ) {
         switch result {
         case .failure(let error):
-            updateSessionFromFailure(error)
-            callback(.failure(error))
+            callback(.failure(updateSessionFromFailure(error)))
         case .success(let response):
             guard let data = response.data,
                   let body = try? JSONDecoder().decode(AuthorizationCodeResponse.self, from: data) else {
-                currentSession = nil
+                transactionState = nil
                 callback(.failure(EmbeddedAuthError(from: response)))
                 return
             }
             exchange(code: body.authorizationCode).start { [self] exchangeResult in
                 switch exchangeResult {
-                case .success:
-                    currentSession = nil
+                case .success(let credentials):
+                    transactionState = nil
+                    callback(.success(credentials))
                 case .failure(let error):
-                    updateSessionFromFailure(error)
+                    callback(.failure(updateSessionFromFailure(error)))
                 }
-                callback(exchangeResult)
             }
         }
     }

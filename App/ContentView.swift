@@ -17,6 +17,14 @@ struct ContentView: View {
                 switch viewModel.embeddedAuthUIState {
 
                 case .initial:
+                    TextField("Connection", text: $viewModel.connection)
+                        #if !os(macOS)
+                        .autocapitalization(.none)
+                        #endif
+                        .disableAutocorrection(true)
+                        #if !os(tvOS)
+                        .textFieldStyle(.roundedBorder)
+                        #endif
                     TextField("Email", text: $viewModel.email)
                         #if !os(macOS)
                         .textContentType(.emailAddress)
@@ -295,17 +303,40 @@ struct ContentView: View {
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading)
 
-                case .confirmSignup:
+                case .confirmSignup(let signupPassword):
                     Text("Your details are verified. Complete the sign-up to finish creating your account.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
+                    if let signupPassword {
+                        Text(passwordHint(for: signupPassword))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        SecureField(signupPassword.isRequired ? "Password" : "Password (optional)", text: $viewModel.password)
+                            #if !os(tvOS)
+                            .textFieldStyle(.roundedBorder)
+                            #endif
+                    }
+                    if let attemptError = viewModel.attemptError {
+                        Text(attemptError)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
                     Button {
-                        Task { await viewModel.confirmSignup() }
+                        Task { await viewModel.confirmSignup(password: signupPassword == nil ? nil : viewModel.password) }
                     } label: {
                         Text("Complete sign-up")
                     }
                     .buttonStyle(PrimaryButtonStyle())
-                    .disabled(viewModel.isLoading)
+                    .disabled(viewModel.isLoading || (signupPassword != nil && viewModel.password.isEmpty))
+                    if let signupPassword, !signupPassword.isRequired {
+                        Button {
+                            Task { await viewModel.confirmSignup() }
+                        } label: {
+                            Text("Skip the password")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
 
                 case .success(let credentials):
                     Text("✓ Authenticated")
@@ -348,6 +379,18 @@ struct ContentView: View {
             .padding()
         }
         .onDisappear { viewModel.cancelPolling() }
+    }
+
+    /// The password rules to show next to the field. They are advisory: the server decides whether a password is accepted.
+    private func passwordHint(for signupPassword: SignupPassword) -> String {
+        // The server counts UTF-16 code units, so the app does as well.
+        let typed = viewModel.password.utf16.count
+        var hint = "At least \(signupPassword.complexity.minLength) characters (\(typed) so far)"
+        let types = signupPassword.complexity.characterTypes.map(\.rawValue)
+        if !types.isEmpty {
+            hint += ", containing \(types.joined(separator: ", "))"
+        }
+        return hint + "."
     }
 
     /// Lets the user skip an optional identifier: the server only offers sign-up confirmation once every
