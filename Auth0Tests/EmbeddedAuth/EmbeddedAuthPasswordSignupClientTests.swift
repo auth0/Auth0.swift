@@ -222,38 +222,6 @@ private final class CapturingOutput: LoggerOutput, @unchecked Sendable {
     }
 }
 
-/// An `EmbeddedAuth` that does not implement `confirmSignup(password:)`, like a conformance written before it existed:
-/// it relies on the default implementation and forwards every other step to a real client.
-private struct PartialEmbeddedAuth: EmbeddedAuth {
-    let inner: EmbeddedAuth
-
-    var auth0ClientInfo: Auth0ClientInfo {
-        get { inner.auth0ClientInfo }
-        set { _ = newValue }
-    }
-
-    var logger: Logger? {
-        get { inner.logger }
-        set { _ = newValue }
-    }
-
-    func authorize(connection: String, capabilities: [EmbeddedCapability], scope: String, audience: String?) -> Request<Void, EmbeddedAuthError> {
-        inner.authorize(connection: connection, capabilities: capabilities, scope: scope, audience: audience)
-    }
-    func identify(_ identifier: String, type: IdentifierType) -> Request<Void, EmbeddedAuthError> { inner.identify(identifier, type: type) }
-    func challengeEmail(index: Int) -> Request<Void, EmbeddedAuthError> { inner.challengeEmail(index: index) }
-    func verifyOtp(_ otp: String, type: OtpType) -> Request<Credentials, EmbeddedAuthError> { inner.verifyOtp(otp, type: type) }
-    func verifyPassword(_ password: String) -> Request<Credentials, EmbeddedAuthError> { inner.verifyPassword(password) }
-    func challengePhone(index: Int, deliveryMethod: PhoneDeliveryMethod) -> Request<Void, EmbeddedAuthError> {
-        inner.challengePhone(index: index, deliveryMethod: deliveryMethod)
-    }
-    func challengePush(index: Int) -> Request<Void, EmbeddedAuthError> { inner.challengePush(index: index) }
-    func verifyOob() -> Request<Credentials, EmbeddedAuthError> { inner.verifyOob() }
-    func verifyRecoveryCode(_ code: String) -> Request<Void, EmbeddedAuthError> { inner.verifyRecoveryCode(code) }
-    func confirmRecoveryCode() -> Request<Credentials, EmbeddedAuthError> { inner.confirmRecoveryCode() }
-    func signup() -> Request<Void, EmbeddedAuthError> { inner.signup() }
-}
-
 // MARK: - Suite
 
 // swiftlint:disable:next type_body_length
@@ -331,22 +299,16 @@ struct EmbeddedAuthPasswordSignupClientTests {
     }
 
     @Test func confirmSignupWithNilPasswordOmitsTheKey() async {
-        for call in [0, 1] {
-            let sut = await clientAtConfirm()
-            nonisolated(unsafe) var body: [String: Any] = [:]
-            Mock.requestHandler = { req in
-                if isTokenRequest(req) { return (response(200), credentialsBody()) }
-                body = bodyJSON(req)
-                return (response(200), authCode())
-            }
-            if call == 0 {
-                _ = try? await sut.confirmSignup(password: nil).start()
-            } else {
-                _ = try? await sut.confirmSignup(password: nil).start()
-            }
-            #expect(Set(body.keys) == ["action", "client_id", "auth_session"])
-            #expect(body["password"] == nil)
+        let sut = await clientAtConfirm()
+        nonisolated(unsafe) var body: [String: Any] = [:]
+        Mock.requestHandler = { req in
+            if isTokenRequest(req) { return (response(200), credentialsBody()) }
+            body = bodyJSON(req)
+            return (response(200), authCode())
         }
+        _ = try? await sut.confirmSignup(password: nil).start()
+        #expect(Set(body.keys) == ["action", "client_id", "auth_session"])
+        #expect(body["password"] == nil)
     }
 
     @Test func confirmSignupSendsAnEmptyPasswordAndDoesNotTrim() async {
@@ -833,75 +795,18 @@ struct EmbeddedAuthPasswordSignupClientTests {
         await expectNoSession(sut)
     }
 
-    @Test func connectionsWithoutAPasswordKeepWorkingWithBothCallForms() async throws {
-        for call in [0, 1] {
-            let sut = makeClient()
-            let actions = await reachConfirm(sut, offer: .noPassword, confirm: confirmAction(options: nil))
-            #expect(actions == [.confirmSignup(password: nil)])
+    @Test func aConnectionWithoutAPasswordIsConfirmedWithoutOne() async throws {
+        let sut = makeClient()
+        let actions = await reachConfirm(sut, offer: .noPassword, confirm: confirmAction(options: nil))
+        #expect(actions == [.confirmSignup(password: nil)])
 
-            nonisolated(unsafe) var keys: Set<String> = []
-            Mock.requestHandler = { req in
-                if isTokenRequest(req) { return (response(200), credentialsBody()) }
-                keys = Set(bodyJSON(req).keys)
-                return (response(200), authCode())
-            }
-            if call == 0 {
-                _ = try await sut.confirmSignup(password: nil).start()
-            } else {
-                _ = try await sut.confirmSignup(password: nil).start()
-            }
-            #expect(keys == ["action", "client_id", "auth_session"])
-        }
-    }
-
-    // MARK: Default implementation for other conformances
-
-    @Test(arguments: [nil, "x"] as [String?])
-    func defaultImplementationFailsLocallyAndMakesNoRequest(password: String?) async {
-        let sut = PartialEmbeddedAuth(inner: makeClient())
-        await reachConfirm(sut.inner, offer: .requiredPassword)
-
-        nonisolated(unsafe) var requestCount = 0
-        Mock.requestHandler = { _ in
-            requestCount += 1
-            return (response(200), authCode())
-        }
-        let error = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.confirmSignup(password: password).start()
-        }
-        #expect(error?.code == "a0.sdk.internal_error.not_implemented")
-        #expect(error?.statusCode == 0)
-        #expect(error?.info["error_description"] as? String == "confirmSignup(password:) is not implemented by this EmbeddedAuth conformance.")
-        #expect(requestCount == 0)
-
-        // The session of the wrapped client is untouched, so its own implementation still works.
+        nonisolated(unsafe) var keys: Set<String> = []
         Mock.requestHandler = { req in
             if isTokenRequest(req) { return (response(200), credentialsBody()) }
-            requestCount += 1
+            keys = Set(bodyJSON(req).keys)
             return (response(200), authCode())
         }
-        let credentials = try? await sut.inner.confirmSignup(password: nil).start()
-        #expect(credentials?.accessToken == "test_access_token")
-        #expect(requestCount == 1)
-    }
-
-    @Test func defaultImplementationSupportsTheCallbackAPI() async {
-        let sut = PartialEmbeddedAuth(inner: makeClient())
-        nonisolated(unsafe) var requestCount = 0
-        Mock.requestHandler = { _ in
-            requestCount += 1
-            return (response(200), authCode())
-        }
-        let code = await withCheckedContinuation { (continuation: CheckedContinuation<String?, Never>) in
-            sut.confirmSignup(password: "x").start { result in
-                if case .failure(let error) = result {
-                    continuation.resume(returning: error.code)
-                } else {
-                    continuation.resume(returning: nil)
-                }
-            }
-        }
-        #expect(code == "a0.sdk.internal_error.not_implemented")
-        #expect(requestCount == 0)
+        _ = try await sut.confirmSignup(password: nil).start()
+        #expect(keys == ["action", "client_id", "auth_session"])
     }
 }
