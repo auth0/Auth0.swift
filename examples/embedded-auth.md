@@ -469,7 +469,7 @@ client.confirmSignup(password: enteredPassword).start { result in
 ```
 </details>
 
-`.passwordRequired`, `.passwordNotAccepted` and `.invalidPassword` keep the flow live on a rotated session, and `nextActions` offers `.confirmSignup` again. `.passwordLeaked` ends the flow: the password appears in a data breach, so start a new flow with `authorize()` and let the user choose a different password. Do not log or store the password.
+`.passwordRequired`, `.passwordNotAccepted` and `.invalidPassword` keep the flow live on a rotated session, and `nextActions` offers `.confirmSignup` again. If the final token exchange fails with `.network`, the session is kept and the SDK does not keep the password, so call `confirmSignup(password:)` again with it. `.passwordLeaked` ends the flow: the password appears in a data breach, so start a new flow with `authorize()` and let the user choose a different password. Do not log or store the password.
 
 #### MFA flows
 

@@ -2,9 +2,9 @@ import Foundation
 
 // MARK: - Result alias
 
-
 /// `Result` wrapper for Embedded Login operations.
 public typealias EmbeddedAuthResult<T> = Result<T, EmbeddedAuthError>
+
 // MARK: - IdentifierType
 
 /// The type of identifier a user submits during the identify step.
@@ -158,52 +158,26 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
 
     /// Starts registering a new user.
     ///
-    /// Call this when ``NextAction/signup(identifiers:passwordRequirement:)`` is among the `nextActions` and the user
-    /// wants to create an account.
+    /// Call this when ``NextAction/signup(identifiers:passwordRequirement:)`` is among the `nextActions`.
     ///
-    /// The request always fails with ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)``:
-    /// read its `nextActions` to find the next step of the registration (for example
-    /// ``NextAction/identifyEmail`` or ``NextAction/verifyOTP(channel:identifier:)``) and handle it like any other
-    /// continuation. Once the registration steps are complete the server offers
-    /// ``NextAction/confirmSignup(password:)``, which you finish with ``confirmSignup(password:)``.
+    /// The request always fails with ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the
+    /// next registration step in `nextActions`. Once the identifiers are verified, the server offers
+    /// ``NextAction/confirmSignup(password:)``: finish the registration with ``confirmSignup(password:)``.
     ///
     /// Requires an active session.
-    ///
-    /// - Note: If the server rejects the identifier before registration starts (for example, because of a
-    ///   pre-registration validation), the request fails with ``EmbeddedAuthErrorReason/accessDenied`` and the flow
-    ///   ends.
     func signup() -> Request<Void, EmbeddedAuthError>
 
-    /// Confirms the registration, optionally with a password for the new account, and completes the flow.
+    /// Confirms the registration and completes the flow.
     ///
     /// Call this when ``NextAction/confirmSignup(password:)`` is among the `nextActions`. Pass the password the user
-    /// entered. Pass `nil` to create the account without one: when the offer's ``SignupPassword`` is `nil` (the
-    /// connection collects no password), or when the password is optional and the user skips it.
-    ///
-    /// The password is sent as given and is not trimmed. The server treats an empty string as no password. The SDK does not
-    /// check its length or its complexity locally: the server and the connection's password policy enforce the limits.
+    /// entered, or `nil` to create the account without one.
     ///
     /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
-    /// The SDK never keeps the password. If the token exchange fails with ``EmbeddedAuthErrorReason/network``, the
-    /// session is kept; retrying sends the confirmation again, so pass the password again. If the connection requires a
-    /// password and `nil` is passed, the request fails with
-    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordRequired`` and the flow stays open.
-    ///
-    /// A request the server cannot accept yet fails with
-    /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the flow stays open:
-    /// - ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordRequired``: ask for a password.
-    /// - ``EmbeddedAuthErrorReason/InsufficientAuthorization/passwordNotAccepted``: the connection does not collect one;
-    ///   call ``confirmSignup(password:)`` with `nil`.
-    /// - ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidPassword``: the password does not meet the
-    ///   connection's policy; ask for another one.
-    ///
-    /// A password found in a data breach ends the flow with ``EmbeddedAuthErrorReason/passwordLeaked``.
+    /// If the server cannot accept the request yet, for example because a required password is missing, the request
+    /// instead fails with ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the flow stays
+    /// open.
     ///
     /// Requires an active session.
-    ///
-    /// - Note: Types outside the SDK that conform to ``EmbeddedAuth`` get a default implementation that sends no request
-    ///   and fails with an ``EmbeddedAuthError`` whose ``EmbeddedAuthError/code`` is
-    ///   `a0.sdk.internal_error.not_implemented`.
     ///
     /// - Parameter password: The password entered by the user, or `nil` for none.
     func confirmSignup(password: String?) -> Request<Credentials, EmbeddedAuthError>
