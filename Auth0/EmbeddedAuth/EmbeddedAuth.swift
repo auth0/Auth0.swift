@@ -182,6 +182,37 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// - Parameter password: The password entered by the user, or `nil` for none.
     func confirmSignup(password: String?) -> Request<Credentials, EmbeddedAuthError>
 
+    #if PASSKEYS_PLATFORM
+    /// Submits a passkey assertion to sign the user in.
+    ///
+    /// Call this when ``NextAction/verifyPasskey(options:requestJson:)`` is among the `nextActions`, after the user picked a
+    /// passkey in the system UI. The app builds the platform request from the ``PasskeyRequestOptions``; the SDK
+    /// doesn't build or present any passkey UI. A passkey both identifies and verifies the user. Only discoverable
+    /// passkeys are supported.
+    ///
+    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    /// If a second factor is also required, the request instead fails with
+    /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the MFA actions in `nextActions`.
+    ///
+    /// If the passkey couldn't be verified, the request fails with
+    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidPasskey``. Show the passkey UI again with the new
+    /// options found in `nextActions` (the previous assertion can't be reused), or offer another option. The server
+    /// might not offer the passkey again, so look for ``NextAction/verifyPasskey(options:requestJson:)`` before showing the UI.
+    ///
+    /// If the assertion has no user handle or lacks required data, the request fails locally with
+    /// ``EmbeddedAuthErrorReason/invalidInput(_:)``: nothing is sent and the session is kept.
+    ///
+    /// Requires an active session, and the passkey must still be on offer: call this right after receiving a
+    /// `nextActions` that contains ``NextAction/verifyPasskey(options:requestJson:)``, before submitting any other step. If the
+    /// request fails with ``EmbeddedAuthErrorReason/network``, the session is kept; retrying means passing the same
+    /// assertion again, and the server decides whether it still accepts it.
+    ///
+    /// - Parameter passkey: The assertion obtained from `ASAuthorizationControllerDelegate`
+    ///   (an `ASAuthorizationPlatformPublicKeyCredentialAssertion`).
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func verifyPasskey(_ passkey: any LoginPasskey) -> Request<Credentials, EmbeddedAuthError>
+    #endif
+
 }
 
 public extension EmbeddedAuth {
@@ -193,4 +224,101 @@ public extension EmbeddedAuth {
                   scope: "openid profile email offline_access",
                   audience: nil)
     }
+}
+
+// MARK: - EmbeddedCapability
+
+/// A capability the SDK advertises in the initial ``EmbeddedAuth/authorize(connection:capabilities:scope:audience:)`` call.
+public enum EmbeddedCapability: Sendable, Equatable {
+
+    /// SDK can identify a user by email.
+    case identifyEmail
+
+    /// SDK can identify a user by phone.
+    case identifyPhone
+
+    /// SDK can identify a user by username.
+    case identifyUsername
+
+    /// SDK can trigger an email OTP challenge.
+    case challengeEmail
+
+    /// SDK can trigger a phone OTP challenge.
+    case challengePhone
+
+    /// SDK can trigger a push notification challenge.
+    case challengePush
+
+    /// SDK can verify an OTP code.
+    case verifyOTP
+
+    /// SDK can poll for push notification approval.
+    case verifyOob
+
+    /// SDK can verify a password.
+    case verifyPassword
+
+    /// SDK can submit a recovery code.
+    case verifyRecoveryCode
+
+    /// SDK can confirm a rotated recovery code.
+    case confirmRecoveryCode
+
+    /// SDK can start a sign-up.
+    case signup
+
+    /// SDK can confirm a sign-up.
+    case confirmSignup
+
+    #if PASSKEYS_PLATFORM
+    /// SDK can verify a passkey.
+    ///
+    /// This case only exists where passkeys are supported: iOS, macOS, Mac Catalyst and visionOS. It is included in
+    /// ``all`` only where the SDK can act on it: iOS 16.6+, macOS 13.5+ and visionOS 1.0+.
+    /// The server only offers a passkey on a custom domain, for a connection with passkey login enabled.
+    case verifyPasskey
+    #endif
+
+    /// All capabilities this SDK version supports on the current platform and OS version.
+    ///
+    /// Includes ``verifyPasskey`` only on iOS 16.6+, macOS 13.5+ and visionOS 1.0+ (checked at runtime), as the
+    /// last entry. To turn passkey sign-in off, pass an explicit list without it, for example
+    /// `EmbeddedCapability.all.filter { $0 != .verifyPasskey }`.
+    public static var all: [EmbeddedCapability] {
+        var capabilities: [EmbeddedCapability] = [
+            .identifyEmail, .identifyPhone, .identifyUsername,
+            .challengeEmail, .challengePhone, .challengePush,
+            .verifyOTP, .verifyOob, .verifyPassword,
+            .verifyRecoveryCode, .confirmRecoveryCode,
+            .signup, .confirmSignup
+        ]
+        #if PASSKEYS_PLATFORM
+        if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
+            capabilities.append(.verifyPasskey)
+        }
+        #endif
+        return capabilities
+    }
+
+    var action: EmbeddedAction {
+        switch self {
+        case .identifyEmail:       return .identifyEmail
+        case .identifyPhone:       return .identifyPhone
+        case .identifyUsername:    return .identifyUsername
+        case .challengeEmail:      return .challengeEmail
+        case .challengePhone:      return .challengePhone
+        case .challengePush:       return .challengePush
+        case .verifyOTP:           return .verifyOTP
+        case .verifyOob:           return .verifyOob
+        case .verifyPassword:      return .verifyPassword
+        case .verifyRecoveryCode:  return .verifyRecoveryCode
+        case .confirmRecoveryCode: return .confirmRecoveryCode
+        case .signup:              return .signup
+        case .confirmSignup:       return .confirmSignup
+        #if PASSKEYS_PLATFORM
+        case .verifyPasskey:       return .verifyPasskey
+        #endif
+        }
+    }
+
 }

@@ -190,7 +190,13 @@ struct EmbeddedAuthPasswordClientTests {
     @Test func capabilitiesAllCoversEveryActionExactlyOnce() {
         let actions = EmbeddedCapability.all.map(\.action)
         #expect(actions.count == Set(actions).count)
-        #expect(Set(actions) == Set(EmbeddedAction.allCases))
+        // Passkey exists only where the platform supports it, and is advertised only on a recent enough OS.
+        var expected = Set(EmbeddedAction.allCases)
+        #if PASSKEYS_PLATFORM
+        expected.remove(.verifyPasskey)
+        if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) { expected.insert(.verifyPasskey) }
+        #endif
+        #expect(Set(actions) == expected)
     }
 
     @Test func authorizeAdvertisesUsernameAndPasswordCapabilities() async {
