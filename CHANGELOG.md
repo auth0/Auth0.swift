@@ -1,5 +1,12 @@
 # Change Log
 
+## [4.0.0-beta.4](https://github.com/auth0/Auth0.swift/tree/4.0.0-beta.4) (2026-11-24)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/4.0.0-beta.3...4.0.0-beta.4)
+
+**Added**
+- feat(embedded-auth): add passkey verification [\#1334](https://github.com/auth0/Auth0.swift/pull/1334) ([NandanPrabhu](https://github.com/NandanPrabhu))
+- feat(embedded-auth): add password sign-up [\#1335](https://github.com/auth0/Auth0.swift/pull/1335) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [3.3.1](https://github.com/auth0/Auth0.swift/tree/3.3.1) (2026-11-12)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/3.3.0...3.3.1)
 
