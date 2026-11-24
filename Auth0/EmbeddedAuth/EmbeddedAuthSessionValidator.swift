@@ -19,3 +19,19 @@ struct EmbeddedAuthSessionValidator: RequestValidator {
     }
 
 }
+
+/// Fails the request locally when the input of a step is not valid, before anything is sent.
+///
+/// The message must never contain secrets such as passkey data.
+struct EmbeddedAuthInputValidator: RequestValidator {
+
+    let message: String
+
+    func validate() throws {
+        throw EmbeddedAuthError(
+            info: ["error": "invalid_input", "error_description": message],
+            statusCode: 0
+        )
+    }
+
+}

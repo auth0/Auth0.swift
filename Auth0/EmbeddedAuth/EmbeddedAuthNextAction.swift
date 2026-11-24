@@ -83,6 +83,27 @@ public enum NextAction: Sendable, Equatable {
     ///   registration. When it is `nil`, call ``EmbeddedAuth/confirmSignup(password:)`` with `nil`.
     case confirmSignup(password: SignupPassword?)
 
+    #if PASSKEYS_PLATFORM
+    /// Server offers passkey sign-in: show the system passkey UI built from `options`, then call
+    /// `verifyPasskey(_:)` with the resulting assertion.
+    ///
+    /// Offered in the first `nextActions`, alongside the identify steps. A passkey both identifies and verifies the
+    /// user in one step. The offer is only valid until another step is submitted: after ``EmbeddedAuth/identify(_:type:)``
+    /// it is gone, and only a new ``EmbeddedAuth/authorize(connection:capabilities:scope:audience:)`` offers it again.
+    /// After ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidPasskey`` use the new options from the error,
+    /// never the previous ones.
+    ///
+    /// This case only exists where passkeys are supported: iOS, macOS, Mac Catalyst and visionOS. `verifyPasskey(_:)`
+    /// needs iOS 16.6+, macOS 13.5+ or visionOS 1.0+, so on an older OS offer another entry from `nextActions`.
+    ///
+    /// - Parameters:
+    ///   - options: The main WebAuthn request options sent by the server, as the values the system passkey API takes.
+    ///   - requestJson: The complete options object the server sent, as a JSON string. Use it if your app runs the
+    ///     passkey ceremony with its own WebAuthn code instead of building the system request from `options`. It holds
+    ///     the challenge, so don't log it, and use it for one attempt only.
+    case verifyPasskey(options: PasskeyRequestOptions, requestJson: String)
+    #endif
+
     /// An action string the SDK does not recognise — preserved for forward compatibility.
     case unknown(rawAction: String)
 
@@ -278,78 +299,10 @@ enum EmbeddedAction: String, Sendable, CaseIterable {
     /// Confirm the registration and complete the flow.
     case confirmSignup = "action:signup:confirm:v1"
 
-}
-
-// MARK: - EmbeddedCapability
-
-/// A capability the SDK advertises in the initial ``EmbeddedAuth/authorize(connection:capabilities:scope:audience:)`` call.
-public enum EmbeddedCapability: Sendable, Equatable {
-
-    /// SDK can identify a user by email.
-    case identifyEmail
-
-    /// SDK can identify a user by phone.
-    case identifyPhone
-
-    /// SDK can identify a user by username.
-    case identifyUsername
-
-    /// SDK can trigger an email OTP challenge.
-    case challengeEmail
-
-    /// SDK can trigger a phone OTP challenge.
-    case challengePhone
-
-    /// SDK can trigger a push notification challenge.
-    case challengePush
-
-    /// SDK can verify an OTP code.
-    case verifyOTP
-
-    /// SDK can poll for push notification approval.
-    case verifyOob
-
-    /// SDK can verify a password.
-    case verifyPassword
-
-    /// SDK can submit a recovery code.
-    case verifyRecoveryCode
-
-    /// SDK can confirm a rotated recovery code.
-    case confirmRecoveryCode
-
-    /// SDK can start a sign-up.
-    case signup
-
-    /// SDK can confirm a sign-up.
-    case confirmSignup
-
-    /// All capabilities this SDK version supports.
-    public static let all: [EmbeddedCapability] = [
-        .identifyEmail, .identifyPhone, .identifyUsername,
-        .challengeEmail, .challengePhone, .challengePush,
-        .verifyOTP, .verifyOob, .verifyPassword,
-        .verifyRecoveryCode, .confirmRecoveryCode,
-        .signup, .confirmSignup
-    ]
-
-    var action: EmbeddedAction {
-        switch self {
-        case .identifyEmail:       return .identifyEmail
-        case .identifyPhone:       return .identifyPhone
-        case .identifyUsername:    return .identifyUsername
-        case .challengeEmail:      return .challengeEmail
-        case .challengePhone:      return .challengePhone
-        case .challengePush:       return .challengePush
-        case .verifyOTP:           return .verifyOTP
-        case .verifyOob:           return .verifyOob
-        case .verifyPassword:      return .verifyPassword
-        case .verifyRecoveryCode:  return .verifyRecoveryCode
-        case .confirmRecoveryCode: return .confirmRecoveryCode
-        case .signup:              return .signup
-        case .confirmSignup:       return .confirmSignup
-        }
-    }
+    #if PASSKEYS_PLATFORM
+    /// Submit a passkey assertion to sign the user in.
+    case verifyPasskey = "action:verify:passkey:v1"
+    #endif
 
 }
 

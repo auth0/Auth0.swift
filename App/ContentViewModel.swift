@@ -1,5 +1,8 @@
 import SwiftUI
 import Auth0
+#if PASSKEYS_PLATFORM
+import AuthenticationServices
+#endif
 
 // MARK: - View Model
 
@@ -40,6 +43,10 @@ final class ContentViewModel: ObservableObject {
 
     private let authenticationClient: Authentication
     private let embeddedAuthClient: EmbeddedAuth
+    #if PASSKEYS_PLATFORM
+    /// A `PasskeySheet`, created on first use because the type needs iOS 16.6+.
+    private var passkeySheet: Any?
+    #endif
 
     /// The action backing the screen currently shown, so it is not offered again as an alternative.
     private var currentAction: NextAction?
@@ -48,6 +55,8 @@ final class ContentViewModel: ObservableObject {
     private var submittedIdentifiers = Set<IdentifierType>()
     /// Whether the running flow is a sign-up, started with the Signup button.
     private var isSigningUp = false
+    /// Whether the user started the flow with the passkey button, so a passkey offer is shown before the identify steps.
+    private var prefersPasskey = false
     private var pollTask: Task<Void, Never>?
 
     private static let minPollIntervalMs = 1_000
@@ -69,7 +78,7 @@ final class ContentViewModel: ObservableObject {
     /// Login advertises every capability except sign-up, so the server never offers it. Sign-up advertises just the
     /// capabilities it uses, calls `signup()` as soon as the server offers it, and then submits the email and the
     /// phone number that were entered as the server asks for them.
-    func startEmbeddedFlow(signingUp: Bool = false) async {
+    func startEmbeddedFlow(signingUp: Bool = false, usingPasskey: Bool = false) async {
         isLoading = true
         // A cancelled poll may still have a request in flight that mutates the SDK's session,
         // so wait for it to finish before starting a new flow.
@@ -78,6 +87,7 @@ final class ContentViewModel: ObservableObject {
         pollTask = nil
         clearFlowState()
         isSigningUp = signingUp
+        prefersPasskey = usingPasskey && !signingUp
         embeddedAuthUIState = .initial
         do {
             _ = try await embeddedAuthClient.authorize(connection: connection,
@@ -358,6 +368,60 @@ final class ContentViewModel: ObservableObject {
         _ = present(confirm, among: availableActions)
     }
 
+    // MARK: - Passkey
+
+    #if PASSKEYS_PLATFORM
+    /// The passkey offer of the latest continuation, if the server made one.
+    private var offeredPasskey: NextAction? {
+        availableActions.first { $0.isVerifyPasskey }
+    }
+
+    /// Whether the identify screens can offer to sign in with a passkey instead.
+    var canUsePasskey: Bool { offeredPasskey != nil }
+
+    /// Shows the passkey screen for the latest offer.
+    func usePasskey() {
+        guard let offer = offeredPasskey else { return }
+        attemptError = nil
+        prefersPasskey = true
+        _ = present(offer, among: availableActions)
+    }
+
+    /// Leaves the passkey screen for the first other entry of the latest continuation, such as the email identify step.
+    func skipPasskey() {
+        attemptError = nil
+        prefersPasskey = false
+        for action in availableActions.filter({ !$0.isVerifyPasskey }) where present(action, among: availableActions) {
+            return
+        }
+        embeddedAuthUIState = .failed("The server offered no other way to sign in.")
+    }
+
+    /// Shows the system passkey sheet for `options`, then verifies the assertion with the server.
+    ///
+    /// Cancelling the sheet keeps the session, so the user can try again or pick another entry. A passkey the server
+    /// rejects arrives as a continuation, and `handle(embeddedAuthError:)` shows the new offer or the other entries.
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func signInWithPasskey(options: PasskeyRequestOptions) async {
+        isLoading = true
+        attemptError = nil
+        do {
+            let sheet = passkeySheet as? PasskeySheet ?? PasskeySheet()
+            passkeySheet = sheet
+            let assertion = try await sheet.assertion(for: options)
+            let credentials = try await embeddedAuthClient.verifyPasskey(assertion).start()
+            finish(with: credentials)
+        } catch let error as ASAuthorizationError where error.code == .canceled {
+            attemptError = "Passkey sign-in was cancelled. Try again, or use another method."
+        } catch let error as EmbeddedAuthError {
+            handle(embeddedAuthError: error)
+        } catch {
+            attemptError = "Passkey sign-in failed: \(error.localizedDescription)"
+        }
+        isLoading = false
+    }
+    #endif
+
     // MARK: - Navigation between offered methods
 
     /// Actions from the latest continuation that the user can switch to without a network call.
@@ -366,6 +430,10 @@ final class ContentViewModel: ObservableObject {
             switch action {
             case .challengeEmail, .challengePhone, .challengePush, .verifyOTP, .verifyRecoveryCode:
                 return action != currentAction
+            #if PASSKEYS_PLATFORM
+            case .verifyPasskey:
+                return action != currentAction
+            #endif
             default:
                 return false
             }
@@ -561,6 +629,7 @@ private extension ContentViewModel {
         submittedIdentifiers = []
         signupIdentifiers = []
         isSigningUp = false
+        prefersPasskey = false
     }
 
     func startPolling(initialIntervalMs: Int) {
@@ -672,6 +741,11 @@ private extension ContentViewModel {
     }
 
     func handle(embeddedAuthError error: EmbeddedAuthError) {
+        // A local check failed: nothing was sent and the SDK kept the session, so stay on the screen and say what to fix.
+        if case .invalidInput(let message) = error.reason {
+            attemptError = message
+            return
+        }
         guard case .insufficientAuthorization(let reason, let nextActions) = error.reason else {
             fail(with: error)
             return
@@ -699,6 +773,10 @@ private extension ContentViewModel {
             attemptError = "This connection does not use a password. Continue without one."
         case .invalidPassword:
             attemptError = "That password does not meet the requirements. Please try another one."
+        #if PASSKEYS_PLATFORM
+        case .invalidPasskey:
+            attemptError = "That passkey couldn't be verified. Please try again."
+        #endif
         default:
             attemptError = nil
         }
@@ -713,7 +791,11 @@ private extension ContentViewModel {
             }
             return
         }
-        for action in nextActions where present(action, among: nextActions) {
+        // A passkey is only shown first when the user asked for it. Otherwise it stays reachable through the
+        // "Use a passkey" button of the identify screens.
+        let passkeys = nextActions.filter(\.isVerifyPasskey)
+        let others = nextActions.filter { !$0.isVerifyPasskey }
+        for action in (prefersPasskey ? passkeys + others : others) where present(action, among: nextActions) {
             return
         }
         fail(with: error)
@@ -765,12 +847,27 @@ private extension ContentViewModel {
             // The field is empty on every visit, so a rejected password is never shown again.
             password = ""
             embeddedAuthUIState = .confirmSignup(password: signupPassword)
+        #if PASSKEYS_PLATFORM
+        case .verifyPasskey(let options, _):
+            // The demo builds the system request from `options`. `requestJson` is for apps with their own WebAuthn code.
+            embeddedAuthUIState = .verifyPasskey(options)
+        #endif
         case .signup, .unknown:
             // Sign-up has no screen of its own: `startEmbeddedFlow(signingUp:)` calls `signup()` when it is offered.
             currentAction = nil
             return false
         }
         return true
+    }
+}
+
+private extension NextAction {
+    /// Whether this is a passkey offer. Always `false` where passkeys aren't supported.
+    var isVerifyPasskey: Bool {
+        #if PASSKEYS_PLATFORM
+        if case .verifyPasskey = self { return true }
+        #endif
+        return false
     }
 }
 
@@ -790,6 +887,9 @@ enum EmbeddedAuthUIState {
     case verifyRecoveryCode
     case confirmRecoveryCode(newCode: String)
     case confirmSignup(password: SignupPassword?)
+    #if PASSKEYS_PLATFORM
+    case verifyPasskey(PasskeyRequestOptions)
+    #endif
     case success(Credentials)
     case failed(String)
 }
@@ -809,3 +909,72 @@ private extension NextAction {
         return false
     }
 }
+
+#if PASSKEYS_PLATFORM
+// MARK: - Passkey sheet
+
+/// Wraps `ASAuthorizationController` so the passkey assertion can be awaited.
+@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+@MainActor
+final class PasskeySheet: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+    private var continuation: CheckedContinuation<ASAuthorizationPlatformPublicKeyCredentialAssertion, Error>?
+    private var controller: ASAuthorizationController?
+
+    func assertion(for options: PasskeyRequestOptions) async throws -> ASAuthorizationPlatformPublicKeyCredentialAssertion {
+        try await withCheckedThrowingContinuation { continuation in
+            self.continuation = continuation
+            let controller = ASAuthorizationController(authorizationRequests: [options.assertionRequest()])
+            controller.delegate = self
+            controller.presentationContextProvider = self
+            self.controller = controller
+            controller.performRequests()
+        }
+    }
+
+    func authorizationController(controller: ASAuthorizationController,
+                                 didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let assertion = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion {
+            continuation?.resume(returning: assertion)
+        } else {
+            continuation?.resume(throwing: ASAuthorizationError(.failed))
+        }
+        continuation = nil
+    }
+
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        continuation?.resume(throwing: error)
+        continuation = nil
+    }
+
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        #if os(macOS)
+        return NSApplication.shared.keyWindow ?? NSApplication.shared.windows.first ?? ASPresentationAnchor()
+        #else
+        let windows = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows)
+        return windows.first(where: \.isKeyWindow) ?? windows.first ?? ASPresentationAnchor()
+        #endif
+    }
+}
+
+@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+private extension PasskeyRequestOptions {
+    /// Example helper: builds the platform passkey request from the options the server sent. The SDK doesn't build
+    /// or present any passkey UI; the app does.
+    func assertionRequest() -> ASAuthorizationPlatformPublicKeyCredentialAssertionRequest {
+        let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: relyingPartyId)
+        let request = provider.createCredentialAssertionRequest(challenge: challengeData)
+        switch userVerification {
+        case .required:
+            request.userVerificationPreference = .required
+        case .preferred:
+            request.userVerificationPreference = .preferred
+        case .discouraged:
+            request.userVerificationPreference = .discouraged
+        }
+        request.allowedCredentials = allowedCredentialIds.map {
+            ASAuthorizationPlatformPublicKeyCredentialDescriptor(credentialID: $0)
+        }
+        return request
+    }
+}
+#endif

@@ -115,6 +115,10 @@ public extension EmbeddedAuthError {
             return .insufficientAuthorization(reason: .passwordNotAccepted, nextActions: parsedNextActions)
         case (_, "insufficient_authorization", "invalid_password"):
             return .insufficientAuthorization(reason: .invalidPassword, nextActions: parsedNextActions)
+        #if PASSKEYS_PLATFORM
+        case (_, "insufficient_authorization", "invalid_passkey"):
+            return .insufficientAuthorization(reason: .invalidPasskey, nextActions: parsedNextActions)
+        #endif
         case (_, "insufficient_authorization", _):
             return .insufficientAuthorization(reason: .none, nextActions: parsedNextActions)
         case (_, "access_denied", "too_many_wrong_otp_attempts"):
@@ -143,6 +147,8 @@ public extension EmbeddedAuthError {
             return .sessionExpired
         case (_, "no_active_session", _):
             return .noActiveSession
+        case (0, "invalid_input", let message):
+            return .invalidInput(message ?? "")
         case (_, "invalid_request", _):
             return .invalidRequest
         default:
@@ -202,6 +208,13 @@ private extension EmbeddedAuthError {
                                passwordRequirement: Self.passwordRequirement(from: entry))
             case .confirmSignup:
                 return confirmSignupAction(from: entry)
+            #if PASSKEYS_PLATFORM
+            case .verifyPasskey:
+                guard let json = entry["authn_params_public_key"] as? [String: Any],
+                      let options = PasskeyRequestOptions(json: json),
+                      let requestJson = PasskeyRequestOptions.requestJson(from: json) else { return nil }
+                return .verifyPasskey(options: options, requestJson: requestJson)
+            #endif
             case .none:
                 return .unknown(rawAction: actionString)
             }

@@ -58,6 +58,17 @@ struct ContentView: View {
                     }
                     .buttonStyle(SecondaryButtonStyle())
                     .disabled(viewModel.isLoading)
+                    #if PASSKEYS_PLATFORM
+                    if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
+                        Button {
+                            Task { await viewModel.startEmbeddedFlow(usingPasskey: true) }
+                        } label: {
+                            Text("Login with Passkey")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
+                    #endif
 
                     #if WEB_AUTH_PLATFORM
                     Button {
@@ -94,6 +105,7 @@ struct ContentView: View {
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading || viewModel.email.isEmpty)
                     skipButton
+                    passkeyButton
                     if viewModel.canToggleIdentifier {
                         Button {
                             viewModel.toggleIdentifier()
@@ -122,6 +134,7 @@ struct ContentView: View {
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading || viewModel.phone.isEmpty)
                     skipButton
+                    passkeyButton
                     if viewModel.canToggleIdentifier {
                         Button {
                             viewModel.toggleIdentifier()
@@ -338,6 +351,34 @@ struct ContentView: View {
                         .disabled(viewModel.isLoading)
                     }
 
+                #if PASSKEYS_PLATFORM
+                case .verifyPasskey(let options):
+                    Text("Sign in with a passkey saved for \(options.relyingPartyId).")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    if let attemptError = viewModel.attemptError {
+                        Text(attemptError)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
+                        Button {
+                            Task { await viewModel.signInWithPasskey(options: options) }
+                        } label: {
+                            Text("Continue with passkey")
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                    }
+                    Button {
+                        viewModel.skipPasskey()
+                    } label: {
+                        Text("Use email or phone instead")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+                #endif
+
                 case .success(let credentials):
                     Text("✓ Authenticated")
                         .font(.headline)
@@ -408,6 +449,22 @@ struct ContentView: View {
         }
     }
 
+    /// Offers the passkey the server made available next to the identify steps.
+    @ViewBuilder
+    private var passkeyButton: some View {
+        #if PASSKEYS_PLATFORM
+        if viewModel.canUsePasskey {
+            Button {
+                viewModel.usePasskey()
+            } label: {
+                Text("Use a passkey")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .disabled(viewModel.isLoading)
+        }
+        #endif
+    }
+
     /// Buttons for switching to another method offered by the latest response.
     @ViewBuilder
     private var alternativeActionButtons: some View {
@@ -434,6 +491,10 @@ struct ContentView: View {
             return channel == .totp ? "Use authenticator app code" : "Enter a code"
         case .verifyRecoveryCode:
             return "Use recovery code"
+        #if PASSKEYS_PLATFORM
+        case .verifyPasskey:
+            return "Use a passkey"
+        #endif
         default:
             return "Use another method"
         }

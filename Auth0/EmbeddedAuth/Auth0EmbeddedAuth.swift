@@ -1,3 +1,5 @@
+// swiftlint:disable file_length
+
 import Foundation
 
 // MARK: - Concrete implementation
@@ -219,6 +221,37 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
         )
     }
 
+    #if PASSKEYS_PLATFORM
+    /// Submits a passkey assertion to sign the user in.
+    /// On success, internally exchanges the authorization code for ``Credentials``.
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func verifyPasskey(_ passkey: any LoginPasskey) -> Request<Credentials, EmbeddedAuthError> {
+        guard let authSession = transactionState?.authSession else { return noActiveSession() }
+        let assertion: [String: Any]
+        do {
+            assertion = try Self.passkeyAssertion(from: passkey)
+        } catch let error as PasskeyInputError {
+            return invalidInputRequest(message: error.message)
+        } catch {
+            return invalidInputRequest(message: "This passkey can't be used.")
+        }
+        return Request(
+            session: session,
+            url: url.appending("e/authorize"),
+            method: "POST",
+            handle: decodeAuthorizationCodeResponse,
+            parameters: [
+                "client_id": clientId,
+                "action": EmbeddedAction.verifyPasskey.rawValue,
+                "auth_session": authSession,
+                "authn_response": assertion
+            ],
+            logger: logger,
+            auth0ClientInfo: auth0ClientInfo
+        )
+    }
+    #endif
+
     /// Requests that the server send an email OTP challenge.
     func challengeEmail(index: Int) -> Request<Void, EmbeddedAuthError> {
         guard let authSession = transactionState?.authSession else { return noActiveSession() }
@@ -348,9 +381,9 @@ extension Auth0EmbeddedAuth {
     }
 }
 
-// MARK: - Private
+// MARK: - Local failures
 
-private extension Auth0EmbeddedAuth {
+extension Auth0EmbeddedAuth {
 
     func noActiveSession<T: Sendable>() -> Request<T, EmbeddedAuthError> {
         Request(
@@ -371,6 +404,81 @@ private extension Auth0EmbeddedAuth {
     }
 
 }
+
+#if PASSKEYS_PLATFORM
+
+// MARK: - Passkey assertion
+
+extension Auth0EmbeddedAuth {
+
+    /// Maps a passkey to the `authn_response` object, with only the fields the server accepts, base64url-encoded.
+    ///
+    /// `clientExtensionResults` is always empty: the SDK requests no WebAuthn extension, so there is nothing to forward.
+    /// It is sent anyway, as a browser does, so that the server can start to use extensions without a new SDK version.
+    ///
+    /// Max lengths are not checked here: the server decides.
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    static func passkeyAssertion(from passkey: any LoginPasskey) throws -> [String: Any] {
+        guard let userID = passkey.userID, !userID.isEmpty else {
+            throw PasskeyInputError(message: "This passkey has no user handle. Only discoverable passkeys are supported.")
+        }
+        let credentialID = passkey.credentialID
+        guard !credentialID.isEmpty else {
+            throw PasskeyInputError(message: "This passkey has no credential ID.")
+        }
+        let clientData = passkey.rawClientDataJSON
+        guard !clientData.isEmpty else {
+            throw PasskeyInputError(message: "This passkey has no client data.")
+        }
+        guard let authenticatorData = passkey.rawAuthenticatorData, !authenticatorData.isEmpty else {
+            throw PasskeyInputError(message: "This passkey has no authenticator data.")
+        }
+        guard let signature = passkey.signature, !signature.isEmpty else {
+            throw PasskeyInputError(message: "This passkey has no signature.")
+        }
+
+        let id = credentialID.encodeBase64URLSafe()
+        var assertion: [String: Any] = [
+            "id": id,
+            "rawId": id,
+            "type": "public-key",
+            "clientExtensionResults": [String: Any](),
+            "response": [
+                "clientDataJSON": clientData.encodeBase64URLSafe(),
+                "authenticatorData": authenticatorData.encodeBase64URLSafe(),
+                "signature": signature.encodeBase64URLSafe(),
+                "userHandle": userID.encodeBase64URLSafe()
+            ]
+        ]
+        if let attachment = passkey.attachment.stringValue {
+            assertion["authenticatorAttachment"] = attachment
+        }
+        return assertion
+    }
+
+    /// Fails the request locally because the input is not valid: nothing is sent and the session is kept.
+    ///
+    /// The message must never contain secrets such as passkey data.
+    func invalidInputRequest<T: Sendable>(message: String) -> Request<T, EmbeddedAuthError> {
+        Request(
+            session: session,
+            url: url.appending("e/authorize"),
+            method: "POST",
+            requestValidator: [EmbeddedAuthInputValidator(message: message)],
+            handle: { _, callback in
+                callback(.failure(EmbeddedAuthError(
+                    info: ["error": "invalid_input", "error_description": message],
+                    statusCode: 0
+                )))
+            },
+            logger: logger,
+            auth0ClientInfo: auth0ClientInfo
+        )
+    }
+
+}
+
+#endif
 
 private extension NextAction {
 
