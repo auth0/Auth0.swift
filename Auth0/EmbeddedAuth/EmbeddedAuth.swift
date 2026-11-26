@@ -59,8 +59,7 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///
     /// Every call generates a fresh PKCE pair. The S256 `code_challenge` is sent on this request, and the matching
     /// `code_verifier` is kept in memory for this flow only and sent automatically when the authorization code is
-    /// exchanged for ``Credentials``. There is nothing to configure. If the system can't provide secure random bytes
-    /// for the verifier, the request fails with ``EmbeddedAuthErrorReason/unknown`` and sends nothing.
+    /// exchanged for ``Credentials``. There is nothing to configure.
     ///
     /// - Parameters:
     ///   - connection:   Connection name to target.

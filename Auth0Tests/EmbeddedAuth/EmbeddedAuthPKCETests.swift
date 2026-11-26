@@ -304,6 +304,19 @@ struct EmbeddedAuthPKCETests {
         #expect(ChallengeGenerator(verifier: verifier).challenge == challenge)
     }
 
+    @Test func theExchangeSendsOnlyTheFieldsItIsGiven() async throws {
+        let sut = try #require(makeClient() as? Auth0EmbeddedAuth)
+        let recorder = Recorder()
+        EmbeddedAuthPKCEMockProtocol.requestHandler = { req in
+            recorder.tokenBodies.append(body(of: req))
+            return (response(status: 200), credentials())
+        }
+        _ = try await sut.exchange(code: "auth0_ac_code", verifier: nil).start()
+
+        let token = try #require(recorder.tokenBodies.first)
+        #expect(Set(token.keys) == ["client_id", "grant_type", "code"])
+    }
+
     @Test func networkFailureOnInitiateStartsNoFlow() async throws {
         let sut = try #require(makeClient() as? Auth0EmbeddedAuth)
         EmbeddedAuthPKCEMockProtocol.requestHandler = { _ in throw URLError(.notConnectedToInternet) }

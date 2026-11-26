@@ -39,7 +39,7 @@ extension Auth0EmbeddedAuth {
     /// the call may not have reached the server, so the session is kept and the caller can retry the step.
     func decodeAuthorizationCodeResponse(
         _ result: Result<ResponseValue, EmbeddedAuthError>,
-        verifier: String,
+        verifier: String?,
         callback: @escaping @Sendable (Result<Credentials, EmbeddedAuthError>) -> Void
     ) {
         switch result {

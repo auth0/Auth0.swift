@@ -112,13 +112,13 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     /// Submits the user's password to verify their identity.
     /// On success, internally exchanges the authorization code for ``Credentials``.
     func verifyPassword(_ password: String) -> Request<Credentials, EmbeddedAuthError> {
-        guard let state = transactionState else { return noActiveSession() }
+        guard let authSession = transactionState?.authSession else { return noActiveSession() }
         return authorizationCodeRequest(body: [
             "client_id": clientId,
             "action": EmbeddedAction.verifyPassword.rawValue,
             "password": password,
-            "auth_session": state.authSession
-        ], verifier: state.verifier)
+            "auth_session": authSession
+        ], verifier: transactionState?.verifier)
     }
 
     /// Requests that the server send a phone OTP challenge.
@@ -146,12 +146,12 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
 
     /// Polls for push notification approval.
     func verifyOob() -> Request<Credentials, EmbeddedAuthError> {
-        guard let state = transactionState else { return noActiveSession() }
+        guard let authSession = transactionState?.authSession else { return noActiveSession() }
         return authorizationCodeRequest(body: [
             "client_id": clientId,
             "action": EmbeddedAction.verifyOob.rawValue,
-            "auth_session": state.authSession
-        ], verifier: state.verifier)
+            "auth_session": authSession
+        ], verifier: transactionState?.verifier)
     }
 
     /// Submits a recovery code to verify the user's identity.
@@ -167,12 +167,12 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
 
     /// Confirms the user has recorded their rotated recovery code.
     func confirmRecoveryCode() -> Request<Credentials, EmbeddedAuthError> {
-        guard let state = transactionState else { return noActiveSession() }
+        guard let authSession = transactionState?.authSession else { return noActiveSession() }
         return authorizationCodeRequest(body: [
             "client_id": clientId,
             "action": EmbeddedAction.confirmRecoveryCode.rawValue,
-            "auth_session": state.authSession
-        ], verifier: state.verifier)
+            "auth_session": authSession
+        ], verifier: transactionState?.verifier)
     }
 
     /// Starts registering a new user. Always fails with a continuation.
@@ -190,14 +190,14 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     ///
     /// The password is only placed in the request body: it is never stored on the client.
     func confirmSignup(password: String?) -> Request<Credentials, EmbeddedAuthError> {
-        guard let state = transactionState else { return noActiveSession() }
+        guard let authSession = transactionState?.authSession else { return noActiveSession() }
         var body: [String: Any] = [
             "client_id": clientId,
             "action": EmbeddedAction.confirmSignup.rawValue,
-            "auth_session": state.authSession
+            "auth_session": authSession
         ]
         if let password { body["password"] = password }
-        return authorizationCodeRequest(body: body, verifier: state.verifier)
+        return authorizationCodeRequest(body: body, verifier: transactionState?.verifier)
     }
 
     #if PASSKEYS_PLATFORM
@@ -205,7 +205,7 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     /// On success, internally exchanges the authorization code for ``Credentials``.
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func verifyPasskey(_ passkey: any LoginPasskey) -> Request<Credentials, EmbeddedAuthError> {
-        guard let state = transactionState else { return noActiveSession() }
+        guard let authSession = transactionState?.authSession else { return noActiveSession() }
         let assertion: [String: Any]
         do {
             assertion = try Self.passkeyAssertion(from: passkey)
@@ -217,9 +217,9 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
         return authorizationCodeRequest(body: [
             "client_id": clientId,
             "action": EmbeddedAction.verifyPasskey.rawValue,
-            "auth_session": state.authSession,
+            "auth_session": authSession,
             "authn_response": assertion
-        ], verifier: state.verifier)
+        ], verifier: transactionState?.verifier)
     }
     #endif
 
@@ -237,14 +237,14 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     /// Submits a one-time password to verify the user's identity.
     /// On success, internally exchanges the authorization code for ``Credentials``.
     func verifyOtp(_ otp: String, type: OtpType) -> Request<Credentials, EmbeddedAuthError> {
-        guard let state = transactionState else { return noActiveSession() }
+        guard let authSession = transactionState?.authSession else { return noActiveSession() }
         return authorizationCodeRequest(body: [
             "client_id": clientId,
             "action": EmbeddedAction.verifyOTP.rawValue,
             "otp": otp,
             "type": type.rawValue,
-            "auth_session": state.authSession
-        ], verifier: state.verifier)
+            "auth_session": authSession
+        ], verifier: transactionState?.verifier)
     }
 
 }
@@ -292,7 +292,7 @@ extension Auth0EmbeddedAuth {
     /// - Parameter verifier: The PKCE `code_verifier` of the flow as it is when the step is built. The exchange sends
     ///   this one, so the code always pairs with the flow that issued it, whatever happens to the client's state while
     ///   the request is in flight.
-    func authorizationCodeRequest(body: [String: Any], verifier: String) -> Request<Credentials, EmbeddedAuthError> {
+    func authorizationCodeRequest(body: [String: Any], verifier: String?) -> Request<Credentials, EmbeddedAuthError> {
         Request(
             session: session,
             url: url.appending("e/authorize"),
@@ -308,8 +308,14 @@ extension Auth0EmbeddedAuth {
 
     /// Exchanges the authorization code returned by a completed flow for ``Credentials``, with the PKCE `code_verifier`
     /// of that flow.
-    func exchange(code: String, verifier: String) -> Request<Credentials, EmbeddedAuthError> {
-        Request(
+    func exchange(code: String, verifier: String?) -> Request<Credentials, EmbeddedAuthError> {
+        var parameters: [String: Any] = [
+            "client_id": clientId,
+            "grant_type": "authorization_code",
+            "code": code
+        ]
+        if let verifier { parameters["code_verifier"] = verifier }
+        return Request(
             session: session,
             url: url.appending("oauth/token"),
             method: "POST",
@@ -326,12 +332,7 @@ extension Auth0EmbeddedAuth {
                     callback(.success(credentials))
                 }
             },
-            parameters: [
-                "client_id": clientId,
-                "grant_type": "authorization_code",
-                "code": code,
-                "code_verifier": verifier
-            ],
+            parameters: parameters,
             logger: logger,
             auth0ClientInfo: auth0ClientInfo
         )
