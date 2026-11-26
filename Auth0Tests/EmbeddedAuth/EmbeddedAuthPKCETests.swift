@@ -425,45 +425,6 @@ struct EmbeddedAuthPKCETests {
         #expect(sut.transactionState == nil)
     }
 
-    // MARK: When the PKCE pair can't be created
-
-    @Test func authorizeFailsLocallyWhenThePKCEPairCannotBeCreated() async throws {
-        let sut = try #require(makeClient() as? Auth0EmbeddedAuth)
-        _ = await startFlow(sut)
-        #expect(sut.transactionState != nil)
-        sut.makeChallenge = { throw ChallengeGeneratorError.randomBytesUnavailable }
-
-        let recorder = Recorder()
-        EmbeddedAuthPKCEMockProtocol.requestHandler = { req in
-            recorder.requests.append(req)
-            return (response(status: 403), insufficientAuth(session: "sess_002"))
-        }
-        let failure = await #expect(throws: EmbeddedAuthError.self) {
-            _ = try await sut.authorize(connection: "test-connection").start()
-        }
-        #expect(failure?.info["error"] as? String == "unknown_error")
-        #expect(failure?.info["error_description"] as? String == "Failed to create the PKCE code challenge.")
-        #expect(failure?.statusCode == 0)
-        let reason = try #require(failure).reason
-        guard case .unknown = reason else {
-            Issue.record("Expected .unknown, got \(reason)")
-            return
-        }
-        #expect(recorder.requests.isEmpty) // a flow is never started without PKCE
-        #expect(sut.transactionState == nil) // and the flow that was running is gone
-    }
-
-    @Test func theNextAuthorizeWorksAfterAPKCEFailure() async throws {
-        let sut = try #require(makeClient() as? Auth0EmbeddedAuth)
-        sut.makeChallenge = { throw ChallengeGeneratorError.randomBytesUnavailable }
-        _ = try? await sut.authorize(connection: "test-connection").start()
-        sut.makeChallenge = { try ChallengeGenerator() }
-
-        let recorder = await startFlow(sut)
-        #expect(recorder.authorizeBodies.count == 1)
-        #expect(sut.transactionState?.authSession == "sess_001")
-    }
-
     // MARK: A request that outlives its client
 
     @Test func aRequestThatOutlivesItsClientStillDeliversTheAnswer() async throws {

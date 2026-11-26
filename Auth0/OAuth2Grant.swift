@@ -19,7 +19,7 @@ struct PKCE: OAuth2Grant {
     let organization: String?
 
     init(authentication: Authentication,
-         generator: ChallengeGenerator,
+         generator: ChallengeGenerator = ChallengeGenerator(),
          redirectURL: URL,
          issuer: String,
          leeway: Int,

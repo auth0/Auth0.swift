@@ -19,9 +19,6 @@ struct Auth0WebAuth: WebAuth, Sendable {
     var logger: Logger?
     var dpop: DPoP?
 
-    /// Creates the PKCE pair of a new login. A property so that a test can make it fail.
-    var makeChallenge: @Sendable () throws -> ChallengeGenerator = { try ChallengeGenerator() }
-
     #if os(macOS)
     private let platform = "macos"
     #elseif os(iOS)
@@ -225,13 +222,7 @@ struct Auth0WebAuth: WebAuth, Sendable {
 
         let nonce = nonce
         let state = state
-        let handler: OAuth2Grant
-        do {
-            handler = try self.handler(redirectURL, nonce: nonce)
-        } catch {
-            barrier.lower()
-            return callback(.failure(WebAuthError(code: .unknown("Unable to create the PKCE code challenge"), cause: error)))
-        }
+        let handler = self.handler(redirectURL, nonce: nonce)
 
         let authorizeURL: URL
         do {
@@ -413,7 +404,7 @@ struct Auth0WebAuth: WebAuth, Sendable {
             .appendingPathComponent("callback")
     }
 
-    private func handler(_ redirectURL: URL, nonce: String) throws -> OAuth2Grant {
+    private func handler(_ redirectURL: URL, nonce: String) -> OAuth2Grant {
         var authentication = Auth0Authentication(clientId: self.clientId,
                                                  url: self.url,
                                                  session: self.session,
@@ -421,7 +412,6 @@ struct Auth0WebAuth: WebAuth, Sendable {
         authentication.dpop = self.dpop
         authentication.logger = self.logger
         return PKCE(authentication: authentication,
-                    generator: try makeChallenge(),
                     redirectURL: redirectURL,
                     issuer: self.issuer,
                     leeway: self.leeway,

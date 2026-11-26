@@ -40,9 +40,6 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
     ///   will clear the state, session and verifier, and undo whatever the new `authorize()` established.
     var transactionState: EmbeddedAuthState?
 
-    /// Creates the PKCE pair of a new flow. A property so that a test can make it fail.
-    var makeChallenge: () throws -> ChallengeGenerator = { try ChallengeGenerator() }
-
     init(clientId: String,
          url: URL,
          session: URLSession = .shared,
@@ -61,12 +58,7 @@ final class Auth0EmbeddedAuth: EmbeddedAuth, @unchecked Sendable {
                    scope: String = "openid profile email offline_access",
                    audience: String?) -> Request<Void, EmbeddedAuthError> {
         transactionState = nil
-        let pkce: ChallengeGenerator
-        do {
-            pkce = try makeChallenge()
-        } catch {
-            return pkceUnavailable()
-        }
+        let pkce = ChallengeGenerator()
         var body: [String: Any] = [
             "client_id": clientId,
             "capabilities": capabilities.map { $0.action.rawValue },
@@ -387,23 +379,6 @@ extension Auth0EmbeddedAuth {
 // MARK: - Local failures
 
 extension Auth0EmbeddedAuth {
-
-    /// Fails `authorize` locally, before anything is sent, because the PKCE pair of the new flow could not be created.
-    func pkceUnavailable() -> Request<Void, EmbeddedAuthError> {
-        let code = "unknown_error"
-        let message = "Failed to create the PKCE code challenge."
-        return Request(
-            session: session,
-            url: url.appending("e/authorize"),
-            method: "POST",
-            requestValidator: [EmbeddedAuthLocalFailureValidator(code: code, message: message)],
-            handle: { _, callback in
-                callback(.failure(EmbeddedAuthError(info: ["error": code, "error_description": message], statusCode: 0)))
-            },
-            logger: logger,
-            auth0ClientInfo: auth0ClientInfo
-        )
-    }
 
     func noActiveSession<T: Sendable>() -> Request<T, EmbeddedAuthError> {
         Request(

@@ -35,21 +35,3 @@ struct EmbeddedAuthInputValidator: RequestValidator {
     }
 
 }
-
-/// Fails the request locally with the given error code, before anything is sent.
-///
-/// For a failure that is not about the session or the input, such as the PKCE pair of a new flow that could not be
-/// created. The message must never contain secrets.
-struct EmbeddedAuthLocalFailureValidator: RequestValidator {
-
-    let code: String
-    let message: String
-
-    func validate() throws {
-        throw EmbeddedAuthError(
-            info: ["error": code, "error_description": message],
-            statusCode: 0
-        )
-    }
-
-}
