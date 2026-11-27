@@ -201,28 +201,6 @@ private func offerInfo(_ entries: [[String: Any]], description: String? = nil) -
     return info
 }
 
-/// Collects what a `DefaultLogger` writes so a test can inspect it.
-private final class CapturingOutput: LoggerOutput, @unchecked Sendable {
-    private let lock = NSLock()
-    private var messages: [String] = []
-
-    var text: String {
-        lock.lock()
-        defer { lock.unlock() }
-        return messages.joined(separator: "\n")
-    }
-
-    func log(message: String) {
-        lock.lock()
-        messages.append(message)
-        lock.unlock()
-    }
-
-    func newLine() {
-        log(message: "")
-    }
-}
-
 @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 private struct MockLoginPasskey: LoginPasskey {
     var userID: Data! = Data([0x01, 0x02])                                   // "AQI"
@@ -691,6 +669,57 @@ extension EmbeddedAuthPasskeyClientTests {
         let body = try #require(passkeyJSON(token))
         #expect(body["grant_type"] as? String == "authorization_code")
         #expect(body["code"] as? String == "auth0_ac_theCode")
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    @Test func verifyPasskeyExchangesTheCodeWithTheVerifierOfTheFlow() async throws {
+        let sut = makePasskeyClient()
+        let recorder = RequestRecorder()
+        EmbeddedAuthPasskeyMockProtocol.requestHandler = { req in
+            recorder.record(req)
+            return (responsePasskey(status: 403), insufficientAuthPasskey(session: "sess_001", nextActions: [passkeyOffer()]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+        let challenge = try #require(recorder.authorizeBodies.first?["code_challenge"] as? String)
+
+        installSuccessHandler(recorder)
+        _ = try await sut.verifyPasskey(MockLoginPasskey()).start()
+
+        // The step that returns the code is a continuation, so it carries no PKCE field.
+        let completing = try #require(recorder.authorizeBodies.last)
+        #expect(completing["code_challenge"] == nil)
+        #expect(completing["code_challenge_method"] == nil)
+        #expect(completing["code_verifier"] == nil)
+
+        let token = try #require(recorder.requests.first { $0.url?.path == "/oauth/token" })
+        let body = try #require(passkeyJSON(token))
+        let verifier = try #require(body["code_verifier"] as? String)
+        #expect(ChallengeGenerator(verifier: verifier).challenge == challenge)
+        #expect(Set(body.keys) == ["client_id", "grant_type", "code", "code_verifier"])
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    @Test func verifyPasskeyKeepsTheVerifierOfTheFlowItWasBuiltIn() async throws {
+        let sut = makePasskeyClient()
+        let recorder = RequestRecorder()
+        EmbeddedAuthPasskeyMockProtocol.requestHandler = { req in
+            recorder.record(req)
+            return (responsePasskey(status: 403), insufficientAuthPasskey(session: "sess_001", nextActions: [passkeyOffer()]))
+        }
+        _ = try? await sut.authorize(connection: "test-connection").start()
+        let firstChallenge = try #require(recorder.authorizeBodies.first?["code_challenge"] as? String)
+        let request = sut.verifyPasskey(MockLoginPasskey()) // built while the first flow is running
+
+        _ = try? await sut.authorize(connection: "test-connection").start() // a second flow, with its own challenge
+        let secondChallenge = try #require(recorder.authorizeBodies.last?["code_challenge"] as? String)
+        #expect(firstChallenge != secondChallenge)
+
+        installSuccessHandler(recorder)
+        _ = try await request.start()
+
+        let token = try #require(recorder.requests.first { $0.url?.path == "/oauth/token" })
+        let verifier = try #require(passkeyJSON(token)?["code_verifier"] as? String)
+        #expect(ChallengeGenerator(verifier: verifier).challenge == firstChallenge)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)

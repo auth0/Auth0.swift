@@ -2,7 +2,7 @@ import Testing
 import Foundation
 @testable import Auth0
 
-/// How `Auth0EmbeddedAuth.updateSessionFromFailure(_:)` moves `transactionState` and rewrites the error it returns.
+/// How `Auth0EmbeddedAuth.updateSessionFromFailure(_:verifier:)` moves `transactionState` and rewrites the error it returns.
 struct EmbeddedAuthStateTests {
 
     // MARK: Fixtures
@@ -31,10 +31,12 @@ struct EmbeddedAuthStateTests {
         return EmbeddedAuthError(info: info, statusCode: 403)
     }
 
-    /// A client whose flow was opened by a sign-up offer with the given password requirement.
+    /// A client whose flow was opened, with the PKCE verifier `verifier_1`, by a sign-up offer with the given password
+    /// requirement.
     private func client(offering requirement: Bool? = nil) -> Auth0EmbeddedAuth {
         let client = makeClient()
-        _ = client.updateSessionFromFailure(continuation(session: "sess_1", next: [signupOffer(requirement: requirement)]))
+        _ = client.updateSessionFromFailure(continuation(session: "sess_1", next: [signupOffer(requirement: requirement)]),
+                                            verifier: "verifier_1")
         return client
     }
 
@@ -65,6 +67,58 @@ struct EmbeddedAuthStateTests {
         #expect(client.transactionState == before)
     }
 
+    // MARK: The PKCE verifier
+
+    @Test func aContinuationKeepsTheVerifierOfTheFlow() {
+        let client = client()
+        _ = client.updateSessionFromFailure(continuation(session: "sess_2"))
+        #expect(client.transactionState?.authSession == "sess_2")
+        #expect(client.transactionState?.verifier == "verifier_1")
+    }
+
+    @Test func anAnswerToAnAuthorizeRequestAdoptsItsOwnVerifier() {
+        let client = client()
+        _ = client.updateSessionFromFailure(continuation(session: "sess_2"), verifier: "verifier_2")
+        #expect(client.transactionState?.authSession == "sess_2")
+        #expect(client.transactionState?.verifier == "verifier_2")
+    }
+
+    @Test func aLateAnswerWithNoVerifierToAdoptOrCarryOpensNoStateButIsStillDelivered() {
+        let client = makeClient()
+        let error = continuation(session: "sess_late")
+        #expect(client.updateSessionFromFailure(error) == error)
+        #expect(client.transactionState == nil)
+    }
+
+    @Test func aNetworkFailureOnAnAuthorizeRequestOpensNoState() {
+        let client = makeClient()
+        let network = EmbeddedAuthError(cause: URLError(.notConnectedToInternet), statusCode: 0)
+        #expect(client.updateSessionFromFailure(network, verifier: "verifier_1") == network)
+        #expect(client.transactionState == nil)
+    }
+
+    @Test func aStateHidesTheSessionAndTheVerifierWhenItIsPrinted() {
+        let state = EmbeddedAuthState(authSession: "secret_session", passwordRequirement: .required, verifier: "secret_verifier")
+        var dumped = ""
+        _ = dump(state, to: &dumped)
+        for text in [String(describing: state), String(reflecting: state), "\(state)", dumped] {
+            #expect(!text.contains("secret_session"))
+            #expect(!text.contains("secret_verifier"))
+            #expect(text.contains("<REDACTED>"))
+        }
+        #expect(String(describing: state).contains("required"))
+    }
+
+    @Test func dumpingAClientHidesTheSessionAndTheVerifier() {
+        let client = makeClient()
+        client.transactionState = EmbeddedAuthState(authSession: "secret_session", verifier: "secret_verifier")
+        var dumped = ""
+        _ = dump(client, to: &dumped)
+        #expect(dumped.contains("transactionState"))
+        #expect(!dumped.contains("secret_session"))
+        #expect(!dumped.contains("secret_verifier"))
+    }
+
     // MARK: The password requirement
 
     @Test(arguments: [(true, CredentialRequirement.required), (false, CredentialRequirement.optional)])
@@ -78,7 +132,8 @@ struct EmbeddedAuthStateTests {
 
     @Test func theFirstSignupOfferWins() {
         let client = makeClient()
-        _ = client.updateSessionFromFailure(continuation(next: [signupOffer(requirement: true), signupOffer(requirement: false)]))
+        _ = client.updateSessionFromFailure(continuation(next: [signupOffer(requirement: true), signupOffer(requirement: false)]),
+                                            verifier: "verifier_1")
         #expect(client.transactionState?.passwordRequirement == .required)
     }
 
