@@ -102,6 +102,22 @@ public enum NextAction: Sendable, Equatable {
     ///     passkey ceremony with its own WebAuthn code instead of building the system request from `options`. It holds
     ///     the challenge, so don't log it, and use it for one attempt only.
     case verifyPasskey(options: PasskeyRequestOptions, requestJson: String)
+
+    /// Server offers to create a passkey for the new account: show the system passkey UI built from `options`, then call
+    /// ``EmbeddedAuth/confirmSignup(passkey:)`` with the result.
+    ///
+    /// Offered next to ``confirmSignup(password:)``, and always optional: a passkey replaces the password, and
+    /// ``EmbeddedAuth/confirmSignup(password:)`` signs up without one.
+    ///
+    /// This case only exists where passkeys are supported: iOS, macOS, Mac Catalyst and visionOS. The server's offer is
+    /// left out on iOS before 16.6, macOS before 13.5 and visionOS before 1.0, where `confirmSignup(passkey:)` isn't
+    /// available.
+    ///
+    /// - Parameters:
+    ///   - options: The main WebAuthn creation options sent by the server, as the values the system passkey API takes.
+    ///   - creationJson: The complete options object the server sent, as a JSON string, for an app that runs the passkey
+    ///     ceremony with its own WebAuthn code. It holds the challenge, so don't log it.
+    case registerPasskey(options: PasskeyCreationOptions, creationJson: String)
     #endif
 
     /// An action string the SDK does not recognise — preserved for forward compatibility.

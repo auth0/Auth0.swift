@@ -4,11 +4,16 @@
 
 - [Obtain a client](#obtain-a-client)
 - [Start the flow and step through next actions](#start-the-flow-and-step-through-next-actions)
+- [Every step at a glance](#every-step-at-a-glance)
 - [Username](#username)
 - [Password](#password)
+- [Email code](#email-code)
+- [Phone code](#phone-code)
+- [Authenticator app code](#authenticator-app-code)
 - [Passkey](#passkey)
 - [Sign up](#sign-up)
 - [Sign up with a password](#sign-up-with-a-password)
+- [Sign up with a passkey](#sign-up-with-a-passkey)
 - [MFA flows](#mfa-flows)
 - [Error handling during the flow](#error-handling-during-the-flow)
 
@@ -32,7 +37,7 @@ let client = Auth0.embeddedAuth()
 > Sign-in with an email OTP (`.challengeEmail` / `.verifyOTP`) is for **existing users**. New users register through the [sign-up](#sign-up) steps (`.signup` / `.confirmSignup`), which reuse the same identify, challenge and verify steps and which the server offers only when the connection allows self-registration.
 
 > [!NOTE]
-> New next actions can be added in future releases, and `.signup` / `.confirmSignup` and `.verifyPasskey` were added during the v4 beta, as were the `.invalidPasskey` sub-reason and the `.invalidInput` error reason. If you switch over `NextAction`, `EmbeddedCapability` or `EmbeddedAuthErrorReason`, keep a `default:` branch (or handle `.unknown`) so new cases don't break your build. The passkey cases, `.verifyPasskey` and `.invalidPasskey`, exist only where passkeys are supported (iOS, macOS, Mac Catalyst and visionOS). If your app also targets tvOS or watchOS, wrap the code that names them in `#if !os(tvOS) && !os(watchOS)`.
+> New next actions can be added in future releases, and `.signup` / `.confirmSignup`, `.verifyPasskey` and `.registerPasskey` were added during the v4 beta, as were the `.invalidPasskey` and `.passkeyRegistrationFailed` sub-reasons and the `.invalidInput` error reason. If you switch over `NextAction`, `EmbeddedCapability` or `EmbeddedAuthErrorReason`, keep a `default:` branch (or handle `.unknown`) so new cases don't break your build. The passkey cases, `.verifyPasskey`, `.registerPasskey`, `.invalidPasskey` and `.passkeyRegistrationFailed`, exist only where passkeys are supported (iOS, macOS, Mac Catalyst and visionOS). If your app also targets tvOS or watchOS, wrap the code that names them in `#if !os(tvOS) && !os(watchOS)`.
 
 > [!IMPORTANT]
 > Choose the step to present by the **type** of the entry in `nextActions`, never by its **position**, and always handle the other entries too. The order is up to the server, and `authorize(connection:)` now advertises passkey sign-in where the platform supports it, so a passkey entry can appear next to the identify steps. See [Passkey](#passkey).
@@ -134,6 +139,10 @@ func handleNextActions(_ actions: [NextAction]) async throws -> Credentials {
         }
         // On an older OS passkeys aren't available: use another entry instead.
         return try await handleNextActions(actions.filter { if case .verifyPasskey = $0 { return false } else { return true } })
+    case .registerPasskey:
+        // The passkey of a sign-up is optional and offered next to .confirmSignup, see "Sign up with a passkey".
+        // This sample doesn't create one: it uses the other entries, which include .confirmSignup.
+        return try await handleNextActions(actions.filter { if case .registerPasskey = $0 { return false } else { return true } })
     #endif
     case .unknown:
         throw EmbeddedAuthError(info: ["error": "unsupported_action"], statusCode: 0)
@@ -163,6 +172,42 @@ Auth0.embeddedAuth()
     }
 ```
 </details>
+
+#### Every step at a glance
+
+Each `EmbeddedAuth` function is the answer to one entry of `nextActions`. Call it when that entry is on offer, never before. A step that continues the flow always fails with `.insufficientAuthorization` and the entries to act on next, so read `nextActions` from the error. A step that finishes the flow returns `Credentials`.
+
+| Function | Call it when `nextActions` has | Outcome | Details |
+|---|---|---|---|
+| `authorize(connection:capabilities:scope:audience:)` | Nothing: it starts the flow | Always fails with the first `nextActions` | [Start the flow](#start-the-flow-and-step-through-next-actions) |
+| `identify(_:type:)` | `.identifyEmail`, `.identifyPhone` or `.identifyUsername` | Continues: a code challenge or `.verifyPassword` | [Username](#username), [Email code](#email-code), [Phone code](#phone-code) |
+| `challengeEmail(index:)` | `.challengeEmail` | Continues: `.verifyOTP` | [Email code](#email-code) |
+| `challengePhone(index:deliveryMethod:)` | `.challengePhone` | Continues: `.verifyOTP` | [Phone code](#phone-code) |
+| `challengePush(index:)` | `.challengePush` | Continues: `.verifyOob` | [Push notification](#mfa-flows) |
+| `verifyOtp(_:type:)` | `.verifyOTP` | Returns `Credentials`, or continues with a second factor | [Email code](#email-code), [Phone code](#phone-code), [Authenticator app code](#authenticator-app-code) |
+| `verifyOob()` | `.verifyOob` | Returns `Credentials` once approved, otherwise continues | [Push notification](#mfa-flows) |
+| `verifyPassword(_:)` | `.verifyPassword` | Returns `Credentials`, or continues with a second factor | [Password](#password) |
+| `verifyRecoveryCode(_:)` | `.verifyRecoveryCode` | Continues: `.confirmRecoveryCode(newCode:)` | [Recovery code](#mfa-flows) |
+| `confirmRecoveryCode()` | `.confirmRecoveryCode` | Returns `Credentials` | [Recovery code](#mfa-flows) |
+| `verifyPasskey(_:)` | `.verifyPasskey` | Returns `Credentials`, or continues with a second factor | [Passkey](#passkey) |
+| `signup()` | `.signup` | Continues: the registration steps | [Sign up](#sign-up) |
+| `confirmSignup(password:)` | `.confirmSignup` | Returns `Credentials` | [Sign up with a password](#sign-up-with-a-password) |
+| `confirmSignup(passkey:)` | `.registerPasskey` | Returns `Credentials` | [Sign up with a passkey](#sign-up-with-a-passkey) |
+
+The next sections follow one sign-in from the first screen to the credentials. They use this helper to read the entries a continuing step offers:
+
+```swift
+/// Runs a step that continues the flow and returns the `nextActions` it offers.
+func nextActions(after step: () async throws -> Void) async throws -> [NextAction] {
+    do {
+        try await step()
+    } catch let error as EmbeddedAuthError {
+        guard case .insufficientAuthorization(_, let actions) = error.reason else { throw error }
+        return actions
+    }
+    throw EmbeddedAuthError(info: ["error": "unexpected_success"], statusCode: 0)
+}
+```
 
 #### Username
 
@@ -207,6 +252,72 @@ func signIn(password: String) async throws -> Credentials {
     }
 }
 ```
+
+#### Email code
+
+Sign-in with an email code is for existing users, and takes three steps.
+
+1. **Identify.** When `nextActions` has `.identifyEmail`, call `identify(_:type:)` with `.email`. The request always continues. For a user with an email authenticator the next entry is `.challengeEmail(index:identifier:)`, where `identifier` is the masked address (`"al**@example.com"`) to show the user.
+2. **Challenge.** Call `challengeEmail(index:)` with the `index` of that entry, unchanged: it picks one of the user's authenticators and isn't a position in `nextActions`. The server sends the code and the request continues with `.verifyOTP(channel: .email, identifier:)`.
+3. **Verify.** Ask the user for the code and call `verifyOtp(_:type:)` with `.oob`. It returns `Credentials`, or continues if a second factor is required.
+
+```swift
+func signInWithEmailCode(email: String, askForCode: (_ sentTo: String?) async -> String) async throws -> Credentials {
+    var actions = try await nextActions { try await client.identify(email, type: .email).start() }
+
+    for case .challengeEmail(let index, _) in actions {
+        actions = try await nextActions { try await client.challengeEmail(index: index).start() }
+        break
+    }
+
+    for case .verifyOTP(_, let sentTo) in actions {
+        return try await client.verifyOtp(await askForCode(sentTo), type: .oob).start()
+    }
+    throw EmbeddedAuthError(info: ["error": "no_next_steps"], statusCode: 0)
+}
+```
+
+A wrong code fails with `.insufficientAuthorization(.invalidIdentifierOrCode, nextActions)` (or `.invalidCode` once the user is identified), and `nextActions` has `.verifyOTP` again: show the error and ask again. After too many wrong codes the flow ends with `.tooManyWrongOtpAttempts`: start over with `authorize()`. If `challengeEmail(index:)` or `verifyOtp(_:type:)` fails with `.network`, the session is kept and the same step can be called again.
+
+#### Phone code
+
+The phone flow is the email flow with a delivery method.
+
+1. **Identify.** When `nextActions` has `.identifyPhone`, call `identify(_:type:)` with `.phone`. The next entry is `.challengePhone(index:identifier:deliveryMethods:)`. `identifier` is the masked number, and `deliveryMethods` lists `.text` and `.voice` as far as the authenticator supports them. It can be empty when the server offers only methods this SDK version doesn't know: use another entry then.
+2. **Challenge.** Let the user pick a method, or take the first, and call `challengePhone(index:deliveryMethod:)` with the entry's `index` unchanged. The request continues with `.verifyOTP` for the channel you picked.
+3. **Verify.** Call `verifyOtp(_:type:)` with `.oob`.
+
+```swift
+func signInWithPhoneCode(phone: String, askForCode: (_ sentTo: String?) async -> String) async throws -> Credentials {
+    var actions = try await nextActions { try await client.identify(phone, type: .phone).start() }
+
+    for case .challengePhone(let index, _, let methods) in actions {
+        actions = try await nextActions {
+            try await client.challengePhone(index: index, deliveryMethod: methods.first ?? .text).start()
+        }
+        break
+    }
+
+    for case .verifyOTP(_, let sentTo) in actions {
+        return try await client.verifyOtp(await askForCode(sentTo), type: .oob).start()
+    }
+    throw EmbeddedAuthError(info: ["error": "no_next_steps"], statusCode: 0)
+}
+```
+
+Wrong codes, too many attempts and network failures behave as in [Email code](#email-code).
+
+#### Authenticator app code
+
+A time-based code from an authenticator app has no challenge step: when `nextActions` has `.verifyOTP` with the `.totp` channel, ask the user for the code and call `verifyOtp(_:type:)` with `.totp`, not `.oob`.
+
+```swift
+for case .verifyOTP(let channel, _) in actions where channel == .totp {
+    return try await client.verifyOtp(code, type: .totp).start()
+}
+```
+
+A wrong code fails like an email code, and the same limits apply.
 
 #### Passkey
 
@@ -380,7 +491,7 @@ Use `verifyPasskey(_:)` inside an embedded flow, where the server offers the pas
 
 #### Sign up
 
-When `nextActions` contains `.signup(identifiers:passwordRequirement:)`, the connection allows self-registration. `identifiers` lists what the server collects for the new account: `.email` and/or `.phone`, each with `isRequired`. Use it to decide which fields to show. Identifiers this SDK does not recognise are left out, so the list can be empty. A username is never offered. `passwordRequirement` says whether the connection also collects a password at the end, see [Sign up with a password](#sign-up-with-a-password).
+When `nextActions` contains `.signup(identifiers:passwordRequirement:)`, the connection allows self-registration. `identifiers` lists what the server collects for the new account: `.email` and/or `.phone`, each with `isRequired`. Use it to decide which fields to show. Identifiers this SDK does not recognise are left out, so the list can be empty. A username is never offered. `passwordRequirement` says whether the connection also collects a password at the end, see [Sign up with a password](#sign-up-with-a-password). The server can also offer to create a passkey at the end, see [Sign up with a passkey](#sign-up-with-a-passkey).
 
 **Choose the capabilities.** `authorize(connection:)` advertises every capability, including sign-up. To keep sign-up out of a login screen, pass the capabilities explicitly. Without `.signup` and `.confirmSignup` the server never offers it. For a sign-up screen, advertise what sign-up uses:
 
@@ -665,11 +776,150 @@ client.confirmSignup(password: enteredPassword).start { result in
 
 `.passwordRequired`, `.passwordNotAccepted` and `.invalidPassword` keep the flow live on a rotated session, and `nextActions` offers `.confirmSignup` again. If the final token exchange fails with `.network`, the session is kept and the SDK does not keep the password, so call `confirmSignup(password:)` again with it. `.passwordLeaked` ends the flow: the password appears in a data breach, so start a new flow with `authorize()` and let the user choose a different password. Do not log or store the password.
 
+##### Sign up with a passkey
+
+Some connections let the new user create a passkey as the last step of the sign-up. The identifiers are collected and verified as above. When the server offers a passkey, `nextActions` contains `.registerPasskey(options:creationJson:)` next to `.confirmSignup(password:)`. The passkey is always optional, and it replaces the password: the server creates the account with the passkey, and a connection that requires a password doesn't ask for one. `confirmSignup(password:)` creates the account without a passkey. To create the account with a passkey, show the system passkey UI, then pass the result to `confirmSignup(passkey:)`. Like `confirmSignup(password:)`, it returns `Credentials` on success. The SDK doesn't show any UI: that is up to your app.
+
+Creating a passkey is available on iOS 16.6+, macOS 13.5+ (including Mac Catalyst) and visionOS 1.0+. On tvOS and watchOS the passkey API doesn't exist: `confirmSignup(passkey:)`, `NextAction.registerPasskey`, `PasskeyCreationOptions` and the `.passkeyRegistrationFailed` sub-reason are all unavailable there, and the server's offer is left out of `nextActions`. It is left out on iOS before 16.6, macOS before 13.5 and visionOS before 1.0 too. If your app also targets tvOS or watchOS, wrap the code that names them in `#if !os(tvOS) && !os(watchOS)`. The server offers a passkey only on a [custom domain](https://auth0.com/docs/customize/custom-domains), for a connection with passkeys enabled, and the SDK can't tell which of the two is missing when it doesn't. Your app needs the same setup as for [passkey sign-in](#passkey): the iOS **Device Settings** configured for your Auth0 application, and a deployment target of iOS 16.6+, macOS 13.5+ or visionOS 1.0+ for the code that calls `confirmSignup(passkey:)`.
+
+`PasskeyCreationOptions` carries the main options the server sent: `relyingPartyId`, `relyingPartyName`, `challengeData`, `userId` (the user handle), `userName`, `userDisplayName`, `userVerification` and `timeout` (in milliseconds). `userVerification` is `.preferred` when the server sends none. An offer that lacks one of the other values, or has a `userVerification` value that your SDK version doesn't recognise, isn't passed to your app, and the user can still sign up without a passkey. Use the options as sent. Your app builds the platform request from them, as the `registrationRequest()` helper in the sample below does. The platform request has no input for `relyingPartyName` and `timeout`, so they aren't applied, and the SDK doesn't impose a timeout of its own. `userDisplayName` is applied as the request's `displayName`.
+
+The next action also carries `creationJson`, the complete options object the server sent, as a JSON string. It includes members that `PasskeyCreationOptions` doesn't model, such as the key algorithms the server accepts. Use it if your app runs the passkey ceremony with its own WebAuthn code instead of the system request built from `options`. It holds the challenge, so don't log it.
+
+Create the passkey only when the user chose to. The system creates it on the device before the server sees it, so a flow that ends afterwards leaves an unused passkey on the device. `confirmSignup(passkey:)` has no `password:`: the server ignores a password sent with a passkey, so a user who wants a password uses `confirmSignup(password:)` instead, as in [Sign up with a password](#sign-up-with-a-password). Call `confirmSignup(passkey:)` only while `.registerPasskey` is in the latest `nextActions`: without a current offer the server ignores the passkey: it creates the account without one, or fails with `.passwordRequired` when the connection requires a password.
+
+```swift
+// Compile this code only for iOS, macOS and visionOS: wrap it in `#if !os(tvOS) && !os(watchOS)`
+// if your app also targets tvOS or watchOS.
+import AuthenticationServices
+
+@MainActor
+@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+func signUp(creatingPasskeyFor options: PasskeyCreationOptions, fallbackPassword: String?) async throws -> Credentials {
+    let registration: ASAuthorizationPlatformPublicKeyCredentialRegistration
+    do {
+        registration = try await PasskeyRegistrationSheet().registration(for: options) // Your wrapper, see below.
+    } catch let error as ASAuthorizationError where error.code == .canceled {
+        // The user cancelled. Nothing was sent and the session is still valid: sign up without a passkey.
+        return try await client.confirmSignup(password: fallbackPassword).start()
+    }
+    do {
+        return try await client.confirmSignup(passkey: registration).start()
+    } catch let error as EmbeddedAuthError {
+        guard case .insufficientAuthorization(.passkeyRegistrationFailed, _) = error.reason else { throw error }
+        // The server rejected the registration, and nextActions offers the same options again: send this registration
+        // again, create a new passkey from the options, or sign up without a passkey, as done here.
+        return try await client.confirmSignup(password: fallbackPassword).start()
+    }
+}
+
+@MainActor
+@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+final class PasskeyRegistrationSheet: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+    private var continuation: CheckedContinuation<ASAuthorizationPlatformPublicKeyCredentialRegistration, Error>?
+    private var controller: ASAuthorizationController?
+
+    func registration(for options: PasskeyCreationOptions) async throws -> ASAuthorizationPlatformPublicKeyCredentialRegistration {
+        try await withCheckedThrowingContinuation { continuation in
+            self.continuation = continuation
+            let controller = ASAuthorizationController(authorizationRequests: [options.registrationRequest()])
+            controller.delegate = self
+            controller.presentationContextProvider = self
+            self.controller = controller
+            controller.performRequests()
+        }
+    }
+
+    func authorizationController(controller: ASAuthorizationController,
+                                 didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let registration = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration {
+            continuation?.resume(returning: registration)
+        } else {
+            continuation?.resume(throwing: ASAuthorizationError(.failed))
+        }
+        continuation = nil
+    }
+
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        continuation?.resume(throwing: error)
+        continuation = nil
+    }
+
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        // … return the window of your app …
+    }
+}
+
+// Your helper, not part of the SDK: builds the platform request from the options the server sent.
+@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+extension PasskeyCreationOptions {
+    func registrationRequest() -> ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest {
+        let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: relyingPartyId)
+        let request = provider.createCredentialRegistrationRequest(challenge: challengeData, name: userName, userID: userId)
+        request.displayName = userDisplayName
+        switch userVerification {
+        case .required:
+            request.userVerificationPreference = .required
+        case .preferred:
+            request.userVerificationPreference = .preferred
+        case .discouraged:
+            request.userVerificationPreference = .discouraged
+        }
+        return request
+    }
+}
+```
+
+<details>
+  <summary>Using callbacks</summary>
+
+```swift
+if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
+    // `registration` comes from the ASAuthorizationControllerDelegate.
+    client.confirmSignup(passkey: registration).start { result in
+        switch result {
+        case .success(let credentials):
+            // The account is created and the user is signed in
+            _ = credentials
+        case .failure(let error):
+            switch error.reason {
+            case .insufficientAuthorization(.passkeyRegistrationFailed, _):
+                // Send the same registration again, create a new passkey from the options in nextActions, or call
+                // confirmSignup(password:) to sign up without a passkey.
+                break
+            case .network:
+                // The session is kept, but the SDK does not keep the registration: call
+                // confirmSignup(passkey:) again with it.
+                break
+            default:
+                print("Failed with: \(error)")
+            }
+        }
+    }
+}
+```
+</details>
+
+**What to expect**
+
+| Outcome | What happens |
+|---|---|
+| Success | `confirmSignup(passkey:)` returns `Credentials`. The SDK clears the session after the token exchange succeeds. |
+| The user cancels the system UI | Nothing was sent to Auth0 and the session is still valid. Show the UI again, or call `confirmSignup(password:)` to sign up without a passkey. |
+| `.insufficientAuthorization(.passkeyRegistrationFailed, nextActions)` | The server rejected the registration. The SDK adopts the rotated session, and `nextActions` offers `.confirmSignup` and the same `.registerPasskey` again. Send the same registration again, create a new passkey from those options, or call `confirmSignup(password:)` to sign up without one. |
+| `.invalidInput(message)` | A local check failed, for example the registration has no attestation object. Nothing was sent and the session is kept. The message never contains passkey data. |
+| `.network` | The request failed before an answer arrived. The session is kept. The SDK doesn't keep the registration, so call `confirmSignup(passkey:)` again with the same one. If the failure hit the final token exchange, the server decides whether it can still complete, so be ready to start over. |
+| `.accessDenied`, `.invalidRequest`, `.tooManyAttempts`, `.tooManyLogins`, `.ipBlocked`, `.unknown` | The flow has ended. Start over with `authorize()`. A passkey created before it ended stays on the device, unused. |
+
+`confirmSignup(passkey:)` needs an active session and fails locally with `.noActiveSession` otherwise, like the other steps.
+
 #### MFA flows
 
-After the primary factor succeeds the server may require a second factor. The `nextActions` in the continuation will include the user's eligible MFA factors. Handle them just like any other continuation step.
+After the primary factor succeeds the server may require a second factor. The `nextActions` in the continuation will include the user's eligible MFA factors. Handle them just like any other continuation step: an email or phone code as in [Email code](#email-code) and [Phone code](#phone-code), an authenticator app code as in [Authenticator app code](#authenticator-app-code).
 
 **Push notification (polling)**
+
+When `nextActions` has `.challengePush(index:name:)`, call `challengePush(index:)` with its `index` unchanged. The server sends the push to the device named `name` and the request continues with `.verifyOob(pollInMs:)`. Then poll `verifyOob()`: it returns `Credentials` once the user approves, continues with `.authorizationPending` while they haven't, and ends with `.authorizationRejected` if they deny it or `.challengeExpired` if it times out.
 
 ```swift
 func pollForPushApproval(pollInMs: Int) async throws -> Credentials {
@@ -697,6 +947,8 @@ func pollForPushApproval(pollInMs: Int) async throws -> Credentials {
 ```
 
 **Recovery code (with rotation)**
+
+When `nextActions` has `.verifyRecoveryCode`, call `verifyRecoveryCode(_:)`. The server accepts the code, rotates it, and the request continues with `.confirmRecoveryCode(newCode:)`. Show `newCode` to the user and call `confirmRecoveryCode()` after they have recorded it: it returns `Credentials`. The old code no longer works.
 
 ```swift
 // Step 1: submit the current recovery code
@@ -779,6 +1031,7 @@ do {
 | `authorization_pending` | `.authorizationPending` | The push notification has not been approved yet. | Wait for the `pollInMs` from `.verifyOob(pollInMs:)`, then call `verifyOob()` again. |
 | `invalid_identifier_or_password` | `.invalidIdentifierOrPassword` | The identifier (email, phone or username) or the password was rejected. It is ambiguous on purpose, so a wrong password and an unknown user look the same. | Show a generic "incorrect username or password" message and present `nextActions` again; it holds `.verifyPassword`. |
 | `invalid_passkey` | `.invalidPasskey` | The passkey assertion could not be verified. The server doesn't say why. | Show the passkey UI again with the **new** options in `nextActions`, or offer another entry. The server may not offer the passkey again. |
+| `passkey_registration_failed` | `.passkeyRegistrationFailed` | The passkey registration of a sign-up was rejected. | Send the same registration to `confirmSignup(passkey:)` again, create a new passkey from the options in `nextActions`, or call `confirmSignup(password:)` to sign up without a passkey. See [Sign up with a passkey](#sign-up-with-a-passkey). |
 | `slow_down` | `.slowDown` | `verifyOob()` was called before `pollInMs` elapsed. | Wait longer than before, then poll again. |
 | `password_required` | `.passwordRequired` | `confirmSignup` was called without a password, but the connection requires one. | Ask for a password and call `confirmSignup(password:)` again. |
 | `password_not_accepted` | `.passwordNotAccepted` | `confirmSignup(password:)` was called with a password, but the connection does not collect one. | Call `confirmSignup(password: nil)` without a password. |
@@ -796,6 +1049,9 @@ case .invalidIdentifierOrCode, .invalidCode, .invalidIdentifierOrPassword:
 case .invalidPasskey:
     // The passkey couldn't be verified — run the passkey UI again with the new options in nextActions, or offer
     // another entry. Never reuse the previous assertion or options.
+    break
+case .passkeyRegistrationFailed:
+    // Only returned by confirmSignup(passkey:) — see "Sign up with a passkey".
     break
 #endif
 case .authorizationPending, .slowDown:

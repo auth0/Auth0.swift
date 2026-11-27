@@ -67,6 +67,13 @@ struct ContentView: View {
                         }
                         .buttonStyle(SecondaryButtonStyle())
                         .disabled(viewModel.isLoading)
+                        Button {
+                            Task { await viewModel.startEmbeddedFlow(signingUp: true, usingPasskey: true) }
+                        } label: {
+                            Text("Signup with Passkey")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
                     }
                     #endif
 
@@ -320,6 +327,7 @@ struct ContentView: View {
                     Text("Your details are verified. Complete the sign-up to finish creating your account.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
+                    passkeySignupSection
                     if let signupPassword {
                         Text(passwordHint(for: signupPassword))
                             .font(.caption)
@@ -337,7 +345,7 @@ struct ContentView: View {
                     Button {
                         Task { await viewModel.confirmSignup(password: signupPassword == nil ? nil : viewModel.password) }
                     } label: {
-                        Text("Complete sign-up")
+                        Text(viewModel.offersPasskeySignup ? "Complete sign-up without a passkey" : "Complete sign-up")
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(viewModel.isLoading || (signupPassword != nil && viewModel.password.isEmpty))
@@ -447,6 +455,41 @@ struct ContentView: View {
             .buttonStyle(SecondaryButtonStyle())
             .disabled(viewModel.isLoading)
         }
+    }
+
+    /// Offers to finish the sign-up with a passkey instead of a password, when the server made that offer. A sign-up
+    /// started with "Signup with Passkey" says so when it didn't, to help check the setup.
+    @ViewBuilder
+    private var passkeySignupSection: some View {
+        #if PASSKEYS_PLATFORM
+        if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
+            if let passkey = viewModel.offeredPasskeyRegistration {
+                Text("Create a passkey for \(passkey.userName) on \(passkey.relyingPartyId), instead of a password.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                if viewModel.hasPendingPasskeyRegistration {
+                    Button {
+                        Task { await viewModel.confirmSignup(creatingPasskeyFor: passkey, resending: true) }
+                    } label: {
+                        Text("Send the same passkey again")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .disabled(viewModel.isLoading)
+                }
+                Button {
+                    Task { await viewModel.confirmSignup(creatingPasskeyFor: passkey) }
+                } label: {
+                    Text(viewModel.hasPendingPasskeyRegistration ? "Create a new passkey" : "Create a passkey")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .disabled(viewModel.isLoading)
+            } else if viewModel.passkeySignupRequested {
+                Text("The server did not offer a passkey for this sign-up. It does so only on a custom domain, for a connection with passkeys enabled.")
+                    .font(.caption)
+                    .foregroundColor(.orange)
+            }
+        }
+        #endif
     }
 
     /// Offers the passkey the server made available next to the identify steps.

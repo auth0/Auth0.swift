@@ -9,7 +9,7 @@ struct SensitiveDataRedactor {
         "authorization_code", "otp", "code", "new_code", "recovery_code",
         "password", "mfa_token", "oob_code", "binding_code",
         "code_verifier", "subject_token", "verification",
-        "authn_response", "challenge"
+        "authn_response", "challenge", "passkey"
     ]
 
     /// Redacts sensitive fields from a JSON body (request or response).

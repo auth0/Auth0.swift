@@ -83,11 +83,13 @@ public enum EmbeddedAuthErrorReason: Sendable {
     ///
     /// The session is preserved — retrying the same step is safe. That includes the final token exchange of
     /// ``EmbeddedAuth/verifyOtp(_:type:)``, ``EmbeddedAuth/verifyPassword(_:)``, ``EmbeddedAuth/verifyOob()``,
-    /// ``EmbeddedAuth/confirmRecoveryCode()``, ``EmbeddedAuth/confirmSignup(password:)`` and `verifyPasskey(_:)`.
+    /// ``EmbeddedAuth/confirmRecoveryCode()``, ``EmbeddedAuth/confirmSignup(password:)``,
+    /// `confirmSignup(passkey:)` and `verifyPasskey(_:)`.
     ///
     /// The SDK never keeps the password given to ``EmbeddedAuth/confirmSignup(password:)``, so pass it again when you retry.
-    /// The SDK doesn't keep a passkey assertion, so retrying `verifyPasskey(_:)` means passing the same assertion
-    /// again; if the failure hit the token exchange, the server decides whether it still accepts it.
+    /// The SDK doesn't keep a passkey assertion or registration, so retrying `verifyPasskey(_:)` or
+    /// `confirmSignup(passkey:)` means passing the same one again; if the failure hit the token exchange, the
+    /// server decides whether it still accepts it.
     case network
 
     /// Client-side guard: no flow is in progress.
@@ -154,6 +156,14 @@ public enum EmbeddedAuthErrorReason: Sendable {
         ///
         /// This case only exists where passkeys are supported: iOS, macOS, Mac Catalyst and visionOS.
         case invalidPasskey
+
+        /// The server rejected the passkey registration of a sign-up.
+        ///
+        /// `nextActions` offers the same options again. Call `confirmSignup(passkey:)` again with the same passkey or
+        /// a new one created from them, or call ``EmbeddedAuth/confirmSignup(password:)`` to sign up without one.
+        ///
+        /// This case only exists where passkeys are supported: iOS, macOS, Mac Catalyst and visionOS.
+        case passkeyRegistrationFailed
         #endif
     }
 }

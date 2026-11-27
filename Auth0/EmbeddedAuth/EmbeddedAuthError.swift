@@ -118,6 +118,8 @@ public extension EmbeddedAuthError {
         #if PASSKEYS_PLATFORM
         case (_, "insufficient_authorization", "invalid_passkey"):
             return .insufficientAuthorization(reason: .invalidPasskey, nextActions: parsedNextActions)
+        case (_, "insufficient_authorization", "passkey_registration_failed"):
+            return .insufficientAuthorization(reason: .passkeyRegistrationFailed, nextActions: parsedNextActions)
         #endif
         case (_, "insufficient_authorization", _):
             return .insufficientAuthorization(reason: .none, nextActions: parsedNextActions)
@@ -165,7 +167,7 @@ private extension EmbeddedAuthError {
     var parsedNextActions: [NextAction] {
         if let nextActionsOverride { return nextActionsOverride }
         guard let nextArray = info["next"] as? [[String: Any]] else { return [] }
-        return nextArray.compactMap { entry in
+        let actions: [NextAction] = nextArray.compactMap { entry in
             guard let actionString = entry["action"] as? String else { return nil }
             switch EmbeddedAction(rawValue: actionString) {
             case .identifyEmail:
@@ -219,7 +221,29 @@ private extension EmbeddedAuthError {
                 return .unknown(rawAction: actionString)
             }
         }
+        #if PASSKEYS_PLATFORM
+        return actions + passkeyRegistrationActions(in: nextArray)
+        #else
+        return actions
+        #endif
     }
+
+    #if PASSKEYS_PLATFORM
+    /// The passkey offers of the confirm-sign-up entries the SDK can read. Each is an action of its own, so the app
+    /// can present it next to ``NextAction/confirmSignup(password:)``. An offer that can't be read is left out, and so
+    /// is every offer on an OS where `confirmSignup(passkey:)` isn't available.
+    func passkeyRegistrationActions(in entries: [[String: Any]]) -> [NextAction] {
+        guard #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) else { return [] }
+        return entries.compactMap { entry in
+            guard entry["action"] as? String == EmbeddedAction.confirmSignup.rawValue,
+                  confirmSignupAction(from: entry) != nil,
+                  let json = entry["authn_params_public_key"] as? [String: Any],
+                  let options = PasskeyCreationOptions(json: json),
+                  let creationJson = PasskeyRequestOptions.requestJson(from: json) else { return nil }
+            return .registerPasskey(options: options, creationJson: creationJson)
+        }
+    }
+    #endif
 
     /// Reads `authentication_methods.password.required` of a sign-up entry.
     ///
