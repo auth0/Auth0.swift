@@ -51,6 +51,7 @@ Each feature lives in its own file under [`examples/`](examples).
 - [Password](examples/embedded-auth.md#password)
 - [Sign up](examples/embedded-auth.md#sign-up)
 - [Sign up with a password](examples/embedded-auth.md#sign-up-with-a-password)
+- [Sign up with a passkey](examples/embedded-auth.md#sign-up-with-a-passkey)
 - [MFA flows](examples/embedded-auth.md#mfa-flows)
 - [Error handling during the flow](examples/embedded-auth.md#error-handling-during-the-flow)
 
