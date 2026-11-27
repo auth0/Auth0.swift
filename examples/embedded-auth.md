@@ -37,7 +37,7 @@ let client = Auth0.embeddedAuth()
 > [!IMPORTANT]
 > Choose the step to present by the **type** of the entry in `nextActions`, never by its **position**, and always handle the other entries too. The order is up to the server, and `authorize(connection:)` now advertises passkey sign-in where the platform supports it, so a passkey entry can appear next to the identify steps. See [Passkey](#passkey).
 
-`authorize(connection:)` uses a default scope of `"openid profile email offline_access"`, which ensures `Credentials.idToken` is populated after a successful `verifyOtp` or `verifyPassword`. Pass a custom `scope:` to the full `authorize(connection:capabilities:scope:audience:)` overload if needed.
+`authorize(connection:)` uses a default scope of `"openid profile email offline_access"`, which ensures `Credentials.idToken` is populated after a successful `verifyOtp` or `verifyPassword`. Pass a custom `scope:` to the full `authorize(connection:capabilities:scope:audience:)` overload if needed. `openid` is added to a custom scope that lacks it, because the SDK validates the ID token.
 
 ```swift
 func runEmbeddedAuth(connection: String) async throws -> Credentials {
