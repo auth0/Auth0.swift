@@ -329,6 +329,31 @@ class SensitiveDataRedactorSpec: QuickSpec {
                     expect(result).to(contain("<REDACTED>"))
                     expect(result).to(contain("login.example.com"))
                 }
+
+                it("should redact the passkey registration and everything inside it") {
+                    let json = """
+                    {
+                        "action": "action:signup:confirm:v1",
+                        "passkey": {
+                            "id": "credential-id-value",
+                            "response": {
+                                "clientDataJSON": "client-data-value",
+                                "attestationObject": "attestation-value"
+                            }
+                        }
+                    }
+                    """
+                    let data = json.data(using: .utf8)!
+
+                    let result = SensitiveDataRedactor.redact(data)
+
+                    expect(result).toNot(beNil())
+                    expect(result).to(contain("<REDACTED>"))
+                    expect(result).toNot(contain("credential-id-value"))
+                    expect(result).toNot(contain("client-data-value"))
+                    expect(result).toNot(contain("attestation-value"))
+                    expect(result).to(contain("action:signup:confirm:v1"))
+                }
             }
         }
     }
