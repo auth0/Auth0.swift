@@ -73,6 +73,11 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
 
     /// Submits a user identifier to continue the authorization flow.
     ///
+    /// Call this when ``NextAction/identifyEmail``, ``NextAction/identifyPhone`` or ``NextAction/identifyUsername`` is
+    /// among the `nextActions`, with the matching `type`. The request always fails with
+    /// ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and the next step in `nextActions`,
+    /// for example a code challenge or ``NextAction/verifyPassword``.
+    ///
     /// Requires an active session (``authorize(connection:capabilities:scope:audience:)`` must have been called first).
     /// - Parameters:
     ///   - identifier: The identifier value (e.g. an email address, a phone number or a username).
@@ -81,6 +86,11 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
 
     /// Requests that the server send an email OTP challenge.
     ///
+    /// Call this when ``NextAction/challengeEmail(index:identifier:)`` is among the `nextActions`. The server sends the
+    /// code, and the request fails with ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and
+    /// ``NextAction/verifyOTP(channel:identifier:)`` in `nextActions`: ask the user for the code and call
+    /// ``verifyOtp(_:type:)``.
+    ///
     /// Requires an active session.
     /// - Parameter index: The `index` of the ``NextAction/challengeEmail(index:identifier:)`` you are acting on.
     ///   It selects one of the user's enrolled email authenticators; it is not a position in the `nextActions` array.
@@ -88,6 +98,12 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     func challengeEmail(index: Int) -> Request<Void, EmbeddedAuthError>
 
     /// Submits a one-time password to verify the user's identity.
+    ///
+    /// Call this when ``NextAction/verifyOTP(channel:identifier:)`` is among the `nextActions`: use `.totp` for the
+    /// ``OtpChannel/totp`` channel and `.oob` for the others. A wrong code fails with
+    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidCode`` or
+    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/invalidIdentifierOrCode`` and the flow stays open, until too
+    /// many wrong codes end it with ``EmbeddedAuthErrorReason/tooManyWrongOtpAttempts``.
     ///
     /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
     ///
@@ -112,6 +128,11 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     func verifyPassword(_ password: String) -> Request<Credentials, EmbeddedAuthError>
 
     /// Requests that the server send a phone OTP challenge via SMS or voice.
+    ///
+    /// Call this when ``NextAction/challengePhone(index:identifier:deliveryMethods:)`` is among the `nextActions`. The
+    /// request fails with ``EmbeddedAuthErrorReason/insufficientAuthorization(reason:nextActions:)`` and
+    /// ``NextAction/verifyOTP(channel:identifier:)`` in `nextActions`: ask the user for the code and call
+    /// ``verifyOtp(_:type:)``.
     ///
     /// Requires an active session.
     ///
@@ -174,7 +195,8 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     /// Confirms the registration and completes the flow.
     ///
     /// Call this when ``NextAction/confirmSignup(password:)`` is among the `nextActions`. Pass the password the user
-    /// entered, or `nil` to create the account without one.
+    /// entered, or `nil` to create the account without one. The password is only placed in the request body: the SDK
+    /// never stores it.
     ///
     /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
     /// If the server cannot accept the request yet, for example because a required password is missing, the request
@@ -215,6 +237,25 @@ public protocol EmbeddedAuth: Trackable, Loggable, Sendable {
     ///   (an `ASAuthorizationPlatformPublicKeyCredentialAssertion`).
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func verifyPasskey(_ passkey: any LoginPasskey) -> Request<Credentials, EmbeddedAuthError>
+
+    /// Confirms the registration with a passkey instead of a password, and completes the flow.
+    ///
+    /// Call this when ``NextAction/registerPasskey(options:creationJson:)`` is among the `nextActions`, after the user
+    /// created the passkey in the system UI. To sign up with a password, or without a passkey, call
+    /// ``confirmSignup(password:)``.
+    ///
+    /// On success, exchanges the returned authorization code for ``Credentials`` internally and returns them directly.
+    /// If the server rejects the registration, the request fails with
+    /// ``EmbeddedAuthErrorReason/InsufficientAuthorization/passkeyRegistrationFailed`` and the flow stays open.
+    /// If the passkey lacks required data, it fails locally with ``EmbeddedAuthErrorReason/invalidInput(_:)``: nothing
+    /// is sent and the session is kept.
+    ///
+    /// Requires an active session.
+    ///
+    /// - Parameter passkey: The registration obtained from `ASAuthorizationControllerDelegate`
+    ///   (an `ASAuthorizationPlatformPublicKeyCredentialRegistration`).
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func confirmSignup(passkey: any SignupPasskey) -> Request<Credentials, EmbeddedAuthError>
     #endif
 
 }

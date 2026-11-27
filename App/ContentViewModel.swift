@@ -46,6 +46,9 @@ final class ContentViewModel: ObservableObject {
     #if PASSKEYS_PLATFORM
     /// A `PasskeySheet`, created on first use because the type needs iOS 16.6+.
     private var passkeySheet: Any?
+    /// The passkey registration of a sign-up that has to be sent again, because the server rejected it or the request
+    /// failed on the network. The passkey already exists on the device, so a retry sends it again instead of creating another.
+    private var pendingRegistration: Any?
     #endif
 
     /// The action backing the screen currently shown, so it is not offered again as an alternative.
@@ -57,6 +60,9 @@ final class ContentViewModel: ObservableObject {
     private var isSigningUp = false
     /// Whether the user started the flow with the passkey button, so a passkey offer is shown before the identify steps.
     private var prefersPasskey = false
+    /// Whether the user started the sign-up with the passkey button, so the confirmation screen says when the server
+    /// didn't offer a passkey.
+    @Published private(set) var passkeySignupRequested = false
     private var pollTask: Task<Void, Never>?
 
     private static let minPollIntervalMs = 1_000
@@ -88,6 +94,7 @@ final class ContentViewModel: ObservableObject {
         clearFlowState()
         isSigningUp = signingUp
         prefersPasskey = usingPasskey && !signingUp
+        passkeySignupRequested = usingPasskey && signingUp
         embeddedAuthUIState = .initial
         do {
             _ = try await embeddedAuthClient.authorize(connection: connection,
@@ -356,6 +363,14 @@ final class ContentViewModel: ObservableObject {
         signupIdentifiers.first { $0.type == type }.map { !$0.isRequired } ?? false
     }
 
+    /// Whether the confirmation also offers a passkey this device can create, so the other path reads as the alternative.
+    var offersPasskeySignup: Bool {
+        #if PASSKEYS_PLATFORM
+        if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) { return offeredPasskeyRegistration != nil }
+        #endif
+        return false
+    }
+
     /// Whether the server lets the user finish sign-up now. That is how an optional identifier is skipped:
     /// the server only offers `confirmSignup` once every required identifier is verified.
     var canCompleteSignup: Bool {
@@ -419,6 +434,64 @@ final class ContentViewModel: ObservableObject {
             attemptError = "Passkey sign-in failed: \(error.localizedDescription)"
         }
         isLoading = false
+    }
+
+    /// The passkey the latest continuation offers to create for the new account, if the server made one.
+    var offeredPasskeyRegistration: PasskeyCreationOptions? {
+        for case .registerPasskey(let options, _) in availableActions { return options }
+        return nil
+    }
+
+    /// Whether a registration is waiting to be sent again, because the server rejected it or the request failed.
+    var hasPendingPasskeyRegistration: Bool { pendingRegistration != nil }
+
+    /// Shows the system sheet that creates a passkey for `options`, then finishes the sign-up with it. The passkey
+    /// replaces the password: the server ignores a password sent along with it.
+    ///
+    /// Cancelling the sheet keeps the session, so the user can try again or finish the sign-up without a passkey. If the
+    /// server rejects the registration, or the request fails on the network, the user can send the same registration
+    /// again (`resending`) or create a new passkey from the options the server offers again.
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func confirmSignup(creatingPasskeyFor options: PasskeyCreationOptions, resending: Bool = false) async {
+        isLoading = true
+        attemptError = nil
+        defer { isLoading = false }
+
+        let registration: ASAuthorizationPlatformPublicKeyCredentialRegistration
+        if resending, let pending = pendingRegistration as? ASAuthorizationPlatformPublicKeyCredentialRegistration {
+            registration = pending
+        } else {
+            do {
+                let sheet = passkeySheet as? PasskeySheet ?? PasskeySheet()
+                passkeySheet = sheet
+                registration = try await sheet.registration(for: options)
+            } catch let error as ASAuthorizationError where error.code == .canceled {
+                attemptError = "Creating the passkey was cancelled. Try again, or finish the sign-up without one."
+                return
+            } catch {
+                attemptError = "Creating the passkey failed: \(error.localizedDescription)"
+                return
+            }
+        }
+        pendingRegistration = nil
+
+        do {
+            let credentials = try await embeddedAuthClient.confirmSignup(passkey: registration).start()
+            finish(with: credentials)
+        } catch let error as EmbeddedAuthError {
+            switch error.reason {
+            case .network:
+                pendingRegistration = registration
+                attemptError = "A network error occurred. Check your connection and try again."
+            case .insufficientAuthorization(.passkeyRegistrationFailed, _):
+                pendingRegistration = registration
+                handle(embeddedAuthError: error)
+            default:
+                handle(embeddedAuthError: error)
+            }
+        } catch {
+            embeddedAuthUIState = .failed(error.localizedDescription)
+        }
     }
     #endif
 
@@ -630,6 +703,10 @@ private extension ContentViewModel {
         signupIdentifiers = []
         isSigningUp = false
         prefersPasskey = false
+        passkeySignupRequested = false
+        #if PASSKEYS_PLATFORM
+        pendingRegistration = nil
+        #endif
     }
 
     func startPolling(initialIntervalMs: Int) {
@@ -776,6 +853,8 @@ private extension ContentViewModel {
         #if PASSKEYS_PLATFORM
         case .invalidPasskey:
             attemptError = "That passkey couldn't be verified. Please try again."
+        case .passkeyRegistrationFailed:
+            attemptError = "The passkey couldn't be registered. Try again, or finish the sign-up without one."
         #endif
         default:
             attemptError = nil
@@ -851,6 +930,10 @@ private extension ContentViewModel {
         case .verifyPasskey(let options, _):
             // The demo builds the system request from `options`. `requestJson` is for apps with their own WebAuthn code.
             embeddedAuthUIState = .verifyPasskey(options)
+        case .registerPasskey:
+            // Shown on the sign-up confirmation screen, see `offeredPasskeyRegistration`.
+            currentAction = nil
+            return false
         #endif
         case .signup, .unknown:
             // Sign-up has no screen of its own: `startEmbeddedFlow(signingUp:)` calls `signup()` when it is offered.
@@ -913,17 +996,31 @@ private extension NextAction {
 #if PASSKEYS_PLATFORM
 // MARK: - Passkey sheet
 
-/// Wraps `ASAuthorizationController` so the passkey assertion can be awaited.
+/// Wraps `ASAuthorizationController` so the passkey assertion or registration can be awaited.
 @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 @MainActor
 final class PasskeySheet: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
-    private var continuation: CheckedContinuation<ASAuthorizationPlatformPublicKeyCredentialAssertion, Error>?
+    private var continuation: CheckedContinuation<any ASAuthorizationCredential, Error>?
     private var controller: ASAuthorizationController?
 
     func assertion(for options: PasskeyRequestOptions) async throws -> ASAuthorizationPlatformPublicKeyCredentialAssertion {
+        guard let assertion = try await perform(options.assertionRequest()) as? ASAuthorizationPlatformPublicKeyCredentialAssertion else {
+            throw ASAuthorizationError(.failed)
+        }
+        return assertion
+    }
+
+    func registration(for options: PasskeyCreationOptions) async throws -> ASAuthorizationPlatformPublicKeyCredentialRegistration {
+        guard let registration = try await perform(options.registrationRequest()) as? ASAuthorizationPlatformPublicKeyCredentialRegistration else {
+            throw ASAuthorizationError(.failed)
+        }
+        return registration
+    }
+
+    private func perform(_ request: ASAuthorizationRequest) async throws -> any ASAuthorizationCredential {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
-            let controller = ASAuthorizationController(authorizationRequests: [options.assertionRequest()])
+            let controller = ASAuthorizationController(authorizationRequests: [request])
             controller.delegate = self
             controller.presentationContextProvider = self
             self.controller = controller
@@ -933,11 +1030,7 @@ final class PasskeySheet: NSObject, ASAuthorizationControllerDelegate, ASAuthori
 
     func authorizationController(controller: ASAuthorizationController,
                                  didCompleteWithAuthorization authorization: ASAuthorization) {
-        if let assertion = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion {
-            continuation?.resume(returning: assertion)
-        } else {
-            continuation?.resume(throwing: ASAuthorizationError(.failed))
-        }
+        continuation?.resume(returning: authorization.credential)
         continuation = nil
     }
 
@@ -973,6 +1066,25 @@ private extension PasskeyRequestOptions {
         }
         request.allowedCredentials = allowedCredentialIds.map {
             ASAuthorizationPlatformPublicKeyCredentialDescriptor(credentialID: $0)
+        }
+        return request
+    }
+}
+
+@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+private extension PasskeyCreationOptions {
+    /// Example helper: builds the platform passkey registration request from the options the server sent.
+    func registrationRequest() -> ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest {
+        let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: relyingPartyId)
+        let request = provider.createCredentialRegistrationRequest(challenge: challengeData, name: userName, userID: userId)
+        request.displayName = userDisplayName
+        switch userVerification {
+        case .required:
+            request.userVerificationPreference = .required
+        case .preferred:
+            request.userVerificationPreference = .preferred
+        case .discouraged:
+            request.userVerificationPreference = .discouraged
         }
         return request
     }

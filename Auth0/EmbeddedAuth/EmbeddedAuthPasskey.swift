@@ -5,7 +5,7 @@ import Foundation
 
 /// The WebAuthn user verification requirement sent by the server with a passkey offer.
 ///
-/// See ``PasskeyRequestOptions/userVerification``.
+/// See ``PasskeyRequestOptions/userVerification`` and ``PasskeyCreationOptions/userVerification``.
 public enum PasskeyUserVerification: String, Sendable, Equatable, CaseIterable {
 
     /// The authenticator must verify the user, for example with biometrics or the device passcode.
@@ -75,7 +75,7 @@ extension PasskeyRequestOptions {
         guard let relyingPartyId = json["rpId"] as? String, !relyingPartyId.isEmpty,
               let challengeString = json["challenge"] as? String,
               let challenge = challengeString.a0_decodeBase64URLSafe(), !challenge.isEmpty,
-              let timeout = json["timeout"] as? Int, !Self.isBoolean(json["timeout"]),
+              let timeout = json["timeout"] as? Int, !isJSONBoolean(json["timeout"]),
               let userVerificationString = json["userVerification"] as? String,
               let userVerification = PasskeyUserVerification(rawValue: userVerificationString) else { return nil }
 
@@ -111,13 +111,92 @@ extension PasskeyRequestOptions {
         return String(data: data, encoding: .utf8)
     }
 
-    /// Whether `value` is a JSON boolean. `JSONSerialization` reads `true` as an `NSNumber` that converts to the integer
-    /// 1, so a plain `as? Int` can't tell it from a number.
-    private static func isBoolean(_ value: Any?) -> Bool {
-        guard let number = value as? NSNumber else { return false }
-        return CFGetTypeID(number) == CFBooleanGetTypeID()
+}
+
+// MARK: - PasskeyCreationOptions
+
+/// The main WebAuthn creation options the server sends with ``NextAction/registerPasskey(options:creationJson:)``.
+///
+/// The app builds the platform registration request from these options, for example with
+/// `ASAuthorizationPlatformPublicKeyCredentialProvider`; the SDK doesn't build or present it. An offer that lacks the
+/// relying party, the challenge, the user or the timeout, or has a user verification value this SDK version doesn't
+/// know, isn't passed to your app, and keys this SDK version doesn't know are ignored. Use the options exactly as
+/// received.
+public struct PasskeyCreationOptions: Sendable, Equatable {
+
+    /// The relying party identifier. Use it as sent.
+    public let relyingPartyId: String
+
+    /// The relying party display name.
+    public let relyingPartyName: String
+
+    /// The single-use challenge, decoded from base64url.
+    public let challengeData: Data
+
+    /// The user handle of the new passkey, decoded from base64url.
+    public let userId: Data
+
+    /// The name shown to the user for the passkey, for example the verified email.
+    public let userName: String
+
+    /// The display name shown to the user.
+    public let userDisplayName: String
+
+    /// The user verification requirement. ``PasskeyUserVerification/preferred`` when the server sends none.
+    public let userVerification: PasskeyUserVerification
+
+    /// The time in milliseconds the server allows for the ceremony.
+    ///
+    /// Informational only. The SDK doesn't impose a timeout, and the platform passkey request has no timeout setting.
+    public let timeout: Int
+}
+
+extension PasskeyCreationOptions {
+
+    /// Parses the `authn_params_public_key` object of a sign-up passkey offer.
+    ///
+    /// Fails if `challenge`, `rp`, `user` or `timeout` is missing, has the wrong type or is empty where a value is
+    /// needed. `authenticatorSelection.userVerification` is optional, but a value this SDK version doesn't know rejects
+    /// the offer. Unknown keys are ignored.
+    init?(json: [String: Any]) {
+        guard let challengeString = json["challenge"] as? String,
+              let challenge = challengeString.a0_decodeBase64URLSafe(), !challenge.isEmpty,
+              let relyingParty = json["rp"] as? [String: Any],
+              let relyingPartyId = relyingParty["id"] as? String, !relyingPartyId.isEmpty,
+              let relyingPartyName = relyingParty["name"] as? String,
+              let user = json["user"] as? [String: Any],
+              let userIdString = user["id"] as? String,
+              let userId = userIdString.a0_decodeBase64URLSafe(), !userId.isEmpty,
+              let userName = user["name"] as? String, !userName.isEmpty,
+              let userDisplayName = user["displayName"] as? String,
+              let timeout = json["timeout"] as? Int, !isJSONBoolean(json["timeout"]) else { return nil }
+
+        var userVerification = PasskeyUserVerification.preferred
+        if let selection = json["authenticatorSelection"] {
+            guard let selection = selection as? [String: Any] else { return nil }
+            if let rawValue = selection["userVerification"] {
+                guard let string = rawValue as? String, let value = PasskeyUserVerification(rawValue: string) else { return nil }
+                userVerification = value
+            }
+        }
+
+        self.init(relyingPartyId: relyingPartyId,
+                  relyingPartyName: relyingPartyName,
+                  challengeData: challenge,
+                  userId: userId,
+                  userName: userName,
+                  userDisplayName: userDisplayName,
+                  userVerification: userVerification,
+                  timeout: timeout)
     }
 
+}
+
+/// Whether `value` is a JSON boolean. `JSONSerialization` reads `true` as an `NSNumber` that converts to the integer
+/// 1, so a plain `as? Int` can't tell it from a number.
+private func isJSONBoolean(_ value: Any?) -> Bool {
+    guard let number = value as? NSNumber else { return false }
+    return CFGetTypeID(number) == CFBooleanGetTypeID()
 }
 
 // MARK: - Local errors
